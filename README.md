@@ -233,7 +233,7 @@ jsui/
 ├── package.json             # npm metadata (Playwright dev dependency)
 ├── package-lock.json
 ├── .gitignore
-└── LICENSE                  # AGPL-3.0
+└── LICENSE                  # GNU GPL-V3
 ```
 
 ---
@@ -294,4 +294,4 @@ PDF output is written to `tests/pdfs/` grouped by functional area, with an `inde
 
 ## License
 
-AGPL-3.0. See `LICENSE`.
+GNU GPL-V3 See `LICENSE`.
