@@ -226,7 +226,7 @@ jsui/
 │   ├── api.md/pdf               # API reference
 │   ├── improvements.md/pdf      # Backlog / improvement notes
 │   ├── user-manual/
-│       ├── index.html       # The users' manual
+│   │   └── index.html           # The users' manual
 │   ├── nginx-config.md          # Server deployment guide
 │   └── instructions/            # Developer instructions
 │
