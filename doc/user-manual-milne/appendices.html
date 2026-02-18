@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Back of the Book - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>The Back of the Book</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>🌐 English</option>
+                    <option value="../user-manual-german/appendices.html">🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/appendices.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/appendices.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="tips-and-best-practices.html">← Previous: Helpful Hints</a>
+        </nav>
+
+        <div class="content">
+            <h2>In Which We Put All the Lists and Tables</h2>
+            <p>Every book needs a back, where all the lists and tables and reference things go. Here's ours.</p>
+
+            <h2>Appendix A: File Types</h2>
+            <p>Computers like to know what kind of file they're looking at. Here are all the kinds that Dydra understands.</p>
+
+            <h3>For Bringing Data In</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>File Ending</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>A friendly way to write RDF</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code>, <code>.xml</code></td><td>RDF in XML format (lots of angle brackets)</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>One fact per line, very simple</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>Like N-Triples, but with an extra piece</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle with named graphs</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code>, <code>.json</code></td><td>RDF that looks like JSON</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Like a spreadsheet (commas between things)</td></tr>
+                </tbody>
+            </table>
+
+            <h3>For Taking Data Out</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>File Ending</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>A friendly way to write RDF</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>One fact per line</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>One fact per line, with graph names</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code></td><td>RDF in XML format</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code></td><td>RDF that looks like JSON</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle with named graphs</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Commas between everything</td></tr>
+                </tbody>
+            </table>
+
+            <h3>For Query Answers</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Technical Name</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>JSON</strong></td><td><code>application/sparql-results+json</code></td><td>The usual answer format</td></tr>
+                    <tr><td><strong>XML</strong></td><td><code>application/sparql-results+xml</code></td><td>For people who like XML</td></tr>
+                    <tr><td><strong>SVG</strong></td><td><code>image/vnd.dydra.SPARQL-RESULTS+GRAPHVIZ+SVG+XML</code></td><td>A picture!</td></tr>
+                    <tr><td><strong>HTML</strong></td><td><code>text/html</code></td><td>A nice table you can read</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>text/csv</code></td><td>Good for spreadsheets</td></tr>
+                    <tr><td><strong>TSV</strong></td><td><code>text/tab-separated-values</code></td><td>Also good for spreadsheets</td></tr>
+                    <tr><td><strong>Turtle</strong></td><td><code>text/turtle</code></td><td>For CONSTRUCT queries</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>application/n-triples</code></td><td>For CONSTRUCT queries</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>application/rdf+xml</code></td><td>For CONSTRUCT queries</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>application/ld+json</code></td><td>For CONSTRUCT queries</td></tr>
+                    <tr><td><strong>SSE</strong></td><td><code>application/sparql-query+sse</code></td><td>A special format for special purposes</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix B: Keyboard Shortcuts</h2>
+            <p>For people who like to keep their hands on the keyboard:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>What You Want to Do</th>
+                        <th>What to Press</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Run a query</td><td>Ctrl+Enter (or Cmd+Enter on a Mac)</td></tr>
+                    <tr><td>Submit a form</td><td>Enter</td></tr>
+                    <tr><td>Close a dialog</td><td>Escape</td></tr>
+                    <tr><td>Close a tab</td><td>Click the little X on the tab</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix C: Words and What They Mean</h2>
+            <p>Some words in this manual might be new to you. Here's what they mean:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Word</th>
+                        <th>What It Means</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Account</strong></td><td>You! Well, your identity in the system.</td></tr>
+                    <tr><td><strong>Repository</strong></td><td>A place where data lives. Like a cupboard for information.</td></tr>
+                    <tr><td><strong>View</strong></td><td>A saved question (written in SPARQL).</td></tr>
+                    <tr><td><strong>Quad</strong></td><td>A single fact with four parts: what, about what, the value, and where.</td></tr>
+                    <tr><td><strong>SPARQL</strong></td><td>The language for asking questions about RDF data. Pronounced "sparkle."</td></tr>
+                    <tr><td><strong>Collaborator</strong></td><td>Someone you've let into your repository.</td></tr>
+                    <tr><td><strong>Token</strong></td><td>A special password for computer programs to use.</td></tr>
+                    <tr><td><strong>Pane</strong></td><td>A section of the screen with its own tabs.</td></tr>
+                    <tr><td><strong>Import</strong></td><td>Bringing data in.</td></tr>
+                    <tr><td><strong>Export</strong></td><td>Taking data out.</td></tr>
+                </tbody>
+            </table>
+
+            <h2>And That's the End</h2>
+            <p>You've reached the very end of the book. Well done!</p>
+            <p>If you'd like to go back to the beginning, here it is: <a href="index.html">The Manual Home</a>.</p>
+            <p>Or you might like to revisit:</p>
+            <ul>
+                <li><a href="login.html">Getting In</a> — How to arrive</li>
+                <li><a href="account-operations.html">Your Account</a> — Who you are</li>
+                <li><a href="repository-operations.html">Your Repositories</a> — Where things are kept</li>
+                <li><a href="view-operations.html">Your Views</a> — Questions you ask</li>
+                <li><a href="tips-and-best-practices.html">Helpful Hints</a> — Useful things to know</li>
+            </ul>
+
+            <p>Thank you for reading. We hope you found it helpful.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repository-Operationen - Dydra Studio Benutzerhandbuch</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Repository-Operationen</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="../user-manual-milne/repository-operations.html">🌐 English</option>
+                    <option value="" selected>🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/repository-operations.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/repository-operations.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Zurück zur Handbuch-Startseite</a>
+            <a href="account-operations.html">← Vorherige: Konto-Operationen</a>
+            <a href="view-operations.html">Weiter: View-Operationen →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Die Kisten</h2>
+            <p>Repositories sind Kisten. Du packst Daten rein. Manchmal nimmst du Daten raus. Das ist ziemlich die ganze Geschichte, aber Leute haben ganze Bücher über weniger interessante Dinge geschrieben.</p>
+
+            <h2>Eine neue Kiste machen</h2>
+            <p>Also willst du ein neues Repository. Gut für dich.</p>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zu deiner Kontoseite. Klick irgendwo da oben auf deinen Namen.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Finde den <strong>New Repository</strong>-Button. Klick ihn.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Ein kleines Fenster erscheint. Tippe einen Namen. Wähle einen Typ, wenn du Lust hast:
+                <ul>
+                    <li><strong>lmdb</strong>: Normale Kiste</li>
+                    <li><strong>lmdb-revisioned</strong>: Kiste, die sich erinnert, was drin war</li>
+                </ul>
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-creation-dialog.png" alt="Repository-Erstellungsdialog mit eingegebenem Namen">
+            <p class="image-caption">Abbildung 1: Das kleine Fenster. Tippe was.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Drück Enter oder klick OK.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Glückwunsch. Du hast jetzt eine Kiste.
+            </div>
+
+            <div class="note">
+                <strong>Namen:</strong> Buchstaben, Zahlen, Bindestriche, Unterstriche. Keine Leerzeichen. Keine Gedichte. Halt es einfach.
+            </div>
+
+            <h2>Was ist in der Kiste?</h2>
+            <p>Wenn du ein Repository anschaust, siehst du Dinge:</p>
+            <ul>
+                <li>Der Name (den hast du ausgesucht)</li>
+                <li>Eine Zusammenfassung (die hast du vielleicht geschrieben)</li>
+                <li>Eine Beschreibung (die hast du vielleicht auch geschrieben)</li>
+                <li>Die Homepage (falls es eine gibt)</li>
+                <li>Wie viele Quads drin sind</li>
+                <li>Wie viel Speicherplatz es frisst</li>
+                <li>Lizenz-Kram</li>
+                <li>Ob gerade was importiert wird</li>
+                <li>Views (Abfragen, die du gespeichert hast)</li>
+            </ul>
+
+            <h2>Die Etiketten der Kiste bearbeiten</h2>
+            <p>Du kannst ändern, was auf der Kiste steht. Das meiste jedenfalls.</p>
+
+            <h3>Dinge, die du ändern kannst</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feld</th>
+                        <th>Was es ist</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>homepage</code></td><td>Eine URL zu irgendwo</td></tr>
+                    <tr><td><code>summary</code></td><td>Die Kurzversion</td></tr>
+                    <tr><td><code>description</code></td><td>Die Langversion</td></tr>
+                    <tr><td><code>abstract</code></td><td>Die andere Zusammenfassung</td></tr>
+                    <tr><td><code>privacy_setting</code></td><td>Privat oder öffentlich</td></tr>
+                    <tr><td><code>permissible_ip_addresses</code></td><td>Wer reinkommt</td></tr>
+                    <tr><td><code>prefixes</code></td><td>Namespace-Abkürzungen</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Wie man sie ändert</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Finde, was du ändern willst.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Doppelklick drauf.
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-metadata-editing.png" alt="Repository-Metadatenfeld im Bearbeitungsmodus">
+            <p class="image-caption">Abbildung 2: Doppelklick. Tippen. Wie üblich.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Tippe was Neues.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Drück Enter oder klick woanders hin.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Klick <strong>Speichern</strong>. Dieser Teil ist wichtig.
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-save-button.png" alt="Repository-Seite mit hervorgehobenem Speichern-Button">
+            <p class="image-caption">Abbildung 3: Der Speichern-Button. Sehr wichtig.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="note">
+                <strong>Hinweis:</strong> Der Computer schickt nur, was sich geändert hat. Er ist nicht dumm.
+            </div>
+
+            <h2>Dinge reinpacken</h2>
+            <p>Daten gehen rein. Das ist der Import-Teil.</p>
+
+            <h3>Welche Arten von Daten</h3>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl)</li>
+                <li><strong>RDF/XML</strong> (.rdf, .xml)</li>
+                <li><strong>N-Triples</strong> (.nt)</li>
+                <li><strong>N-Quads</strong> (.nq)</li>
+                <li><strong>TriG</strong> (.trig)</li>
+                <li><strong>JSON-LD</strong> (.jsonld, .json)</li>
+                <li><strong>CSV</strong> (.csv)</li>
+            </ul>
+
+            <h3>Von deinem Computer</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Klick <strong>Import</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Wähle eine Datei.
+            </div>
+
+            <div class="float-right">
+            <img src="images/dataset-import-file-selected.png" alt="Datensatz-Import-Dialog mit ausgewählter Datei">
+            <p class="image-caption">Abbildung 4: Wähle eine Datei. Irgendeine. Naja, eine von den richtigen Arten.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Der Computer findet raus, was für eine Datei das ist.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Klick Import.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Warten. Zuschauen. Hoffen.
+            </div>
+
+            <h3>Aus dem Internet</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Klick <strong>Import</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Tippe eine URL.
+            </div>
+
+            <div class="float-left">
+            <img src="images/dataset-import-url-entered.png" alt="Datensatz-Import-Dialog mit eingegebener URL">
+            <p class="image-caption">Abbildung 5: Tippe eine URL. Der Computer holt sie.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Sag ihm vielleicht, was für eine Datei das ist.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Klick Import.
+            </div>
+
+            <div class="note">
+                <strong>Hinweis:</strong> Große Importe brauchen Zeit. Der Computer kann sie im Hintergrund machen. Du kannst was anderes tun gehen. Der Computer hat nichts dagegen, allein zu sein.
+            </div>
+
+            <h2>Dinge rausnehmen</h2>
+            <p>Daten gehen raus. Das ist der Export-Teil.</p>
+
+            <h3>Export-Formate</h3>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl)</li>
+                <li><strong>N-Triples</strong> (.nt)</li>
+                <li><strong>RDF/XML</strong> (.rdf)</li>
+                <li><strong>JSON-LD</strong> (.jsonld)</li>
+                <li><strong>TriG</strong> (.trig)</li>
+                <li><strong>CSV</strong> (.csv)</li>
+                <li><strong>Graphviz</strong> (.gv)</li>
+            </ul>
+
+            <h3>Wie man exportiert</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Klick <strong>Export</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Wähle ein Format.
+            </div>
+
+            <div class="float-left">
+            <img src="images/dataset-export-format-selected.png" alt="Datensatz-Export-Dialog mit ausgewähltem Format">
+            <p class="image-caption">Abbildung 5: Wähle ein Format. Irgendein Format.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Klick Export.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Eine Datei erscheint auf deinem Computer. Magie.
+            </div>
+
+            <h2>Die Kiste teilen</h2>
+            <p>Collaborators sind Leute, die du in deine Kiste schauen lässt. Manchmal lässt du sie auch Dinge ändern. Das liegt bei dir.</p>
+
+            <h3>Jemanden hinzufügen</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Finde den Collaboration-Abschnitt.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Klick <strong>Add Collaborator</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Tippe ihren Namen.
+            </div>
+
+            <div class="float-right">
+            <img src="images/collaborator-addition-form.png" alt="Collaborator-Hinzufügungsformular mit eingegebenen Werten">
+            <p class="image-caption">Abbildung 6: Tippe ihren Namen. Wähle ihre Rechte.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Wähle, was sie tun können:
+                <ul>
+                    <li><strong>Read:</strong> Schauen aber nicht anfassen</li>
+                    <li><strong>Write:</strong> Anfassen so viel du willst</li>
+                </ul>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Klick Add.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 7:</span>
+                Klick <strong>Speichern</strong>. Immer Speichern klicken.
+            </div>
+
+            <h3>Über Vertrauen</h3>
+            <div class="note">
+                <p><strong>Ein paar Ratschläge:</strong></p>
+                <ul>
+                    <li>Gib Leuten die wenigsten Rechte, die sie brauchen</li>
+                    <li>Prüfe deine Liste ab und zu</li>
+                    <li>Nur-Lesen reicht normalerweise</li>
+                    <li>Schreib auf, warum jede Person Zugang hat</li>
+                </ul>
+                <p>Vertrauen ist eine komische Sache. Du musst es geben, aber du musst es nicht alles auf einmal geben.</p>
+            </div>
+
+            <h3>Jemanden entfernen</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Finde sie in der Liste.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Klick den Mülleimer.
+            </div>
+
+            <div class="float-right">
+            <img src="images/collaborator-removal-confirmation.png" alt="Collaborator-Entfernungs-Bestätigungsdialog">
+            <p class="image-caption">Abbildung 7: Die Bestätigung. Sag Tschüss.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Bestätige wenn gefragt.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Klick <strong>Speichern</strong>.
+            </div>
+
+            <h3>Ihre Rechte ändern</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Finde sie.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Klick auf ihre Berechtigungsstufe.
+            </div>
+
+            <div class="float-left">
+            <img src="images/collaborator-permission-editing.png" alt="Collaborator-Berechtigungsbearbeitung mit neuer ausgewählter Berechtigung">
+            <p class="image-caption">Abbildung 8: Ändere, was sie tun können.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Wähle was anderes.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Klick <strong>Speichern</strong>.
+            </div>
+
+            <h2>Die Kiste leeren</h2>
+            <p>Manchmal willst du neu anfangen. Clear löscht die Daten, behält aber die Kiste.</p>
+
+            <div class="warning">
+                <strong>Warnung:</strong> Das ist für immer. Die Daten sind weg. Nicht versteckt. Weg.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Finde den <strong>Clear</strong>-Button.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Klick ihn.
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-clear-confirmation.png" alt="Repository-Leer-Bestätigungsdialog">
+            <p class="image-caption">Abbildung 9: Die Warnung. Sie meint es ernst.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Lies die Warnung.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Denk darüber nach.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Wenn du sicher bist, bestätige.
+            </div>
+
+            <h2>Die Kiste wegwerfen</h2>
+            <p>Delete löscht alles. Die Kiste, die Daten, alles. Weg.</p>
+
+            <div class="warning">
+                <strong>Warnung:</strong> Das ist sehr für immer. Alles verschwindet. Die Kiste. Die Daten. Die Views. Die Erinnerungen. Alles.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Finde <strong>Delete Repository</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Klick es.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Lies die Warnung. Tippe vielleicht den Namen, um zu beweisen, dass du es ernst meinst.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Wenn du wirklich sicher bist, bestätige.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Die Kiste ist weg. Du bist zurück auf deiner Kontoseite, schaust auf alle deine anderen Kisten, fragst dich, ob du das Richtige getan hast.
+            </div>
+
+            <h2>Wenn Dinge schief gehen</h2>
+            <h3>Import funktioniert nicht</h3>
+            <ul>
+                <li>Wird das Dateiformat unterstützt?</li>
+                <li>Ist die Datei tatsächlich gültig?</li>
+                <li>Funktioniert dein Internet?</li>
+                <li>Hast du Schreibberechtigung?</li>
+                <li>Was sagt die Fehlermeldung?</li>
+            </ul>
+
+            <h3>Export funktioniert nicht</h3>
+            <ul>
+                <li>Sind da Daten drin?</li>
+                <li>Versuch ein anderes Format</li>
+                <li>Prüfe deine Browser-Downloads</li>
+                <li>Hast du Leseberechtigung?</li>
+            </ul>
+
+            <h2>Was kommt als Nächstes</h2>
+            <ul>
+                <li>Erstelle <a href="view-operations.html">Views</a>, um Fragen zu stellen</li>
+                <li>Importiere mehr Daten</li>
+                <li>Spielie mit den Einstellungen</li>
+                <li>Lies die <a href="tips-and-best-practices.html">Tipps</a></li>
+                <li>Prüfe die <a href="appendices.html">Anhänge</a></li>
+            </ul>
+
+            <p>Das sind Repositories. Kisten für deine Daten. Einfach genug.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+[
+  {
+    "requirement": "REQ-1.2.1",
+    "title": "Session Persistence",
+    "section": "authentication",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Authenticated session before page reload",
+    "filename": "req-1-2-1-session-persistence-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:43.242Z"
+  },
+  {
+    "requirement": "REQ-1.2.1",
+    "title": "Session Persistence",
+    "section": "authentication",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Page after reload showing remembered account name",
+    "filename": "req-1-2-1-session-persistence-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:44.023Z"
+  }
+]

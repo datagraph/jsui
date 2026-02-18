@@ -1,0 +1,26 @@
+
+on the basis of the doc/requirements-20260207.md requirements specification, produce a usage manual
+as a collection
+of html documents which describe how to perform all of the actions to create and manage data on the service.
+
+include at least
+- login
+- account metadata changes
+- repository creation
+- repository metadata changes
+- dataset import
+- dataset export
+- view creation
+- view execution
+- view editing on the repository pane
+- view editing on a separate pane
+- view presentation on a separate page
+- view deletion
+- collaborator addition
+- collaborator removal
+- repository deletion
+
+formulate a root document and one sub-ducument for each topic:
+- login
+- account operations
+- repository operations - view operations

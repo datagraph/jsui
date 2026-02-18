@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Dydra is a cloud-hosted RDF graph database with SPARQL query support, repository management, and data import/export." />
+    <meta name="author" content="Dydra" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:title" content="Dydra - Cloud-hosted RDF Graph Database" />
+    <meta property="og:description" content="Store, query, and manage RDF data in the cloud with SPARQL." />
+    <meta property="og:image" content="https://dydra.com/images/dydra-icon.png" />
+    <meta property="og:url" content="https://dydra.com" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Dydra - Cloud-hosted RDF Graph Database" />
+    <meta name="twitter:description" content="Store, query, and manage RDF data in the cloud with SPARQL." />
+    <title>Dydra Service</title>
+    <link rel="canonical" href="https://dydra.com" />
+    <link rel="shortcut icon" href="/ui/favicon.ico" />
+    <link rel="apple-touch-icon" href="/ui/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="Dydra Blog" href="http://feeds.feedburner.com/dydra" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Dydra",
+      "url": "https://dydra.com",
+      "description": "Cloud-hosted RDF graph database with SPARQL support",
+      "applicationCategory": "Database",
+      "operatingSystem": "Web"
+    }
+    </script>
+    <link rel="stylesheet" href="/ui/stylesheets/style.css" media="all" />
+    <link rel="stylesheet" href="/ui/stylesheets/jsui-overrides.css" media="all" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>
+      <h1>Dydra</h1>
+      <p>Dydra is a cloud-hosted RDF graph database. JavaScript is required to use this application.</p>
+      <ul>
+        <li><a href="https://docs.dydra.com">Documentation</a></li>
+        <li><a href="https://blog.dydra.com">Blog</a></li>
+      </ul>
+    </noscript>
+    <script src="/ui/js/yasqe-wrapper.js"></script>
+    <script src="/ui/js/sparql-editor.js"></script>
+    <script type="module" src="/ui/app.js"></script>
+  </body>
+</html>

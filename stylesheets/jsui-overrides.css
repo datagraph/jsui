@@ -1,0 +1,1426 @@
+/* SVG logo variant (revert to PNG: remove this block, uncomment the one below) */
+#logo {
+  width: 162px;
+  background-image: url('../images/Dydra Logo-user.svg') !important;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+/* PNG logo fallback:
+#logo {
+  width: 166px;
+}
+*/
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+#account #account-repositories .repository {
+  margin-bottom: 0;
+}
+
+#content-container {
+  width: 100%;
+  margin: 0;
+  padding: 0 2px;
+  box-sizing: border-box;
+}
+
+body.accounts.show #content-container {
+  position: relative;
+}
+
+/* Content wrapper for pages with sidebar (repository pages) */
+#content-container .content-wrapper {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+#content-container .content-main {
+  flex: 1;
+  min-width: 300px;
+  padding-right: 12px;
+}
+
+body.repositories.show #content-container .content-main {
+  padding-right: 12px;
+}
+
+body.repositories.show #content-container #aside {
+  width: 260px;
+  min-width: 180px;
+  background: #f3f3f3;
+  padding: 12px 0;
+}
+
+body.repositories.show #content-container #sidebar-gutter {
+  width: 6px;
+  cursor: col-resize;
+  background: #e5e7eb;
+  margin-right: 12px;
+}
+
+body.repositories.show #content-container #sidebar-gutter.dragging {
+  background: #cbd5f5;
+}
+
+h1#content-title {
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 12px;
+}
+#tabs-container .pane-tabs-bar,
+#login-tabs .pane-tabs-bar,
+#loggedin-tabs .pane-tabs-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  padding: 6px 10px 0 10px;
+  background: #333;
+  color: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#content-title {
+  width: 100%;
+}
+
+#tabs-container ul[data-tab-list],
+#login-tabs ul[data-tab-list],
+#loggedin-tabs ul[data-tab-list] {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0;
+}
+
+#tabs-container ul[data-tab-list] li,
+#login-tabs ul[data-tab-list] li,
+#loggedin-tabs ul[data-tab-list] li {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+#tabs-container ul[data-tab-list] li a,
+#login-tabs ul[data-tab-list] li a,
+#loggedin-tabs ul[data-tab-list] li a {
+  display: block;
+  padding: 1px 12px 2px;
+  background: #eee;
+  color: #333;
+  font-weight: bold;
+  text-decoration: none;
+  border: 1px solid #555;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  margin-right: -1px;
+}
+
+.tab-action {
+  background: #555;
+  border: none;
+  color: #fff;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.tab-save {
+  background: #2d6cdf;
+}
+
+#tabs-container a[data-tab-link],
+#login-tabs a[data-tab-link],
+#loggedin-tabs a[data-tab-link] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#tabs-container .tab-actions-vertical,
+#login-tabs .tab-actions-vertical,
+#loggedin-tabs .tab-actions-vertical {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-left: 6px;
+}
+
+#tabs-container .tab-icon,
+#login-tabs .tab-icon,
+#loggedin-tabs .tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+#tabs-container .tab-close,
+#login-tabs .tab-close,
+#loggedin-tabs .tab-close {
+  background-image: url("../images/square-x.svg");
+}
+
+#tabs-container .tab-save,
+#login-tabs .tab-save,
+#loggedin-tabs .tab-save {
+  background-image: url("../images/file-upload.svg");
+}
+
+#tabs-container .tab-save[aria-disabled="true"],
+#login-tabs .tab-save[aria-disabled="true"],
+#loggedin-tabs .tab-save[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#tabs-container ul[data-tab-list] li a:hover,
+#login-tabs ul[data-tab-list] li a:hover,
+#loggedin-tabs ul[data-tab-list] li a:hover {
+  background: #f5f5f5;
+}
+
+#tabs-container ul[data-tab-list] li a.active,
+#login-tabs ul[data-tab-list] li a.active,
+#loggedin-tabs ul[data-tab-list] li a.active {
+  background: #fff;
+  color: #111;
+}
+
+#tabs-container .tab-label,
+#login-tabs .tab-label,
+#loggedin-tabs .tab-label {
+  display: inline-block;
+  line-height: 1;
+  text-align: left;
+  font-size: 10px;
+}
+
+#tabs-container .pane-tabs-actions,
+#login-tabs .pane-tabs-actions,
+#loggedin-tabs .pane-tabs-actions {
+  display: none;
+}
+
+body.accounts.show .account-pane-layout {
+  flex-direction: row-reverse;
+}
+
+body.accounts.show .account-pane-content {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+body.accounts.show .account-sidebar {
+  position: relative;
+  padding-left: 44px;
+}
+
+body.accounts.show .account-sidebar .manage-tabs {
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: none;
+  background: #F3F3F3;
+}
+
+body.accounts.show .account-sidebar .manage-tab {
+  writing-mode: horizontal-tb;
+  transform: rotate(0deg);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  color: #333;
+  cursor: pointer;
+}
+
+body.accounts.show .account-sidebar .manage-tab img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+body.accounts.show .account-sidebar .manage-tab[data-tab="prefixes"] img {
+  transform: scaleX(-1);
+}
+
+body.accounts.show .account-sidebar .manage-tab.active {
+  background: #fff;
+  color: #111;
+  border-color: #aaa;
+  border-right-color: #fff;
+  border-top: 2px solid #111;
+  border-bottom: 2px solid #111;
+  z-index: 1;
+}
+
+body.accounts.show .account-sidebar .manage-save-button {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  padding: 8px 6px;
+}
+
+body.repositories.show .repository-pane-layout {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: stretch;
+}
+
+body.repositories.show .repository-pane-content {
+  flex: 1;
+}
+
+body.repositories.show .repository-sidebar {
+  width: 260px;
+  min-width: 200px;
+  background: rgba(243, 243, 243, 0.1);
+  padding: 12px 12px 12px 44px;
+  border: 1px solid #ddd;
+  position: relative;
+}
+
+body.repositories.show .repository-meta-tabs {
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #F3F3F3;
+}
+
+body.repositories.show .repository-meta-tabs .manage-tab {
+  writing-mode: horizontal-tb;
+  transform: rotate(0deg);
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  color: #333;
+  cursor: pointer;
+}
+
+body.repositories.show .repository-meta-tabs .manage-tab img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+body.repositories.show .repository-meta-tabs .manage-tab[data-tab="prefixes"] img {
+  transform: scaleX(-1);
+}
+
+body.repositories.show .repository-meta-tabs .manage-tab.active {
+  background: #fff;
+  color: #111;
+  border-color: #aaa;
+  border-right-color: #fff;
+  border-top: 2px solid #111;
+  border-bottom: 2px solid #111;
+  z-index: 1;
+}
+
+body.repositories.show .repository-meta-panel {
+  display: none;
+  background: transparent;
+}
+
+body.repositories.show .repository-meta-panel.active {
+  display: block;
+  background: transparent;
+}
+
+body.repositories.show .repository-sidebar .repo-meta-field {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+body.repositories.show .repository-sidebar .repo-meta-field .label {
+  font-weight: bold;
+  min-width: 110px;
+}
+
+body.repositories.show .repository-sidebar .repo-meta-field .value {
+  flex: 1;
+}
+
+body.repositories.show .repository-sidebar .repo-meta-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 2px;
+}
+
+body.repositories.show .repository-sidebar .repo-config-input {
+  width: calc(100% - 10px);
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+body.repositories.show .repository-sidebar .repo-prefixes-input {
+  font-family: monospace;
+  font-size: 11px;
+  min-height: 120px;
+}
+
+/* Empty editable fields display "-" inline with label */
+body.repositories.show .repository-sidebar .repo-meta-field.has-empty-value {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
+}
+
+body.repositories.show .repository-sidebar .repo-meta-field .value.empty {
+  color: #999;
+  font-style: normal;
+  cursor: text;
+}
+
+/* When editing, input goes on new line */
+body.repositories.show .repository-sidebar .repo-meta-field.editing {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+body.repositories.show .repository-sidebar .collaboration-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+body.repositories.show .repository-sidebar .collaboration-table th,
+body.repositories.show .repository-sidebar .collaboration-table td {
+  border: 1px solid #ddd;
+  padding: 4px 6px;
+}
+
+body.repositories.show .repository-sidebar .collaboration-table th {
+  background: #f0f0f0;
+  font-weight: bold;
+  text-align: left;
+}
+
+body.repositories.show .repository-sidebar .collab-flag {
+  text-align: center;
+  font-weight: bold;
+}
+
+.account-pane-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.account-pane-content {
+  flex: 1;
+  min-width: 300px;
+}
+
+.account-sidebar {
+  width: 260px;
+  min-width: 200px;
+  background: rgba(243, 243, 243, 0.1);
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+.account-sidebar .account-manage {
+  background: transparent;
+}
+
+.account-sidebar .admin-links {
+  margin-bottom: 12px;
+}
+
+.account-sidebar .admin-links .button {
+  display: inline-block;
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+.account-sidebar .foaf-field {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 2px;
+}
+
+.account-sidebar .foaf-label {
+  font-weight: bold;
+}
+
+.account-sidebar .foaf-label,
+body.repositories.show .repository-sidebar .repo-meta-field .label {
+  margin-bottom: 0px;
+  margin-top: 4px;
+  line-height: 1;
+}
+
+.account-sidebar .foaf-label,
+.account-sidebar .foaf-value,
+body.repositories.show .repository-sidebar .repo-meta-field .label,
+body.repositories.show .repository-sidebar .repo-meta-field .value {
+  font-size: 12pt;
+}
+
+.account-sidebar .foaf-value,
+body.repositories.show .repository-sidebar .repo-meta-field .value {
+  color: #655CB4;
+  font-weight: 300;
+}
+
+.account-sidebar .foaf-value[data-editable="true"] {
+  outline: 1px dashed #cbd5f5;
+  outline-offset: 2px;
+  cursor: text;
+}
+
+/* Empty editable fields display "-" inline with label */
+.account-sidebar .foaf-field.has-empty-value {
+  flex-direction: row;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.account-sidebar .foaf-value.empty {
+  color: #999;
+  font-style: normal;
+  outline: none;
+}
+
+/* When editing, input goes on new line */
+.account-sidebar .foaf-field.editing {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.account-sidebar .profile-input {
+  border: 1px solid #cbd5f5;
+  padding: 2px 4px;
+  width: calc(100% - 10px);
+  display: block;
+  margin-top: 2px;
+}
+
+.account-sidebar .manage-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #ddd;
+  background: #F3F3F3;
+}
+
+.account-sidebar .manage-tab {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: #555;
+}
+
+.account-sidebar .manage-tab.active {
+  color: #111;
+  border-top: 2px solid #111;
+  border-bottom: 2px solid #111;
+  font-weight: bold;
+}
+
+.account-sidebar .manage-save-button {
+  margin-left: auto;
+  background: #2d6cdf;
+  color: #fff;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.account-sidebar .manage-tab-content {
+  background: transparent;
+}
+
+.account-sidebar .tab-panel {
+  display: none;
+  background: transparent;
+}
+
+.account-sidebar .tab-panel.active {
+  display: block;
+  background: transparent;
+}
+
+.account-sidebar .sidebar-note {
+  font-size: 12px;
+  color: #666;
+  margin-top: 6px;
+}
+
+.account-sidebar .token-input,
+.account-sidebar .password-input,
+.account-sidebar .profile-input,
+.account-sidebar .prefix-input {
+  flex: 1;
+  min-width: 120px;
+}
+
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.modal {
+  background: #fff;
+  padding: 16px;
+  border-radius: 6px;
+  min-width: 320px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal textarea {
+  width: 100%;
+  margin: 8px 0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.password-recovery-link {
+  margin-top: 8px;
+  font-size: 12px;
+}
+
+.password-recovery-link a {
+  color: #2d6cdf;
+  text-decoration: none;
+}
+
+.password-recovery-link a:hover {
+  text-decoration: underline;
+}
+
+.invite-request-link {
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.invite-request-link a {
+  color: #2d6cdf;
+  text-decoration: none;
+}
+
+.invite-request-link a:hover {
+  text-decoration: underline;
+}
+
+/* Repository layout overrides */
+.repository-views-layout {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.query-catalog {
+  width: 300px;
+  min-width: 300px;
+}
+
+.query-catalog .query-container {
+  height: 420px;
+  overflow-y: auto;
+}
+
+.view-editors {
+  flex: 1;
+  min-width: 300px;
+}
+
+.view-editors-container {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  height: 420px;
+  overflow-y: auto;
+  padding: 8px;
+  background: #fff;
+}
+
+.view-editor {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  background: #f9fafb;
+}
+
+.view-editor.dragging {
+  opacity: 0.5;
+}
+
+.view-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  font-weight: bold;
+  background: #f3f4f6;
+  border-bottom: 1px solid #e5e7eb;
+  cursor: move;
+}
+
+/* Repository pages can add their own wrapper structure for sidebar if needed */
+body.repositories.show #content-container {
+  display: flex;
+  align-items: stretch;
+}
+
+body.repositories.show #content-container > .repository-pane {
+  flex: 1;
+  min-width: 300px;
+  padding-right: 12px;
+}
+
+body.repositories.show #content-container > #aside {
+  width: 260px;
+  min-width: 180px;
+  background: #f3f3f3;
+  padding: 12px 0;
+}
+
+body.repositories.show #content-container > #sidebar-gutter {
+  width: 6px;
+  cursor: col-resize;
+  background: #e5e7eb;
+  margin-right: 12px;
+}
+
+body.repositories.show #content-container > #sidebar-gutter.dragging {
+  background: #cbd5f5;
+}
+
+/* Location bar */
+.location-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #f3f4f6;
+  border-top: 1px solid #d1d5db;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #333;
+  z-index: 1000;
+}
+
+.location-bar input {
+  width: 100%;
+  font-size: 12px;
+  padding: 2px 6px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+}
+
+.account-pane {
+  position: relative;
+  overflow: hidden;
+}
+
+.account-pane::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../images/user.svg");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+  opacity: 0.05;
+  transform: rotate(-30deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.account-pane > * {
+  position: relative;
+  z-index: 1;
+}
+
+.repository-pane {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Repository logs overlay */
+.repository-logs-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.repository-logs-content {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 100%;
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.repository-pane::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../images/database.svg");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+  opacity: 0.02;
+  transform: rotate(-30deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.repository-pane > * {
+  position: relative;
+  z-index: 1;
+}
+
+#tab-login {
+  position: relative;
+  overflow: hidden;
+  background: rgba(151, 198, 159, 0.3) ;
+  min-height: calc(100vh - 200px); /* Adjust based on header/footer height */
+  padding: 20px;
+}
+
+#tab-login::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("../images/logo.png");
+  background-repeat: repeat;
+  background-size: 200%;
+  opacity: 0.02;
+  transform: rotate(-30deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#tab-login > * {
+  position: relative;
+  z-index: 1;
+}
+
+#login-error,
+#login-error .ui-state-error,
+#inline-login-form,
+#inline-login-form fieldset,
+#inline-login-form fieldset.inputs,
+#inline-login-form fieldset.buttons,
+#inline-login-form ol,
+#login-status {
+  background: transparent;
+}
+
+/* Admin dashboard styles */
+.admin-pane {
+  padding: 16px;
+}
+
+.admin-pane h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-pane h2 .action {
+  order: 1;
+  margin-left: auto;
+}
+
+.admin-pane table.admin {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-pane table.admin th,
+.admin-pane table.admin td {
+  border: 1px solid #ddd;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.admin-pane table.admin th {
+  background: #f0f0f0;
+  font-weight: bold;
+}
+
+.admin-pane table.admin tr.even {
+  background: #fff;
+}
+
+.admin-pane table.admin tr.odd {
+  background: #f9f9f9;
+}
+
+.admin-pane table.admin tr:hover {
+  background: #f0f5ff;
+}
+
+.admin-pane table.admin .actions {
+  white-space: nowrap;
+}
+
+.admin-pane table.admin .actions a {
+  color: #2d6cdf;
+  text-decoration: none;
+}
+
+.admin-pane table.admin .actions a:hover {
+  text-decoration: underline;
+}
+
+/* ========================================
+   jQuery UI CSS Replacement Classes
+   ======================================== */
+
+/* Icon System - Replace ui-icon-* classes */
+.icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+  text-indent: -99999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+/* SVG-based icons using existing SVG files */
+.icon-trash {
+  background-image: url("/ui/images/trash.svg");
+}
+
+.icon-square-chevron-up {
+  background-image: url("/ui/images/square-chevron-up.svg");
+}
+
+.icon-square-chevron-down {
+  background-image: url("/ui/images/square-chevron-down.svg");
+}
+
+/* CSS-based icons for others */
+.icon-alert::before {
+  content: "⚠";
+  text-indent: 0;
+  display: block;
+  font-size: 16px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+}
+
+.icon-link::before {
+  content: "🔗";
+  text-indent: 0;
+  display: block;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+}
+
+.icon-play::before {
+  content: "▶";
+  text-indent: 0;
+  display: block;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+}
+
+.icon-disk::before {
+  content: "💾";
+  text-indent: 0;
+  display: block;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+}
+
+.icon-circle-arrow-w::before {
+  content: "←";
+  text-indent: 0;
+  display: block;
+  font-size: 16px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+  font-weight: bold;
+}
+
+.icon-plusthick::before {
+  content: "+";
+  text-indent: 0;
+  display: block;
+  font-size: 18px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+  font-weight: bold;
+}
+
+.icon-help::before {
+  content: "?";
+  text-indent: 0;
+  display: block;
+  font-size: 12px;
+  line-height: 14px;
+  text-align: center;
+  width: 14px;
+  height: 14px;
+  margin: 1px auto;
+  font-weight: bold;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+/* State Classes - Replace ui-state-* classes */
+.alert-error,
+.error-state {
+  border: 1px solid #e2d0d0;
+  background: #fcf0f0;
+  color: #280b0b;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.alert-error a,
+.error-state a {
+  color: #cd0a0a;
+}
+
+.alert-success,
+.highlight-state {
+  border: 1px solid #d2dbf4;
+  background: #f4f8fd;
+  color: #0d2054;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.alert-success a,
+.highlight-state a {
+  color: #363636;
+}
+
+.hover-state:hover,
+a.hover-state:hover {
+  border-color: #9D9D9D;
+  color: #313131;
+}
+
+.active-state:active,
+a.active-state:active {
+  border-color: #9D9D9D;
+  background: #e5e5e5;
+  color: #313131;
+}
+
+.disabled-state,
+.disabled-state:disabled {
+  opacity: 0.35;
+  cursor: default !important;
+  pointer-events: none;
+}
+
+/* Widget Classes - Replace ui-widget-* classes */
+.widget {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1.1em;
+}
+
+.widget .widget {
+  font-size: 1em;
+}
+
+.widget input,
+.widget select,
+.widget textarea,
+.widget button {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1em;
+}
+
+.widget-content {
+  border: 1px solid #B6B6B6;
+  background: #ffffff;
+  color: #4F4F4F;
+}
+
+.widget-content a {
+  color: #4F4F4F;
+}
+
+.widget-header {
+  border: 1px solid #B6B6B6;
+  color: #4F4F4F;
+  font-weight: bold;
+  background: linear-gradient(to bottom, #ededed, #c4c4c4);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+.widget-header a {
+  color: #4F4F4F;
+}
+
+/* Corner/Radius utilities - Replace ui-corner-* */
+.rounded {
+  border-radius: 4px;
+}
+
+.rounded-all {
+  border-radius: 4px;
+}
+
+/* Layout Classes - Replace ui-layout-* (from jQuery UI Layout plugin) */
+.layout-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.layout-north {
+  flex-shrink: 0;
+}
+
+.layout-west {
+  flex-shrink: 0;
+  width: 200px;
+  min-width: 180px;
+}
+
+/* Compatibility: Keep old ui-* classes working during transition */
+.ui-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+  text-indent: -99999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.ui-icon-alert::before {
+  content: "⚠";
+  text-indent: 0;
+  display: block;
+  font-size: 16px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+}
+
+.ui-icon-link::before {
+  content: "🔗";
+  text-indent: 0;
+  display: block;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+}
+
+.ui-icon-play::before {
+  content: "▶";
+  text-indent: 0;
+  display: block;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+}
+
+.ui-icon-disk::before {
+  content: "💾";
+  text-indent: 0;
+  display: block;
+  font-size: 14px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+}
+
+.ui-icon-trash {
+  background-image: url("../images/trash.svg");
+}
+
+.ui-icon-circle-arrow-w::before {
+  content: "←";
+  text-indent: 0;
+  display: block;
+  font-size: 16px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+  font-weight: bold;
+}
+
+.ui-icon-plusthick::before {
+  content: "+";
+  text-indent: 0;
+  display: block;
+  font-size: 18px;
+  line-height: 16px;
+  text-align: center;
+  width: 16px;
+  height: 16px;
+  font-weight: bold;
+}
+
+.ui-icon-help::before {
+  content: "?";
+  text-indent: 0;
+  display: block;
+  font-size: 12px;
+  line-height: 14px;
+  text-align: center;
+  width: 14px;
+  height: 14px;
+  margin: 1px auto;
+  font-weight: bold;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.ui-state-error {
+  border: 1px solid #e2d0d0;
+  background: #fcf0f0;
+  color: #280b0b;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.ui-state-error a {
+  color: #cd0a0a;
+}
+
+.ui-state-highlight {
+  border: 1px solid #d2dbf4;
+  background: #f4f8fd;
+  color: #0d2054;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.ui-state-highlight a {
+  color: #363636;
+}
+
+.ui-state-hover:hover,
+a.ui-state-hover:hover {
+  border-color: #9D9D9D;
+  color: #313131;
+}
+
+.ui-state-active:active,
+a.ui-state-active:active {
+  border-color: #9D9D9D;
+  background: #e5e5e5;
+  color: #313131;
+}
+
+.ui-state-disabled,
+.ui-state-disabled:disabled {
+  opacity: 0.35;
+  cursor: default !important;
+  pointer-events: none;
+}
+
+.ui-widget {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1.1em;
+}
+
+.ui-widget .ui-widget {
+  font-size: 1em;
+}
+
+.ui-widget input,
+.ui-widget select,
+.ui-widget textarea,
+.ui-widget button {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 1em;
+}
+
+.ui-widget-content {
+  border: 1px solid #B6B6B6;
+  background: #ffffff;
+  color: #4F4F4F;
+}
+
+.ui-widget-content a {
+  color: #4F4F4F;
+}
+
+.ui-widget-header {
+  border: 1px solid #B6B6B6;
+  color: #4F4F4F;
+  font-weight: bold;
+  background: linear-gradient(to bottom, #ededed, #c4c4c4);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+}
+
+.ui-widget-header a {
+  color: #4F4F4F;
+}
+
+.ui-corner-all {
+  border-radius: 4px;
+}
+
+.ui-layout-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ui-layout-north {
+  flex-shrink: 0;
+}
+
+.ui-layout-west {
+  flex-shrink: 0;
+  width: 200px;
+  min-width: 180px;
+}
+
+/* History tabs styling */
+.history-tabs-container {
+  margin-top: 12px;
+}
+
+.history-tabs-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0;
+  border-bottom: 1px solid #ddd;
+  background: #F3F3F3;
+  padding: 4px 8px 0 8px;
+}
+
+.history-tab {
+  background: none;
+  border: none;
+  padding: 6px 8px;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.history-tab:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.history-tab.active {
+  color: #111;
+  border-bottom: 2px solid #111;
+  font-weight: bold;
+}
+
+.history-tab img {
+  display: block;
+}
+
+.history-tab-content {
+  margin-top: 0;
+}

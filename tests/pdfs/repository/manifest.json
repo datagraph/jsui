@@ -1,0 +1,24 @@
+[
+  {
+    "requirement": "REQ-3.6.1",
+    "title": "Clear Repository",
+    "section": "repository",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository with Clear button visible",
+    "filename": "req-3-6-1-clear-repository-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:35.321Z"
+  },
+  {
+    "requirement": "REQ-3.6.1",
+    "title": "Clear Repository",
+    "section": "repository",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Repository cleared after confirmation dialog",
+    "filename": "req-3-6-1-clear-repository-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:35.605Z"
+  }
+]

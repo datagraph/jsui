@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View-Operationen - Dydra Studio Benutzerhandbuch</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>View-Operationen</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="../user-manual-milne/view-operations.html">🌐 English</option>
+                    <option value="" selected>🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/view-operations.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/view-operations.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Zurück zur Handbuch-Startseite</a>
+            <a href="repository-operations.html">← Vorherige: Repository-Operationen</a>
+            <a href="tips-and-best-practices.html">Weiter: Tipps und bewährte Praktiken →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Fragen</h2>
+            <p>Views sind Fragen. Du speicherst sie, damit du sie nicht nochmal tippen musst. Der Computer merkt sie sich für dich. Dafür sind Computer eigentlich da. Dinge merken.</p>
+
+            <h2>Was Views tun</h2>
+            <ul>
+                <li>Deine Fragen speichern</li>
+                <li>Sie mit anderen teilen</li>
+                <li>Sie ausführen, wann immer du willst</li>
+                <li>Antworten in verschiedenen Formen bekommen</li>
+            </ul>
+
+            <h2>Eine View erstellen</h2>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zu einem Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Finde den Views-Abschnitt.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Klick <strong>New View</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Tippe einen Namen für deine Frage.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-creation-dialog.png" alt="View-Erstellungsdialog mit eingegebenem Namen">
+            <p class="image-caption">Abbildung 1: Benenne deine Frage.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Drück Enter.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Ein kleines Popup sagt dir, dass es funktioniert hat.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-creation-confirmation.png" alt="View-Erstellungs-Bestätigungs-Popup">
+            <p class="image-caption">Abbildung 2: Hat funktioniert. Jetzt schreib die eigentliche Frage.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 7:</span>
+                Ein Editor erscheint. Da schreibst du dein SPARQL.
+            </div>
+
+            <div class="note">
+                <strong>Wichtig:</strong> Die View ist jetzt leer. Sie macht noch nichts. Du musst was schreiben und speichern. Der Computer ist geduldig, aber er kann keine Gedanken lesen.
+            </div>
+
+            <h2>Im Repository schreiben</h2>
+            <p>Du kannst Views direkt im Repository-Bereich bearbeiten.</p>
+
+            <h3>Den Editor öffnen</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Klick auf den View-Namen.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Ein Editor öffnet sich. Schreib dein SPARQL da rein.
+            </div>
+
+            <h3>Die Abfrage schreiben</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Finde den Textbereich.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Tippe dein SPARQL. Die Farben helfen dir zu sehen, was was ist.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-editing-repository-pane.png" alt="View-Editor im Repository-Bereich mit Abfragetext">
+            <p class="image-caption">Abbildung 3: Schreib deine Frage hier.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Klick <strong>Speichern</strong>.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Es sagt dir, dass es gespeichert wurde.
+            </div>
+
+            <div class="note">
+                <strong>Tipp:</strong> Strg+Enter führt die Abfrage aus. Cmd+Enter auf einem Mac. Du musst nicht speichern, um auszuführen.
+            </div>
+
+            <h2>Im eigenen Bereich schreiben</h2>
+            <p>Du kannst einer View ihren eigenen Bereich geben. Mehr Platz zum Denken.</p>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Finde die View.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Klick den Bereich-Button. Er sieht aus wie ein kleiner Ordner.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Ein neuer Bereich öffnet sich. Mehr Platz.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-editing-separate-pane.png" alt="View-Editor in separatem Bereich mit Abfragetext">
+            <p class="image-caption">Abbildung 4: Raum zum Atmen.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Schreib dein SPARQL.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Klick <strong>Speichern</strong>.
+            </div>
+
+            <div class="note">
+                <strong>Hinweis:</strong> Du kannst viele Editoren offen haben. Einige hier, einige dort. Sie wissen nichts voneinander, und das ist in Ordnung.
+            </div>
+
+            <h2>Eine View ausführen</h2>
+            <p>Du stellst die Frage. Der Computer antwortet. Das ist der Deal.</p>
+
+            <h3>Vom Editor aus</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Öffne die View in einem Editor.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Stell sicher, dass die Abfrage richtig aussieht.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Wähle ein Ausgabeformat, wenn du willst.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-execution-ready.png" alt="View-Editor bereit zur Ausführung mit ausgewähltem Format">
+            <p class="image-caption">Abbildung 5: Bereit zu fragen.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Klick <strong>Run</strong>. Oder drück Strg+Enter.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Die Antwort erscheint unten. Da ist sie.
+            </div>
+
+            <h3>Antwortformate</h3>
+            <p>Antworten kommen in verschiedenen Formen:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Wie es aussieht</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>JSON</td><td>Überall geschweifte Klammern</td></tr>
+                    <tr><td>XML</td><td>Überall spitze Klammern</td></tr>
+                    <tr><td>HTML</td><td>Eine schöne Tabelle</td></tr>
+                    <tr><td>CSV</td><td>Überall Kommas</td></tr>
+                    <tr><td>TSV</td><td>Überall Tabs</td></tr>
+                    <tr><td>Turtle</td><td>RDF, aber lesbar</td></tr>
+                    <tr><td>N-Triples</td><td>RDF, eine Zeile auf einmal</td></tr>
+                    <tr><td>RDF/XML</td><td>RDF in XML-Kleidung</td></tr>
+                    <tr><td>JSON-LD</td><td>JSON, das so tut als wäre es RDF</td></tr>
+                    <tr><td>SVG</td><td>Ein Bild deiner Daten</td></tr>
+                </tbody>
+            </table>
+
+            <h2>In einem neuen Fenster</h2>
+            <p>Manchmal willst du Ergebnisse in ihrem eigenen Fenster sehen. Frische Seite. Saubere Tafel.</p>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zum Repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Finde die View.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Klick den Fenster-Button. Er sieht aus wie ein Link.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-window-button.png" alt="View-Liste mit hervorgehobenem Fenster-Button">
+            <p class="image-caption">Abbildung 6a: Der Fenster-Button.</p>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Ein neues Fenster öffnet sich mit einer Tabelle der Ergebnisse.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-presentation-new-window.png" alt="View-Ergebnisse in neuem Browser-Fenster angezeigt">
+            <p class="image-caption">Abbildung 6b: Ergebnisse in ihrem eigenen Fenster.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Wähle verschiedene Formate aus dem Dropdown.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Schau zu, wie sich die Ergebnisse ändern.
+            </div>
+
+            <div class="note">
+                <strong>Hinweis:</strong> Das neue Fenster muss wissen, wer du bist. Die App erledigt das automatisch.
+            </div>
+
+            <div class="warning">
+                <strong>Popups:</strong> Wenn nichts passiert, blockiert dein Browser vielleicht Popups. Erlaube sie für diese Seite.
+            </div>
+
+            <h2>Eine View löschen</h2>
+            <p>Manchmal lohnt es sich nicht mehr, Fragen zu stellen.</p>
+
+            <div class="warning">
+                <strong>Warnung:</strong> Weg ist weg. Kopiere den Abfragetext irgendwo hin, wenn du ihn vielleicht später brauchst.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Finde die View.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Klick den Mülleimer.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Eine Bestätigung erscheint.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-deletion-confirmation.png" alt="View-Löschungs-Bestätigungsdialog">
+            <p class="image-caption">Abbildung 7: Bist du sicher? Wirklich sicher?</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Lies sie.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Wenn du sicher bist, bestätige.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Die View verschwindet aus der Liste.
+            </div>
+
+            <h2>Editor-Funktionen</h2>
+            <p>Der Editor macht ein paar hilfreiche Dinge.</p>
+
+            <h3>Mehrere Tabs</h3>
+            <ul>
+                <li>Jeder Tab ist eine andere Abfrage</li>
+                <li>Ergebnisse bleiben bei ihren Tabs</li>
+                <li>Wechsle zwischen ihnen zum Vergleichen</li>
+                <li>Schließe die, die du nicht brauchst</li>
+            </ul>
+
+            <h3>Zurücksetzen</h3>
+            <ul>
+                <li>Klick Reset, um deine Änderungen rückgängig zu machen</li>
+                <li>Geht zurück zur gespeicherten Version</li>
+                <li>Alles, was du getippt hast, verschwindet</li>
+            </ul>
+
+            <h3>Ereignisprotokoll</h3>
+            <ul>
+                <li>Zeigt, was passiert ist</li>
+                <li>Abfragen, die du ausgeführt hast</li>
+                <li>Dinge, die du gespeichert hast</li>
+                <li>Fehler, die du verursacht hast</li>
+                <li>Wie lange Dinge gedauert haben</li>
+            </ul>
+
+            <h3>In Fenster ziehen</h3>
+            <ul>
+                <li>Greif einen Editor-Tab</li>
+                <li>Ziehe ihn aus dem Browser</li>
+                <li>Lass los</li>
+                <li>Neues Fenster mit deiner Abfrage</li>
+            </ul>
+
+            <h2>Ein paar Ratschläge</h2>
+            <ul>
+                <li><strong>Namen:</strong> Gib Views Namen, die was bedeuten</li>
+                <li><strong>Organisation:</strong> Verwandte Views gehören ins selbe Repository</li>
+                <li><strong>Kommentare:</strong> Schreib Notizen in dein SPARQL mit #</li>
+                <li><strong>Testen:</strong> Führe Abfragen aus, bevor du sie speicherst</li>
+                <li><strong>Backups:</strong> Kopiere wichtige Abfragen woanders hin</li>
+            </ul>
+
+            <h2>Wenn Dinge schief gehen</h2>
+            <h3>Speichert nicht</h3>
+            <ul>
+                <li>Hast du Speichern geklickt?</li>
+                <li>Prüfe das Ereignisprotokoll</li>
+                <li>Hast du die Berechtigung?</li>
+                <li>Funktioniert das Internet?</li>
+            </ul>
+
+            <h3>Läuft nicht</h3>
+            <ul>
+                <li>Prüfe deine SPARQL-Syntax</li>
+                <li>Sind die URIs richtig?</li>
+                <li>Prüfe das Ereignisprotokoll</li>
+                <li>Sind Daten im Repository?</li>
+            </ul>
+
+            <h3>View verschwunden</h3>
+            <ul>
+                <li>Aktualisiere die Seite</li>
+                <li>Wurde sie tatsächlich gespeichert?</li>
+                <li>Richtiges Repository?</li>
+                <li>Hast du Leseberechtigung?</li>
+            </ul>
+
+            <h2>Was kommt als Nächstes</h2>
+            <ul>
+                <li>Führe deine Views oft aus</li>
+                <li>Teile sie mit Leuten</li>
+                <li>Baue größere Abfragen aus kleineren</li>
+                <li>Exportiere Ergebnisse in nützlichen Formaten</li>
+                <li>Lies die <a href="tips-and-best-practices.html">Tipps</a></li>
+                <li>Prüfe die <a href="appendices.html">Anhänge</a></li>
+            </ul>
+
+            <p>Das sind Views. Fragen, die du speicherst. Antworten, die du bekommst. Einfach.</p>
+        </div>
+    </div>
+</body>
+</html>

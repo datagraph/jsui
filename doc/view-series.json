@@ -1,0 +1,12 @@
+{
+    "elapsed_time": 78414,
+    "run_time": 53,
+    "requests": 0,
+    "responses": 0,
+    "uuid": "264dac23-6ea0-11e9-8c65-2c4d5446686d",
+    "timestamp": "2019-05-04 19:09:32",
+    "signature": "5d37e9524aaa95bba21182093a9cf4fcc78b4c63",
+    "agent": "system",
+    "account": "james",
+    "repository": "foaf"
+  }

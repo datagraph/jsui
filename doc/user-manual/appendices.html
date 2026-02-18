@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appendices - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Appendices</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="tips-and-best-practices.html">← Previous: Tips and Best Practices</a>
+        </nav>
+
+        <div class="content">
+            <h2>Appendix A: Supported File Formats</h2>
+
+            <h3>Import Formats</h3>
+            <p>The following file formats are supported for importing data into repositories:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>File Extensions</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Turtle</strong></td>
+                        <td><code>.ttl</code></td>
+                        <td>RDF serialization format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RDF/XML</strong></td>
+                        <td><code>.rdf</code>, <code>.xml</code></td>
+                        <td>XML-based RDF format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>N-Triples</strong></td>
+                        <td><code>.nt</code></td>
+                        <td>Line-based RDF format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>N-Quads</strong></td>
+                        <td><code>.nq</code></td>
+                        <td>N-Triples with graph context</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TriG</strong></td>
+                        <td><code>.trig</code></td>
+                        <td>Turtle with named graphs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>JSON-LD</strong></td>
+                        <td><code>.jsonld</code>, <code>.json</code></td>
+                        <td>JSON-based RDF format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CSV</strong></td>
+                        <td><code>.csv</code></td>
+                        <td>Comma-separated values</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Export Formats</h3>
+            <p>The following formats are available for exporting repository data:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>File Extension</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Turtle</strong></td>
+                        <td><code>.ttl</code></td>
+                        <td>RDF serialization format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>N-Triples</strong></td>
+                        <td><code>.nt</code></td>
+                        <td>Line-based RDF format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>N-Quads</strong></td>
+                        <td><code>.nq</code></td>
+                        <td>N-Triples with graph context</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RDF/XML</strong></td>
+                        <td><code>.rdf</code></td>
+                        <td>XML-based RDF format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>JSON-LD</strong></td>
+                        <td><code>.jsonld</code></td>
+                        <td>JSON-based RDF format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TriG</strong></td>
+                        <td><code>.trig</code></td>
+                        <td>Turtle with named graphs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CSV</strong></td>
+                        <td><code>.csv</code></td>
+                        <td>Comma-separated values</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Query Result Formats</h3>
+            <p>When executing SPARQL queries, you can request results in the following formats:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Media Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>JSON</strong></td>
+                        <td><code>application/sparql-results+json</code></td>
+                        <td>Structured JSON results (default)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>XML</strong></td>
+                        <td><code>application/sparql-results+xml</code></td>
+                        <td>XML format results</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SVG</strong></td>
+                        <td><code>image/vnd.dydra.SPARQL-RESULTS+GRAPHVIZ+SVG+XML</code></td>
+                        <td>Graph visualization</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HTML</strong></td>
+                        <td><code>text/html</code></td>
+                        <td>Formatted HTML table</td>
+                    </tr>
+                    <tr>
+                        <td><strong>CSV</strong></td>
+                        <td><code>text/csv</code></td>
+                        <td>Comma-separated values</td>
+                    </tr>
+                    <tr>
+                        <td><strong>TSV</strong></td>
+                        <td><code>text/tab-separated-values</code></td>
+                        <td>Tab-separated values</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Turtle</strong></td>
+                        <td><code>text/turtle</code></td>
+                        <td>RDF Turtle format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>N-Triples</strong></td>
+                        <td><code>application/n-triples</code></td>
+                        <td>N-Triples RDF format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>RDF/XML</strong></td>
+                        <td><code>application/rdf+xml</code></td>
+                        <td>RDF/XML format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>JSON-LD</strong></td>
+                        <td><code>application/ld+json</code></td>
+                        <td>JSON-LD format</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SSE</strong></td>
+                        <td><code>application/sparql-query+sse</code></td>
+                        <td>SPARQL query SSE format</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix B: Keyboard Shortcuts</h2>
+            <p>The following keyboard shortcuts are available in Dydra Studio:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Shortcut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Execute SPARQL Query</td>
+                        <td>Ctrl+Enter (Windows/Linux) or Cmd+Enter (Mac)</td>
+                    </tr>
+                    <tr>
+                        <td>Submit Form</td>
+                        <td>Enter</td>
+                    </tr>
+                    <tr>
+                        <td>Cancel Dialog</td>
+                        <td>Escape</td>
+                    </tr>
+                    <tr>
+                        <td>Close Tab</td>
+                        <td>Click X button on tab</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix C: Glossary</h2>
+            <p>Key terms used in this manual:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Term</th>
+                        <th>Definition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Account</strong></td>
+                        <td>A user account on the Dydra platform</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Repository</strong></td>
+                        <td>A container for RDF data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>View</strong></td>
+                        <td>A saved SPARQL query</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Quad</strong></td>
+                        <td>An RDF statement (subject, predicate, object, graph)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SPARQL</strong></td>
+                        <td>Query language for RDF data</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Collaborator</strong></td>
+                        <td>An account with access to a repository</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Token</strong></td>
+                        <td>Authentication token for API access</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pane</strong></td>
+                        <td>A tabbed interface element for viewing content</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Import</strong></td>
+                        <td>Adding data to a repository</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Export</strong></td>
+                        <td>Downloading data from a repository</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>Next Steps</h2>
+            <p>Return to the <a href="index.html">manual home</a> or explore other sections:</p>
+            <ul>
+                <li><a href="login.html">Login</a> - Authentication and session management</li>
+                <li><a href="account-operations.html">Account Operations</a> - Managing your account</li>
+                <li><a href="repository-operations.html">Repository Operations</a> - Working with repositories</li>
+                <li><a href="view-operations.html">View Operations</a> - Creating and managing views</li>
+                <li><a href="tips-and-best-practices.html">Tips and Best Practices</a> - Helpful tips and troubleshooting</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dydra Studio Benutzerhandbuch</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Dydra Studio Benutzerhandbuch</h1>
+                <p>So läuft das eben.</p>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="../user-manual-milne/index.html">🌐 English</option>
+                    <option value="" selected>🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/index.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/index.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <ul>
+                <li>
+                    <a href="login.html">
+                          <h2>Anmeldung</h2>
+                          <p>Reinkommen. Drinbleiben. Rauskommen.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="account-operations.html">
+                        <h2>Konto-Operationen</h2>
+                        <p>Du bist, wer du sagst, dass du bist. Wahrscheinlich.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="repository-operations.html">
+                        <h2>Repository-Operationen</h2>
+                        <p>Dinge in Kisten packen. Dinge aus Kisten nehmen.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="view-operations.html">
+                        <h2>View-Operationen</h2>
+                        <p>Fragen stellen. Antworten bekommen. Manchmal.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="tips-and-best-practices.html">
+                        <h2>Tipps und bewährte Praktiken</h2>
+                        <p>Dinge, die vielleicht helfen. Keine Garantie.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="appendices.html">
+                        <h2>Anhänge</h2>
+                        <p>Listen. Tabellen. Das übliche Zeug.</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <h2>Willkommen, Erdling</h2>
+            <p>Hör zu: Dies ist ein Handbuch über ein Computerprogramm namens Dydra Studio. Das Programm lässt dich Daten speichern und Fragen darüber stellen. Die Daten werden als etwas namens RDF gespeichert, was für Resource Description Framework steht. Mach dir keine Sorgen darüber. Die meisten Leute tun es nicht.</p>
+
+            <p>Hier ist die Sache mit Daten: Wir produzieren eine Menge davon. So viele, dass wir spezielle Programme brauchen, um den Überblick zu behalten. Dies ist eines dieser Programme. Es macht seinen Job ziemlich gut.</p>
+
+            <h3>Was kann dieses Ding?</h3>
+            <p>Dydra Studio ist das, was Programmierer eine "Single-Page Web Application" nennen. Das bedeutet, alles passiert in einem Browser-Fenster. Kein Neuladen. Kein Warten. Naja, etwas Warten. Es gibt immer etwas Warten.</p>
+
+            <p>Hier ist, was du damit machen kannst:</p>
+            <ul>
+                <li>Daten in Repositories speichern (Kisten für deine Daten)</li>
+                <li>Fragen mit SPARQL stellen (eine Sprache, um mit Daten zu reden)</li>
+                <li>Daten importieren und exportieren (rein damit, raus damit)</li>
+                <li>Views erstellen (gespeicherte Fragen, die du wieder stellen kannst)</li>
+                <li>Informationen über dich und deine Daten bearbeiten</li>
+                <li>Mit anderen teilen (wenn du großzügig bist)</li>
+            </ul>
+
+            <h2>Los geht's</h2>
+
+            <h3>Die Adresse</h3>
+            <p>Tippe das in deinen Browser:</p>
+            <div class="note">
+                <strong>URL:</strong> <code>https://dydra.com/ui/user</code>
+            </div>
+            <p>Das ist es. Das ist die Tür. Geh durch.</p>
+
+            <h3>Dein Browser</h3>
+            <p>Du brauchst einen modernen Browser. Hier ist, was das bedeutet:</p>
+            <ul>
+                <li>JavaScript muss funktionieren (tut es wahrscheinlich)</li>
+                <li>Chrome, Firefox, Safari oder Edge tun den Job</li>
+                <li>Hol dir die neueste Version, wenn du kannst</li>
+            </ul>
+            <p>Wenn dein Browser aus dem letzten Jahrzehnt ist, sollte es gehen. Wenn er älter ist, nun, ich bewundere deine Treue zur Vergangenheit.</p>
+
+            <h3>Zwei Schnittstellen</h3>
+            <p>Es gibt zwei Versionen von diesem Ding:</p>
+            <ul>
+                <li><strong>User App</strong>: Das wirst du benutzen. Es ist für normale Menschen.</li>
+                <li><strong>Konsole</strong>: Das ist für Administratoren. Das wird woanders behandelt.</li>
+            </ul>
+            <p>Dieses Handbuch ist über die User App. Das ist wahrscheinlich, was du willst.</p>
+
+            <h3>Schnellstart</h3>
+            <p>Hier ist, was du tust:</p>
+            <ol>
+                <li>Geh zu <strong>https://dydra.com/ui/user</strong></li>
+                <li>Melde dich an (siehe den Abschnitt <a href="login.html">Anmeldung</a>)</li>
+                <li>Tu, wofür du hergekommen bist</li>
+            </ol>
+            <p>Einfach genug. Alles ist einfach, wenn man es in Schritte zerlegt.</p>
+
+            <h3>Dieses Handbuch</h3>
+            <p>Das Handbuch ist in Abschnitte unterteilt. Jeder Abschnitt behandelt etwas anderes:</p>
+            <ul>
+                <li><strong><a href="login.html">Anmeldung</a></strong> - Wie man reinkommt</li>
+                <li><strong><a href="account-operations.html">Konto-Operationen</a></strong> - Wer du bist</li>
+                <li><strong><a href="repository-operations.html">Repository-Operationen</a></strong> - Deine Daten</li>
+                <li><strong><a href="view-operations.html">View-Operationen</a></strong> - Deine Fragen</li>
+                <li><strong><a href="tips-and-best-practices.html">Tipps und bewährte Praktiken</a></strong> - Hilfreiche Ratschläge</li>
+                <li><strong><a href="appendices.html">Anhänge</a></strong> - Referenzmaterial</li>
+            </ul>
+
+            <h3>Hilfe</h3>
+            <p>Wenn Dinge schief gehen—und Dinge gehen immer irgendwann schief—kontaktiere <strong>support@dydra.com</strong>. Das sind gute Leute. Die helfen dir.</p>
+
+            <p>So läuft das eben.</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Dydra. Alle Rechte vorbehalten.</p>
+            <p>Handbuch-Version: 2026-02-07 (Vonnegut-Ausgabe)</p>
+        </div>
+    </footer>
+</body>
+</html>

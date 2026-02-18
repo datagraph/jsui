@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appendices - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Appendices</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="tips-and-best-practices.html">← Previous: Chapter 5</a>
+        </nav>
+
+        <div class="content">
+            <h2>Appendix A: Serialization Formats</h2>
+            <p>This appendix enumerates the data serialization formats supported by the system for import, export, and query result operations.</p>
+
+            <h3>A.1 Import Formats</h3>
+            <p>The following formats are accepted for data import operations:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format Name</th>
+                        <th>File Extension(s)</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>Terse RDF Triple Language, a compact human-readable RDF syntax</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code>, <code>.xml</code></td><td>XML-based RDF serialization, W3C original standard</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>Line-based triple format, one statement per line</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>N-Triples extended with graph context</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle extended with named graph support</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code>, <code>.json</code></td><td>JSON-based linked data format</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Comma-separated values with RDF transformation</td></tr>
+                </tbody>
+            </table>
+
+            <h3>A.2 Export Formats</h3>
+            <p>The following formats are available for data export:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format Name</th>
+                        <th>File Extension</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>Compact RDF serialization</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>Line-based triple format</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>Line-based quad format</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code></td><td>XML-based serialization</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code></td><td>JSON-based linked data</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle with named graphs</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Tabular representation</td></tr>
+                </tbody>
+            </table>
+
+            <h3>A.3 Query Result Formats</h3>
+            <p>SPARQL query results may be requested in these formats:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Media Type</th>
+                        <th>Application</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>JSON</strong></td><td><code>application/sparql-results+json</code></td><td>Default format for SELECT/ASK queries</td></tr>
+                    <tr><td><strong>XML</strong></td><td><code>application/sparql-results+xml</code></td><td>W3C standard XML result format</td></tr>
+                    <tr><td><strong>SVG</strong></td><td><code>image/vnd.dydra.SPARQL-RESULTS+GRAPHVIZ+SVG+XML</code></td><td>Graph visualization rendering</td></tr>
+                    <tr><td><strong>HTML</strong></td><td><code>text/html</code></td><td>Human-readable tabular display</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>text/csv</code></td><td>Comma-separated values</td></tr>
+                    <tr><td><strong>TSV</strong></td><td><code>text/tab-separated-values</code></td><td>Tab-separated values</td></tr>
+                    <tr><td><strong>Turtle</strong></td><td><code>text/turtle</code></td><td>CONSTRUCT/DESCRIBE results</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>application/n-triples</code></td><td>CONSTRUCT/DESCRIBE results</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>application/rdf+xml</code></td><td>CONSTRUCT/DESCRIBE results</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>application/ld+json</code></td><td>CONSTRUCT/DESCRIBE results</td></tr>
+                    <tr><td><strong>SSE</strong></td><td><code>application/sparql-query+sse</code></td><td>S-expression format for query algebra</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix B: Keyboard Shortcuts</h2>
+            <p>The following keyboard shortcuts are available throughout the application:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Key Combination</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Execute SPARQL Query</td><td>Ctrl+Enter (Windows/Linux) or Cmd+Enter (macOS)</td></tr>
+                    <tr><td>Submit Form</td><td>Enter</td></tr>
+                    <tr><td>Dismiss Dialog</td><td>Escape</td></tr>
+                    <tr><td>Close Editor Tab</td><td>Click tab close button (×)</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix C: Terminology</h2>
+            <p>Definitions of technical terms used throughout this manual:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Term</th>
+                        <th>Definition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Account</strong></td><td>A principal entity capable of authentication; the identity associated with a user</td></tr>
+                    <tr><td><strong>Repository</strong></td><td>A named, persistent container for RDF quads</td></tr>
+                    <tr><td><strong>View</strong></td><td>A named, persistent SPARQL query associated with a repository</td></tr>
+                    <tr><td><strong>Quad</strong></td><td>An RDF statement comprising subject, predicate, object, and graph components</td></tr>
+                    <tr><td><strong>Triple</strong></td><td>An RDF statement comprising subject, predicate, and object (quad without explicit graph)</td></tr>
+                    <tr><td><strong>SPARQL</strong></td><td>SPARQL Protocol and RDF Query Language; the standard query language for RDF</td></tr>
+                    <tr><td><strong>Collaborator</strong></td><td>An account granted access permissions to another account's repository</td></tr>
+                    <tr><td><strong>Token</strong></td><td>An authentication credential suitable for programmatic API access</td></tr>
+                    <tr><td><strong>Pane</strong></td><td>A tabbed interface element displaying a distinct view or editor</td></tr>
+                    <tr><td><strong>Import</strong></td><td>The operation of ingesting external data into a repository</td></tr>
+                    <tr><td><strong>Export</strong></td><td>The operation of extracting data from a repository to an external file</td></tr>
+                    <tr><td><strong>Namespace Prefix</strong></td><td>A short alias for a URI namespace, enabling compact notation in SPARQL</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix D: References</h2>
+            <p>The following external references provide additional technical detail:</p>
+            <ul>
+                <li><strong>RDF 1.1 Concepts:</strong> W3C Recommendation for RDF data model</li>
+                <li><strong>SPARQL 1.1 Query Language:</strong> W3C Recommendation for RDF query</li>
+                <li><strong>Turtle:</strong> W3C Recommendation for Terse RDF Triple Language</li>
+                <li><strong>JSON-LD:</strong> W3C Recommendation for JSON-based Linked Data</li>
+            </ul>
+
+            <h2>Manual Cross-Reference</h2>
+            <p>Return to the <a href="index.html">manual index</a> or consult specific chapters:</p>
+            <ul>
+                <li><a href="login.html">Chapter 1: Authentication</a></li>
+                <li><a href="account-operations.html">Chapter 2: Account Management</a></li>
+                <li><a href="repository-operations.html">Chapter 3: Repository Operations</a></li>
+                <li><a href="view-operations.html">Chapter 4: Query Views</a></li>
+                <li><a href="tips-and-best-practices.html">Chapter 5: Practical Considerations</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

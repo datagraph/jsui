@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repository Operations - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Repository Operations</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">← Previous: Account Operations</a>
+            <a href="view-operations.html">Next: View Operations →</a>
+        </nav>
+
+        <div class="content">
+            <h2>The Boxes</h2>
+            <p>Repositories are boxes. You put data in them. Sometimes you take data out. That's pretty much the whole story, but people have written entire books about less interesting things.</p>
+
+            <h2>Making a New Box</h2>
+            <p>So you want a new repository. Good for you.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to your account page. Click your name somewhere up there.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the <strong>New Repository</strong> button. Click it.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                A little window appears. Type a name. Pick a type if you feel like it:
+                <ul>
+                    <li><strong>lmdb</strong>: Regular box</li>
+                    <li><strong>lmdb-revisioned</strong>: Box that remembers what used to be in it</li>
+                </ul>
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-creation-dialog.png" alt="Repository creation dialog with name entered">
+            <p class="image-caption">Figure 1: The little window. Type something.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Press Enter or click OK.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Congratulations. You have a box now.
+            </div>
+
+            <div class="note">
+                <strong>Names:</strong> Letters, numbers, hyphens, underscores. No spaces. No poems. Keep it simple.
+            </div>
+
+            <h2>What's in the Box?</h2>
+            <p>When you look at a repository, you'll see things:</p>
+            <ul>
+                <li>The name (you picked this)</li>
+                <li>A summary (you might have written this)</li>
+                <li>A description (maybe you wrote this too)</li>
+                <li>The homepage (if there is one)</li>
+                <li>How many quads are in there</li>
+                <li>How much disk space it's eating</li>
+                <li>License stuff</li>
+                <li>Whether anything is being imported right now</li>
+                <li>Views (queries you saved)</li>
+            </ul>
+
+            <h2>Editing the Box's Labels</h2>
+            <p>You can change what's written on the box. Most things, anyway.</p>
+
+            <h3>Things You Can Change</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>homepage</code></td><td>A URL to somewhere</td></tr>
+                    <tr><td><code>summary</code></td><td>The short version</td></tr>
+                    <tr><td><code>description</code></td><td>The long version</td></tr>
+                    <tr><td><code>abstract</code></td><td>The other summary</td></tr>
+                    <tr><td><code>privacy_setting</code></td><td>Private or public</td></tr>
+                    <tr><td><code>permissible_ip_addresses</code></td><td>Who gets in</td></tr>
+                    <tr><td><code>prefixes</code></td><td>Namespace shortcuts</td></tr>
+                </tbody>
+            </table>
+
+            <h3>How to Change Them</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find what you want to change.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Double-click it.
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-metadata-editing.png" alt="Repository metadata field in edit mode">
+            <p class="image-caption">Figure 2: Double-click. Type. The usual.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Type something new.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Press Enter or click away.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click <strong>Save</strong>. This part matters.
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-save-button.png" alt="Repository page with Save button highlighted">
+            <p class="image-caption">Figure 3: The Save button. Very important.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="note">
+                <strong>Note:</strong> The computer only sends what changed. It's not stupid.
+            </div>
+
+            <h2>Putting Things In</h2>
+            <p>Data goes in. That's the import part.</p>
+
+            <h3>What Kinds of Data</h3>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl)</li>
+                <li><strong>RDF/XML</strong> (.rdf, .xml)</li>
+                <li><strong>N-Triples</strong> (.nt)</li>
+                <li><strong>N-Quads</strong> (.nq)</li>
+                <li><strong>TriG</strong> (.trig)</li>
+                <li><strong>JSON-LD</strong> (.jsonld, .json)</li>
+                <li><strong>CSV</strong> (.csv)</li>
+            </ul>
+
+            <h3>From Your Computer</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click <strong>Import</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Pick a file.
+            </div>
+
+            <div class="float-right">
+            <img src="images/dataset-import-file-selected.png" alt="Dataset import dialog with file selected">
+            <p class="image-caption">Figure 4: Pick a file. Any file. Well, one of the right kinds.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                The computer figures out what kind of file it is.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Click Import.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Wait. Watch. Hope.
+            </div>
+
+            <h3>From the Internet</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click <strong>Import</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Type a URL.
+            </div>
+
+            <div class="float-left">
+            <img src="images/dataset-import-url-entered.png" alt="Dataset import dialog with URL entered">
+            <p class="image-caption">Figure 5: Type a URL. The computer will go get it.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Maybe tell it what kind of file it is.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Click Import.
+            </div>
+
+            <div class="note">
+                <strong>Note:</strong> Big imports take time. The computer can do them in the background. You can go do something else. The computer doesn't mind being alone.
+            </div>
+
+            <h2>Taking Things Out</h2>
+            <p>Data goes out. That's the export part.</p>
+
+            <h3>Export Formats</h3>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl)</li>
+                <li><strong>N-Triples</strong> (.nt)</li>
+                <li><strong>RDF/XML</strong> (.rdf)</li>
+                <li><strong>JSON-LD</strong> (.jsonld)</li>
+                <li><strong>TriG</strong> (.trig)</li>
+                <li><strong>CSV</strong> (.csv)</li>
+                <li><strong>Graphviz</strong> (.gv)</li>
+            </ul>
+
+            <h3>How to Export</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click <strong>Export</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Pick a format.
+            </div>
+
+            <div class="float-left">
+            <img src="images/dataset-export-format-selected.png" alt="Dataset export dialog with format selected">
+            <p class="image-caption">Figure 5: Pick a format. Any format.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Click Export.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                A file appears on your computer. Magic.
+            </div>
+
+            <h2>Sharing the Box</h2>
+            <p>Collaborators are people you let look in your box. Sometimes you let them change things too. That's up to you.</p>
+
+            <h3>Adding Someone</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the Collaboration section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click <strong>Add Collaborator</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Type their name.
+            </div>
+
+            <div class="float-right">
+            <img src="images/collaborator-addition-form.png" alt="Collaborator addition form with values entered">
+            <p class="image-caption">Figure 6: Type their name. Pick their powers.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Pick what they can do:
+                <ul>
+                    <li><strong>Read:</strong> Look but don't touch</li>
+                    <li><strong>Write:</strong> Touch all you want</li>
+                </ul>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click Add.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 7:</span>
+                Click <strong>Save</strong>. Always click Save.
+            </div>
+
+            <h3>About Trust</h3>
+            <div class="note">
+                <p><strong>Some advice:</strong></p>
+                <ul>
+                    <li>Give people the least power they need</li>
+                    <li>Check your list once in a while</li>
+                    <li>Read-only is usually enough</li>
+                    <li>Write down why each person has access</li>
+                </ul>
+                <p>Trust is a funny thing. You have to give it, but you don't have to give it all at once.</p>
+            </div>
+
+            <h3>Removing Someone</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Find them in the list.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click the trash can.
+            </div>
+
+            <div class="float-right">
+            <img src="images/collaborator-removal-confirmation.png" alt="Collaborator removal confirmation dialog">
+            <p class="image-caption">Figure 7: The confirmation. Say goodbye.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Confirm if asked.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Click <strong>Save</strong>.
+            </div>
+
+            <h3>Changing Their Powers</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Find them.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click on their permission level.
+            </div>
+
+            <div class="float-left">
+            <img src="images/collaborator-permission-editing.png" alt="Collaborator permission editing with new permission selected">
+            <p class="image-caption">Figure 8: Change what they can do.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Pick something different.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Click <strong>Save</strong>.
+            </div>
+
+            <h2>Emptying the Box</h2>
+            <p>Sometimes you want to start over. Clear gets rid of the data but keeps the box.</p>
+
+            <div class="warning">
+                <strong>Warning:</strong> This is forever. The data will be gone. Not hiding. Gone.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the <strong>Clear</strong> button.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click it.
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-clear-confirmation.png" alt="Repository clear confirmation dialog">
+            <p class="image-caption">Figure 9: The warning. It means it.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Read the warning.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Think about it.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                If you're sure, confirm.
+            </div>
+
+            <h2>Throwing Away the Box</h2>
+            <p>Delete gets rid of everything. The box, the data, all of it. Gone.</p>
+
+            <div class="warning">
+                <strong>Warning:</strong> This is very forever. Everything disappears. The box. The data. The views. The memories. All of it.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find <strong>Delete Repository</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click it.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Read the warning. Maybe type the name to prove you mean it.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                If you're really sure, confirm.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                The box is gone. You're back at your account page, looking at all your other boxes, wondering if you did the right thing.
+            </div>
+
+            <h2>When Things Go Wrong</h2>
+            <h3>Import Won't Work</h3>
+            <ul>
+                <li>Is the file format supported?</li>
+                <li>Is the file actually valid?</li>
+                <li>Is your internet working?</li>
+                <li>Do you have write permission?</li>
+                <li>What does the error message say?</li>
+            </ul>
+
+            <h3>Export Won't Work</h3>
+            <ul>
+                <li>Is there data in there?</li>
+                <li>Try a different format</li>
+                <li>Check your browser downloads</li>
+                <li>Do you have read permission?</li>
+            </ul>
+
+            <h2>What's Next</h2>
+            <ul>
+                <li>Create <a href="view-operations.html">views</a> to ask questions</li>
+                <li>Import more data</li>
+                <li>Tinker with settings</li>
+                <li>Read the <a href="tips-and-best-practices.html">tips</a></li>
+                <li>Check the <a href="appendices.html">appendices</a></li>
+            </ul>
+
+            <p>That's repositories. Boxes for your data. Simple enough.</p>
+        </div>
+    </div>
+</body>
+</html>

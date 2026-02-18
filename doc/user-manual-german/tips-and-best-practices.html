@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipps und bewährte Praktiken - Dydra Studio Benutzerhandbuch</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Tipps und bewährte Praktiken</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="../user-manual-milne/tips-and-best-practices.html">🌐 English</option>
+                    <option value="" selected>🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/tips-and-best-practices.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/tips-and-best-practices.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Zurück zur Handbuch-Startseite</a>
+            <a href="view-operations.html">← Vorherige: View-Operationen</a>
+            <a href="appendices.html">Weiter: Anhänge →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Worte der Weisheit</h2>
+            <p>Hier sind einige Dinge, die Leute auf die harte Tour gelernt haben. Du kannst genauso gut von ihrem Leiden profitieren.</p>
+
+            <h2>Sich umsehen</h2>
+            <ul>
+                <li><strong>Die Adressleiste:</strong> Du kannst URLs direkt reintippen. Schneller als Klicken.</li>
+                <li><strong>Vor und Zurück:</strong> Die Browser-Buttons funktionieren. Benutze sie.</li>
+                <li><strong>Tabs:</strong> Öffne mehrere Dinge gleichzeitig. Computer sind gut darin.</li>
+                <li><strong>Tastaturkürzel:</strong>
+                    <ul>
+                        <li>Strg+Enter (Cmd auf Mac): Führe die Abfrage aus</li>
+                        <li>Enter: Formulare absenden</li>
+                        <li>Escape: Egal, mach das zu</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h2>Der Abfrage-Editor</h2>
+            <ul>
+                <li><strong>Farben:</strong> Die Syntax-Hervorhebung hilft. Vertrau den Farben.</li>
+                <li><strong>Autovervollständigung:</strong> Lass den Computer dir beim Tippen helfen.</li>
+                <li><strong>Tabs:</strong> Führe mehrere Abfragen aus. Vergleiche Ergebnisse. Lerne Dinge.</li>
+                <li><strong>Formate:</strong> Probiere verschiedene. JSON für Maschinen. HTML für Augen.</li>
+                <li><strong>Das Protokoll:</strong> Es sagt dir, was passiert ist. Lies es, wenn Dinge schief gehen.</li>
+            </ul>
+
+            <h2>Daten</h2>
+            <ul>
+                <li><strong>Backups:</strong> Exportiere, bevor du was Dramatisches machst. Du wirst besser schlafen.</li>
+                <li><strong>Erst testen:</strong> Kleine Importe vor großen. Schau, was passiert.</li>
+                <li><strong>Async-Importe:</strong> Große Dateien? Lass sie im Hintergrund laufen. Hol dir einen Kaffee.</li>
+                <li><strong>Beobachte den Fortschritt:</strong> Diese Indikatoren bedeuten was. Achte drauf.</li>
+                <li><strong>Überprüfe:</strong> Nach dem Import, führe eine Abfrage aus. Stell sicher, dass es funktioniert hat.</li>
+            </ul>
+
+            <h2>Collaborators</h2>
+            <ul>
+                <li><strong>Klein anfangen:</strong> Gib erst Lesezugriff. Schreibzugriff ist ein Privileg.</li>
+                <li><strong>Aufschreiben:</strong> Merke dir, warum du Zugriff gegeben hast. Du wirst es sonst vergessen.</li>
+                <li><strong>Manchmal prüfen:</strong> Überprüfe deine Collaborator-Liste. Entferne die, die gegangen sind.</li>
+                <li><strong>Mit Leuten reden:</strong> Sag Collaborators, was du erwartest. Annahmen verursachen Probleme.</li>
+            </ul>
+
+            <h2>Performance</h2>
+            <ul>
+                <li><strong>Tabs schließen:</strong> Zu viele Tabs verlangsamen Dinge. Der Computer wird müde.</li>
+                <li><strong>Filter benutzen:</strong> Scrolle nicht durch alles. Suche nach dem, was du brauchst.</li>
+                <li><strong>Gute Abfragen schreiben:</strong> Schlechtes SPARQL ist langsames SPARQL. Lerne, effizient zu schreiben.</li>
+            </ul>
+
+            <h2>Wenn Dinge kaputt gehen</h2>
+
+            <h3>Import-Probleme</h3>
+            <p>Daten wollen nicht rein? Prüfe diese:</p>
+            <ul>
+                <li>Wird das Format unterstützt?</li>
+                <li>Ist die Datei zu groß?</li>
+                <li>Hast du Schreibberechtigung?</li>
+                <li>Versuch async für große Dateien</li>
+            </ul>
+
+            <h3>Abfrage-Probleme</h3>
+            <p>Abfrage läuft nicht? Überlege:</p>
+            <ul>
+                <li>Ist dein SPARQL korrekt?</li>
+                <li>Gibt es Daten zum Abfragen?</li>
+                <li>Was sagt der Fehler?</li>
+                <li>Versuch erst eine einfachere Abfrage</li>
+            </ul>
+
+            <h3>Anmelde-Probleme</h3>
+            <p>Kommst nicht rein? Versuch:</p>
+            <ul>
+                <li>Prüfe deine Anmeldedaten</li>
+                <li>Ist die Host-URL richtig?</li>
+                <li>Lösche deinen Browser-Cache</li>
+                <li>Frag den Administrator</li>
+            </ul>
+
+            <h3>Collaboration-Probleme</h3>
+            <p>Teilen funktioniert nicht? Prüfe:</p>
+            <ul>
+                <li>Sind die Kontonamen richtig?</li>
+                <li>Kannst du Collaborators verwalten?</li>
+                <li>Hast du Speichern geklickt?</li>
+                <li>Versuch neu zu laden</li>
+            </ul>
+
+            <h2>Das Wichtigste</h2>
+            <p>Klick Speichern. Was auch immer du tust, klick Speichern. Der Computer weiß nicht, was du willst, bis du es ihm sagst, und du sagst es ihm, indem du Speichern klickst.</p>
+
+            <p>Das ist der wichtigste Tipp. Alles andere sind Details.</p>
+
+            <h2>Weiterführendes</h2>
+            <ul>
+                <li><a href="appendices.html">Anhänge</a> - Die Listen und Tabellen</li>
+                <li><a href="login.html">Anmeldung</a> - Reinkommen</li>
+                <li><a href="repository-operations.html">Repository-Operationen</a> - Die Kisten</li>
+                <li><a href="view-operations.html">View-Operationen</a> - Die Fragen</li>
+            </ul>
+
+            <p>Viel Glück. So läuft das eben.</p>
+        </div>
+    </div>
+</body>
+</html>

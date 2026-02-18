@@ -1,0 +1,24 @@
+[
+  {
+    "requirement": "REQ-4.2.2",
+    "title": "Load View Query Text",
+    "section": "view",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Views list showing saved view",
+    "filename": "req-4-2-2-load-view-query-text-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:30:34.766Z"
+  },
+  {
+    "requirement": "REQ-4.2.2",
+    "title": "Load View Query Text",
+    "section": "view",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "View query text loaded in editor",
+    "filename": "req-4-2-2-load-view-query-text-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:30:37.077Z"
+  }
+]

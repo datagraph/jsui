@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Repository Operations - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 3: Repository Operations</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">← Previous: Chapter 2</a>
+            <a href="view-operations.html">Next: Chapter 4 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>3.1 Repository Abstraction</h2>
+            <p>A repository constitutes the fundamental unit of data storage within Dydra. Formally, a repository is a persistent, named collection of RDF quads—statements extended with graph context. This chapter describes operations for repository lifecycle management, data interchange, and access control.</p>
+
+            <h2>3.2 Repository Creation</h2>
+            <p>The procedure for creating a new repository is as follows:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the account view displaying your repository collection.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Locate and activate the <strong>New Repository</strong> control.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                The system presents a dialog requesting:
+                <ul>
+                    <li>Repository name (unique within the account namespace)</li>
+                    <li>Repository type selection:
+                        <ul>
+                            <li><strong>lmdb</strong>: Standard persistent storage (default)</li>
+                            <li><strong>lmdb-revisioned</strong>: Storage with revision history support</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-creation-dialog.png" alt="Repository creation dialog">
+            <p class="image-caption">Figure 3.1: Repository creation dialog with name field.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Confirm creation by pressing Enter or activating the OK control.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                The system creates the repository and redirects to its management view.
+            </div>
+
+            <div class="note">
+                <strong>Naming Constraints:</strong> Repository names must be unique within an account. Permitted characters include alphanumeric characters, hyphens, and underscores. Names are case-sensitive.
+            </div>
+
+            <h2>3.3 Repository Information Display</h2>
+            <p>The repository view presents:</p>
+            <ul>
+                <li>Repository name and textual summary</li>
+                <li>Extended description and abstract</li>
+                <li>Homepage URL reference</li>
+                <li>Quad count (cardinality of stored statements)</li>
+                <li>Storage utilization metrics</li>
+                <li>License specification</li>
+                <li>Import operation status</li>
+                <li>View (saved query) enumeration</li>
+            </ul>
+
+            <h2>3.4 Metadata Modification</h2>
+            <p>Repository metadata fields supporting modification:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>homepage</code></td><td>External URL reference</td></tr>
+                    <tr><td><code>summary</code></td><td>Brief textual description</td></tr>
+                    <tr><td><code>description</code></td><td>Extended textual description</td></tr>
+                    <tr><td><code>abstract</code></td><td>Synopsis or overview</td></tr>
+                    <tr><td><code>privacy_setting</code></td><td>Access visibility (private/public)</td></tr>
+                    <tr><td><code>permissible_ip_addresses</code></td><td>IP-based access control list</td></tr>
+                    <tr><td><code>prefixes</code></td><td>Namespace prefix declarations</td></tr>
+                </tbody>
+            </table>
+
+            <h3>3.4.1 Modification Procedure</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Locate the target field in the metadata section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Double-click to activate edit mode.
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-metadata-editing.png" alt="Repository metadata editing">
+            <p class="image-caption">Figure 3.2: Metadata field in edit mode.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Enter the new value.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Confirm by pressing Enter or clicking outside the field.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Persist changes via the <strong>Save</strong> control.
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-save-button.png" alt="Save button">
+            <p class="image-caption">Figure 3.3: The Save control.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>3.5 Data Import Operations</h2>
+            <p>RDF data may be imported from local files or remote URLs.</p>
+
+            <h3>3.5.1 Supported Import Formats</h3>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl) — Terse RDF Triple Language</li>
+                <li><strong>RDF/XML</strong> (.rdf, .xml) — XML serialization</li>
+                <li><strong>N-Triples</strong> (.nt) — Line-based triple format</li>
+                <li><strong>N-Quads</strong> (.nq) — Line-based quad format</li>
+                <li><strong>TriG</strong> (.trig) — Turtle with named graph support</li>
+                <li><strong>JSON-LD</strong> (.jsonld, .json) — JSON-based linked data</li>
+                <li><strong>CSV</strong> (.csv) — Tabular data transformation</li>
+            </ul>
+
+            <h3>3.5.2 Local File Import</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the target repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Activate the <strong>Import</strong> control.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Select file upload and choose the local file.
+            </div>
+
+            <div class="float-right">
+            <img src="images/dataset-import-file-selected.png" alt="Import dialog with file">
+            <p class="image-caption">Figure 3.4: Import dialog with file selected.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                The system infers format from file extension.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Initiate import by activating the Import control.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Monitor progress; await completion confirmation.
+            </div>
+
+            <h3>3.5.3 URL Import</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the target repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Activate the <strong>Import</strong> control.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Enter the URL of the remote RDF resource.
+            </div>
+
+            <div class="float-left">
+            <img src="images/dataset-import-url-entered.png" alt="Import dialog with URL">
+            <p class="image-caption">Figure 3.5: Import dialog with URL specified.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Specify content type if automatic detection is insufficient.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Initiate import.
+            </div>
+
+            <div class="note">
+                <strong>Asynchronous Processing:</strong> Large imports may be processed asynchronously, permitting continued application use during data ingestion. The system indicates asynchronous operation status.
+            </div>
+
+            <h2>3.6 Data Export Operations</h2>
+
+            <h3>3.6.1 Supported Export Formats</h3>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl)</li>
+                <li><strong>N-Triples</strong> (.nt)</li>
+                <li><strong>RDF/XML</strong> (.rdf)</li>
+                <li><strong>JSON-LD</strong> (.jsonld)</li>
+                <li><strong>TriG</strong> (.trig)</li>
+                <li><strong>CSV</strong> (.csv)</li>
+                <li><strong>Graphviz</strong> (.gv) — Graph visualization</li>
+            </ul>
+
+            <h3>3.6.2 Export Procedure</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the source repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Activate the <strong>Export</strong> control.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Select the desired serialization format.
+            </div>
+
+            <div class="float-left">
+            <img src="images/dataset-export-format-selected.png" alt="Export format selection">
+            <p class="image-caption">Figure 3.6: Export format selection.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Initiate download.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                The browser downloads the file with appropriate extension.
+            </div>
+
+            <h2>3.7 Collaboration Management</h2>
+            <p>Repositories support shared access via collaborator assignments.</p>
+
+            <h3>3.7.1 Adding Collaborators</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Access the Collaboration section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Activate <strong>Add Collaborator</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Enter the collaborator's account name.
+            </div>
+
+            <div class="float-right">
+            <img src="images/collaborator-addition-form.png" alt="Collaborator addition form">
+            <p class="image-caption">Figure 3.7: Collaborator addition with permission selection.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Specify permission level:
+                <ul>
+                    <li><strong>Read:</strong> Query and export access</li>
+                    <li><strong>Write:</strong> Modification and management access</li>
+                </ul>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Confirm the addition.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 7:</span>
+                Persist changes via <strong>Save</strong>.
+            </div>
+
+            <h3>3.7.2 Permission Principles</h3>
+            <div class="note">
+                <ul>
+                    <li><strong>Principle of Least Privilege:</strong> Assign minimal necessary permissions</li>
+                    <li><strong>Periodic Review:</strong> Audit collaborator lists regularly</li>
+                    <li><strong>Documentation:</strong> Maintain records of access grants and rationale</li>
+                </ul>
+            </div>
+
+            <h3>3.7.3 Removing Collaborators</h3>
+            <p>Locate the collaborator entry, activate the delete control, confirm removal, and save changes.</p>
+
+            <div class="float-right">
+            <img src="images/collaborator-removal-confirmation.png" alt="Removal confirmation">
+            <p class="image-caption">Figure 3.8: Collaborator removal confirmation.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h3>3.7.4 Modifying Permissions</h3>
+            <p>Click the permission level to edit, select the new level, and save changes.</p>
+
+            <div class="float-left">
+            <img src="images/collaborator-permission-editing.png" alt="Permission editing">
+            <p class="image-caption">Figure 3.9: Permission modification interface.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>3.8 Repository Data Clearing</h2>
+            <p>The clear operation removes all quads while preserving repository structure.</p>
+
+            <div class="warning">
+                <strong>Destructive Operation:</strong> Data clearing is irreversible. All RDF content is permanently deleted.
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-clear-confirmation.png" alt="Clear confirmation">
+            <p class="image-caption">Figure 3.10: Clear operation confirmation.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>3.9 Repository Deletion</h2>
+            <p>Complete repository removal including all data, views, and configuration.</p>
+
+            <div class="warning">
+                <strong>Destructive Operation:</strong> Repository deletion is permanent and irreversible. All associated data structures are removed.
+            </div>
+
+            <h2>3.10 Error Conditions</h2>
+
+            <h3>3.10.1 Import Failures</h3>
+            <ul>
+                <li>Verify format compatibility</li>
+                <li>Validate RDF syntax correctness</li>
+                <li>Confirm network connectivity (URL imports)</li>
+                <li>Verify write permissions</li>
+                <li>Examine error messages for specifics</li>
+            </ul>
+
+            <h3>3.10.2 Export Issues</h3>
+            <ul>
+                <li>Confirm repository contains data</li>
+                <li>Attempt alternative formats</li>
+                <li>Verify browser download configuration</li>
+                <li>Confirm read permissions</li>
+            </ul>
+
+            <h2>3.11 Subsequent Operations</h2>
+            <p>With repository operations understood, proceed to:</p>
+            <ul>
+                <li>SPARQL view creation and management (<a href="view-operations.html">Chapter 4</a>)</li>
+                <li>Best practices guidance (<a href="tips-and-best-practices.html">Chapter 5</a>)</li>
+                <li>Format reference material (<a href="appendices.html">Appendices</a>)</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

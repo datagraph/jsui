@@ -1,0 +1,24 @@
+[
+  {
+    "requirement": "REQ-2.2.4",
+    "title": "Display Authentication Token",
+    "section": "account",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account page with token information",
+    "filename": "req-2-2-4-display-authentication-token-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:32.997Z"
+  },
+  {
+    "requirement": "REQ-2.2.4",
+    "title": "Display Authentication Token",
+    "section": "account",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Token display area",
+    "filename": "req-2-2-4-display-authentication-token-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:33.262Z"
+  }
+]

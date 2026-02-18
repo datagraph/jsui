@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='UTF-8'>
+<title>
+Dydra - Request an Access Code
+</title>
+<meta content='Dydra.com' name='description'>
+<meta content='Dydra' name='author'>
+<meta content='width=device-width, initial-scale=1.0' name='viewport'>
+<link href='/favicon.ico?1619199722' rel='shortcut icon'>
+<link href='/apple-touch-icon.png?1619199722' rel='apple-touch-icon'>
+<link href='http://feeds.feedburner.com/dydra' rel='alternate' title='Dydra Blog' type='application/rss+xml'>
+<link href="/stylesheets/jquery-ui/aristo/jquery-ui-1.8.7.custom_compiled.css?1619199722" media="screen" rel="stylesheet" type="text/css" />
+<link href="/stylesheets/style.css?1619202025" media="screen" rel="stylesheet" type="text/css" />
+
+
+<meta name="csrf-param" content="authenticity_token"/>
+<meta name="csrf-token" content="sFtAz1INCFOW7VATgfk5fszt3Jza2kkI510QM75pzdU="/>
+
+</head>
+
+<body class='invitations new'>
+<div id='flash' style='display:none'>
+<div class='wrapper'>
+</div>
+</div>
+
+<div id='header'>
+<div class='wrapper'>
+<a href="https://dydra.com/" id="logo">Dydra</a>
+<div id='nav'>
+<ul class='nav' id='dydra-header-logged-out'>
+<li><a href="https://dydra.com/signup" class="dydra-link-signup">Signup</a></li>
+<li><a href="https://dydra.com/login" class="dydra-link-login">Login</a></li>
+</ul>
+<ul class='nav' id='dydra-header-logged-in'>
+<li><a href="https://dydra.com/account" class="dydra-link-my-account">My Account</a></li>
+<li><a href="https://dydra.com/logout" class="dydra-link-logout">Logout</a></li>
+</ul>
+<ul class='nav'>
+<li><a href="https://dydra.com/home" class="dydra-link-home">Home</a></li>
+<li><a href="https://dydra.com/about" class="dydra-link-about">About</a></li>
+<li><a href="https://docs.dydra.com/" class="dydra-link-docs">Docs</a></li>
+<li><a href="https://blog.dydra.com/" class="dydra-link-blog">Blog</a></li>
+</ul>
+</div>
+<script>
+  //<![CDATA[
+    if(document.cookie.indexOf('dydra_session') != -1) {
+      document.getElementById('dydra-header-logged-out').style.display = 'none';
+    }
+    else {
+      document.getElementById('dydra-header-logged-in').style.display = 'none';
+    }
+  //]]>
+</script>
+
+</div>
+</div>
+
+<div id='main'>
+<div id='main-0'>
+<div class='wrapper'>
+<div id='content'>
+<h1 id='content-title'>Access Code Request</h1>
+<p>If would like a Dydra account, please submit your email address below and we'll send you an access code.</p>
+<script src='https://www.google.com/recaptcha/api.js'></script>
+<style>
+  /*<![CDATA[*/
+    .tooltip { position: relative; display: inline-block; }
+    .tooltip .tooltiptext { top: 2em; left: -250%; visibility: hidden; width: 18em; background-color: #a9a9b4; color: #ffffff; text-align: center; line-height: 100%; border-radius: 2px; border: solic black 2px; padding: 2px; position: absolute; z-index: 1}
+    .tooltip:hover .tooltiptext { visibility: visible; }
+  /*]]>*/
+</style>
+
+<!-- = semantic_form_for(@invitation, :url => invitations_path) do |f| -->
+<form accept-charset="UTF-8" action="/invitations" class="formtastic invitation" id="join-beta" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="sFtAz1INCFOW7VATgfk5fszt3Jza2kkI510QM75pzdU=" /></div>
+<h3>Request an invite</h3>
+<p>
+Enter your email address and we'll
+<br>
+let you know when a slot is available.
+</p>
+<p class='textfield'>
+<input class='placeholder' name='invitation[email]' type='text' value='Your email address...' width='20em'>
+<a class='disabled submit tooltip' href='#'>
+Notify Me
+<span class='tooltiptext'>
+By registering for an access code,
+you consent to our terms of use and to our privacy policy.
+</span>
+</a>
+</p>
+<div class='g-recaptcha' data-sitekey='6LdOTiAUAAAAAKPvgEEfvpf7qYYaKj8Ly1LMNJLX'></div>
+<!-- = f.inputs do -->
+<!--   = f.input :email, :label => "Email address" -->
+<!-- = f.buttons do -->
+<!--   = f.commit_button 'Sign up!', :class => "tooltip" -->
+<!-- %div.g-recaptcha(data-sitekey="6LdOTiAUAAAAAKPvgEEfvpf7qYYaKj8Ly1LMNJLX") -->
+</form>
+
+</div>
+<div id='aside'>
+<h5>Already have an invite code?</h5>
+<p><a href="https://dydra.com/signup">Sign up</a> now.</p>
+<p style='font-size: &#39;8pt&#39;;'>
+By registering for an access code,
+you consent to our terms of use and to our privacy policy.
+</p>
+
+</div>
+</div>
+</div>
+</div>
+<div id='footer'>
+<div class='wrapper'>
+<p id='copyright'>
+A product of
+<a href='http://datagraph.org/'>Datagraph GmbH</a>
+&nbsp;&bull;&nbsp;
+<span><a href="https://dydra.com/home" class="dydra-link-home">Home</a></span>
+&nbsp;&bull;&nbsp;
+<span><a href="https://dydra.com/about" class="dydra-link-about">About</a></span>
+&nbsp;&bull;&nbsp;
+<span><a href="https://docs.dydra.com/" class="dydra-link-docs">Docs</a></span>
+&nbsp;&bull;&nbsp;
+<span><a href="https://blog.dydra.com/" class="dydra-link-blog">Blog</a></span>
+<span id='dydra-footer-logged-in'>
+&nbsp;&bull;&nbsp;
+<span><a href="https://dydra.com/account" class="dydra-link-my-account">My Account</a></span>
+&nbsp;&bull;&nbsp;
+<span><a href="https://dydra.com/logout" class="dydra-link-logout">Logout</a></span>
+</span>
+<span id='dydra-footer-logged-out'>
+&nbsp;&bull;&nbsp;
+<span><a href="https://dydra.com/signup" class="dydra-link-signup">Signup</a></span>
+&nbsp;&bull;&nbsp;
+<span><a href="https://dydra.com/login" class="dydra-link-login">Login</a></span>
+</span>
+&nbsp;&bull;&nbsp;
+<span><a href="/legal">Legal</a></span>
+&nbsp;&bull;&nbsp;
+<span><a href="/legal#contact">Contact</a></span>
+</p>
+<p id='footer-links'>
+<a href='https://github.com/dydra/support/blob/master/README.rst#readme'>Support</a>
+&nbsp;&bull;&nbsp;
+<a href='https://github.com/dydra'>GitHub</a>
+&nbsp;&bull;&nbsp;
+<a href='http://twitter.com/dydradata'>Twitter</a>
+&nbsp;&bull;&nbsp;
+<a href='http://feeds.feedburner.com/dydra'>RSS</a>
+</p>
+</div>
+</div>
+<div id='waitMessage' style='display:none'>
+<img alt="Loading_large" src="/images/loading_large.gif?1619199722" />
+<div class='message'>Loading...</div>
+</div>
+<script>
+  //<![CDATA[
+    if(document.cookie.indexOf('dydra_session') != -1) {
+      document.getElementById('dydra-footer-logged-out').style.display = 'none';
+    }
+    else {
+      document.getElementById('dydra-footer-logged-in').style.display = 'none';
+    }
+  //]]>
+</script>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js" type="text/javascript"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/jquery-ui.min.js" type="text/javascript"></script>
+<script>
+  //<![CDATA[
+    if (!window.jQuery) {
+      document.write(unescape('%3Cscript src="/javascripts/vendor/jquery-1.8.3.min.js"%3E%3C/script%3E'))
+      document.write(unescape('%3Cscript src="/javascripts/vendor/jquery-ui-1.8.24.min.js"%3E%3C/script%3E'));
+      document.write(unescape('%3Clink href="/stylesheets/jquery-ui-1.8.24.min.css" media="screen" rel="stylesheet" type="text/css" /%3E'));
+    }
+    
+    var DYDRA = new function(){
+      this.CURRENT_ACCOUNT_NAME = "-none-";
+      this.BASE_HOST = "dydra.com";
+      this.BLOG_HOST = "blog.dydra.com";
+      this.DOCS_HOST = "docs.dydra.com";
+    };
+  //]]>
+</script>
+
+<script src="/javascripts/app.js?1619199722" type="text/javascript"></script>
+
+<script>
+  //<![CDATA[
+    var _gaq = [['_setAccount', 'UA-20639574-1'], ['_trackPageview']];
+    (function(d, t) {
+     var g = d.createElement(t),
+         s = d.getElementsByTagName(t)[0];
+     g.async = true;
+     g.src = ('https:' == location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+     s.parentNode.insertBefore(g, s);
+    })(document, 'script');
+  //]]>
+</script>
+
+<!--[if lt IE 7]>
+<script>
+  //<![CDATA[
+    var IE6UPDATE_OPTIONS = {
+      icons_path: "javascripts/ie6update/images/"
+    }
+  //]]>
+</script>
+<script src="/javascripts/ie6update/ie6update.js?1619199722" type="text/javascript"></script>
+<![endif]-->
+
+</body>
+</html>

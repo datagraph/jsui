@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achterin het Boek - Dydra Studio Gebruikershandleiding</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Achterin het Boek</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="../user-manual-milne/appendices.html">🌐 English</option>
+                    <option value="../user-manual-german/appendices.html">🇩🇪 Deutsch</option>
+                    <option value="" selected>🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/appendices.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Terug naar Handleiding Home</a>
+            <a href="tips-and-best-practices.html">← Vorige: Handige Tips</a>
+        </nav>
+
+        <div class="content">
+            <h2>Waarin we alle lijsten en tabellen verzamelen</h2>
+            <p>Elk boek heeft een achterkant nodig, waar alle lijsten en tabellen en naslagdingen komen. Hier is de onze.</p>
+
+            <h2>Bijlage A: Bestandstypen</h2>
+            <p>Computers willen graag weten naar wat voor soort bestand ze kijken. Hier zijn alle soorten die Dydra begrijpt.</p>
+
+            <h3>Voor het binnenhalen van data</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Bestandsuitgang</th>
+                        <th>Wat het is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>Een vriendelijke manier om RDF te schrijven</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code>, <code>.xml</code></td><td>RDF in XML-formaat (veel punthaken)</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>Eén feit per regel, heel simpel</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>Als N-Triples, maar met een extra stukje</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle met benoemde graphs</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code>, <code>.json</code></td><td>RDF dat eruitziet als JSON</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Als een spreadsheet (komma's tussen dingen)</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Voor het meenemen van data</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Bestandsuitgang</th>
+                        <th>Wat het is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>Een vriendelijke manier om RDF te schrijven</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>Eén feit per regel</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>Eén feit per regel, met graph-namen</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code></td><td>RDF in XML-formaat</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code></td><td>RDF dat eruitziet als JSON</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle met benoemde graphs</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Komma's tussen alles</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Voor query-antwoorden</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Technische naam</th>
+                        <th>Wat het is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>JSON</strong></td><td><code>application/sparql-results+json</code></td><td>Het gebruikelijke antwoordformaat</td></tr>
+                    <tr><td><strong>XML</strong></td><td><code>application/sparql-results+xml</code></td><td>Voor mensen die van XML houden</td></tr>
+                    <tr><td><strong>SVG</strong></td><td><code>image/vnd.dydra.SPARQL-RESULTS+GRAPHVIZ+SVG+XML</code></td><td>Een plaatje!</td></tr>
+                    <tr><td><strong>HTML</strong></td><td><code>text/html</code></td><td>Een mooie tabel die je kunt lezen</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>text/csv</code></td><td>Goed voor spreadsheets</td></tr>
+                    <tr><td><strong>TSV</strong></td><td><code>text/tab-separated-values</code></td><td>Ook goed voor spreadsheets</td></tr>
+                    <tr><td><strong>Turtle</strong></td><td><code>text/turtle</code></td><td>Voor CONSTRUCT queries</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>application/n-triples</code></td><td>Voor CONSTRUCT queries</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>application/rdf+xml</code></td><td>Voor CONSTRUCT queries</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>application/ld+json</code></td><td>Voor CONSTRUCT queries</td></tr>
+                    <tr><td><strong>SSE</strong></td><td><code>application/sparql-query+sse</code></td><td>Een speciaal formaat voor speciale doeleinden</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Bijlage B: Sneltoetsen</h2>
+            <p>Voor mensen die hun handen graag op het toetsenbord houden:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Wat je wilt doen</th>
+                        <th>Wat je moet drukken</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Een query uitvoeren</td><td>Ctrl+Enter (of Cmd+Enter op een Mac)</td></tr>
+                    <tr><td>Een formulier versturen</td><td>Enter</td></tr>
+                    <tr><td>Een dialoogvenster sluiten</td><td>Escape</td></tr>
+                    <tr><td>Een tabblad sluiten</td><td>Klik op het kleine X op het tabblad</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Bijlage C: Woorden en wat ze betekenen</h2>
+            <p>Sommige woorden in deze handleiding zijn misschien nieuw voor je. Hier is wat ze betekenen:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Woord</th>
+                        <th>Wat het betekent</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Account</strong></td><td>Jij! Nou ja, je identiteit in het systeem.</td></tr>
+                    <tr><td><strong>Repository</strong></td><td>Een plek waar data woont. Als een kast voor informatie.</td></tr>
+                    <tr><td><strong>View</strong></td><td>Een opgeslagen vraag (geschreven in SPARQL).</td></tr>
+                    <tr><td><strong>Quad</strong></td><td>Een enkel feit met vier delen: wat, waarover, de waarde, en waar.</td></tr>
+                    <tr><td><strong>SPARQL</strong></td><td>De taal voor het stellen van vragen over RDF-data. Uitgesproken als "sparkle."</td></tr>
+                    <tr><td><strong>Collaborator</strong></td><td>Iemand die je toegang hebt gegeven tot je repository.</td></tr>
+                    <tr><td><strong>Token</strong></td><td>Een speciaal wachtwoord voor computerprogramma's om te gebruiken.</td></tr>
+                    <tr><td><strong>Pane</strong></td><td>Een deel van het scherm met zijn eigen tabbladen.</td></tr>
+                    <tr><td><strong>Import</strong></td><td>Data binnenhalen.</td></tr>
+                    <tr><td><strong>Export</strong></td><td>Data meenemen.</td></tr>
+                </tbody>
+            </table>
+
+            <h2>En dat is het einde</h2>
+            <p>Je hebt het allerlaatste van het boek bereikt. Goed gedaan!</p>
+            <p>Als je terug wilt naar het begin, hier is het: <a href="index.html">De Handleiding Home</a>.</p>
+            <p>Of je wilt misschien opnieuw bezoeken:</p>
+            <ul>
+                <li><a href="login.html">Binnenkomen</a> — Hoe je aankomt</li>
+                <li><a href="account-operations.html">Je Account</a> — Wie je bent</li>
+                <li><a href="repository-operations.html">Je Repositories</a> — Waar dingen bewaard worden</li>
+                <li><a href="view-operations.html">Je Views</a> — Vragen die je stelt</li>
+                <li><a href="tips-and-best-practices.html">Handige Tips</a> — Nuttige dingen om te weten</li>
+            </ul>
+
+            <p>Bedankt voor het lezen. We hopen dat je het nuttig vond.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Operations - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>View Operations</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="repository-operations.html">← Previous: Repository Operations</a>
+            <a href="tips-and-best-practices.html">Next: Tips and Best Practices →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Overview</h2>
+            <p>Views are saved SPARQL queries that can be executed against your repository data. This section covers creating, editing, executing, and managing SPARQL views in Dydra Studio.</p>
+
+            <h2>Understanding Views</h2>
+            <p>A view is a named SPARQL query that is saved in your repository. Views allow you to:</p>
+            <ul>
+                <li>Save frequently used queries for quick access</li>
+                <li>Share queries with collaborators</li>
+                <li>Execute queries with different output formats</li>
+                <li>Organize your queries by repository</li>
+            </ul>
+
+            <h2>Creating a View</h2>
+            <p>To create a new view (saved SPARQL query):</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository where you want to create the view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the views/queries section on the repository page.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click the <strong>New View</strong> or <strong>Create View</strong> button, or click the link that says "Create one now!" if no views exist yet.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                A dialog will appear prompting you to enter a view name. Enter a unique name for your view (use only the base name, not a full path).
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-creation-dialog.png" alt="View creation dialog with name entered">
+            <p class="image-caption">Figure 1: View creation dialog with view name entered</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Click <strong>OK</strong> or press <kbd>Enter</kbd> to create the view.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                A confirmation popup will appear indicating that the view has been created. The popup will remind you to edit and save the query text to persist the view.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-creation-confirmation.png" alt="View creation confirmation popup">
+            <p class="image-caption">Figure 2: View creation confirmation popup with instructions</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 7:</span>
+                An editor panel will appear in the repository pane's editor list. You can now enter your SPARQL query.
+            </div>
+
+            <div class="note">
+                <strong>Important:</strong> A newly created view does not have any query text yet. You must edit the query text and save it to persist the view. Until you save the query text, the view is not fully created on the server.
+            </div>
+
+            <h2>Editing a View on the Repository Pane</h2>
+            <p>You can edit views directly in the repository pane's editor list.</p>
+
+            <h3>Opening a View Editor in the Repository Pane</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository containing the view you want to edit.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                In the views list, click on the view name (the text link).
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                An editor panel will appear in the "Editors" section of the repository pane. <strong>Note:</strong> The editor will open with the default SPARQL query template. The view's actual query text is NOT automatically loaded. You will need to manually enter or load the query text.
+            </div>
+
+            <h3>Editing the Query Text</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                In the editor panel, locate the query text area (the SPARQL editor).
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Modify the SPARQL query text as needed. The editor provides syntax highlighting and autocomplete features.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-editing-repository-pane.png" alt="View editor in repository pane with query text">
+            <p class="image-caption">Figure 3: View editor in repository pane with SPARQL query text entered</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click the <strong>Save</strong> button in the editor panel to save your changes to the server.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                You will see a confirmation message when the view is successfully saved.
+            </div>
+
+            <div class="note">
+                <strong>Tip:</strong> You can use keyboard shortcuts in the editor. Press <kbd>Ctrl+Enter</kbd> (or <kbd>Cmd+Enter</kbd> on Mac) to execute the query without saving.
+            </div>
+
+            <h2>Editing a View on a Separate Pane</h2>
+            <p>You can open a view editor in its own pane for a larger editing area and better organization.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository containing the view you want to edit.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                In the views list, find the view you want to edit.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click the <strong>pane</strong> button (usually represented by a folder-plus icon) next to the view name.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                A new pane will open with a tab showing the view name. The editor will be displayed in this separate pane.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-editing-separate-pane.png" alt="View editor in separate pane with query text">
+            <p class="image-caption">Figure 4: View editor in separate pane with SPARQL query text entered</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Edit the query text in the editor.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click the <strong>Save</strong> button to save your changes.
+            </div>
+
+            <div class="note">
+                <strong>Note:</strong> You can have multiple view editors open simultaneously - some in the repository pane and some in separate panes. They operate independently.
+            </div>
+
+            <h2>Executing a View</h2>
+            <p>You can execute a view to see the query results. Views can be executed in several ways.</p>
+
+            <h3>Executing from the Editor</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open the view in an editor (either in the repository pane or a separate pane).
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Ensure the query text is correct and up to date.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Select the desired output format from the media type selector (if available).
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-execution-ready.png" alt="View editor ready to execute with format selected">
+            <p class="image-caption">Figure 5: View editor with query text and output format selected, ready to execute</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Click the <strong>Run</strong> or <strong>Execute</strong> button, or press <kbd>Ctrl+Enter</kbd> (or <kbd>Cmd+Enter</kbd> on Mac).
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                The query will execute and results will be displayed below the editor.
+            </div>
+
+            <h3>Supported Output Formats</h3>
+            <p>Views can be executed with the following output formats:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Media Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>JSON</td>
+                        <td><code>application/sparql-results+json</code></td>
+                        <td>Structured JSON results (default)</td>
+                    </tr>
+                    <tr>
+                        <td>XML</td>
+                        <td><code>application/sparql-results+xml</code></td>
+                        <td>XML format results</td>
+                    </tr>
+                    <tr>
+                        <td>HTML</td>
+                        <td><code>text/html</code></td>
+                        <td>Formatted HTML table</td>
+                    </tr>
+                    <tr>
+                        <td>CSV</td>
+                        <td><code>text/csv</code></td>
+                        <td>Comma-separated values</td>
+                    </tr>
+                    <tr>
+                        <td>TSV</td>
+                        <td><code>text/tab-separated-values</code></td>
+                        <td>Tab-separated values</td>
+                    </tr>
+                    <tr>
+                        <td>Turtle</td>
+                        <td><code>text/turtle</code></td>
+                        <td>RDF Turtle format</td>
+                    </tr>
+                    <tr>
+                        <td>N-Triples</td>
+                        <td><code>application/n-triples</code></td>
+                        <td>N-Triples RDF format</td>
+                    </tr>
+                    <tr>
+                        <td>RDF/XML</td>
+                        <td><code>application/rdf+xml</code></td>
+                        <td>RDF/XML format</td>
+                    </tr>
+                    <tr>
+                        <td>JSON-LD</td>
+                        <td><code>application/ld+json</code></td>
+                        <td>JSON-LD format</td>
+                    </tr>
+                    <tr>
+                        <td>SVG</td>
+                        <td><code>image/vnd.dydra.SPARQL-RESULTS+GRAPHVIZ+SVG+XML</code></td>
+                        <td>Graph visualization</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>View Presentation on a Separate Page</h2>
+            <p>You can open a view's results in a new browser window, which displays the results in a table format with options for different output formats.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository containing the view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                In the views list, find the view you want to display.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click the <strong>window</strong> button (usually represented by a link icon) next to the view name.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-window-button.png" alt="View list with window button highlighted">
+            <p class="image-caption">Figure 6a: View list showing the window button next to a view name</p>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                A new browser window will open displaying the view results in a table format.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-presentation-new-window.png" alt="View results displayed in new browser window">
+            <p class="image-caption">Figure 6b: View results displayed in a new browser window with table format and output format selector</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                In the new window, you can select different output formats from a dropdown menu.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                The results will update to show the selected format.
+            </div>
+
+            <div class="note">
+                <strong>Note:</strong> The new window requires authentication. The application automatically includes your authentication token when opening the view in a new window.
+            </div>
+
+            <div class="warning">
+                <strong>Browser Popup Blockers:</strong> If the new window does not open, check that your browser is not blocking popups for this site. You may need to allow popups for dydra.com.
+            </div>
+
+            <h2>Deleting a View</h2>
+            <p>You can delete views that you no longer need.</p>
+
+            <div class="warning">
+                <strong>Warning:</strong> Deleting a view is permanent and cannot be undone. Make sure you have a backup of the query text if you might need it later.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository containing the view you want to delete.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                In the views list, find the view you want to delete.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click the <strong>delete</strong> button (usually represented by a trash icon) next to the view name.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                A confirmation dialog will appear asking you to confirm the deletion.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-deletion-confirmation.png" alt="View deletion confirmation dialog">
+            <p class="image-caption">Figure 7: View deletion confirmation dialog with warning message</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Read the confirmation message carefully. It will indicate that the action cannot be undone.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                If you are sure you want to proceed, click <strong>OK</strong> or <strong>Confirm</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 7:</span>
+                The view will be deleted and removed from the views list. You will see a success message.
+            </div>
+
+            <h2>Query Editor Features</h2>
+            <p>The SPARQL query editor provides several useful features for working with queries.</p>
+
+            <h3>Multiple Query Tabs</h3>
+            <p>Within a single editor instance, you can have multiple query tabs:</p>
+            <ul>
+                <li>Each tab can contain a different query</li>
+                <li>Results are stored per tab</li>
+                <li>You can switch between tabs to compare queries and results</li>
+                <li>Tabs can be closed individually</li>
+            </ul>
+
+            <h3>Query Reset</h3>
+            <p>You can reset the query text to its original saved state:</p>
+            <ol>
+                <li>Click the <strong>Reset</strong> button in the editor</li>
+                <li>The query text will be restored to the last saved version</li>
+                <li>Any unsaved changes will be discarded</li>
+            </ol>
+
+            <h3>Event Log</h3>
+            <p>The editor includes an event log that shows:</p>
+            <ul>
+                <li>Query execution history</li>
+                <li>Save operations</li>
+                <li>Error messages</li>
+                <li>Execution times</li>
+            </ul>
+
+            <h3>Drag to New Window</h3>
+            <p>You can drag a query editor tab outside the application window to open it as a standalone window:</p>
+            <ol>
+                <li>Click and hold on a query editor tab</li>
+                <li>Drag it outside the browser window</li>
+                <li>Release to create a new standalone window</li>
+                <li>The new window will contain the query text, results, and authentication state</li>
+            </ol>
+
+            <h2>View Management Tips</h2>
+            <ul>
+                <li><strong>Naming:</strong> Use descriptive names for your views to make them easy to identify</li>
+                <li><strong>Organization:</strong> Group related views by creating them in the same repository</li>
+                <li><strong>Documentation:</strong> Add comments in your SPARQL queries to document their purpose</li>
+                <li><strong>Testing:</strong> Test queries in the editor before saving them as views</li>
+                <li><strong>Backup:</strong> Keep backups of important query text, especially before making major changes</li>
+            </ul>
+
+            <h2>Troubleshooting</h2>
+            <h3>View Not Saving</h3>
+            <p>If a view is not saving:</p>
+            <ul>
+                <li>Ensure you clicked the <strong>Save</strong> button after editing</li>
+                <li>Check for error messages in the event log</li>
+                <li>Verify that you have write permissions for the repository</li>
+                <li>Check your internet connection</li>
+            </ul>
+
+            <h3>Query Execution Errors</h3>
+            <p>If a query fails to execute:</p>
+            <ul>
+                <li>Check the SPARQL syntax for errors</li>
+                <li>Verify that the query references valid URIs and prefixes</li>
+                <li>Check the event log for specific error messages</li>
+                <li>Ensure the repository contains the data you're querying</li>
+            </ul>
+
+            <h3>View Not Appearing</h3>
+            <p>If a view doesn't appear in the list:</p>
+            <ul>
+                <li>Refresh the repository page</li>
+                <li>Verify that the view was successfully created</li>
+                <li>Check that you're viewing the correct repository</li>
+                <li>Ensure you have read permissions for the repository</li>
+            </ul>
+
+            <h2>Next Steps</h2>
+            <p>After creating and managing views, you can:</p>
+            <ul>
+                <li>Execute views regularly to query your data</li>
+                <li>Share views with collaborators</li>
+                <li>Use views as building blocks for more complex queries</li>
+                <li>Export view results in various formats</li>
+                <li>See <a href="tips-and-best-practices.html">Tips and Best Practices</a> for helpful tips and troubleshooting</li>
+                <li>Refer to the <a href="appendices.html">Appendices</a> for file formats and keyboard shortcuts</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

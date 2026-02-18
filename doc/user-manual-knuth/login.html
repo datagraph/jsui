@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Authentication - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 1: Authentication</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">Next: Chapter 2 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>1.1 Theoretical Foundation</h2>
+            <p>Authentication, in the context of distributed systems, establishes a binding between a user agent and an identity known to the server. This chapter describes the authentication mechanisms supported by Dydra Studio and the procedures for their correct application.</p>
+
+            <h2>1.2 Access Point</h2>
+            <p>The canonical URL for the user interface is:</p>
+            <div class="note">
+                <strong>URL:</strong> <code>https://dydra.com/ui/user</code>
+            </div>
+            <p>Unauthenticated requests to this URL result in the presentation of a login form. Authenticated requests proceed directly to the account view.</p>
+
+            <h2>1.3 Authentication Procedure</h2>
+            <p>The following algorithm describes the standard authentication process:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to <code>https://dydra.com/ui/user</code> using a compatible web browser.
+            </div>
+
+            <div class="float-right">
+            <img src="images/login-form-filled.png" alt="Login form with credentials entered">
+            <p class="image-caption">Figure 1.1: Authentication form with credential fields populated.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Complete the form fields as follows:
+                <ul>
+                    <li><strong>Host:</strong> The server address, typically <code>https://dydra.com</code></li>
+                    <li><strong>Login:</strong> Your assigned username</li>
+                    <li><strong>Password:</strong> Your authentication credential</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Submit the form by activating the <strong>Login</strong> button or pressing the Enter key.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Upon successful validation, the system redirects to the account view. Failed authentication results in an error indication, requiring credential correction and resubmission.
+            </div>
+
+            <div class="note">
+                <strong>Observation:</strong> The system supports concurrent authentication to multiple accounts within a single browser session. This capability proves useful when managing separate personal and organizational accounts.
+            </div>
+
+            <h2>1.4 Authentication Methods</h2>
+            <p>The system supports two distinct authentication mechanisms:</p>
+
+            <h3>1.4.1 Basic Authentication</h3>
+            <p>The traditional username-password pair, transmitted via HTTP Basic Authentication headers. This method is appropriate for interactive browser sessions.</p>
+
+            <h3>1.4.2 Bearer Token Authentication</h3>
+            <p>For programmatic access, the system accepts bearer tokens in the Authorization header, formatted as: <code>Bearer &lt;token&gt;</code>. Tokens may be obtained from the account management interface (see Chapter 2).</p>
+
+            <p>The choice between methods depends on the access context. Human users typically employ Basic Authentication; automated systems and API clients use Bearer Tokens.</p>
+
+            <h2>1.5 Session Persistence</h2>
+
+            <h3>1.5.1 What Is Preserved</h3>
+            <p>The browser's local storage mechanism retains the username across sessions. This convenience feature reduces data entry upon subsequent visits.</p>
+
+            <div class="warning">
+                <strong>Security Note:</strong> Passwords, tokens, and active session state are <em>not</em> persisted to local storage. Closing the browser tab terminates the session. This behavior is intentional: it limits exposure in shared computing environments.
+            </div>
+
+            <h3>1.5.2 Session Termination</h3>
+            <p>To explicitly terminate a session:</p>
+            <ol>
+                <li>Locate the <strong>Logout</strong> control in the navigation area</li>
+                <li>Activate the control</li>
+                <li>The system returns to the unauthenticated login view</li>
+                <li>The previously-used username remains available for convenience</li>
+            </ol>
+
+            <h2>1.6 Error Conditions</h2>
+
+            <h3>1.6.1 Authentication Failure</h3>
+            <p>When authentication fails, verify the following:</p>
+            <ul>
+                <li>Correct character case in the password (note keyboard state)</li>
+                <li>Correct host URL specification</li>
+                <li>Network connectivity to the server</li>
+                <li>Account existence and activation status</li>
+            </ul>
+
+            <h3>1.6.2 Error Message Interpretation</h3>
+            <p>The system provides diagnostic messages upon failure:</p>
+            <ul>
+                <li>"Invalid credentials" — Username or password mismatch</li>
+                <li>Network errors — Connectivity or server availability issues</li>
+            </ul>
+            <p>Persistent difficulties should be reported to <strong>support@dydra.com</strong> with complete environmental details.</p>
+
+            <h2>1.7 Post-Authentication Operations</h2>
+            <p>Upon successful authentication, the following capabilities become available:</p>
+            <ul>
+                <li>Account information review and modification (<a href="account-operations.html">Chapter 2</a>)</li>
+                <li>Repository creation and management (<a href="repository-operations.html">Chapter 3</a>)</li>
+                <li>SPARQL view definition and execution (<a href="view-operations.html">Chapter 4</a>)</li>
+                <li>Reference material consultation (<a href="appendices.html">Appendices</a>)</li>
+            </ul>
+
+            <p><em>The reader may now proceed to Chapter 2 for discussion of account management operations.</em></p>
+        </div>
+    </div>
+</body>
+</html>

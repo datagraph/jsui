@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Login and Authentication</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">Next: Account Operations →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Overview</h2>
+            <p>Dydra Studio requires authentication to access your account and repositories. This section explains how to log in to the application and manage your session.</p>
+
+            <h2>Accessing the Login Page</h2>
+            <p>To access Dydra Studio, navigate to:</p>
+            <div class="note">
+                <strong>URL:</strong> <code>https://dydra.com/ui/user</code>
+            </div>
+            <p>The application will display the login page when you first access it or when you are not authenticated.</p>
+
+            <h2>Logging In</h2>
+            <p>To log in to your Dydra account:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the login page at <code>https://dydra.com/ui/user</code>
+            </div>
+
+
+            <div  class="float-right">
+            <img src="images/login-form-filled.png" alt="Login form with credentials entered">
+            <p class="image-caption">Figure 1: Login form with credentials entered, ready to submit</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Enter your account credentials:
+                <ul>
+                    <li><strong>Host:</strong> The Dydra service host (typically <code>https://dydra.com</code>)</li>
+                    <li><strong>Login:</strong> Your account username</li>
+                    <li><strong>Password:</strong> Your account password</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click the <strong>Login</strong> button or press <kbd>Enter</kbd>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Upon successful authentication, you will be redirected to your account page, where you can see your repositories and account information.
+            </div>
+
+            <div class="note">
+                <strong>Note:</strong> The application supports multiple authenticated accounts simultaneously. You can switch between accounts or add additional accounts during your session.
+            </div>
+
+            <h2>Authentication Methods</h2>
+            <p>Dydra Studio supports two authentication methods:</p>
+            <ul>
+                <li><strong>Basic Authentication:</strong> Username and password authentication</li>
+                <li><strong>Bearer Token Authentication:</strong> Token-based authentication (for programmatic access)
+                  <br />Express this as "Bearer <i>tokenValue</i>"</li>
+            </ul>
+            <p>For normal user access, use Basic Authentication with your username and password.</p>
+
+            <h2>Session Management</h2>
+            <h3>Session Persistence</h3>
+            <p>The application persists only account name(s) across page reloads using browser storage. This means:</p>
+            <ul>
+                <li>Account names you have logged into are remembered when you reload the page</li>
+                <li>You can quickly access previously used accounts without re-entering the account name</li>
+            </ul>
+
+            <div class="warning">
+                <strong>Important:</strong> Authentication tokens and all other session data exist only in JavaScript objects during a single page session. When you close the page or browser tab, all session data (including tokens) is discarded. You will need to log in again after closing the page, even if account names are remembered.
+            </div>
+
+            <h3>Logging Out</h3>
+            <p>To log out of the application:</p>
+            <ol>
+                <li>Click the <strong>Logout</strong> link in the navigation bar</li>
+                <li>You will be redirected to the login page</li>
+                <li>All session data (including authentication tokens) will be cleared from memory</li>
+                <li>Account names may still be remembered in browser storage for convenience, but you will need to log in again to access your account</li>
+            </ol>
+
+            <h2>Troubleshooting</h2>
+            <h3>Login Failures</h3>
+            <p>If you are unable to log in, check the following:</p>
+            <ul>
+                <li>Verify that your username and password are correct</li>
+                <li>Ensure that the host URL is correct (typically <code>https://dydra.com</code>)</li>
+                <li>Check your internet connection</li>
+                <li>Verify that your account exists and is active</li>
+            </ul>
+
+            <h3>Error Messages</h3>
+            <p>If you see an error message during login:</p>
+            <ul>
+                <li>Read the error message carefully - it will indicate the specific problem</li>
+                <li>Common errors include "Invalid credentials" or "Authentication failed"</li>
+                <li>If the problem persists, contact support at <strong>support@dydra.com</strong></li>
+            </ul>
+
+            <h2>Next Steps</h2>
+            <p>After successfully logging in, you can:</p>
+            <ul>
+                <li>View and edit your <a href="account-operations.html">account metadata</a></li>
+                <li>Create and manage <a href="repository-operations.html">repositories</a></li>
+                <li>Import and export data</li>
+                <li>Create and execute <a href="view-operations.html">SPARQL views</a></li>
+                <li>See <a href="tips-and-best-practices.html">Tips and Best Practices</a> for helpful tips and troubleshooting</li>
+                <li>Refer to the <a href="appendices.html">Appendices</a> for file formats and keyboard shortcuts</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+the signup process involves several steps:
+1. request an invitation
+2. confirm the invitation and send the invite code
+3. apply the invitation code with name and email to create an account
+4. send a password reset email with a reset token to the email
+5. apply the reset token to set the password.
+
+these steps are now implemented in the dydra rails service.
+steps 4 and 5 were rails devise capabilities and have been ported to the spocq lisp server.
+the task is to emulate steps 1 through 3 in the spocq-server implementation
+
+step 1 will require one new resource for the invitation request location:
+
+  /system/invite
+
+a GET returns a page with captcha to accept the email address to which the invitation is sent.
+the page should be like "Dydra - Request an Access Code.html".
+
+a POST with the email address sends an email with the invitation token and signup location and and registers the token in the invitations table
+
+mysql> show columns from invitations;
++---------------+--------------+------+-----+---------+----------------+
+| Field         | Type         | Null | Key | Default | Extra          |
++---------------+--------------+------+-----+---------+----------------+
+| id            | int(11)      | NO   | PRI | NULL    | auto_increment |
+| email         | varchar(255) | YES  |     | NULL    |                |
+| invite_code   | varchar(255) | YES  | MUL | NULL    |                |
+| account_id    | int(11)      | YES  |     | NULL    |                |
+| http_referrer | varchar(255) | YES  |     | NULL    |                |
+| created_at    | datetime     | YES  |     | NULL    |                |
++---------------+--------------+------+-----+---------+----------------+
+
+
+
+
+step 2 should be accomplished requests to
+ 
+  /system/signup
+
+a GET retrieve a form to enter the token, name email (filled in) and password.
+a POST of the form with the account name, email, and request token creates the account
+
+the method should be anonymous, as the user will not yet exist.
+if an invitation token is present and agrees with the stored email address, proceed.
+otherwise apply the admin restrictions
+
+this is implemented in a combinations of
+
+    app/views/invite_mailer/invite_signup_notification.html.haml
+    app/views/devise/registrations/new.html.haml
+
+finally, there is a page to manage invitations: view, confirm, delete
+
+    app/views/invitations/index.html.haml

@@ -1,0 +1,30 @@
+respond to the Actual Gaps by implementing the following :
+
+  Actual Gaps, by Priority
+
+  1. Repository Creation : implement this as a popup dialog similar to new view. persist as a POST to /system/accounts/{account}/repositories with the simple configuration object (just name and type (lmdb or lmdb-revisioned) as fields. on success, navigate to the new repository's pane for editing.                                                                   
+                                                                                                                                                                                               
+  2. Password Changes                                                                                                                                                                          
+  Implementation: attach input listeners to the password fields so they register as deltas in the account tracker. The save flow already POSTs changed fields to /system/accounts/{account}/configuration — password fields just need to be included in that delta collection.                 
+                                                                                                                                                                                               
+  3. Auth Token Persistence                                                                                                                                                                    
+  change the reset button to not generate a local SHA-1 token, but rather to POST to /{account}/auth_token with no content. it returns an html response with the new token. Parse the response and update the display.                                                                                               
+                                                                                                                                                                                               
+  4. Account Creation (Signup)
+  the signup page is present and independent of account creation.
+  implement the account creation as part of a separate single-page admin application, as a post to /system/accounts with the name as a minimal configuration. create an account pane to permit editing. this differentiates admin-created accounts from self-signup (as your notes indicate).                                                                                                           
+                                                                                                                                                                                               
+  5. Password Reset / Unlock Pages                                                                                                                                                             
+  this is implemented as a link from "forgot your password" to an external page. that page links to further external resources.
+                                                                                                                                                                                               
+  6. Invitation System                                                                                                                                                                         
+  Implement this as part of a separate single-page admin application: wire up POST/DELETE to the invitations endpoint. Low priority per your notes.                                         
+                                                                                                                                                                                               
+  7. Admin Pages (separate SPA)                                                                                                                                                                
+  Implement this as part of a separate single-page admin application. The current AdminMenuPage links to 6 undefined routes. Implementation: new SPA with its own routes, page classes,  
+  and API calls for account/repository management and history views.                                                                                                                           
+
+                                                                                                                                                                                            
+  Dead Code (can be removed or left as-is)
+                                                                                                                                                     
+remove the dead code: QueriesIndexPage, QueryNewPage, RepositoryImportSuccessPage                                                                                               

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 5: Practical Considerations - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 5: Practical Considerations</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="view-operations.html">← Previous: Chapter 4</a>
+            <a href="appendices.html">Next: Appendices →</a>
+        </nav>
+
+        <div class="content">
+            <h2>5.1 Introduction</h2>
+            <p>This chapter consolidates empirically-derived recommendations for effective system use. The guidance presented here emerges from observed usage patterns and common difficulties encountered by practitioners.</p>
+
+            <h2>5.2 Navigation Efficiency</h2>
+            <ul>
+                <li><strong>Location Bar:</strong> The editable location bar accepts direct URL entry, providing rapid navigation without intermediate clicks.</li>
+                <li><strong>Browser Controls:</strong> Standard browser back/forward navigation operates correctly within the application.</li>
+                <li><strong>Tab Management:</strong> Multiple browser tabs enable concurrent work across repositories and views.</li>
+                <li><strong>Keyboard Shortcuts:</strong>
+                    <ul>
+                        <li>Ctrl+Enter (Cmd+Enter on macOS): Execute SPARQL query</li>
+                        <li>Enter: Submit form input</li>
+                        <li>Escape: Dismiss dialogs</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h2>5.3 Query Editor Optimization</h2>
+            <ul>
+                <li><strong>Syntax Highlighting:</strong> The editor provides visual differentiation of SPARQL elements. Attend to color coding for syntax verification.</li>
+                <li><strong>Autocomplete:</strong> The editor offers completion suggestions. Accept suggestions to reduce typing errors.</li>
+                <li><strong>Tab Workflow:</strong> Utilize multiple query tabs for iterative refinement and result comparison.</li>
+                <li><strong>Format Selection:</strong> Choose output formats appropriate to the analysis task. HTML tables suit human inspection; JSON suits programmatic processing.</li>
+                <li><strong>Event Log Monitoring:</strong> The event log provides execution history and error details. Consult it when investigating unexpected behavior.</li>
+            </ul>
+
+            <h2>5.4 Data Management Principles</h2>
+            <ul>
+                <li><strong>Preventive Export:</strong> Export repository contents prior to significant modifications. This provides recovery capability should changes prove problematic.</li>
+                <li><strong>Incremental Import:</strong> Test import procedures with small data samples before processing large datasets. This identifies format issues early.</li>
+                <li><strong>Asynchronous Operations:</strong> For large datasets, utilize asynchronous import mode to avoid browser timeout conditions.</li>
+                <li><strong>Progress Monitoring:</strong> Observe import progress indicators to track operation status and estimate completion.</li>
+                <li><strong>Post-Import Verification:</strong> Execute queries against imported data to confirm successful ingestion and expected data characteristics.</li>
+            </ul>
+
+            <h2>5.5 Access Control Guidelines</h2>
+            <ul>
+                <li><strong>Minimal Initial Permissions:</strong> Grant read-only access initially. Elevate to write access only when modification requirements are established.</li>
+                <li><strong>Access Documentation:</strong> Maintain records of collaborator access grants, including rationale and duration expectations.</li>
+                <li><strong>Periodic Audit:</strong> Review collaborator lists at regular intervals. Remove access that is no longer required.</li>
+                <li><strong>Communication:</strong> Establish expectations with collaborators regarding data handling and modification protocols.</li>
+            </ul>
+
+            <h2>5.6 Performance Considerations</h2>
+            <ul>
+                <li><strong>Tab Economy:</strong> Excessive open tabs increase browser resource consumption. Close unused tabs to maintain responsiveness.</li>
+                <li><strong>Focused Navigation:</strong> Utilize filtering and search functionality rather than exhaustive browsing.</li>
+                <li><strong>Query Optimization:</strong> Compose efficient SPARQL queries. Avoid unbounded patterns and prefer specific triple patterns where possible.</li>
+            </ul>
+
+            <h2>5.7 Troubleshooting Procedures</h2>
+
+            <h3>5.7.1 Import Difficulties</h3>
+            <p>When import operations fail:</p>
+            <ul>
+                <li>Verify the file format is among supported types</li>
+                <li>Confirm file size is within acceptable limits</li>
+                <li>Verify write permission for the target repository</li>
+                <li>Attempt asynchronous mode for large files</li>
+            </ul>
+
+            <h3>5.7.2 Query Failures</h3>
+            <p>When queries fail to execute:</p>
+            <ul>
+                <li>Validate SPARQL syntax correctness</li>
+                <li>Confirm the repository contains the expected data</li>
+                <li>Examine error messages in the event log</li>
+                <li>Simplify the query to isolate the problematic component</li>
+            </ul>
+
+            <h3>5.7.3 Authentication Issues</h3>
+            <p>When authentication fails:</p>
+            <ul>
+                <li>Verify credential accuracy (attention to character case)</li>
+                <li>Confirm host URL correctness</li>
+                <li>Clear browser cache and retry</li>
+                <li>Contact system administrator for persistent issues</li>
+            </ul>
+
+            <h3>5.7.4 Collaboration Anomalies</h3>
+            <p>When collaboration features malfunction:</p>
+            <ul>
+                <li>Verify collaborator account names</li>
+                <li>Confirm permission to manage collaborators</li>
+                <li>Verify changes were persisted (Save activated)</li>
+                <li>Refresh the browser view</li>
+            </ul>
+
+            <h2>5.8 Summary of Key Principles</h2>
+            <ol>
+                <li>Persist changes explicitly via Save controls</li>
+                <li>Export data before destructive operations</li>
+                <li>Test with small samples before large-scale operations</li>
+                <li>Consult event logs when investigating problems</li>
+                <li>Apply minimal necessary permissions</li>
+            </ol>
+
+            <h2>5.9 Reference Material</h2>
+            <p>Additional information is available in:</p>
+            <ul>
+                <li><a href="appendices.html">Appendices</a> — Format specifications, keyboard shortcuts, terminology</li>
+                <li><a href="login.html">Chapter 1</a> — Authentication details</li>
+                <li><a href="repository-operations.html">Chapter 3</a> — Data management operations</li>
+                <li><a href="view-operations.html">Chapter 4</a> — Query management</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

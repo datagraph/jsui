@@ -1,0 +1,46 @@
+[
+  {
+    "requirement": "REQ-3.5.1",
+    "title": "Export Repository Data",
+    "section": "export",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository with export button",
+    "filename": "req-3-5-1-export-repository-data-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:46.102Z"
+  },
+  {
+    "requirement": "REQ-3.5.1",
+    "title": "Export Repository Data",
+    "section": "export",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Repository exported in N-Triples format",
+    "filename": "req-3-5-1-export-repository-data-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:46.892Z"
+  },
+  {
+    "requirement": "REQ-3.5.2",
+    "title": "Direct Download URL",
+    "section": "export",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository page with direct download link",
+    "filename": "req-3-5-2-direct-download-url-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:47.164Z"
+  },
+  {
+    "requirement": "REQ-3.5.2",
+    "title": "Direct Download URL",
+    "section": "export",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Direct download URL available for repository data",
+    "filename": "req-3-5-2-direct-download-url-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:47.445Z"
+  }
+]

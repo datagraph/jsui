@@ -1,0 +1,86 @@
+
+review the source code again to verify the state. for example i reviewed this analysis and recorded the conclusions in this file (validation.txt).
+in light of those conclusions, reexamine the application to revise your analysis and/or propose implementation steps. 
+
+  1. Repository Creation                                                                                                                                                                       
+  propose how to implement this : Form exists but has no submit handler. Needs a POST to /system/accounts/{account}/repositories with the form fields (name, homepage, summary, description, license, privacy). Wire up the    
+  submit button in afterRender similar to setupInlineLogin.  
+  
+  2. Repository Import (RDF upload/URL)                                                                                                                                                        
+  review the implementation : Three import forms exist (URL, file upload, HDT) with no handlers. The URL import needs a POST to the repository's import endpoint with the source URL and media type. File upload needs     
+  FormData with a fetch call.
+  review the implementation : it uses a pop-up dialog for this : The repo-import-btn handler exists but the standalone import page forms are not wired.
+                                                                           
+  3. Repository Settings Forms (About/Privacy/Prefixes)                                                                                                                                        
+  review the implementation : it uses the GraphObject state management and does save the changes : RepositoryEditPage renders three tab forms with no submit handlers. The inline double-click editing in the pane sidebar partially covers this, but the dedicated edit page forms need        
+  review the implementation : it should save back to the same url use to read the configuration : afterRender handlers that collect form values and call updateRepositoryConfiguration.                                                                                                        
+
+  4. Query/View Creation via Standalone Page                                                                                                                                                   
+  review the implementation : the query editor include a save button : QueryNewPage has a name/summary/query form but no handler. Needs a PUT to /system/accounts/{account}/repositories/{repo}/views/{name} with the query text. The in-pane "New" button works.
+  review the implementation : which standalone page is meant :  but the standalone page does not.                                                                                                                                                            
+
+  5. Query/View Editing via Standalone Page                                                                                                                                                    
+  review the implementation : which standalone page is meant : QueryEditPage form has no handler. Same approach as creation — read form fields and PUT to the view URL.                                                                                     
+                                                                                                                                                                                                                                                                                                                                                                                              
+  6. Account Creation (Signup)                                                                                                                                                                 
+  propose how to implement this : it will require means to differentiate admin status : AccountNewPage and SignupPage have forms but no handlers. Needs a POST to /system/accounts with username, email, and password. Add afterRender to attach a submit listener.                  
+
+  7. Account Profile Editing                                                                                                                                                                   
+  review the implementation : there is a sve button on the tab which should save the changed properties back to the configuration location : AccountEditPage has 5 tab forms (profile, password, settings, prefixes, admin) — none submit. Profile fields need a PATCH/PUT to /system/accounts/{account} with the changed fields.
+  review the implementation : password changes are part of the configuration : Password change needs a separate endpoint call. The inline pane editing covers some fields, but the dedicated edit page is non-functional.                                                           
+
+  8. Password Reset                                                                                                                                                                            
+  review the implementation : password changes are saves a part of configuration : ResetPasswordPage renders a form with no handler. Needs a POST to the password reset endpoint with the email address.                                                                        
+
+  9. Account Auth Token Page                                                                                                                                                                   
+  review the implementation : POST to the /<account>/auth_token endpoint with no content returns an html form with the new token : Displays the token but has no generation/regeneration UI on the page itself (the sidebar reset button works). Could add a "Regenerate" button that calls the token endpoint.                 
+                                                                                                                                                                                               
+  10. Invitation System                                                                                                                                                                        
+  propose how to implement, but low priority : InvitationsNewPage has an email form, InvitationsIndexPage has Send/Delete links that are href="#" with no handlers. Needs POST/DELETE calls to an invitations API endpoint.                 
+
+  11. Email Confirmation Resend                                                                                                                                                                
+  ConfirmationsPage form has no handler. Needs a POST to resend the confirmation email.                                                                                                        
+
+  12. Account Unlock                                                                                                                                                                           
+  review the implementation : the "forgot your password" link works : UnlocksPage form has no handler. Needs a POST to request an unlock email.                                                                                                                    
+
+  13. Admin Pages                                                                                                                                                                              
+  propose how to implement this as a separate single-page-application : AdminMenuPage links to 6 admin routes (/admin/manage/accounts, /admin/manage/repositories, /admin/history/*) that don't exist in the router. Requires new page classes, routes, and API integration for each admin function.                                                                                                                                                         
+
+  14. Queries Index Page                                                                                                                                                                       
+  which page is this? QueriesIndexPage returns only an <h1> heading with no list. Needs to call fetchRepositoryViews and render the list, similar to how views are listed in the repository pane.                  
+
+  15. Repository Import Success Flow                                                                                                                                                           
+  review the implementation : the page ma be superseded by the current import process : RepositoryImportSuccessPage exists but is never navigated to since imports don't work. Will become relevant once import (#2) is implemented.  
+
+
+respond to the Actual Gaps by implementing the following :
+
+  Actual Gaps, by Priority
+
+  1. Repository Creation : implement this as a popup dialog similar to new view. persist as a POST to /system/accounts/{account}/repositories with the simple configuration object (just name and type (lmdb or lmdb-revisioned) as fields. on success, navigate to the new repository's pane for editing.                                                                   
+                                                                                                                                                                                               
+  2. Password Changes                                                                                                                                                                          
+  Implementation: attach input listeners to the password fields so they register as deltas in the account tracker. The save flow already POSTs changed fields to /system/accounts/{account}/configuration — password fields just need to be included in that delta collection.                 
+                                                                                                                                                                                               
+  3. Auth Token Persistence                                                                                                                                                                    
+  change the reset button to not generate a local SHA-1 token, but rather to POST to /{account}/auth_token with no content. it returns an html response with the new token. Parse the response and update the display.                                                                                               
+                                                                                                                                                                                               
+  4. Account Creation (Signup)
+  the signup page is present and independent of account creation.
+  implement the account creation as part of a separate single-page admin application, as a post to /system/accounts with the name as a minimal configuration. create an account pane to permit editing. this differentiates admin-created accounts from self-signup (as your notes indicate).                                                                                                           
+                                                                                                                                                                                               
+  5. Password Reset / Unlock Pages                                                                                                                                                             
+  this is implemented as a link from "forgot your password" to an external page. that page links to further external resources.
+                                                                                                                                                                                               
+  6. Invitation System                                                                                                                                                                         
+  Implement this as part of a separate single-page admin application: wire up POST/DELETE to the invitations endpoint. Low priority per your notes.                                         
+                                                                                                                                                                                               
+  7. Admin Pages (separate SPA)                                                                                                                                                                
+  Implement this as part of a separate single-page admin application. The current AdminMenuPage links to 6 undefined routes. Implementation: new SPA with its own routes, page classes,  
+  and API calls for account/repository management and history views.                                                                                                                           
+
+                                                                                                                                                                                            
+  Dead Code (can be removed or left as-is)
+                                                                                                                                                     
+remove the dead code: QueriesIndexPage, QueryNewPage, RepositoryImportSuccessPage                                                                                               

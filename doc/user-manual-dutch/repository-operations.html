@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Je Repositories - Dydra Studio Gebruikershandleiding</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Je Repositories</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="../user-manual-milne/repository-operations.html">🌐 English</option>
+                    <option value="../user-manual-german/repository-operations.html">🇩🇪 Deutsch</option>
+                    <option value="" selected>🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/repository-operations.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Terug naar Handleiding Home</a>
+            <a href="account-operations.html">← Vorige: Je Account</a>
+            <a href="view-operations.html">Volgende: Je Views →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Waarin we plekken vinden om dingen te bewaren</h2>
+            <p>Een repository is een plek waar data woont. Zie het als een gezellig huisje voor je informatie—een plek waar feiten en cijfers zich kunnen settelen en comfortabel kunnen zijn. Je kunt zoveel repositories hebben als je wilt, elk met zijn eigen naam en zijn eigen verzameling dingen erin.</p>
+
+            <h2>Een nieuwe repository maken</h2>
+            <p>Als je een nieuwe plek wilt om wat data te bewaren, zo maak je er een:</p>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Ga naar je accountpagina. Daar staan al je repositories.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Zoek de <strong>Nieuwe Repository</strong> knop en klik erop.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Er verschijnt een klein venstertje dat om een naam vraagt. Bedenk een goede naam—iets dat je herinnert aan wat erin zit. Je kunt ook een type kiezen:
+                <ul>
+                    <li><strong>lmdb</strong>: Een gewone repository (dit is de gebruikelijke keuze)</li>
+                    <li><strong>lmdb-revisioned</strong>: Een speciale repository die onthoudt hoe dingen waren, als een dagboek</li>
+                </ul>
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-creation-dialog.png" alt="Repository aanmaakdialoog met ingevulde naam">
+            <p class="image-caption">Figuur 1: Geef je nieuwe repository een naam.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Klik op OK (of druk op Enter).
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                En daar is hij! Je nieuwe repository, helemaal klaar voor data.
+            </div>
+
+            <div class="note">
+                <strong>Over namen:</strong> Repository-namen kunnen letters, cijfers, koppeltekens (-) en underscores (_) hebben. Geen spaties echter. Spaties verwarren computers. Houd het simpel.
+            </div>
+
+            <h2>Wat zit er in een repository</h2>
+            <p>Als je naar een repository kijkt, zie je:</p>
+            <ul>
+                <li>De naam (die koos je zelf)</li>
+                <li>Een samenvatting (een paar woorden over wat erin zit)</li>
+                <li>Een beschrijving (meer woorden, indien nodig)</li>
+                <li>Een homepage (een webadres, als die er is)</li>
+                <li>Hoeveel quads erin zitten (quads zijn de kleine stukjes data)</li>
+                <li>Hoeveel ruimte het inneemt</li>
+                <li>Licentie-informatie</li>
+                <li>Of er nu iets geïmporteerd wordt</li>
+                <li>Views (vragen die je opgeslagen hebt)</li>
+            </ul>
+
+            <h2>Veranderen wat er op het etiket staat</h2>
+            <p>Je kunt de meeste informatie over een repository veranderen:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Het ding</th>
+                        <th>Wat het is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>homepage</code></td><td>Een webadres</td></tr>
+                    <tr><td><code>summary</code></td><td>Een korte beschrijving</td></tr>
+                    <tr><td><code>description</code></td><td>Een langere beschrijving</td></tr>
+                    <tr><td><code>abstract</code></td><td>Een nog kortere samenvatting</td></tr>
+                    <tr><td><code>privacy_setting</code></td><td>Of anderen het kunnen zien</td></tr>
+                    <tr><td><code>permissible_ip_addresses</code></td><td>Welke computers mogen verbinden</td></tr>
+                    <tr><td><code>prefixes</code></td><td>Afkortingen voor lange webadressen</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Hoe je ze verandert</h3>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Ga naar de repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Zoek wat je wilt veranderen.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Dubbelklik erop (twee keer klikken, snel).
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-metadata-editing.png" alt="Repository metadata veld in bewerkingsmodus">
+            <p class="image-caption">Figuur 2: Dubbelklik om te bewerken.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Typ iets nieuws.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                Druk op Enter of klik ergens anders.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 6:</span>
+                Klik op <strong>Opslaan</strong>. (Heel belangrijk!)
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-save-button.png" alt="Repository pagina met gemarkeerde Opslaan knop">
+            <p class="image-caption">Figuur 3: De Opslaan knop. Klik er altijd op.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>Dingen erin stoppen (Importeren)</h2>
+            <p>Data kan komen van bestanden op je computer of van adressen op het internet.</p>
+
+            <h3>Soorten bestanden</h3>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl) — Een vriendelijk formaat</li>
+                <li><strong>RDF/XML</strong> (.rdf, .xml) — Een ouder formaat</li>
+                <li><strong>N-Triples</strong> (.nt) — Heel simpel, één ding per regel</li>
+                <li><strong>N-Quads</strong> (.nq) — Als N-Triples, maar met een extra stukje</li>
+                <li><strong>TriG</strong> (.trig) — Als Turtle, maar chiquer</li>
+                <li><strong>JSON-LD</strong> (.jsonld, .json) — Een modern formaat</li>
+                <li><strong>CSV</strong> (.csv) — Als een spreadsheet</li>
+            </ul>
+
+            <h3>Van je computer</h3>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Ga naar de repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Klik op <strong>Import</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Kies een bestand van je computer.
+            </div>
+
+            <div class="float-right">
+            <img src="images/dataset-import-file-selected.png" alt="Dataset import dialoog met geselecteerd bestand">
+            <p class="image-caption">Figuur 4: Kies je bestand.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                De computer zoekt uit wat voor soort bestand het is.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                Klik op Import.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 6:</span>
+                Wacht geduldig. Hij vertelt je als het klaar is.
+            </div>
+
+            <h3>Van het internet</h3>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Ga naar de repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Klik op <strong>Import</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Typ het webadres waar de data woont.
+            </div>
+
+            <div class="float-left">
+            <img src="images/dataset-import-url-entered.png" alt="Dataset import dialoog met ingevulde URL">
+            <p class="image-caption">Figuur 5: Typ het webadres.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Misschien moet je vertellen wat voor soort bestand het is.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                Klik op Import.
+            </div>
+
+            <div class="note">
+                <strong>Geduld:</strong> Grote imports kunnen even duren. De computer kan eraan werken op de achtergrond terwijl jij andere dingen doet. Hij vindt het niet erg.
+            </div>
+
+            <h2>Dingen eruit halen (Exporteren)</h2>
+            <p>Je kunt ook data uit een repository halen en opslaan als bestand.</p>
+
+            <h3>Export formaten</h3>
+            <p>Dezelfde soorten bestanden die je kunt importeren, kun je ook exporteren: Turtle, N-Triples, RDF/XML, JSON-LD, en meer.</p>
+
+            <div class="float-left">
+            <img src="images/dataset-export-format-selected.png" alt="Dataset export dialoog met geselecteerd formaat">
+            <p class="image-caption">Figuur 6: Kies een formaat voor je export.</p>
+            </div>
+
+            <div class="clear"></div>
+
+            <h2>Delen met vrienden (Medewerkers)</h2>
+            <p>Je kunt andere mensen naar je repository laten kijken, of zelfs dingen laten veranderen.</p>
+
+            <h3>Een vriend toevoegen</h3>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Ga naar de repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Zoek het Collaboration-gedeelte.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Klik op <strong>Add Collaborator</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Typ hun gebruikersnaam.
+            </div>
+
+            <div class="float-right">
+            <img src="images/collaborator-addition-form.png" alt="Medewerker toevoegformulier met ingevulde waarden">
+            <p class="image-caption">Figuur 7: Voeg een vriend toe aan je repository.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                Kies wat ze mogen doen:
+                <ul>
+                    <li><strong>Read:</strong> Ze mogen kijken, maar niet veranderen</li>
+                    <li><strong>Write:</strong> Ze mogen kijken EN veranderen</li>
+                </ul>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 6:</span>
+                Klik op Add.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 7:</span>
+                Klik op <strong>Opslaan</strong>. (Altijd Opslaan!)
+            </div>
+
+            <h3>Een vriend verwijderen</h3>
+            <p>Als je iemands toegang wilt verwijderen, zoek ze in de lijst, klik op de verwijderknop (het ziet eruit als een prullenbakje), bevestig, en Opslaan.</p>
+
+            <div class="float-right">
+            <img src="images/collaborator-removal-confirmation.png" alt="Bevestigingsdialoog medewerker verwijderen">
+            <p class="image-caption">Figuur 8: Afscheid nemen.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h3>Veranderen wat ze mogen doen</h3>
+
+            <div class="float-left">
+            <img src="images/collaborator-permission-editing.png" alt="Medewerker rechten bewerken met nieuwe rechten geselecteerd">
+            <p class="image-caption">Figuur 9: Rechten veranderen.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>Alles leegmaken (Wissen)</h2>
+            <p>Soms wil je een repository helemaal leegmaken—alles eruit halen en opnieuw beginnen.</p>
+
+            <div class="warning">
+                <strong>Wees voorzichtig!</strong> Als je een repository wist, is alle data erin voor altijd weg. Je kunt het niet terugkrijgen. Denk heel goed na voordat je dit doet.
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-clear-confirmation.png" alt="Repository wissen bevestigingsdialoog">
+            <p class="image-caption">Figuur 10: De waarschuwing. Hij meent het.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>De repository helemaal verwijderen (Deleten)</h2>
+            <p>Als je een repository helemaal wilt verwijderen—niet alleen legen, maar helemaal laten verdwijnen...</p>
+
+            <div class="warning">
+                <strong>Nog voorzichtiger!</strong> Een repository verwijderen verwijdert alles: de data, de views, de instellingen, alles. Het is voor eeuwig en altijd weg. Doe dit alleen als je absoluut zeker bent.
+            </div>
+
+            <h2>Als er iets misgaat</h2>
+            <h3>Import werkt niet</h3>
+            <ul>
+                <li>Is het een ondersteund bestandstype?</li>
+                <li>Is het bestand geldig?</li>
+                <li>Werkt je internet?</li>
+                <li>Heb je toestemming om naar deze repository te schrijven?</li>
+            </ul>
+
+            <h3>Export werkt niet</h3>
+            <ul>
+                <li>Zit er eigenlijk wel data in?</li>
+                <li>Probeer een ander formaat</li>
+                <li>Check de download-instellingen van je browser</li>
+            </ul>
+
+            <h2>Wat komt er hierna</h2>
+            <p>Nu weet je over repositories! Hierna wil je misschien:</p>
+            <ul>
+                <li><a href="view-operations.html">Views</a> maken om vragen aan je data te stellen</li>
+                <li>Meer data importeren</li>
+                <li>Wat <a href="tips-and-best-practices.html">handige tips</a> lezen</li>
+                <li>Naar <a href="appendices.html">achterin het boek</a> kijken</li>
+            </ul>
+
+            <p>Zo. Repositories: gezellige huisjes voor je data.</p>
+        </div>
+    </div>
+</body>
+</html>

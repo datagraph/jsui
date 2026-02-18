@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Query Views - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 4: Query Views</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="repository-operations.html">← Previous: Chapter 3</a>
+            <a href="tips-and-best-practices.html">Next: Chapter 5 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>4.1 Theoretical Background</h2>
+            <p>A view in Dydra represents a named, persistent SPARQL query associated with a repository. The SPARQL Protocol and RDF Query Language, standardized by W3C, provides a declarative means of specifying pattern matching and result construction over RDF graphs. Views encapsulate these queries for repeated execution and sharing.</p>
+
+            <h2>4.2 Capabilities</h2>
+            <p>Views provide the following functionality:</p>
+            <ul>
+                <li>Persistent storage of query specifications</li>
+                <li>Shared access among repository collaborators</li>
+                <li>Multiple result format selection</li>
+                <li>Organizational grouping within repositories</li>
+            </ul>
+
+            <h2>4.3 View Creation</h2>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the target repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Locate the views section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Activate <strong>New View</strong> or equivalent control.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Enter a unique view name (the base name only, not a path).
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-creation-dialog.png" alt="View creation dialog">
+            <p class="image-caption">Figure 4.1: View creation dialog.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Confirm creation.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                A confirmation message indicates successful creation.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-creation-confirmation.png" alt="View creation confirmation">
+            <p class="image-caption">Figure 4.2: Creation confirmation with instructions.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 7:</span>
+                An editor panel appears for query text entry.
+            </div>
+
+            <div class="note">
+                <strong>Important:</strong> A newly created view contains no query text. The view is not fully instantiated on the server until query text is entered and saved.
+            </div>
+
+            <h2>4.4 Query Editing: Repository Pane</h2>
+            <p>Views may be edited directly within the repository pane interface.</p>
+
+            <h3>4.4.1 Opening the Editor</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository containing the view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click the view name in the views list.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                An editor panel appears in the Editors section. Note: The editor initializes with a default template; existing query text is not automatically loaded.
+            </div>
+
+            <h3>4.4.2 Modifying Query Text</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Locate the query text area within the editor panel.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Enter or modify the SPARQL query. The editor provides syntax highlighting for improved readability.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-editing-repository-pane.png" alt="View editor in repository pane">
+            <p class="image-caption">Figure 4.3: Query editor within repository pane.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Persist the query by activating <strong>Save</strong>.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                A confirmation message indicates successful persistence.
+            </div>
+
+            <div class="note">
+                <strong>Keyboard Shortcut:</strong> Ctrl+Enter (Cmd+Enter on macOS) executes the query without saving.
+            </div>
+
+            <h2>4.5 Query Editing: Separate Pane</h2>
+            <p>For enhanced workspace organization, views may be opened in dedicated panes.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Locate the target view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Activate the pane control (folder-plus icon) adjacent to the view name.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                A new pane opens containing the view editor.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-editing-separate-pane.png" alt="View editor in separate pane">
+            <p class="image-caption">Figure 4.4: Query editor in dedicated pane.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Edit query text as required.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Save changes.
+            </div>
+
+            <div class="note">
+                <strong>Concurrent Editing:</strong> Multiple editor instances may exist simultaneously—some within the repository pane, others in separate panes. Each operates independently.
+            </div>
+
+            <h2>4.6 Query Execution</h2>
+
+            <h3>4.6.1 Execution from Editor</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open the view in an editor.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Verify query text correctness.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Select output format from the media type selector.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-execution-ready.png" alt="View ready for execution">
+            <p class="image-caption">Figure 4.5: Editor prepared for query execution.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Activate <strong>Run</strong> or use keyboard shortcut (Ctrl+Enter / Cmd+Enter).
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Results appear in the results area below the editor.
+            </div>
+
+            <h3>4.6.2 Result Formats</h3>
+            <p>Query results may be requested in various serializations:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Media Type</th>
+                        <th>Application</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>JSON</td><td><code>application/sparql-results+json</code></td><td>Programmatic consumption (default)</td></tr>
+                    <tr><td>XML</td><td><code>application/sparql-results+xml</code></td><td>XML processing pipelines</td></tr>
+                    <tr><td>HTML</td><td><code>text/html</code></td><td>Human inspection</td></tr>
+                    <tr><td>CSV</td><td><code>text/csv</code></td><td>Spreadsheet import</td></tr>
+                    <tr><td>TSV</td><td><code>text/tab-separated-values</code></td><td>Text processing</td></tr>
+                    <tr><td>Turtle</td><td><code>text/turtle</code></td><td>CONSTRUCT results</td></tr>
+                    <tr><td>N-Triples</td><td><code>application/n-triples</code></td><td>CONSTRUCT results</td></tr>
+                    <tr><td>RDF/XML</td><td><code>application/rdf+xml</code></td><td>CONSTRUCT results</td></tr>
+                    <tr><td>JSON-LD</td><td><code>application/ld+json</code></td><td>CONSTRUCT results</td></tr>
+                    <tr><td>SVG</td><td><code>image/vnd.dydra.SPARQL-RESULTS+GRAPHVIZ+SVG+XML</code></td><td>Graph visualization</td></tr>
+                </tbody>
+            </table>
+
+            <h2>4.7 External Window Presentation</h2>
+            <p>Results may be displayed in a separate browser window.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Locate the target view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Activate the window control (link icon).
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-window-button.png" alt="Window button">
+            <p class="image-caption">Figure 4.6a: Window control location.</p>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                A new window displays results in tabular format.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-presentation-new-window.png" alt="Results in new window">
+            <p class="image-caption">Figure 4.6b: Query results in external window.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Format selection is available via dropdown menu.
+            </div>
+
+            <div class="note">
+                <strong>Authentication:</strong> The external window automatically receives authentication credentials.
+            </div>
+
+            <div class="warning">
+                <strong>Browser Configuration:</strong> If the window fails to open, verify that popup blocking is disabled for this site.
+            </div>
+
+            <h2>4.8 View Deletion</h2>
+
+            <div class="warning">
+                <strong>Destructive Operation:</strong> View deletion is permanent. Preserve query text externally if future reference may be required.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Locate the view in the repository view list.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Activate the delete control (trash icon).
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Confirm deletion when prompted.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-deletion-confirmation.png" alt="Deletion confirmation">
+            <p class="image-caption">Figure 4.7: View deletion confirmation.</p>
+            </div>
+
+            <div class="clear"></div>
+
+            <h2>4.9 Editor Features</h2>
+
+            <h3>4.9.1 Multiple Query Tabs</h3>
+            <ul>
+                <li>Each tab maintains independent query text</li>
+                <li>Results are retained per tab</li>
+                <li>Tab switching enables comparison workflows</li>
+                <li>Individual tabs may be closed independently</li>
+            </ul>
+
+            <h3>4.9.2 Query Reset</h3>
+            <p>The Reset control restores query text to the last saved state, discarding local modifications.</p>
+
+            <h3>4.9.3 Event Log</h3>
+            <p>The editor maintains a log of:</p>
+            <ul>
+                <li>Query execution events</li>
+                <li>Save operations</li>
+                <li>Error conditions</li>
+                <li>Execution timing metrics</li>
+            </ul>
+
+            <h3>4.9.4 Tab Extraction</h3>
+            <p>Editor tabs may be dragged outside the browser window to create standalone windows with preserved query state.</p>
+
+            <h2>4.10 Management Guidelines</h2>
+            <ul>
+                <li><strong>Naming:</strong> Use descriptive, semantically meaningful names</li>
+                <li><strong>Organization:</strong> Group related views within repositories</li>
+                <li><strong>Documentation:</strong> Include SPARQL comments explaining query purpose</li>
+                <li><strong>Validation:</strong> Test queries interactively before saving</li>
+                <li><strong>Preservation:</strong> Maintain external backups of critical queries</li>
+            </ul>
+
+            <h2>4.11 Troubleshooting</h2>
+
+            <h3>4.11.1 Save Failures</h3>
+            <ul>
+                <li>Confirm Save control activation</li>
+                <li>Examine event log for error details</li>
+                <li>Verify write permissions</li>
+                <li>Check network connectivity</li>
+            </ul>
+
+            <h3>4.11.2 Execution Errors</h3>
+            <ul>
+                <li>Validate SPARQL syntax</li>
+                <li>Verify URI and prefix correctness</li>
+                <li>Review event log diagnostics</li>
+                <li>Confirm repository contains expected data</li>
+            </ul>
+
+            <h3>4.11.3 Missing Views</h3>
+            <ul>
+                <li>Refresh the browser view</li>
+                <li>Confirm successful creation</li>
+                <li>Verify correct repository context</li>
+                <li>Confirm read permissions</li>
+            </ul>
+
+            <h2>4.12 Subsequent Topics</h2>
+            <ul>
+                <li>Operational best practices (<a href="tips-and-best-practices.html">Chapter 5</a>)</li>
+                <li>Format specifications (<a href="appendices.html">Appendices</a>)</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,302 @@
+berlinnew:jsui james$  CAPTURE_DOCS=true npx playwright test tests/*-documented.spec.js 
+
+Running 48 tests using 5 workers
+
+  ✓   1 tests/import-export-documented.spec.js:274:7 › Import/Export › import Turtle file [REQ-3.4.4, REQ-3.4.7] (6.1s)
+  ✓   2 tests/navigation-documented.spec.js:222:7 › Navigation › client-side routing [REQ-5.1.1] (10.0s)
+  ✓   3 tests/repository-documented.spec.js:229:7 › Repository Management › repository profile properties [REQ-3.2.1, REQ-3.2.3] (7.7s)
+  ✓   4 tests/account-documented.spec.js:153:7 › Account Management › display account information [REQ-2.1.1, REQ-2.1.2] (9.1s)
+  ✓   5 tests/authentication-documented.spec.js:174:7 › Authentication › login with valid credentials [REQ-1.1.1, REQ-1.1.2] (5.0s)
+[DocCapture] REQ-1.1.1 before: req-1-1-1-basic-bearer-authentication-before.pdf
+[DocCapture] REQ-1.1.1 form-filled: req-1-1-1-basic-bearer-authentication-form-filled.pdf
+[DocCapture] REQ-1.1.2 before: req-1-1-2-authenticate-against-api-before.pdf
+[DocCapture] REQ-1.1.2 after: req-1-1-2-authenticate-against-api-after.pdf
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓   6 tests/authentication-documented.spec.js:203:7 › Authentication › login with invalid credentials [REQ-9.1.1] (2.7s)
+[DocCapture] REQ-3.4.4 before: req-3-4-4-import-from-file-upload-before.pdf
+[DocCapture] REQ-3.2.1 before: req-3-2-1-edit-repository-metadata-before.pdf
+[DocCapture] REQ-3.2.1 form-filled: req-3-2-1-edit-repository-metadata-form-filled.pdf
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓   7 tests/import-export-documented.spec.js:292:7 › Import/Export › import N-Triples file [REQ-3.4.4, REQ-3.4.7] (4.9s)
+[DocCapture] REQ-3.2.1 after: req-3-2-1-edit-repository-metadata-after.pdf
+[DocCapture] REQ-9.1.1 before: req-9-1-1-authentication-error-messages-before.pdf
+[DocCapture] REQ-3.2.3 before: req-3-2-3-save-repository-configuration-before.pdf
+[DocCapture] REQ-5.1.1 before: req-5-1-1-client-side-routing-before.pdf
+[DocCapture] REQ-3.2.3 after: req-3-2-3-save-repository-configuration-after.pdf
+[DocCapture] Manifest written: tests/pdfs/repository/manifest.json
+[DocCapture] Index written: tests/pdfs/repository/index.html
+  ✓   8 tests/repository-documented.spec.js:269:7 › Repository Management › repository collaboration [REQ-3.7.1, REQ-3.7.2, REQ-3.7.3] (6.7s)
+[DocCapture] REQ-9.1.1 after: req-9-1-1-authentication-error-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+      9 tests/authentication-documented.spec.js:218:7 › Authentication › logout functionality [REQ-1.2.2]
+[DocCapture] REQ-5.1.1 account-route: req-5-1-1-client-side-routing-account-route.pdf
+[DocCapture] REQ-2.1.1 before: req-2-1-1-display-account-information-before.pdf
+[DocCapture] REQ-2.1.1 after: req-2-1-1-display-account-information-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account/manifest.json
+[DocCapture] Index written: tests/pdfs/account/index.html
+  ✓  10 tests/account-documented.spec.js:171:7 › Account Management › edit account profile fields [REQ-2.2.1, REQ-2.2.3] (7.8s)
+[DocCapture] REQ-5.1.1 after: req-5-1-1-client-side-routing-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  11 tests/navigation-documented.spec.js:241:7 › Navigation › browser back/forward [REQ-5.1.2] (9.3s)
+[DocCapture] REQ-3.4.4 before: req-3-4-4-import-from-file-upload-before.pdf
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓  12 tests/import-export-documented.spec.js:309:7 › Import/Export › import N-Quads file [REQ-3.4.4, REQ-3.4.7] (5.0s)
+[DocCapture] REQ-3.7.1 before: req-3-7-1-manage-collaborators-before.pdf
+[DocCapture] REQ-3.7.1 after: req-3-7-1-manage-collaborators-after.pdf
+[DocCapture] REQ-3.7.2 before: req-3-7-2-add-edit-remove-collaborators-before.pdf
+[DocCapture] REQ-3.7.2 form-filled: req-3-7-2-add-edit-remove-collaborators-form-filled.pdf
+[DocCapture] REQ-3.7.2 after: req-3-7-2-add-edit-remove-collaborators-after.pdf
+[DocCapture] REQ-3.7.3 before: req-3-7-3-save-collaboration-changes-before.pdf
+[DocCapture] REQ-1.2.2 before: req-1-2-2-logout-functionality-before.pdf
+[DocCapture] REQ-3.7.3 after: req-3-7-3-save-collaboration-changes-after.pdf
+[DocCapture] Manifest written: tests/pdfs/collaboration/manifest.json
+[DocCapture] Index written: tests/pdfs/collaboration/index.html
+     13 tests/repository-documented.spec.js:287:7 › Repository Management › repository creation [REQ-3.3.1]
+[DocCapture] REQ-1.2.2 after: req-1-2-2-logout-functionality-after.pdf
+[DocCapture] REQ-2.2.1 before: req-2-2-1-edit-account-profile-fields-before.pdf
+[DocCapture] REQ-3.4.4 before: req-3-4-4-import-from-file-upload-before.pdf
+[DocCapture] REQ-2.2.1 form-filled: req-2-2-1-edit-account-profile-fields-form-filled.pdf
+[DocCapture] REQ-5.1.2 before: req-5-1-2-browser-back-forward-before.pdf
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json
+[DocCapture] Index written: tests/pdfs/import/index.html
+     14 tests/import-export-documented.spec.js:326:7 › Import/Export › import from URL [REQ-3.4.3]
+[DocCapture] REQ-2.2.1 after: req-2-2-1-edit-account-profile-fields-after.pdf
+[DocCapture] REQ-2.2.3 before: req-2-2-3-save-account-configuration-before.pdf
+[DocCapture] REQ-2.2.3 after: req-2-2-3-save-account-configuration-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account/manifest.json
+[DocCapture] Index written: tests/pdfs/account/index.html
+     15 tests/account-documented.spec.js:195:7 › Account Management › view authentication token [REQ-2.2.4]
+[DocCapture] REQ-5.1.2 after-back: req-5-1-2-browser-back-forward-after-back.pdf
+[DocCapture] REQ-3.3.1 before: req-3-3-1-create-repository-before.pdf
+[DocCapture] REQ-3.3.1 dialog-open: req-3-3-1-create-repository-dialog-open.pdf
+[DocCapture] REQ-5.1.2 after: req-5-1-2-browser-back-forward-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+     16 tests/navigation-documented.spec.js:253:7 › Navigation › tab management [REQ-6.3.1, REQ-6.3.2]
+[DocCapture] REQ-3.4.3 before: req-3-4-3-import-from-url-before.pdf
+Logout test note: expect(locator).toBeVisible() failed
+
+Locator: getByTestId('login-username-input')
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 5000ms
+  - waiting for getByTestId('login-username-input')
+
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓   9 tests/authentication-documented.spec.js:218:7 › Authentication › logout functionality [REQ-1.2.2] (12.5s)
+  ✓  17 tests/authentication-documented.spec.js:240:7 › Authentication › navigation links based on auth status [REQ-1.2.3] (6.8s)
+[DocCapture] REQ-3.3.1 after: req-3-3-1-create-repository-after.pdf
+[DocCapture] REQ-3.4.3 url-entered: req-3-4-3-import-from-url-url-entered.pdf
+Deleted repository playwright/test-repo-1771248568263 via API
+[DocCapture] Manifest written: tests/pdfs/repository/manifest.json
+[DocCapture] Index written: tests/pdfs/repository/index.html
+  ✓  13 tests/repository-documented.spec.js:287:7 › Repository Management › repository creation [REQ-3.3.1] (6.7s)
+  ✓  18 tests/repository-documented.spec.js:303:7 › Repository Management › repository clear [REQ-3.6.1] (4.5s)
+[DocCapture] REQ-1.2.3 before: req-1-2-3-auth-based-navigation-links-before.pdf
+[DocCapture] REQ-3.4.3 after: req-3-4-3-import-from-url-after.pdf
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓  14 tests/import-export-documented.spec.js:326:7 › Import/Export › import from URL [REQ-3.4.3] (6.2s)
+  ✓  19 tests/import-export-documented.spec.js:336:7 › Import/Export › import progress display [REQ-3.4.6] (4.4s)
+[DocCapture] REQ-2.2.4 before: req-2-2-4-display-authentication-token-before.pdf
+[DocCapture] REQ-2.2.4 after: req-2-2-4-display-authentication-token-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account/manifest.json
+[DocCapture] Index written: tests/pdfs/account/index.html
+  ✓  15 tests/account-documented.spec.js:195:7 › Account Management › view authentication token [REQ-2.2.4] (6.3s)
+     20 tests/sparql-documented.spec.js:286:7 › SPARQL Queries › execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4]
+[DocCapture] REQ-3.6.1 before: req-3-6-1-clear-repository-before.pdf
+[DocCapture] REQ-3.6.1 after: req-3-6-1-clear-repository-after.pdf
+[DocCapture] Manifest written: tests/pdfs/repository/manifest.json
+[DocCapture] Index written: tests/pdfs/repository/index.html
+  ✓  21 tests/ui-components-documented.spec.js:206:7 › UI Components › flash message display [REQ-6.2.1] (6.4s)
+[DocCapture] REQ-6.3.1 before: req-6-3-1-tab-management-before.pdf
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓  22 tests/import-export-documented.spec.js:357:7 › Import/Export › export Turtle format [REQ-3.5.1] (5.1s)
+[DocCapture] REQ-1.2.3 after: req-1-2-3-auth-based-navigation-links-after.pdf
+Auth links note: Account tab/pane not visible after login
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  23 tests/authentication-documented.spec.js:254:7 › Authentication › session persistence of account name [REQ-1.2.1] (6.8s)
+[DocCapture] REQ-6.3.1 after: req-6-3-1-tab-management-after.pdf
+Editor note: expect(received).toBeTruthy()
+
+Received: false
+[DocCapture] REQ-4.1.2 before: req-4-1-2-execute-sparql-queries-before.pdf
+[DocCapture] REQ-3.5.1 before: req-3-5-1-export-repository-data-before.pdf
+[DocCapture] REQ-6.3.2 before: req-6-3-2-close-tabs-before.pdf
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+[DocCapture] REQ-3.5.1 after: req-3-5-1-export-repository-data-after.pdf
+[DocCapture] Manifest written: tests/pdfs/export/manifest.json
+[DocCapture] Index written: tests/pdfs/export/index.html
+  ✓  24 tests/import-export-documented.spec.js:367:7 › Import/Export › export N-Triples format [REQ-3.5.1, REQ-3.5.2] (5.6s)
+[DocCapture] REQ-6.2.1 after: req-6-2-1-flash-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui/manifest.json
+[DocCapture] Index written: tests/pdfs/ui/index.html
+  ✓  25 tests/ui-components-documented.spec.js:224:7 › UI Components › loading indicator [REQ-6.2.2] (4.4s)
+[DocCapture] REQ-4.1.2 after: req-4-1-2-execute-sparql-queries-after.pdf
+[DocCapture] REQ-4.1.4 before: req-4-1-4-display-query-results-before.pdf
+[DocCapture] REQ-6.3.2 after: req-6-3-2-close-tabs-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  16 tests/navigation-documented.spec.js:253:7 › Navigation › tab management [REQ-6.3.1, REQ-6.3.2] (13.4s)
+  ✓  26 tests/navigation-documented.spec.js:271:7 › Navigation › location bar display [REQ-5.2.4] (5.9s)
+[DocCapture] REQ-1.2.1 before: req-1-2-1-session-persistence-before.pdf
+[DocCapture] REQ-1.2.1 after: req-1-2-1-session-persistence-after.pdf
+Username after reload: playwright
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  27 tests/view-documented.spec.js:250:7 › View Management › create view [REQ-4.2.1] (7.4s)
+[DocCapture] REQ-3.5.1 before: req-3-5-1-export-repository-data-before.pdf
+[DocCapture] REQ-6.2.2 before: req-6-2-2-loading-indicators-before.pdf
+[DocCapture] REQ-6.2.2 after: req-6-2-2-loading-indicators-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui/manifest.json
+[DocCapture] Index written: tests/pdfs/ui/index.html
+  ✓  28 tests/ui-components-documented.spec.js:242:7 › UI Components › error message display [REQ-9.1.2] (5.9s)
+[DocCapture] REQ-3.5.1 after: req-3-5-1-export-repository-data-after.pdf
+[DocCapture] REQ-3.5.2 before: req-3-5-2-direct-download-url-before.pdf
+[DocCapture] REQ-3.5.2 after: req-3-5-2-direct-download-url-after.pdf
+[DocCapture] Manifest written: tests/pdfs/export/manifest.json
+[DocCapture] Index written: tests/pdfs/export/index.html
+[DocCapture] REQ-5.2.4 before: req-5-2-4-location-bar-display-before.pdf
+[DocCapture] REQ-5.2.4 after: req-5-2-4-location-bar-display-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+     29 tests/navigation-documented.spec.js:283:7 › Navigation › tabbed interface [REQ-5.2.5]
+[DocCapture] REQ-4.2.1 before: req-4-2-1-crud-sparql-views-before.pdf
+[DocCapture] REQ-9.1.2 before: req-9-1-2-api-error-messages-before.pdf
+[DocCapture] REQ-4.2.1 dialog-open: req-4-2-1-crud-sparql-views-dialog-open.pdf
+[DocCapture] REQ-4.2.1 after: req-4-2-1-crud-sparql-views-after.pdf
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json
+[DocCapture] Index written: tests/pdfs/view/index.html
+     30 tests/view-documented.spec.js:277:7 › View Management › edit view [REQ-4.2.2, REQ-4.2.3, REQ-4.2.5]
+[DocCapture] REQ-9.1.2 after: req-9-1-2-api-error-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui/manifest.json
+[DocCapture] Index written: tests/pdfs/ui/index.html
+  ✓  31 tests/ui-components-documented.spec.js:254:7 › UI Components › 404 page [REQ-9.1.3] (3.2s)
+[DocCapture] REQ-9.1.3 before: req-9-1-3-404-page-before.pdf
+Results note: expect(locator).toBeVisible() failed
+
+Locator: locator('.query-results, .results-table, .sparql-results').first()
+Expected: visible
+Timeout: 10000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "toBeVisible" with timeout 10000ms
+  - waiting for locator('.query-results, .results-table, .sparql-results').first()
+
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  20 tests/sparql-documented.spec.js:286:7 › SPARQL Queries › execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4] (19.3s)
+  ✓  32 tests/sparql-documented.spec.js:316:7 › SPARQL Queries › query result formats - JSON [REQ-4.1.3] (4.4s)
+[DocCapture] REQ-5.2.5 before: req-5-2-5-tabbed-interface-before.pdf
+[DocCapture] REQ-5.2.5 multiple-tabs: req-5-2-5-tabbed-interface-multiple-tabs.pdf
+[DocCapture] REQ-9.1.3 after: req-9-1-3-404-page-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui/manifest.json
+[DocCapture] Index written: tests/pdfs/ui/index.html
+  ✓  33 tests/ui-components-documented.spec.js:264:7 › UI Components › modal dialog behavior [REQ-6.2.3] (5.9s)
+[DocCapture] REQ-4.1.3 before: req-4-1-3-multiple-response-media-types-before.pdf
+[DocCapture] REQ-4.1.3 after: req-4-1-3-multiple-response-media-types-after.pdf
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  34 tests/sparql-documented.spec.js:329:7 › SPARQL Queries › query result formats - CSV [REQ-4.1.3] (4.3s)
+[DocCapture] REQ-5.2.5 after: req-5-2-5-tabbed-interface-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  29 tests/navigation-documented.spec.js:283:7 › Navigation › tabbed interface [REQ-5.2.5] (8.8s)
+  ✓  35 tests/navigation-documented.spec.js:295:7 › Navigation › direct URL navigation [REQ-5.1.1] (7.9s)
+[DocCapture] REQ-4.2.5 before: req-4-2-5-open-view-in-pane-editor-before.pdf
+[DocCapture] REQ-6.2.3 before: req-6-2-3-form-validation-before.pdf
+[DocCapture] REQ-4.2.5 after: req-4-2-5-open-view-in-pane-editor-after.pdf
+[DocCapture] REQ-4.1.3 before: req-4-1-3-multiple-response-media-types-before.pdf
+[DocCapture] REQ-4.1.3 after: req-4-1-3-multiple-response-media-types-after.pdf
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+[DocCapture] REQ-6.2.3 after: req-6-2-3-form-validation-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui/manifest.json
+[DocCapture] Index written: tests/pdfs/ui/index.html
+  ✓  36 tests/sparql-documented.spec.js:342:7 › SPARQL Queries › query result formats - XML [REQ-4.1.3] (4.6s)
+  ✓  37 tests/ui-components-documented.spec.js:276:7 › UI Components › confirmation dialog [REQ-6.2.3] (4.4s)
+[DocCapture] REQ-4.2.2 before: req-4-2-2-load-view-query-text-before.pdf
+[DocCapture] REQ-5.1.1 before: req-5-1-1-client-side-routing-before.pdf
+[DocCapture] REQ-4.2.2 after: req-4-2-2-load-view-query-text-after.pdf
+[DocCapture] REQ-4.2.3 before: req-4-2-3-save-view-query-text-before.pdf
+[DocCapture] REQ-5.1.1 after: req-5-1-1-client-side-routing-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  38 tests/navigation-documented.spec.js:321:7 › Navigation › navigation between account and repositories [REQ-5.2.5] (7.8s)
+[DocCapture] REQ-6.2.3 before: req-6-2-3-form-validation-before.pdf
+[DocCapture] REQ-4.2.3 after: req-4-2-3-save-view-query-text-after.pdf
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  30 tests/view-documented.spec.js:277:7 › View Management › edit view [REQ-4.2.2, REQ-4.2.3, REQ-4.2.5] (14.3s)
+  ✓  39 tests/view-documented.spec.js:321:7 › View Management › delete view [REQ-4.2.1] (9.6s)
+[DocCapture] REQ-4.1.3 before: req-4-1-3-multiple-response-media-types-before.pdf
+[DocCapture] REQ-6.2.3 after: req-6-2-3-form-validation-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui/manifest.json
+[DocCapture] Index written: tests/pdfs/ui/index.html
+  ✓  40 tests/ui-components-documented.spec.js:289:7 › UI Components › responsive layout elements (6.4s)
+[DocCapture] REQ-4.1.3 after: req-4-1-3-multiple-response-media-types-after.pdf
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  41 tests/sparql-documented.spec.js:355:7 › SPARQL Queries › query execution time display [REQ-4.3.4] (7.3s)
+[DocCapture] REQ-4.1.2 before: req-4-1-2-execute-sparql-queries-before.pdf
+[DocCapture] REQ-5.2.5 before: req-5-2-5-tabbed-interface-before.pdf
+[DocCapture] REQ-5.2.5 at-repository: req-5-2-5-tabbed-interface-at-repository.pdf
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+[DocCapture] REQ-6.2.1 after: req-6-2-1-flash-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui/manifest.json
+[DocCapture] Index written: tests/pdfs/ui/index.html
+  ✓  42 tests/ui-components-documented.spec.js:326:7 › UI Components › keyboard navigation (4.5s)
+[DocCapture] REQ-4.2.1 before: req-4-2-1-crud-sparql-views-before.pdf
+[DocCapture] REQ-4.1.2 after: req-4-1-2-execute-sparql-queries-after.pdf
+[DocCapture] REQ-5.2.5 after: req-5-2-5-tabbed-interface-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+[DocCapture] REQ-4.3.4 before: req-4-3-4-execution-time-display-before.pdf
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  43 tests/sparql-documented.spec.js:370:7 › SPARQL Queries › query keyboard shortcut [REQ-4.3.2] (4.2s)
+[DocCapture] REQ-4.2.1 after: req-4-2-1-crud-sparql-views-after.pdf
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  44 tests/view-documented.spec.js:352:7 › View Management › open view in pane editor [REQ-4.2.5, REQ-4.2.6] (12.0s)
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+[DocCapture] REQ-6.2.1 after: req-6-2-1-flash-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui/manifest.json
+[DocCapture] Index written: tests/pdfs/ui/index.html
+  ✓  45 tests/ui-components-documented.spec.js:352:7 › UI Components › tooltip display (3.9s)
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  46 tests/sparql-documented.spec.js:383:7 › SPARQL Queries › query reset functionality [REQ-4.3.3] (3.9s)
+[DocCapture] Manifest written: tests/pdfs/ui/manifest.json
+[DocCapture] Index written: tests/pdfs/ui/index.html
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  47 tests/sparql-documented.spec.js:396:7 › SPARQL Queries › multiple query tabs [REQ-4.3.6] (3.9s)
+[DocCapture] REQ-4.2.6 before: req-4-2-6-open-view-in-new-pane-before.pdf
+[DocCapture] REQ-4.2.6 after: req-4-2-6-open-view-in-new-pane-after.pdf
+[DocCapture] REQ-4.2.5 before: req-4-2-5-open-view-in-pane-editor-before.pdf
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+[DocCapture] REQ-4.2.5 after: req-4-2-5-open-view-in-pane-editor-after.pdf
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  48 tests/view-documented.spec.js:389:7 › View Management › execute view [REQ-4.2.2] (14.0s)
+[DocCapture] REQ-4.2.2 before: req-4-2-2-load-view-query-text-before.pdf
+[DocCapture] REQ-4.2.2 after: req-4-2-2-load-view-query-text-after.pdf
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json
+[DocCapture] Index written: tests/pdfs/view/index.html
+
+  48 passed (1.6m)
+

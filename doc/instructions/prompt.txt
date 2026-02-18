@@ -1,0 +1,9 @@
+review and correct the pane handling in the application.
+the initial pane should be the login pane.
+in that stage, it should be possible to switch between the login pane and the info pane.
+after authentication, display just the authenticated account page and hide the info tab.
+the login tab remains and display the login pane again.
+an additional authentication display another account page.
+at this stage it is possible to switch among the login and the two account tabs.
+from an account pane, it is possible to select a repository and display it in its own pane.
+at this stage it remains possible to switch among all tabs.

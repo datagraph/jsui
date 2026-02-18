@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Login and Authentication</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">Next: Account Operations →</a>
+        </nav>
+
+        <div class="content">
+            <h2>The Door</h2>
+            <p>You can't get in without proving who you are. That's just how it works. The computer doesn't trust you. Why should it? It doesn't know you.</p>
+
+            <h2>Finding the Door</h2>
+            <p>Go here:</p>
+            <div class="note">
+                <strong>URL:</strong> <code>https://dydra.com/ui/user</code>
+            </div>
+            <p>If you're not logged in, you'll see a login page. If you are logged in, you won't. That's how you know.</p>
+
+            <h2>Getting In</h2>
+            <p>Here's the ritual:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to <code>https://dydra.com/ui/user</code>. You just did this. Good.
+            </div>
+
+            <div class="float-right">
+            <img src="images/login-form-filled.png" alt="Login form with credentials entered">
+            <p class="image-caption">Figure 1: The login form. Fill in the blanks.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Fill in the blanks:
+                <ul>
+                    <li><strong>Host:</strong> Usually <code>https://dydra.com</code></li>
+                    <li><strong>Login:</strong> Your username</li>
+                    <li><strong>Password:</strong> Your password</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click <strong>Login</strong>. Or press Enter. Either works.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                If you got everything right, you're in. If not, you're not. Try again.
+            </div>
+
+            <div class="note">
+                <strong>Fun fact:</strong> You can be logged into multiple accounts at the same time. The computer can handle it. Computers are good at keeping track of things. Better than people, usually.
+            </div>
+
+            <h2>Two Ways to Prove You're You</h2>
+            <p>There are two methods:</p>
+            <ul>
+                <li><strong>Basic Authentication:</strong> Username and password. The classic. Works every time. Well, most times.</li>
+                <li><strong>Bearer Token:</strong> A special code for computers talking to computers. Format: "Bearer <i>yourTokenHere</i>"</li>
+            </ul>
+            <p>If you're a human using a browser, stick with the username and password. That's what it's there for.</p>
+
+            <h2>Memory</h2>
+            <h3>What the Computer Remembers</h3>
+            <p>The computer remembers your username. That's it. Just the username.</p>
+            <ul>
+                <li>Your username gets saved in the browser</li>
+                <li>Next time you come back, it's already filled in</li>
+            </ul>
+
+            <div class="warning">
+                <strong>What it doesn't remember:</strong> Your password. Your token. Your session. When you close the browser tab, all of that disappears. Poof. Gone. You'll have to log in again. That's a security feature, not a bug.
+            </div>
+
+            <h3>Logging Out</h3>
+            <p>When you're done:</p>
+            <ol>
+                <li>Click <strong>Logout</strong> in the navigation bar</li>
+                <li>You'll be taken back to the login page</li>
+                <li>Everything you were doing is gone now</li>
+                <li>Your username might still be there. Just the username.</li>
+            </ol>
+
+            <h2>When Things Go Wrong</h2>
+            <h3>Can't Get In</h3>
+            <p>Check these things:</p>
+            <ul>
+                <li>Did you type your password right? Caps lock is a thing.</li>
+                <li>Is the host URL correct? It should be <code>https://dydra.com</code></li>
+                <li>Is your internet working?</li>
+                <li>Does your account exist?</li>
+            </ul>
+
+            <h3>Error Messages</h3>
+            <p>If you see an error:</p>
+            <ul>
+                <li>Read it. It's trying to tell you something.</li>
+                <li>"Invalid credentials" means wrong username or password</li>
+                <li>If nothing works, email <strong>support@dydra.com</strong></li>
+            </ul>
+
+            <h2>Now What?</h2>
+            <p>Once you're in, you can:</p>
+            <ul>
+                <li>Look at your <a href="account-operations.html">account information</a></li>
+                <li>Create and manage <a href="repository-operations.html">repositories</a></li>
+                <li>Create and run <a href="view-operations.html">SPARQL queries</a></li>
+                <li>Read the <a href="tips-and-best-practices.html">tips</a></li>
+                <li>Consult the <a href="appendices.html">appendices</a></li>
+            </ul>
+
+            <p>Welcome to Dydra Studio. Try not to break anything.</p>
+        </div>
+    </div>
+</body>
+</html>

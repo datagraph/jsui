@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Account Management - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 2: Account Management</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="login.html">← Previous: Chapter 1</a>
+            <a href="repository-operations.html">Next: Chapter 3 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>2.1 Account Data Model</h2>
+            <p>An account in Dydra represents a principal—an entity capable of authentication and authorization within the system. Each account possesses associated metadata, authentication tokens, and repository ownership records.</p>
+
+            <h2>2.2 Account Information Display</h2>
+            <p>Upon navigating to the account view, the system presents the following information categories:</p>
+            <ul>
+                <li>Username (the unique identifier established at account creation)</li>
+                <li>Email address (for system notifications)</li>
+                <li>Full name (for display purposes)</li>
+                <li>Homepage and blog URLs (optional external references)</li>
+                <li>Company affiliation</li>
+                <li>Geographic location</li>
+                <li>Repository enumeration</li>
+            </ul>
+
+            <h2>2.3 Modifiable Fields</h2>
+            <p>The following account attributes support user modification:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field Identifier</th>
+                        <th>Semantic Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>firstname</code></td><td>Given name</td></tr>
+                    <tr><td><code>familyname</code></td><td>Surname</td></tr>
+                    <tr><td><code>fullname</code></td><td>Complete name representation</td></tr>
+                    <tr><td><code>email</code></td><td>Electronic mail address</td></tr>
+                    <tr><td><code>homepage</code></td><td>Personal web page URL</td></tr>
+                    <tr><td><code>blog</code></td><td>Web log URL</td></tr>
+                    <tr><td><code>company</code></td><td>Organizational affiliation</td></tr>
+                    <tr><td><code>location</code></td><td>Geographic descriptor</td></tr>
+                    <tr><td><code>phone</code></td><td>Telephone contact number</td></tr>
+                    <tr><td><code>skype_id</code></td><td>Skype service identifier</td></tr>
+                    <tr><td><code>jabber_id</code></td><td>XMPP/Jabber identifier</td></tr>
+                    <tr><td><code>workinfo</code></td><td>Professional information</td></tr>
+                </tbody>
+            </table>
+
+            <h2>2.4 Field Modification Procedure</h2>
+            <p>The algorithm for modifying account fields proceeds as follows:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to the account view by selecting your account name in the interface.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Locate the field requiring modification within the profile section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Double-click the field value to enter edit mode. The display transforms to an editable text input.
+            </div>
+
+            <div class="float-right">
+            <img src="images/account-metadata-editing.png" alt="Editing a field">
+            <p class="image-caption">Figure 2.1: Field in edit mode following double-click activation.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Enter the revised value using the text input.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Confirm the edit by pressing Enter or clicking outside the input field.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Persist all modifications by activating the <strong>Save</strong> button.
+            </div>
+
+            <div class="float-left">
+            <img src="images/account-save-button.png" alt="Save button">
+            <p class="image-caption">Figure 2.2: The Save control in the tab bar.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="note">
+                <strong>Implementation Note:</strong> The application employs differential update semantics. Upon save, only modified fields are transmitted to the server, minimizing bandwidth utilization and reducing the probability of concurrent modification conflicts.
+            </div>
+
+            <div class="warning">
+                <strong>Caution:</strong> Modifications exist only in local state until the Save operation completes. Navigation away from the account view without saving results in loss of pending changes.
+            </div>
+
+            <h2>2.5 Authentication Token Management</h2>
+            <p>Each account possesses an associated authentication token suitable for programmatic API access. This token serves as an alternative to username-password authentication for automated systems.</p>
+
+            <h3>2.5.1 Token Retrieval</h3>
+            <ol>
+                <li>Navigate to the account view</li>
+                <li>Locate the Token section</li>
+                <li>The current token value is displayed for reference</li>
+            </ol>
+
+            <h3>2.5.2 Token Regeneration</h3>
+            <p>Should token compromise be suspected, or when rotating credentials per security policy:</p>
+            <ol>
+                <li>Navigate to the token section</li>
+                <li>Activate the <strong>Reset Token</strong> control</li>
+                <li>A new token is generated and displayed</li>
+                <li>Update all systems utilizing the previous token</li>
+            </ol>
+
+            <div class="float-right">
+            <img src="images/account-token-reset.png" alt="Token reset">
+            <p class="image-caption">Figure 2.3: Token reset control.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="warning">
+                <strong>Security Advisory:</strong> The authentication token provides equivalent access to username-password authentication. Treat tokens as sensitive credentials. Suspected compromise mandates immediate regeneration.
+            </div>
+
+            <h2>2.6 Navigation from Account View</h2>
+            <p>The account view provides access to:</p>
+            <ul>
+                <li>Repository enumeration and selection</li>
+                <li>Repository creation interface</li>
+                <li>Individual repository management views</li>
+                <li>Associated repository operations</li>
+            </ul>
+
+            <h2>2.7 Multiple Account Sessions</h2>
+            <p>The system architecture supports concurrent authentication to multiple accounts within a single browser session. This capability addresses scenarios including:</p>
+            <ul>
+                <li>Distinct personal and organizational account management</li>
+                <li>Testing and development workflows</li>
+                <li>Cross-account data verification</li>
+            </ul>
+            <p>Each authenticated account maintains an independent session state.</p>
+
+            <h2>2.8 Troubleshooting</h2>
+
+            <h3>2.8.1 Save Operation Failure</h3>
+            <ul>
+                <li>Verify that the Save control was activated</li>
+                <li>Examine any error messages presented</li>
+                <li>Confirm account modification permissions</li>
+                <li>Verify network connectivity</li>
+            </ul>
+
+            <h3>2.8.2 Token Display Issues</h3>
+            <ul>
+                <li>Confirm navigation to the correct account</li>
+                <li>Refresh the browser view</li>
+                <li>Verify account access permissions</li>
+            </ul>
+
+            <h2>2.9 Subsequent Operations</h2>
+            <p>With account configuration complete, the reader may proceed to:</p>
+            <ul>
+                <li>Repository creation and management (<a href="repository-operations.html">Chapter 3</a>)</li>
+                <li>Data import and export operations</li>
+                <li>SPARQL view development (<a href="view-operations.html">Chapter 4</a>)</li>
+                <li>Operational best practices (<a href="tips-and-best-practices.html">Chapter 5</a>)</li>
+            </ul>
+
+            <p><em>Chapter 3 addresses repository operations—the fundamental data storage abstraction within Dydra.</em></p>
+        </div>
+    </div>
+</body>
+</html>

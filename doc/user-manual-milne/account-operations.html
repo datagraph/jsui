@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Account - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Your Account</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>🌐 English</option>
+                    <option value="../user-manual-german/account-operations.html">🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/account-operations.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/account-operations.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="login.html">← Previous: Getting In</a>
+            <a href="repository-operations.html">Next: Your Repositories →</a>
+        </nav>
+
+        <div class="content">
+            <h2>In Which We Learn About Ourselves</h2>
+            <p>Your account is a collection of things that say who you are. It's rather like a little card with your name on it, except it has more information than that, and it lives inside the computer instead of in your pocket.</p>
+
+            <h2>What You'll Find There</h2>
+            <p>When you look at your account, you'll see all sorts of things about yourself:</p>
+            <ul>
+                <li>Your username (the name you use to get in)</li>
+                <li>Your email address (for important messages)</li>
+                <li>Your full name (the one your parents gave you)</li>
+                <li>Your homepage and blog (if you have such things)</li>
+                <li>Your company (where you work)</li>
+                <li>Where you live</li>
+                <li>Your repositories (those come later in the book)</li>
+            </ul>
+
+            <h2>Changing Things About Yourself</h2>
+            <p>Most of these things can be changed. Not all of them—some things are permanent—but most things. If you move house, or change your name, or decide you'd rather be known by a different blog address, you can update it here.</p>
+
+            <h3>Things You Can Change</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>The Thing</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>firstname</code></td><td>Your first name (Christopher, perhaps)</td></tr>
+                    <tr><td><code>familyname</code></td><td>Your family name (Robin, for instance)</td></tr>
+                    <tr><td><code>fullname</code></td><td>Your whole name, all together</td></tr>
+                    <tr><td><code>email</code></td><td>Where letters from the computer should go</td></tr>
+                    <tr><td><code>homepage</code></td><td>Your own special place on the internet</td></tr>
+                    <tr><td><code>blog</code></td><td>Where you write about your thoughts</td></tr>
+                    <tr><td><code>company</code></td><td>The place where you work</td></tr>
+                    <tr><td><code>location</code></td><td>Where you are (perhaps a house in the forest)</td></tr>
+                    <tr><td><code>phone</code></td><td>Your telephone number</td></tr>
+                    <tr><td><code>skype_id</code></td><td>For video calls</td></tr>
+                    <tr><td><code>jabber_id</code></td><td>For messages</td></tr>
+                    <tr><td><code>workinfo</code></td><td>Things about your work</td></tr>
+                </tbody>
+            </table>
+
+            <h3>How to Change Them</h3>
+            <p>It's really quite simple:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to your account page. You can get there by clicking on your name somewhere at the top.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the thing you want to change.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Double-click on it. (That means clicking twice, rather quickly.) It will turn into a little box where you can type.
+            </div>
+
+            <div class="float-right">
+            <img src="images/account-metadata-editing.png" alt="Editing a field">
+            <p class="image-caption">Figure 1: Double-click, and the box appears. Type something new.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Type the new value. Take your time—spelling counts.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Press Enter, or click somewhere else. The typing box goes away.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click the <strong>Save</strong> button. This is terribly important! If you don't click Save, the computer won't remember what you changed.
+            </div>
+
+            <div class="float-left">
+            <img src="images/account-save-button.png" alt="Save button">
+            <p class="image-caption">Figure 2: The Save button. Do click it.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="note">
+                <strong>A Clever Thing:</strong> The computer only sends the things you changed, not everything. It's efficient like that—no sense carrying things that don't need carrying.
+            </div>
+
+            <div class="warning">
+                <strong>Remember!</strong> If you forget to click Save, your changes will disappear when you leave the page. They'll be gone, like footprints in the rain. So always, always click Save.
+            </div>
+
+            <h2>Your Secret Token</h2>
+            <p>You have something called a "token." It's like a special password, but for computer programs to use instead of people. If you write programs that need to talk to Dydra, they'll use this token.</p>
+
+            <h3>Finding Your Token</h3>
+            <ol>
+                <li>Go to your account page</li>
+                <li>Look for the Token section</li>
+                <li>There it is!</li>
+            </ol>
+
+            <h3>Getting a New Token</h3>
+            <p>Sometimes you might need a new one. Perhaps you accidentally told someone your old one (oh dear), or perhaps you just want a fresh start.</p>
+            <ol>
+                <li>Find the token section</li>
+                <li>Click <strong>Reset Token</strong></li>
+                <li>A brand new token appears!</li>
+                <li>If any programs were using the old one, you'll need to tell them about the new one</li>
+            </ol>
+
+            <div class="float-right">
+            <img src="images/account-token-reset.png" alt="Token reset">
+            <p class="image-caption">Figure 3: The Reset button. Use it wisely.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="warning">
+                <strong>A Word of Caution:</strong> Your token is secret, just like a password. Don't tell it to anyone you don't trust completely. If someone else has your token, they can pretend to be you. If you think someone might have seen it, reset it right away.
+            </div>
+
+            <h2>Where You Can Go From Here</h2>
+            <p>From your account page, you can wander off to:</p>
+            <ul>
+                <li>See all your repositories</li>
+                <li>Create new repositories</li>
+                <li>Visit specific repositories</li>
+                <li>Do all sorts of repository things</li>
+            </ul>
+
+            <h2>Being Logged Into More Than One Account</h2>
+            <p>As we mentioned before, you can be logged into several accounts at once. Perhaps you have different accounts for different purposes—one for work, one for play. The computer keeps track of them all, each in its own little space.</p>
+            <ul>
+                <li>Switch between accounts whenever you like</li>
+                <li>Work with different repositories in each</li>
+                <li>Each account has its own separate session</li>
+            </ul>
+
+            <h2>When Things Go Wrong</h2>
+            <h3>Changes Won't Save</h3>
+            <ul>
+                <li>Did you click the Save button? (Check again.)</li>
+                <li>Look for any error messages—they're trying to help</li>
+                <li>Make sure you're allowed to change this account</li>
+                <li>Is your internet still working?</li>
+            </ul>
+
+            <h3>Can't Find Your Token</h3>
+            <ul>
+                <li>Are you looking at the right account?</li>
+                <li>Try refreshing the page</li>
+                <li>Check that you have the right permissions</li>
+            </ul>
+
+            <h2>What Comes Next</h2>
+            <p>Now that you know about your account, you might like to:</p>
+            <ul>
+                <li>Create some <a href="repository-operations.html">repositories</a> to keep your data in</li>
+                <li>Import and export data</li>
+                <li>Create <a href="view-operations.html">views</a> to ask questions</li>
+                <li>Read some <a href="tips-and-best-practices.html">helpful hints</a></li>
+            </ul>
+
+            <p>That's your account, then. It's yours—take good care of it.</p>
+        </div>
+    </div>
+</body>
+</html>

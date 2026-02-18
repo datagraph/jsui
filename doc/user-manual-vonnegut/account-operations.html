@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Operations - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Account Operations</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="login.html">← Previous: Login</a>
+            <a href="repository-operations.html">Next: Repository Operations →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Who You Are</h2>
+            <p>This section is about your account. Your account is a collection of information that says who you are. Or at least, who you claim to be. The computer believes you. It has to.</p>
+
+            <h2>What You'll See</h2>
+            <p>When you log in, you get to see things about yourself:</p>
+            <ul>
+                <li>Your username (you picked this, remember?)</li>
+                <li>Your email address</li>
+                <li>Your full name</li>
+                <li>Your homepage and blog (if you have them)</li>
+                <li>Your company</li>
+                <li>Where you live</li>
+                <li>Your repositories (boxes full of data)</li>
+            </ul>
+
+            <h2>Changing Who You Are</h2>
+            <p>You can edit most of this stuff. Not everything. Some things are permanent.</p>
+
+            <h3>Things You Can Change</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>firstname</code></td><td>Your first name</td></tr>
+                    <tr><td><code>familyname</code></td><td>Your last name</td></tr>
+                    <tr><td><code>fullname</code></td><td>Your whole name</td></tr>
+                    <tr><td><code>email</code></td><td>Where the emails go</td></tr>
+                    <tr><td><code>homepage</code></td><td>Your website</td></tr>
+                    <tr><td><code>blog</code></td><td>Your blog</td></tr>
+                    <tr><td><code>company</code></td><td>Where you work</td></tr>
+                    <tr><td><code>location</code></td><td>Where you are</td></tr>
+                    <tr><td><code>phone</code></td><td>Your phone number</td></tr>
+                    <tr><td><code>skype_id</code></td><td>Your Skype</td></tr>
+                    <tr><td><code>jabber_id</code></td><td>Your Jabber</td></tr>
+                    <tr><td><code>workinfo</code></td><td>Work stuff</td></tr>
+                </tbody>
+            </table>
+
+            <h3>How to Change Things</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to your account page. Click your name somewhere.
+            </div>
+
+            <div class="float-right">
+            <img src="images/account-metadata-editing.png" alt="Editing a field">
+            <p class="image-caption">Figure 1: Double-click. Type. Simple.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the thing you want to change.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Double-click on it. It turns into a text box.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Type the new value.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Press Enter or click somewhere else.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click the <strong>Save</strong> button. This is important.
+            </div>
+
+            <div class="float-left">
+            <img src="images/account-save-button.png" alt="Save button">
+            <p class="image-caption">Figure 2: The Save button. Click it.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="note">
+                <strong>The computer only sends what changed.</strong> It's efficient that way. It doesn't send everything every time. Just the bits that are different now.
+            </div>
+
+            <div class="warning">
+                <strong>Important:</strong> If you don't click Save, nothing happens. Well, nothing permanent. Your changes disappear when you leave. Click Save.
+            </div>
+
+            <h2>Your Token</h2>
+            <p>You have an authentication token. It's like a secret password for computers. Programs use it to access your account without typing passwords.</p>
+
+            <h3>Finding Your Token</h3>
+            <ol>
+                <li>Go to your account page</li>
+                <li>Look for the Token section</li>
+                <li>There it is</li>
+            </ol>
+
+            <h3>Getting a New Token</h3>
+            <p>Sometimes you need a new one:</p>
+            <ol>
+                <li>Find the token section</li>
+                <li>Click <strong>Reset Token</strong></li>
+                <li>New token appears</li>
+                <li>Update anything that was using the old one</li>
+            </ol>
+
+            <div class="float-right">
+            <img src="images/account-token-reset.png" alt="Token reset">
+            <p class="image-caption">Figure 3: The Reset button. Use it carefully.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="warning">
+                <strong>Security:</strong> Your token is secret. Don't share it. Anyone with your token can access your account. If you think someone else has it, reset it immediately.
+            </div>
+
+            <h2>Getting Around</h2>
+            <p>From your account page, you can:</p>
+            <ul>
+                <li>See all your repositories</li>
+                <li>Create new repositories</li>
+                <li>Go to specific repositories</li>
+                <li>Do repository things</li>
+            </ul>
+
+            <h2>Multiple Accounts</h2>
+            <p>You can have more than one account active. Maybe you have a work account and a personal account. Maybe you're testing something. Whatever the reason, it works:</p>
+            <ul>
+                <li>Switch between accounts</li>
+                <li>Work with different repositories</li>
+                <li>Each account has its own session</li>
+            </ul>
+
+            <h2>Troubleshooting</h2>
+            <h3>Changes Won't Save</h3>
+            <ul>
+                <li>Did you click the Save button?</li>
+                <li>Check for error messages</li>
+                <li>Make sure you have permission</li>
+                <li>Check your internet</li>
+            </ul>
+
+            <h3>Token Gone</h3>
+            <ul>
+                <li>Are you on the right account?</li>
+                <li>Try refreshing</li>
+                <li>Check your permissions</li>
+            </ul>
+
+            <h2>What's Next</h2>
+            <ul>
+                <li>Create <a href="repository-operations.html">repositories</a></li>
+                <li>Import and export data</li>
+                <li>Create <a href="view-operations.html">SPARQL views</a></li>
+                <li>Read the <a href="tips-and-best-practices.html">tips</a></li>
+            </ul>
+
+            <p>That's your account. It's yours. Take care of it.</p>
+        </div>
+    </div>
+</body>
+</html>

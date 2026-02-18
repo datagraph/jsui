@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anmeldung - Dydra Studio Benutzerhandbuch</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Anmeldung und Authentifizierung</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="../user-manual-milne/login.html">🌐 English</option>
+                    <option value="" selected>🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/login.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/login.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Zurück zur Handbuch-Startseite</a>
+            <a href="account-operations.html">Weiter: Konto-Operationen →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Die Tür</h2>
+            <p>Du kommst nicht rein, ohne zu beweisen, wer du bist. So läuft das nun mal. Der Computer vertraut dir nicht. Warum sollte er? Er kennt dich nicht.</p>
+
+            <h2>Die Tür finden</h2>
+            <p>Geh hierhin:</p>
+            <div class="note">
+                <strong>URL:</strong> <code>https://dydra.com/ui/user</code>
+            </div>
+            <p>Wenn du nicht angemeldet bist, siehst du eine Anmeldeseite. Wenn du angemeldet bist, nicht. So weißt du Bescheid.</p>
+
+            <h2>Reinkommen</h2>
+            <p>Hier ist das Ritual:</p>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zu <code>https://dydra.com/ui/user</code>. Das hast du gerade gemacht. Gut.
+            </div>
+
+            <div class="float-right">
+            <img src="images/login-form-filled.png" alt="Anmeldeformular mit eingegebenen Daten">
+            <p class="image-caption">Abbildung 1: Das Anmeldeformular. Füll die Lücken aus.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Füll die Lücken aus:
+                <ul>
+                    <li><strong>Host:</strong> Normalerweise <code>https://dydra.com</code></li>
+                    <li><strong>Login:</strong> Dein Benutzername</li>
+                    <li><strong>Passwort:</strong> Dein Passwort</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Klick <strong>Login</strong>. Oder drück Enter. Beides funktioniert.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Wenn du alles richtig gemacht hast, bist du drin. Wenn nicht, nicht. Versuch's nochmal.
+            </div>
+
+            <div class="note">
+                <strong>Interessante Tatsache:</strong> Du kannst in mehreren Konten gleichzeitig angemeldet sein. Der Computer kommt damit klar. Computer sind gut im Überblick behalten. Besser als Menschen, normalerweise.
+            </div>
+
+            <h2>Zwei Wege zu beweisen, dass du du bist</h2>
+            <p>Es gibt zwei Methoden:</p>
+            <ul>
+                <li><strong>Basic Authentication:</strong> Benutzername und Passwort. Der Klassiker. Funktioniert jedes Mal. Naja, meistens.</li>
+                <li><strong>Bearer Token:</strong> Ein spezieller Code für Computer, die mit Computern reden. Format: "Bearer <i>deinTokenHier</i>"</li>
+            </ul>
+            <p>Wenn du ein Mensch bist, der einen Browser benutzt, bleib beim Benutzernamen und Passwort. Dafür ist es da.</p>
+
+            <h2>Erinnerung</h2>
+            <h3>Was der Computer sich merkt</h3>
+            <p>Der Computer merkt sich deinen Benutzernamen. Das ist alles. Nur den Benutzernamen.</p>
+            <ul>
+                <li>Dein Benutzername wird im Browser gespeichert</li>
+                <li>Nächstes Mal, wenn du zurückkommst, ist er schon ausgefüllt</li>
+            </ul>
+
+            <div class="warning">
+                <strong>Was er sich nicht merkt:</strong> Dein Passwort. Dein Token. Deine Sitzung. Wenn du den Browser-Tab schließt, ist das alles weg. Puff. Verschwunden. Du musst dich wieder anmelden. Das ist ein Sicherheitsmerkmal, kein Fehler.
+            </div>
+
+            <h3>Abmelden</h3>
+            <p>Wenn du fertig bist:</p>
+            <ol>
+                <li>Klick <strong>Logout</strong> in der Navigationsleiste</li>
+                <li>Du wirst zur Anmeldeseite zurückgebracht</li>
+                <li>Alles, was du gemacht hast, ist jetzt weg</li>
+                <li>Dein Benutzername könnte noch da sein. Nur der Benutzername.</li>
+            </ol>
+
+            <h2>Wenn Dinge schief gehen</h2>
+            <h3>Kommst nicht rein</h3>
+            <p>Prüfe diese Dinge:</p>
+            <ul>
+                <li>Hast du dein Passwort richtig eingegeben? Feststelltaste ist eine Sache.</li>
+                <li>Ist die Host-URL korrekt? Sie sollte <code>https://dydra.com</code> sein</li>
+                <li>Funktioniert dein Internet?</li>
+                <li>Existiert dein Konto?</li>
+            </ul>
+
+            <h3>Fehlermeldungen</h3>
+            <p>Wenn du einen Fehler siehst:</p>
+            <ul>
+                <li>Lies ihn. Er versucht, dir etwas zu sagen.</li>
+                <li>"Invalid credentials" bedeutet falscher Benutzername oder Passwort</li>
+                <li>Wenn nichts funktioniert, schreib an <strong>support@dydra.com</strong></li>
+            </ul>
+
+            <h2>Und jetzt?</h2>
+            <p>Sobald du drin bist, kannst du:</p>
+            <ul>
+                <li>Deine <a href="account-operations.html">Kontoinformationen</a> ansehen</li>
+                <li><a href="repository-operations.html">Repositories</a> erstellen und verwalten</li>
+                <li><a href="view-operations.html">SPARQL-Abfragen</a> erstellen und ausführen</li>
+                <li>Die <a href="tips-and-best-practices.html">Tipps</a> lesen</li>
+                <li>Die <a href="appendices.html">Anhänge</a> konsultieren</li>
+            </ul>
+
+            <p>Willkommen bei Dydra Studio. Versuch nichts kaputt zu machen.</p>
+        </div>
+    </div>
+</body>
+</html>

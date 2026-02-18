@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konto-Operationen - Dydra Studio Benutzerhandbuch</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Konto-Operationen</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="../user-manual-milne/account-operations.html">🌐 English</option>
+                    <option value="" selected>🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/account-operations.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/account-operations.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Zurück zur Handbuch-Startseite</a>
+            <a href="login.html">← Vorherige: Anmeldung</a>
+            <a href="repository-operations.html">Weiter: Repository-Operationen →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Wer du bist</h2>
+            <p>Dieser Abschnitt handelt von deinem Konto. Dein Konto ist eine Sammlung von Informationen, die sagen, wer du bist. Oder zumindest, wer du behauptest zu sein. Der Computer glaubt dir. Er muss.</p>
+
+            <h2>Was du sehen wirst</h2>
+            <p>Wenn du dich anmeldest, siehst du Dinge über dich selbst:</p>
+            <ul>
+                <li>Dein Benutzername (den hast du ausgesucht, erinnerst du dich?)</li>
+                <li>Deine E-Mail-Adresse</li>
+                <li>Dein vollständiger Name</li>
+                <li>Deine Homepage und dein Blog (falls du welche hast)</li>
+                <li>Deine Firma</li>
+                <li>Wo du wohnst</li>
+                <li>Deine Repositories (Kisten voller Daten)</li>
+            </ul>
+
+            <h2>Ändern, wer du bist</h2>
+            <p>Du kannst das meiste davon bearbeiten. Nicht alles. Manche Dinge sind permanent.</p>
+
+            <h3>Dinge, die du ändern kannst</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feld</th>
+                        <th>Was es ist</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>firstname</code></td><td>Dein Vorname</td></tr>
+                    <tr><td><code>familyname</code></td><td>Dein Nachname</td></tr>
+                    <tr><td><code>fullname</code></td><td>Dein ganzer Name</td></tr>
+                    <tr><td><code>email</code></td><td>Wo die E-Mails hingehen</td></tr>
+                    <tr><td><code>homepage</code></td><td>Deine Webseite</td></tr>
+                    <tr><td><code>blog</code></td><td>Dein Blog</td></tr>
+                    <tr><td><code>company</code></td><td>Wo du arbeitest</td></tr>
+                    <tr><td><code>location</code></td><td>Wo du bist</td></tr>
+                    <tr><td><code>phone</code></td><td>Deine Telefonnummer</td></tr>
+                    <tr><td><code>skype_id</code></td><td>Dein Skype</td></tr>
+                    <tr><td><code>jabber_id</code></td><td>Dein Jabber</td></tr>
+                    <tr><td><code>workinfo</code></td><td>Arbeitskram</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Wie man Dinge ändert</h3>
+
+            <div class="step">
+                <span class="step-number">Schritt 1:</span>
+                Geh zu deiner Kontoseite. Klick irgendwo auf deinen Namen.
+            </div>
+
+            <div class="float-right">
+            <img src="images/account-metadata-editing.png" alt="Ein Feld bearbeiten">
+            <p class="image-caption">Abbildung 1: Doppelklick. Tippen. Einfach.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 2:</span>
+                Finde die Sache, die du ändern willst.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 3:</span>
+                Doppelklick drauf. Es wird zu einem Textfeld.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 4:</span>
+                Tippe den neuen Wert.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Schritt 5:</span>
+                Drück Enter oder klick woanders hin.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Schritt 6:</span>
+                Klick den <strong>Speichern</strong>-Button. Das ist wichtig.
+            </div>
+
+            <div class="float-left">
+            <img src="images/account-save-button.png" alt="Speichern-Button">
+            <p class="image-caption">Abbildung 2: Der Speichern-Button. Klick ihn.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="note">
+                <strong>Der Computer schickt nur, was sich geändert hat.</strong> Er ist so effizient. Er schickt nicht jedes Mal alles. Nur die Bits, die jetzt anders sind.
+            </div>
+
+            <div class="warning">
+                <strong>Wichtig:</strong> Wenn du nicht auf Speichern klickst, passiert nichts. Naja, nichts Permanentes. Deine Änderungen verschwinden, wenn du gehst. Klick Speichern.
+            </div>
+
+            <h2>Dein Token</h2>
+            <p>Du hast einen Authentifizierungstoken. Er ist wie ein geheimes Passwort für Computer. Programme benutzen ihn, um auf dein Konto zuzugreifen, ohne Passwörter einzugeben.</p>
+
+            <h3>Deinen Token finden</h3>
+            <ol>
+                <li>Geh zu deiner Kontoseite</li>
+                <li>Such den Token-Abschnitt</li>
+                <li>Da ist er</li>
+            </ol>
+
+            <h3>Einen neuen Token bekommen</h3>
+            <p>Manchmal brauchst du einen neuen:</p>
+            <ol>
+                <li>Finde den Token-Abschnitt</li>
+                <li>Klick <strong>Reset Token</strong></li>
+                <li>Neuer Token erscheint</li>
+                <li>Aktualisiere alles, was den alten benutzt hat</li>
+            </ol>
+
+            <div class="float-right">
+            <img src="images/account-token-reset.png" alt="Token zurücksetzen">
+            <p class="image-caption">Abbildung 3: Der Reset-Button. Benutze ihn vorsichtig.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="warning">
+                <strong>Sicherheit:</strong> Dein Token ist geheim. Teile ihn nicht. Jeder mit deinem Token kann auf dein Konto zugreifen. Wenn du denkst, jemand anderes hat ihn, setze ihn sofort zurück.
+            </div>
+
+            <h2>Sich umsehen</h2>
+            <p>Von deiner Kontoseite kannst du:</p>
+            <ul>
+                <li>Alle deine Repositories sehen</li>
+                <li>Neue Repositories erstellen</li>
+                <li>Zu bestimmten Repositories gehen</li>
+                <li>Repository-Sachen machen</li>
+            </ul>
+
+            <h2>Mehrere Konten</h2>
+            <p>Du kannst mehr als ein Konto aktiv haben. Vielleicht hast du ein Arbeitskonto und ein privates Konto. Vielleicht testest du etwas. Was auch immer der Grund ist, es funktioniert:</p>
+            <ul>
+                <li>Wechsle zwischen Konten</li>
+                <li>Arbeite mit verschiedenen Repositories</li>
+                <li>Jedes Konto hat seine eigene Sitzung</li>
+            </ul>
+
+            <h2>Problembehandlung</h2>
+            <h3>Änderungen werden nicht gespeichert</h3>
+            <ul>
+                <li>Hast du den Speichern-Button geklickt?</li>
+                <li>Prüfe auf Fehlermeldungen</li>
+                <li>Stelle sicher, dass du die Berechtigung hast</li>
+                <li>Prüfe dein Internet</li>
+            </ul>
+
+            <h3>Token verschwunden</h3>
+            <ul>
+                <li>Bist du auf dem richtigen Konto?</li>
+                <li>Versuch neu zu laden</li>
+                <li>Prüfe deine Berechtigungen</li>
+            </ul>
+
+            <h2>Was kommt als Nächstes</h2>
+            <ul>
+                <li>Erstelle <a href="repository-operations.html">Repositories</a></li>
+                <li>Importiere und exportiere Daten</li>
+                <li>Erstelle <a href="view-operations.html">SPARQL-Views</a></li>
+                <li>Lies die <a href="tips-and-best-practices.html">Tipps</a></li>
+            </ul>
+
+            <p>Das ist dein Konto. Es gehört dir. Pass gut darauf auf.</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+[
+  {
+    "requirement": "REQ-3.7.1",
+    "title": "Manage Collaborators",
+    "section": "collaboration",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Collaboration panel displayed",
+    "filename": "req-3-7-1-manage-collaborators-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:22.128Z"
+  },
+  {
+    "requirement": "REQ-3.7.1",
+    "title": "Manage Collaborators",
+    "section": "collaboration",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Collaborator list visible with Add button",
+    "filename": "req-3-7-1-manage-collaborators-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:22.395Z"
+  },
+  {
+    "requirement": "REQ-3.7.2",
+    "title": "Add/Edit/Remove Collaborators",
+    "section": "collaboration",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Empty collaborator form ready",
+    "filename": "req-3-7-2-add-edit-remove-collaborators-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:22.658Z"
+  },
+  {
+    "requirement": "REQ-3.7.2",
+    "title": "Add/Edit/Remove Collaborators",
+    "section": "collaboration",
+    "phase": "form-filled",
+    "stepIndex": 0,
+    "description": "Collaborator jhacker added with read access",
+    "filename": "req-3-7-2-add-edit-remove-collaborators-form-filled.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:22.972Z"
+  },
+  {
+    "requirement": "REQ-3.7.2",
+    "title": "Add/Edit/Remove Collaborators",
+    "section": "collaboration",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Collaborator entry added to list",
+    "filename": "req-3-7-2-add-edit-remove-collaborators-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:23.234Z"
+  },
+  {
+    "requirement": "REQ-3.7.3",
+    "title": "Save Collaboration Changes",
+    "section": "collaboration",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Save button enabled with pending changes",
+    "filename": "req-3-7-3-save-collaboration-changes-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:23.499Z"
+  },
+  {
+    "requirement": "REQ-3.7.3",
+    "title": "Save Collaboration Changes",
+    "section": "collaboration",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Collaboration changes saved via POST",
+    "filename": "req-3-7-3-save-collaboration-changes-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-16T13:29:24.442Z"
+  }
+]

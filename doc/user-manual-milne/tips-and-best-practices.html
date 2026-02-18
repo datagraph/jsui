@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Helpful Hints - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Helpful Hints</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>🌐 English</option>
+                    <option value="../user-manual-german/tips-and-best-practices.html">🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/tips-and-best-practices.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/tips-and-best-practices.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="view-operations.html">← Previous: Your Views</a>
+            <a href="appendices.html">Next: The Back of the Book →</a>
+        </nav>
+
+        <div class="content">
+            <h2>In Which We Share Some Useful Things</h2>
+            <p>Here are some things that people have discovered while using Dydra Studio. They're the sort of things you learn by doing, but we thought we'd write them down so you don't have to discover them all by yourself.</p>
+
+            <h2>Getting Around</h2>
+            <ul>
+                <li><strong>The Location Bar:</strong> There's a bar at the top where you can type addresses directly. It's faster than clicking, sometimes.</li>
+                <li><strong>Back and Forward:</strong> The browser's back and forward buttons work just like they should. Very handy.</li>
+                <li><strong>Tabs:</strong> You can open several things at once in different tabs. The computer doesn't mind keeping track.</li>
+                <li><strong>Shortcuts:</strong> Some things have keyboard shortcuts:
+                    <ul>
+                        <li>Ctrl+Enter (or Cmd+Enter on a Mac): Run a query</li>
+                        <li>Enter: Submit a form</li>
+                        <li>Escape: Close a dialog (when you change your mind)</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h2>The Query Editor</h2>
+            <ul>
+                <li><strong>Colours:</strong> The editor colours different parts of your SPARQL. Pay attention to the colours—they help you see if something's wrong.</li>
+                <li><strong>Suggestions:</strong> Sometimes the editor suggests words while you type. It's trying to help.</li>
+                <li><strong>Multiple Tabs:</strong> You can have several queries open at once and compare them.</li>
+                <li><strong>Different Formats:</strong> Try different answer formats to see which one suits your needs.</li>
+                <li><strong>The Log:</strong> If something goes wrong, check the log. It remembers everything that happened.</li>
+            </ul>
+
+            <h2>Looking After Your Data</h2>
+            <ul>
+                <li><strong>Make Copies:</strong> Before you do anything big, export your data first. Then if something goes wrong, you haven't lost everything.</li>
+                <li><strong>Start Small:</strong> When importing, try a little bit first to make sure it works before importing the whole lot.</li>
+                <li><strong>Let Big Things Run:</strong> Large imports can work in the background. You don't have to watch them the whole time.</li>
+                <li><strong>Watch the Progress:</strong> Those little progress indicators tell you how things are going. They're worth watching.</li>
+                <li><strong>Check Afterwards:</strong> After importing, run a quick query to make sure everything arrived properly.</li>
+            </ul>
+
+            <h2>Sharing Nicely</h2>
+            <ul>
+                <li><strong>Start Carefully:</strong> When you add new people, give them read-only access first. You can always give them more later.</li>
+                <li><strong>Write It Down:</strong> Remember why you gave each person access. You'll forget otherwise.</li>
+                <li><strong>Check Sometimes:</strong> Every now and then, look at who has access and remove anyone who doesn't need it anymore.</li>
+                <li><strong>Talk to People:</strong> Let your collaborators know what you expect. It prevents misunderstandings.</li>
+            </ul>
+
+            <h2>Keeping Things Running Smoothly</h2>
+            <ul>
+                <li><strong>Don't Open Too Much:</strong> Having lots of tabs open makes everything slower. Close the ones you're not using.</li>
+                <li><strong>Use Search:</strong> Instead of scrolling through everything, use filters to find what you need.</li>
+                <li><strong>Write Good Questions:</strong> Well-written SPARQL runs faster. It's worth learning to write it well.</li>
+            </ul>
+
+            <h2>When Things Go Wrong</h2>
+
+            <h3>Import Troubles</h3>
+            <p>If your data won't go in:</p>
+            <ul>
+                <li>Is it a file type that's supported?</li>
+                <li>Is the file too big?</li>
+                <li>Do you have permission to write here?</li>
+                <li>Try using the background import for big files</li>
+            </ul>
+
+            <h3>Query Troubles</h3>
+            <p>If your question won't work:</p>
+            <ul>
+                <li>Is there a spelling mistake in your SPARQL?</li>
+                <li>Is there data there to ask about?</li>
+                <li>What does the error message say?</li>
+                <li>Try a simpler question first</li>
+            </ul>
+
+            <h3>Login Troubles</h3>
+            <p>If you can't get in:</p>
+            <ul>
+                <li>Is your password right? (Check the Caps Lock key.)</li>
+                <li>Is the host address correct?</li>
+                <li>Try clearing your browser's memory and starting fresh</li>
+                <li>Ask the administrator if nothing works</li>
+            </ul>
+
+            <h3>Collaboration Troubles</h3>
+            <p>If sharing isn't working:</p>
+            <ul>
+                <li>Are the usernames spelled correctly?</li>
+                <li>Are you allowed to manage collaborators?</li>
+                <li>Did you click Save?</li>
+                <li>Try refreshing the page</li>
+            </ul>
+
+            <h2>The Most Important Hint of All</h2>
+            <p>Click <strong>Save</strong>.</p>
+            <p>Whatever you do, remember to click Save. The computer can't read your mind. It only knows about changes when you tell it to save them. So always, always click Save.</p>
+            <p>(We've said this before, but it's worth saying again.)</p>
+
+            <h2>More Reading</h2>
+            <p>If you'd like to know more:</p>
+            <ul>
+                <li><a href="appendices.html">The Back of the Book</a> — Lists of file types and shortcuts</li>
+                <li><a href="login.html">Getting In</a> — All about logging in</li>
+                <li><a href="repository-operations.html">Your Repositories</a> — All about storing data</li>
+                <li><a href="view-operations.html">Your Views</a> — All about asking questions</li>
+            </ul>
+
+            <p>There you are. Some helpful hints. We hope they help.</p>
+        </div>
+    </div>
+</body>
+</html>

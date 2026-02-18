@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Views - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Your Views</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>🌐 English</option>
+                    <option value="../user-manual-german/view-operations.html">🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/view-operations.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/view-operations.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="repository-operations.html">← Previous: Your Repositories</a>
+            <a href="tips-and-best-practices.html">Next: Helpful Hints →</a>
+        </nav>
+
+        <div class="content">
+            <h2>In Which We Learn to Ask Questions</h2>
+            <p>A view is a question you've saved so you can ask it again later. Because sometimes you think of a very good question, and it would be a shame to forget it. The question is written in a special language called SPARQL (which is pronounced "sparkle," like something that glitters).</p>
+
+            <h2>What Views Are For</h2>
+            <p>Views are rather useful:</p>
+            <ul>
+                <li>You can save questions you ask often</li>
+                <li>You can share them with friends</li>
+                <li>You can ask them in different ways and get different sorts of answers</li>
+                <li>You can keep them all together in one repository, nice and tidy</li>
+            </ul>
+
+            <h2>Making a New View</h2>
+            <p>Here's how to save a new question:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository where you want to keep this question.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the views section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click <strong>New View</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Give your question a name. Something that will remind you what it's about.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-creation-dialog.png" alt="View creation dialog with name entered">
+            <p class="image-caption">Figure 1: Name your question.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Press Enter.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                A little message pops up to say it worked.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-creation-confirmation.png" alt="View creation confirmation popup">
+            <p class="image-caption">Figure 2: It worked! Now write the actual question.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 7:</span>
+                An editor appears. That's where you write your question.
+            </div>
+
+            <div class="note">
+                <strong>Important:</strong> Your new view is empty right now. It's like a blank piece of paper. You need to write something on it and save it, or it won't do anything at all.
+            </div>
+
+            <h2>Writing Your Question (In the Repository)</h2>
+            <p>You can write your question right there in the repository pane.</p>
+
+            <h3>Opening the Editor</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click on the view's name.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                An editor opens up. It's a nice place to write SPARQL.
+            </div>
+
+            <h3>Writing the Question</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Find the big text area where you can type.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Write your SPARQL question. The editor will colour different parts different colours, which is helpful for seeing what's what.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-editing-repository-pane.png" alt="View editor in repository pane with query text">
+            <p class="image-caption">Figure 3: Write your question here.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click <strong>Save</strong> to remember it forever (or at least until you change it).
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                You'll see a message saying it saved. Hooray!
+            </div>
+
+            <div class="note">
+                <strong>A Shortcut:</strong> If you press Ctrl+Enter (or Cmd+Enter on a Mac), the question runs immediately. You don't have to save it first—though saving is still a good idea.
+            </div>
+
+            <h2>Writing in Its Own Window</h2>
+            <p>If you'd like more room to write, you can give the view its very own pane.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find your view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click the little pane button (it looks like a folder with a plus).
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                A whole new pane opens, just for this view. So much room!
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-editing-separate-pane.png" alt="View editor in separate pane with query text">
+            <p class="image-caption">Figure 4: A room of one's own.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Write your question.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click <strong>Save</strong>.
+            </div>
+
+            <div class="note">
+                <strong>Multiple Windows:</strong> You can have lots of editors open at once, some in the repository pane and some in their own panes. They don't interfere with each other at all.
+            </div>
+
+            <h2>Asking the Question (Running a View)</h2>
+            <p>Once you've written a question, you can ask it and get an answer.</p>
+
+            <h3>From the Editor</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open the view in an editor.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Make sure your question looks right.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Choose what shape you'd like the answer in (there's a little dropdown menu).
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-execution-ready.png" alt="View editor ready to execute with format selected">
+            <p class="image-caption">Figure 5: Ready to ask!</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Click <strong>Run</strong> (or press Ctrl+Enter).
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                The answer appears below. There it is!
+            </div>
+
+            <h3>Different Kinds of Answers</h3>
+            <p>Answers can come in different shapes:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Shape</th>
+                        <th>What It Looks Like</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>JSON</td><td>Lots of curly brackets (computers like this)</td></tr>
+                    <tr><td>XML</td><td>Lots of angle brackets (also for computers)</td></tr>
+                    <tr><td>HTML</td><td>A nice neat table (easy for people to read)</td></tr>
+                    <tr><td>CSV</td><td>Commas between everything (good for spreadsheets)</td></tr>
+                    <tr><td>TSV</td><td>Tabs between everything (also for spreadsheets)</td></tr>
+                    <tr><td>Turtle</td><td>RDF in a friendly format</td></tr>
+                    <tr><td>N-Triples</td><td>RDF, one line at a time</td></tr>
+                    <tr><td>RDF/XML</td><td>RDF in XML clothing</td></tr>
+                    <tr><td>JSON-LD</td><td>JSON that's also RDF</td></tr>
+                    <tr><td>SVG</td><td>A picture! How lovely!</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Seeing Answers in a New Window</h2>
+            <p>Sometimes it's nice to see results in their very own window, separate from everything else.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find your view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click the window button (it looks like a little link).
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-window-button.png" alt="View list with window button highlighted">
+            <p class="image-caption">Figure 6a: The window button.</p>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                A brand new window opens with your results in a table!
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-presentation-new-window.png" alt="View results displayed in new browser window">
+            <p class="image-caption">Figure 6b: Results in their own window.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                You can choose different answer shapes from a menu in the new window.
+            </div>
+
+            <div class="warning">
+                <strong>Popups:</strong> If nothing happens when you click, your browser might be blocking new windows. You'll need to tell it that popups from this site are all right.
+            </div>
+
+            <h2>Deleting a View</h2>
+            <p>Sometimes a question isn't useful anymore, and you'd like to tidy it away.</p>
+
+            <div class="warning">
+                <strong>Be Sure:</strong> When you delete a view, it's gone forever. If you might want the question again someday, copy it somewhere safe first.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Find the view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click the delete button (the little rubbish bin).
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                A message appears, asking if you're sure.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-deletion-confirmation.png" alt="View deletion confirmation dialog">
+            <p class="image-caption">Figure 7: Are you quite sure?</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                If you're sure, click to confirm.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                The view is gone.
+            </div>
+
+            <h2>Nice Things the Editor Can Do</h2>
+
+            <h3>Multiple Tabs</h3>
+            <p>The editor can have several tabs, like a notebook with different pages:</p>
+            <ul>
+                <li>Each tab has its own question</li>
+                <li>Each tab keeps its own answers</li>
+                <li>You can flip between them to compare</li>
+                <li>Close tabs you don't need anymore</li>
+            </ul>
+
+            <h3>Reset</h3>
+            <p>If you've made a mess of your question, click Reset to go back to how it was before you started changing things.</p>
+
+            <h3>The Log</h3>
+            <p>There's a little log that remembers what happened—questions you asked, things you saved, any mistakes that occurred, and how long things took.</p>
+
+            <h3>Dragging to a New Window</h3>
+            <p>You can grab an editor tab and drag it right out of the browser window, and it becomes its own little window. Rather magical, really.</p>
+
+            <h2>Some Advice About Views</h2>
+            <ul>
+                <li><strong>Names:</strong> Give views sensible names that remind you what they're about</li>
+                <li><strong>Organization:</strong> Keep related views in the same repository</li>
+                <li><strong>Comments:</strong> You can write notes in your SPARQL using # marks</li>
+                <li><strong>Testing:</strong> Try your question before you save it</li>
+                <li><strong>Backups:</strong> Keep copies of important questions somewhere safe</li>
+            </ul>
+
+            <h2>When Things Go Wrong</h2>
+            <h3>Won't Save</h3>
+            <ul>
+                <li>Did you click Save?</li>
+                <li>Check the log for error messages</li>
+                <li>Do you have permission?</li>
+                <li>Is your internet working?</li>
+            </ul>
+
+            <h3>Won't Run</h3>
+            <ul>
+                <li>Is there a mistake in your SPARQL?</li>
+                <li>Are the addresses in your question right?</li>
+                <li>Look at the log for clues</li>
+                <li>Is there actually data to ask about?</li>
+            </ul>
+
+            <h3>View Missing</h3>
+            <ul>
+                <li>Try refreshing the page</li>
+                <li>Did it save properly?</li>
+                <li>Are you looking in the right repository?</li>
+            </ul>
+
+            <h2>What Comes Next</h2>
+            <p>Now you know about views! You might like to:</p>
+            <ul>
+                <li>Ask your questions regularly</li>
+                <li>Share them with friends</li>
+                <li>Build bigger questions from smaller ones</li>
+                <li>Read some <a href="tips-and-best-practices.html">helpful hints</a></li>
+                <li>Look at the <a href="appendices.html">back of the book</a></li>
+            </ul>
+
+            <p>That's views, then. Questions you can save and ask again. Rather nice, isn't it?</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Repositories - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Your Repositories</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>🌐 English</option>
+                    <option value="../user-manual-german/repository-operations.html">🇩🇪 Deutsch</option>
+                    <option value="../user-manual-dutch/repository-operations.html">🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/repository-operations.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">← Previous: Your Account</a>
+            <a href="view-operations.html">Next: Your Views →</a>
+        </nav>
+
+        <div class="content">
+            <h2>In Which We Find Places to Keep Things</h2>
+            <p>A repository is a place where data lives. Think of it as a cozy little house for your information—a place where facts and figures can settle down and be comfortable. You can have as many repositories as you like, each with its own name and its own collection of things inside.</p>
+
+            <h2>Making a New Repository</h2>
+            <p>If you'd like a new place to keep some data, here's how to make one:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to your account page. That's where all your repositories are listed.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the <strong>New Repository</strong> button and give it a click.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                A little window will appear, asking you for a name. Think of a good name—something that will remind you what's inside. You can also choose a type:
+                <ul>
+                    <li><strong>lmdb</strong>: An ordinary repository (this is the usual choice)</li>
+                    <li><strong>lmdb-revisioned</strong>: A special repository that remembers what things used to be, like a diary</li>
+                </ul>
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-creation-dialog.png" alt="Repository creation dialog with name entered">
+            <p class="image-caption">Figure 1: Give your new repository a name.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Click OK (or press Enter).
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                And there it is! Your new repository, all ready for data.
+            </div>
+
+            <div class="note">
+                <strong>About Names:</strong> Repository names can have letters, numbers, hyphens (-), and underscores (_). No spaces, though. Spaces confuse computers. Keep it simple.
+            </div>
+
+            <h2>What's Inside a Repository</h2>
+            <p>When you look at a repository, you'll see:</p>
+            <ul>
+                <li>The name (you chose this)</li>
+                <li>A summary (a few words about what's inside)</li>
+                <li>A description (more words, if needed)</li>
+                <li>A homepage (a web address, if there is one)</li>
+                <li>How many quads are in there (quads are the little bits of data)</li>
+                <li>How much space it takes up</li>
+                <li>License information</li>
+                <li>Whether anything is being imported right now</li>
+                <li>Views (questions you've saved)</li>
+            </ul>
+
+            <h2>Changing What's Written on the Label</h2>
+            <p>You can change most of the information about a repository:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>The Thing</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>homepage</code></td><td>A web address</td></tr>
+                    <tr><td><code>summary</code></td><td>A short description</td></tr>
+                    <tr><td><code>description</code></td><td>A longer description</td></tr>
+                    <tr><td><code>abstract</code></td><td>An even briefer summary</td></tr>
+                    <tr><td><code>privacy_setting</code></td><td>Whether others can see it</td></tr>
+                    <tr><td><code>permissible_ip_addresses</code></td><td>Which computers can connect</td></tr>
+                    <tr><td><code>prefixes</code></td><td>Shortcuts for long web addresses</td></tr>
+                </tbody>
+            </table>
+
+            <h3>How to Change Them</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the thing you want to change.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Double-click on it (click twice, quickly).
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-metadata-editing.png" alt="Repository metadata field in edit mode">
+            <p class="image-caption">Figure 2: Double-click to edit.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Type something new.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Press Enter or click somewhere else.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click <strong>Save</strong>. (Very important!)
+            </div>
+
+            <div class="float-left">
+            <img src="images/repository-save-button.png" alt="Repository page with Save button highlighted">
+            <p class="image-caption">Figure 3: The Save button. Always click it.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>Putting Things In (Importing)</h2>
+            <p>Data can come from files on your computer or from addresses on the internet.</p>
+
+            <h3>Types of Files</h3>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl) — A friendly format</li>
+                <li><strong>RDF/XML</strong> (.rdf, .xml) — An older format</li>
+                <li><strong>N-Triples</strong> (.nt) — Very simple, one thing per line</li>
+                <li><strong>N-Quads</strong> (.nq) — Like N-Triples, but with an extra bit</li>
+                <li><strong>TriG</strong> (.trig) — Like Turtle, but fancier</li>
+                <li><strong>JSON-LD</strong> (.jsonld, .json) — A modern format</li>
+                <li><strong>CSV</strong> (.csv) — Like a spreadsheet</li>
+            </ul>
+
+            <h3>From Your Computer</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click <strong>Import</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Choose a file from your computer.
+            </div>
+
+            <div class="float-right">
+            <img src="images/dataset-import-file-selected.png" alt="Dataset import dialog with file selected">
+            <p class="image-caption">Figure 4: Choose your file.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                The computer figures out what kind of file it is.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Click Import.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Wait patiently. It will tell you when it's done.
+            </div>
+
+            <h3>From the Internet</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click <strong>Import</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Type in the web address where the data lives.
+            </div>
+
+            <div class="float-left">
+            <img src="images/dataset-import-url-entered.png" alt="Dataset import dialog with URL entered">
+            <p class="image-caption">Figure 5: Type the web address.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                You might need to tell it what kind of file it is.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Click Import.
+            </div>
+
+            <div class="note">
+                <strong>Patience:</strong> Big imports can take a while. The computer can work on them in the background while you do other things. It doesn't mind.
+            </div>
+
+            <h2>Taking Things Out (Exporting)</h2>
+            <p>You can also take data out of a repository and save it as a file.</p>
+
+            <h3>Export Formats</h3>
+            <p>The same sorts of files you can import, you can export: Turtle, N-Triples, RDF/XML, JSON-LD, and more.</p>
+
+            <div class="float-left">
+            <img src="images/dataset-export-format-selected.png" alt="Dataset export dialog with format selected">
+            <p class="image-caption">Figure 6: Pick a format for your export.</p>
+            </div>
+
+            <div class="clear"></div>
+
+            <h2>Sharing with Friends (Collaborators)</h2>
+            <p>You can let other people look at your repository, or even change things in it.</p>
+
+            <h3>Adding a Friend</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the Collaboration section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click <strong>Add Collaborator</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Type their username.
+            </div>
+
+            <div class="float-right">
+            <img src="images/collaborator-addition-form.png" alt="Collaborator addition form with values entered">
+            <p class="image-caption">Figure 7: Add a friend to your repository.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Choose what they can do:
+                <ul>
+                    <li><strong>Read:</strong> They can look, but not change things</li>
+                    <li><strong>Write:</strong> They can look AND change things</li>
+                </ul>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click Add.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 7:</span>
+                Click <strong>Save</strong>. (Always Save!)
+            </div>
+
+            <h3>Removing a Friend</h3>
+            <p>If you need to remove someone's access, find them in the list, click the delete button (it looks like a little rubbish bin), confirm, and Save.</p>
+
+            <div class="float-right">
+            <img src="images/collaborator-removal-confirmation.png" alt="Collaborator removal confirmation dialog">
+            <p class="image-caption">Figure 8: Saying goodbye.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h3>Changing What They Can Do</h3>
+
+            <div class="float-left">
+            <img src="images/collaborator-permission-editing.png" alt="Collaborator permission editing with new permission selected">
+            <p class="image-caption">Figure 9: Changing permissions.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>Emptying Everything Out (Clearing)</h2>
+            <p>Sometimes you want to empty a repository completely—take everything out and start fresh.</p>
+
+            <div class="warning">
+                <strong>Be Careful!</strong> When you clear a repository, all the data inside is gone forever. You can't get it back. Think very carefully before you do this.
+            </div>
+
+            <div class="float-right">
+            <img src="images/repository-clear-confirmation.png" alt="Repository clear confirmation dialog">
+            <p class="image-caption">Figure 10: The warning. It means it.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>Getting Rid of the Repository Entirely (Deleting)</h2>
+            <p>If you want to remove a repository completely—not just empty it, but make it go away entirely...</p>
+
+            <div class="warning">
+                <strong>Even More Careful!</strong> Deleting a repository removes everything: the data, the views, the settings, everything. It's gone forever and ever. Only do this if you're absolutely certain.
+            </div>
+
+            <h2>When Things Go Wrong</h2>
+            <h3>Import Won't Work</h3>
+            <ul>
+                <li>Is it a supported file type?</li>
+                <li>Is the file valid?</li>
+                <li>Is your internet working?</li>
+                <li>Do you have permission to write to this repository?</li>
+            </ul>
+
+            <h3>Export Won't Work</h3>
+            <ul>
+                <li>Is there actually data in there?</li>
+                <li>Try a different format</li>
+                <li>Check your browser's download settings</li>
+            </ul>
+
+            <h2>What Comes Next</h2>
+            <p>Now you know about repositories! Next you might want to:</p>
+            <ul>
+                <li>Create <a href="view-operations.html">views</a> to ask questions of your data</li>
+                <li>Import more data</li>
+                <li>Read some <a href="tips-and-best-practices.html">helpful hints</a></li>
+                <li>Look at the <a href="appendices.html">back of the book</a></li>
+            </ul>
+
+            <p>There you are. Repositories: cozy homes for your data.</p>
+        </div>
+    </div>
+</body>
+</html>

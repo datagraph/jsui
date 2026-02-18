@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Dydra Studio User Manual</h1>
+            <p>A Systematic Introduction to Graph Data Management</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <ul>
+                <li>
+                    <a href="login.html">
+                          <h2>Chapter 1: Authentication</h2>
+                          <p>On the establishment and maintenance of user sessions.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="account-operations.html">
+                        <h2>Chapter 2: Account Management</h2>
+                        <p>The representation and modification of user identity.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="repository-operations.html">
+                        <h2>Chapter 3: Repository Operations</h2>
+                        <p>Fundamental operations on persistent data stores.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="view-operations.html">
+                        <h2>Chapter 4: Query Views</h2>
+                        <p>The art of declarative data retrieval via SPARQL.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="tips-and-best-practices.html">
+                        <h2>Chapter 5: Practical Considerations</h2>
+                        <p>Empirically-derived recommendations for effective use.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="appendices.html">
+                        <h2>Appendices</h2>
+                        <p>Reference tables and formal definitions.</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <h2>Preface</h2>
+            <p>This manual describes <em>Dydra Studio</em>, a browser-based application for managing RDF (Resource Description Framework) data repositories. The name "Dydra" derives from the computational notion of persistent, distributed data structures—though the etymological details need not concern the practitioner.</p>
+
+            <p>The Resource Description Framework, standardized by the World Wide Web Consortium in 1999 and subsequently revised, provides a formal model for expressing relationships between entities. Each statement in RDF constitutes a <em>triple</em>: a subject, predicate, and object. When extended with a fourth component specifying the named graph, we obtain a <em>quad</em>. This manual assumes familiarity with these fundamental concepts.</p>
+
+            <h3>Scope and Purpose</h3>
+            <p>Dydra Studio is implemented as what contemporary web developers term a "single-page application"—a design pattern wherein the interface updates dynamically without requiring full page reloads. This architectural choice has important implications for both performance and user interaction.</p>
+
+            <p>The system provides facilities for:</p>
+            <ul>
+                <li>Persistent storage of RDF datasets in named repositories</li>
+                <li>Query execution using the SPARQL Protocol and RDF Query Language</li>
+                <li>Data interchange via multiple serialization formats</li>
+                <li>Management of saved queries (termed "views")</li>
+                <li>Collaborative access control mechanisms</li>
+                <li>Modification of metadata associated with repositories and accounts</li>
+            </ul>
+
+            <h2>Prerequisites</h2>
+
+            <h3>System Requirements</h3>
+            <p>The application requires a modern web browser with JavaScript execution capabilities. Empirical testing confirms compatibility with recent versions of Chrome, Firefox, Safari, and Edge. The reader is advised to maintain current browser versions, as older implementations may lack necessary API support.</p>
+
+            <div class="note">
+                <strong>Technical Note:</strong> The application URL is <code>https://dydra.com/ui/user</code>. This constitutes the entry point for all subsequent operations described herein.
+            </div>
+
+            <h3>Interface Variants</h3>
+            <p>Two distinct interfaces exist:</p>
+            <ul>
+                <li><strong>User Application</strong>: The primary interface for data management operations, documented in this manual.</li>
+                <li><strong>Administrative Console</strong>: A separate interface for system administration, documented elsewhere.</li>
+            </ul>
+
+            <h3>Algorithm: Initial Access</h3>
+            <p>The procedure for initial system access may be expressed as follows:</p>
+            <ol>
+                <li>Direct the browser to <strong>https://dydra.com/ui/user</strong></li>
+                <li>Complete the authentication procedure (see <a href="login.html">Chapter 1</a>)</li>
+                <li>Proceed with desired operations as documented in subsequent chapters</li>
+            </ol>
+
+            <h3>Organization of This Manual</h3>
+            <p>The material is organized in order of increasing complexity:</p>
+            <ul>
+                <li><strong><a href="login.html">Chapter 1: Authentication</a></strong> — Establishing valid sessions</li>
+                <li><strong><a href="account-operations.html">Chapter 2: Account Management</a></strong> — User identity and configuration</li>
+                <li><strong><a href="repository-operations.html">Chapter 3: Repository Operations</a></strong> — Data storage and retrieval</li>
+                <li><strong><a href="view-operations.html">Chapter 4: Query Views</a></strong> — SPARQL query management</li>
+                <li><strong><a href="tips-and-best-practices.html">Chapter 5: Practical Considerations</a></strong> — Operational guidance</li>
+                <li><strong><a href="appendices.html">Appendices</a></strong> — Format specifications and reference material</li>
+            </ul>
+
+            <h3>Support</h3>
+            <p>Technical inquiries may be directed to <strong>support@dydra.com</strong>. The author recommends providing detailed descriptions of observed behavior, expected behavior, and environmental factors when reporting difficulties.</p>
+
+            <p><em>— The remainder of this manual assumes the reader has successfully accessed the application interface.</em></p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Dydra. All rights reserved.</p>
+            <p>Manual Version: 2026-02-07 (Knuth Edition)</p>
+        </div>
+    </footer>
+</body>
+</html>

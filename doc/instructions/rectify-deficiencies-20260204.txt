@@ -1,0 +1,39 @@
+propose a plan to resolve jsui deficiencies.
+take into account the two single-page javascript implementations, the rails implementation (/Users/Shared/Development/Source/Library/org/datagraph/dydra-rails-20161201) and the lisp spocq implementation (/Users/Shared/Development/Source/Library/org/datagraph/spocq/gensrc)
+in the spocq implementation src/spocq-server/resource.lisp defines the endpoint patterns and src/spocq-server/admin implemeents them.
+
+consider these deficiencies in formulating the plan.
+save it as doc/improvements.md
+
+- the description should more clearly distinguish patterns for local routes which control the client-side presentation from remote endpoint patterns
+- password reset is currently performed with requests to existing rails endpoints and pages. propose server implementation using the same persistent resources.
+- email confirmation is the same.
+- these require server-side implementation.
+- new invitations depend on a rails page. a link to it should be added to the user login page.
+  currently reached from the home page. a link from the invitation list is not useful.
+  needs to be reimplemented in new service
+- auth token reset is currently performed with requests to existing rails endpoint. this requires server-side implementation
+- there is no account--account collaboration, even in the rails case, it does not exist
+- the graph store endpoints, /<acct>/<repo>, are available also for post, put, delete
+1. repository meta from rails page : status, quad count, size need a request location or must be integrated into other metadata,
+2. each account page has a list of views
+    the entries should support the link to execute the view with an html document returned
+3. -
+4. -
+5. -
+6. the logic was specified to disable import just as export until the response is received
+    support for the additional asynchronous import capability must be included in the import ui
+7. import status should indicate a byte count
+    add a means to terminate the request
+8. import history and transaction history are equivalent
+9. authorization. current admin app requires admin authorization.
+    change that to permit any authenticated user, but expect that some requests will have limited responses.
+    limit deletion to admin users
+10.either the admin spa does not need to create invitations or it should adopt the user app page.
+11. if it is possible to have access to the response header during the process, there could be a meter for bytes/total
+12. propose seo inclusions
+13. suggest how to eliminate bootstrap, jquery, aristo (css and js)
+14. it was admin only. change to limit just side-effect buttons to admin only. leave service to decide content access
+15. propose implementation based on lisp code references
+16. query history pane is based on import logging in the service with records in the same postgres tables as the rails version.
+17. no payment mechanism intended

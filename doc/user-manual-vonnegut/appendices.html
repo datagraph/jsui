@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appendices - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Appendices</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="tips-and-best-practices.html">← Previous: Tips and Best Practices</a>
+        </nav>
+
+        <div class="content">
+            <h2>Appendix A: File Formats</h2>
+            <p>Computers need to agree on how to store things. Here's what we agreed on.</p>
+
+            <h3>For Importing</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Extension</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>RDF, but readable</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code>, <code>.xml</code></td><td>RDF in XML</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>One triple per line</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>N-Triples plus graphs</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle plus graphs</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code>, <code>.json</code></td><td>JSON that means something</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Spreadsheet style</td></tr>
+                </tbody>
+            </table>
+
+            <h3>For Exporting</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Extension</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>RDF, but readable</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>One triple per line</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>N-Triples plus graphs</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code></td><td>RDF in XML</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code></td><td>JSON that means something</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle plus graphs</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Spreadsheet style</td></tr>
+                </tbody>
+            </table>
+
+            <h3>For Query Results</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Media Type</th>
+                        <th>What It Is</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>JSON</strong></td><td><code>application/sparql-results+json</code></td><td>The default</td></tr>
+                    <tr><td><strong>XML</strong></td><td><code>application/sparql-results+xml</code></td><td>For XML fans</td></tr>
+                    <tr><td><strong>SVG</strong></td><td><code>image/vnd.dydra.SPARQL-RESULTS+GRAPHVIZ+SVG+XML</code></td><td>A picture</td></tr>
+                    <tr><td><strong>HTML</strong></td><td><code>text/html</code></td><td>A nice table</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>text/csv</code></td><td>Commas</td></tr>
+                    <tr><td><strong>TSV</strong></td><td><code>text/tab-separated-values</code></td><td>Tabs</td></tr>
+                    <tr><td><strong>Turtle</strong></td><td><code>text/turtle</code></td><td>For CONSTRUCT queries</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>application/n-triples</code></td><td>For CONSTRUCT queries</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>application/rdf+xml</code></td><td>For CONSTRUCT queries</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>application/ld+json</code></td><td>For CONSTRUCT queries</td></tr>
+                    <tr><td><strong>SSE</strong></td><td><code>application/sparql-query+sse</code></td><td>If you know, you know</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix B: Keyboard Shortcuts</h2>
+            <p>For people who don't like mice. Or for people in a hurry. Same difference.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>What</th>
+                        <th>How</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Run Query</td><td>Ctrl+Enter (Mac: Cmd+Enter)</td></tr>
+                    <tr><td>Submit Form</td><td>Enter</td></tr>
+                    <tr><td>Cancel</td><td>Escape</td></tr>
+                    <tr><td>Close Tab</td><td>Click the X</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix C: Words</h2>
+            <p>People use words that mean specific things. Here's what those things are.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Word</th>
+                        <th>What It Means</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Account</strong></td><td>You</td></tr>
+                    <tr><td><strong>Repository</strong></td><td>A box of data</td></tr>
+                    <tr><td><strong>View</strong></td><td>A saved question</td></tr>
+                    <tr><td><strong>Quad</strong></td><td>A fact with four parts</td></tr>
+                    <tr><td><strong>SPARQL</strong></td><td>How you ask questions</td></tr>
+                    <tr><td><strong>Collaborator</strong></td><td>Someone you let in</td></tr>
+                    <tr><td><strong>Token</strong></td><td>A password for computers</td></tr>
+                    <tr><td><strong>Pane</strong></td><td>A tabbed window thing</td></tr>
+                    <tr><td><strong>Import</strong></td><td>Putting data in</td></tr>
+                    <tr><td><strong>Export</strong></td><td>Getting data out</td></tr>
+                </tbody>
+            </table>
+
+            <h2>The End</h2>
+            <p>That's everything. The lists. The tables. The words.</p>
+            <p>Go back to the <a href="index.html">beginning</a> if you want. Or explore:</p>
+            <ul>
+                <li><a href="login.html">Login</a> - The door</li>
+                <li><a href="account-operations.html">Account Operations</a> - Who you are</li>
+                <li><a href="repository-operations.html">Repository Operations</a> - Your boxes</li>
+                <li><a href="view-operations.html">View Operations</a> - Your questions</li>
+                <li><a href="tips-and-best-practices.html">Tips and Best Practices</a> - Hard-won wisdom</li>
+            </ul>
+
+            <p>And so it goes.</p>
+        </div>
+    </div>
+</body>
+</html>

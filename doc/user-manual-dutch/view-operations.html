@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Je Views - Dydra Studio Gebruikershandleiding</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-text">
+                <h1>Je Views</h1>
+            </div>
+            <div class="language-selector">
+                <select onchange="if(this.value) window.location.href=this.value">
+                    <option value="../user-manual-milne/view-operations.html">🌐 English</option>
+                    <option value="../user-manual-german/view-operations.html">🇩🇪 Deutsch</option>
+                    <option value="" selected>🇳🇱 Nederlands</option>
+                    <option value="../user-manual-ukrainian/view-operations.html">🇺🇦 Українська</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Terug naar Handleiding Home</a>
+            <a href="repository-operations.html">← Vorige: Je Repositories</a>
+            <a href="tips-and-best-practices.html">Volgende: Handige Tips →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Waarin we leren vragen te stellen</h2>
+            <p>Een view is een vraag die je opgeslagen hebt zodat je hem later opnieuw kunt stellen. Want soms bedenk je een heel goede vraag, en het zou zonde zijn om hem te vergeten. De vraag wordt geschreven in een speciale taal die SPARQL heet (wat uitgesproken wordt als "sparkle," zoals iets dat glinstert).</p>
+
+            <h2>Waar views voor zijn</h2>
+            <p>Views zijn best handig:</p>
+            <ul>
+                <li>Je kunt vragen opslaan die je vaak stelt</li>
+                <li>Je kunt ze delen met vrienden</li>
+                <li>Je kunt ze op verschillende manieren stellen en verschillende soorten antwoorden krijgen</li>
+                <li>Je kunt ze allemaal bij elkaar houden in één repository, lekker netjes</li>
+            </ul>
+
+            <h2>Een nieuwe view maken</h2>
+            <p>Zo sla je een nieuwe vraag op:</p>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Ga naar de repository waar je deze vraag wilt bewaren.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Zoek het views-gedeelte.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Klik op <strong>New View</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Geef je vraag een naam. Iets dat je herinnert waar hij over gaat.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-creation-dialog.png" alt="View aanmaakdialoog met ingevulde naam">
+            <p class="image-caption">Figuur 1: Geef je vraag een naam.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                Druk op Enter.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 6:</span>
+                Een berichtje verschijnt om te zeggen dat het gelukt is.
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-creation-confirmation.png" alt="View aanmaak bevestigingspopup">
+            <p class="image-caption">Figuur 2: Het is gelukt! Schrijf nu de echte vraag.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 7:</span>
+                Er verschijnt een editor. Daar schrijf je je vraag.
+            </div>
+
+            <div class="note">
+                <strong>Belangrijk:</strong> Je nieuwe view is nu nog leeg. Het is als een blanco vel papier. Je moet er iets op schrijven en het opslaan, anders doet het helemaal niets.
+            </div>
+
+            <h2>Je vraag schrijven (in de repository)</h2>
+            <p>Je kunt je vraag gewoon daar in het repository-paneel schrijven.</p>
+
+            <h3>De editor openen</h3>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Ga naar de repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Klik op de naam van de view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Er opent een editor. Het is een fijne plek om SPARQL te schrijven.
+            </div>
+
+            <h3>De vraag schrijven</h3>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Zoek het grote tekstvak waar je kunt typen.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Schrijf je SPARQL-vraag. De editor kleurt verschillende delen in verschillende kleuren, wat helpt om te zien wat wat is.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-editing-repository-pane.png" alt="View editor in repository paneel met querytekst">
+            <p class="image-caption">Figuur 3: Schrijf je vraag hier.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Klik op <strong>Opslaan</strong> om het voor altijd te onthouden (of in ieder geval tot je het verandert).
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Je ziet een bericht dat het opgeslagen is. Hoera!
+            </div>
+
+            <div class="note">
+                <strong>Een snelkoppeling:</strong> Als je Ctrl+Enter drukt (of Cmd+Enter op een Mac), wordt de vraag meteen uitgevoerd. Je hoeft hem niet eerst op te slaan—hoewel opslaan nog steeds een goed idee is.
+            </div>
+
+            <h2>Schrijven in een eigen venster</h2>
+            <p>Als je meer ruimte wilt om te schrijven, kun je de view zijn eigen paneel geven.</p>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Ga naar de repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Zoek je view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Klik op het kleine paneelknopje (het ziet eruit als een map met een plusje).
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Er opent een heel nieuw paneel, alleen voor deze view. Zo veel ruimte!
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-editing-separate-pane.png" alt="View editor in apart paneel met querytekst">
+            <p class="image-caption">Figuur 4: Een eigen kamertje.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                Schrijf je vraag.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 6:</span>
+                Klik op <strong>Opslaan</strong>.
+            </div>
+
+            <div class="note">
+                <strong>Meerdere vensters:</strong> Je kunt heel veel editors tegelijk open hebben, sommige in het repository-paneel en sommige in hun eigen panelen. Ze zitten elkaar helemaal niet in de weg.
+            </div>
+
+            <h2>De vraag stellen (een view uitvoeren)</h2>
+            <p>Als je eenmaal een vraag geschreven hebt, kun je hem stellen en een antwoord krijgen.</p>
+
+            <h3>Vanuit de editor</h3>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Open de view in een editor.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Controleer of je vraag er goed uitziet.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Kies in welke vorm je het antwoord wilt hebben (er is een klein uitklapmenu).
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-execution-ready.png" alt="View editor klaar om uit te voeren met geselecteerd formaat">
+            <p class="image-caption">Figuur 5: Klaar om te vragen!</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Klik op <strong>Run</strong> (of druk op Ctrl+Enter).
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                Het antwoord verschijnt hieronder. Daar is het!
+            </div>
+
+            <h3>Verschillende soorten antwoorden</h3>
+            <p>Antwoorden kunnen in verschillende vormen komen:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vorm</th>
+                        <th>Hoe het eruitziet</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>JSON</td><td>Veel accolades (computers vinden dit fijn)</td></tr>
+                    <tr><td>XML</td><td>Veel punthaken (ook voor computers)</td></tr>
+                    <tr><td>HTML</td><td>Een mooie nette tabel (makkelijk leesbaar voor mensen)</td></tr>
+                    <tr><td>CSV</td><td>Komma's tussen alles (goed voor spreadsheets)</td></tr>
+                    <tr><td>TSV</td><td>Tabs tussen alles (ook voor spreadsheets)</td></tr>
+                    <tr><td>Turtle</td><td>RDF in een vriendelijk formaat</td></tr>
+                    <tr><td>N-Triples</td><td>RDF, één regel tegelijk</td></tr>
+                    <tr><td>RDF/XML</td><td>RDF in XML-kleding</td></tr>
+                    <tr><td>JSON-LD</td><td>JSON dat ook RDF is</td></tr>
+                    <tr><td>SVG</td><td>Een plaatje! Wat leuk!</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Antwoorden zien in een nieuw venster</h2>
+            <p>Soms is het fijn om resultaten in hun eigen venster te zien, los van al het andere.</p>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Ga naar de repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Zoek je view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Klik op de vensterknop (het ziet eruit als een linkje).
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-window-button.png" alt="View lijst met gemarkeerde vensterknop">
+            <p class="image-caption">Figuur 6a: De vensterknop.</p>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Er opent een gloednieuw venster met je resultaten in een tabel!
+            </div>
+
+            <div class="float-right">
+            <img src="images/view-presentation-new-window.png" alt="View resultaten weergegeven in nieuw browservenster">
+            <p class="image-caption">Figuur 6b: Resultaten in hun eigen venster.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                Je kunt verschillende antwoordvormen kiezen via een menu in het nieuwe venster.
+            </div>
+
+            <div class="warning">
+                <strong>Popups:</strong> Als er niets gebeurt wanneer je klikt, blokkeert je browser misschien nieuwe vensters. Je moet hem vertellen dat popups van deze site oké zijn.
+            </div>
+
+            <h2>Een view verwijderen</h2>
+            <p>Soms is een vraag niet meer nuttig, en wil je hem opruimen.</p>
+
+            <div class="warning">
+                <strong>Wees zeker:</strong> Als je een view verwijdert, is hij voor altijd weg. Als je de vraag ooit nog eens wilt, kopieer hem eerst ergens veilig.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 1:</span>
+                Zoek de view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 2:</span>
+                Klik op de verwijderknop (het prullenbakje).
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 3:</span>
+                Er verschijnt een bericht dat vraagt of je het zeker weet.
+            </div>
+
+            <div class="float-left">
+            <img src="images/view-deletion-confirmation.png" alt="View verwijdering bevestigingsdialoog">
+            <p class="image-caption">Figuur 7: Weet je het heel zeker?</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Stap 4:</span>
+                Als je het zeker weet, klik om te bevestigen.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Stap 5:</span>
+                De view is weg.
+            </div>
+
+            <h2>Handige dingen die de editor kan</h2>
+
+            <h3>Meerdere tabbladen</h3>
+            <p>De editor kan meerdere tabbladen hebben, als een notitieboekje met verschillende pagina's:</p>
+            <ul>
+                <li>Elk tabblad heeft zijn eigen vraag</li>
+                <li>Elk tabblad bewaart zijn eigen antwoorden</li>
+                <li>Je kunt ertussen wisselen om te vergelijken</li>
+                <li>Sluit tabbladen die je niet meer nodig hebt</li>
+            </ul>
+
+            <h3>Reset</h3>
+            <p>Als je een rommel van je vraag hebt gemaakt, klik op Reset om terug te gaan naar hoe het was voordat je begon met veranderen.</p>
+
+            <h3>Het logboek</h3>
+            <p>Er is een klein logboek dat onthoudt wat er gebeurd is—vragen die je gesteld hebt, dingen die je opgeslagen hebt, fouten die er waren, en hoe lang dingen duurden.</p>
+
+            <h3>Slepen naar een nieuw venster</h3>
+            <p>Je kunt een editortabblad pakken en helemaal uit het browservenster slepen, en dan wordt het zijn eigen kleine venstertje. Best magisch, eigenlijk.</p>
+
+            <h2>Wat advies over views</h2>
+            <ul>
+                <li><strong>Namen:</strong> Geef views verstandige namen die je herinneren waar ze over gaan</li>
+                <li><strong>Organisatie:</strong> Houd gerelateerde views in dezelfde repository</li>
+                <li><strong>Opmerkingen:</strong> Je kunt notities in je SPARQL schrijven met # tekens</li>
+                <li><strong>Testen:</strong> Probeer je vraag voordat je hem opslaat</li>
+                <li><strong>Back-ups:</strong> Bewaar kopieën van belangrijke vragen ergens veilig</li>
+            </ul>
+
+            <h2>Als er iets misgaat</h2>
+            <h3>Wordt niet opgeslagen</h3>
+            <ul>
+                <li>Heb je op Opslaan geklikt?</li>
+                <li>Kijk in het logboek naar foutmeldingen</li>
+                <li>Heb je toestemming?</li>
+                <li>Werkt je internet?</li>
+            </ul>
+
+            <h3>Wordt niet uitgevoerd</h3>
+            <ul>
+                <li>Zit er een fout in je SPARQL?</li>
+                <li>Kloppen de adressen in je vraag?</li>
+                <li>Kijk in het logboek voor aanwijzingen</li>
+                <li>Is er eigenlijk wel data om over te vragen?</li>
+            </ul>
+
+            <h3>View is weg</h3>
+            <ul>
+                <li>Probeer de pagina te verversen</li>
+                <li>Is hij wel goed opgeslagen?</li>
+                <li>Kijk je in de juiste repository?</li>
+            </ul>
+
+            <h2>Wat komt er hierna</h2>
+            <p>Nu weet je over views! Je wilt misschien:</p>
+            <ul>
+                <li>Je vragen regelmatig stellen</li>
+                <li>Ze delen met vrienden</li>
+                <li>Grotere vragen bouwen uit kleinere</li>
+                <li>Wat <a href="tips-and-best-practices.html">handige tips</a> lezen</li>
+                <li>Naar <a href="appendices.html">achterin het boek</a> kijken</li>
+            </ul>
+
+            <p>Dat zijn views dan. Vragen die je kunt opslaan en opnieuw stellen. Best fijn, toch?</p>
+        </div>
+    </div>
+</body>
+</html>
