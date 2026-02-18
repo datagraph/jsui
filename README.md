@@ -8,6 +8,7 @@ The UI is split into two independent applications sharing a common codebase:
 - **Admin** (`admin.html` / `admin-app.js`) — the administration interface for managing accounts, repositories, and invitations
 
 The suggested nginx configuration (see doc/nginx-config.md) is to allow the locations `/ui/user` and `/ui/admin`.
+
 ---
 
 ## Implementation Summary
