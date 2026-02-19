@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dydra JSUI — Codebase Graph</title>
+<style>
+:root {
+  --bg:     #0d0d14;
+  --bg2:    #15151e;
+  --bg3:    #1c1c28;
+  --border: #2a2a3c;
+  --text:   #c4c5d2;
+  --dim:    #5a5b6a;
+  --accent: #7c6fff;
+  --white:  #eeeef4;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── TOOLBAR ──────────────────────────────────────────────── */
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  z-index: 10;
+}
+#toolbar h1 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+  white-space: nowrap;
+  letter-spacing: .2px;
+}
+#toolbar h1 em { color: var(--accent); font-style: normal; }
+#search-wrap { position: relative; flex: 1; max-width: 240px; }
+#search-wrap svg { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); opacity: .4; pointer-events: none; }
+#search {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px 5px 28px;
+  color: var(--text);
+  font-size: 12px;
+  outline: none;
+  transition: border-color .15s;
+}
+#search::placeholder { color: var(--dim); }
+#search:focus { border-color: var(--accent); }
+#stats { font-size: 11px; color: var(--dim); white-space: nowrap; margin-left: 2px; }
+.spacer { flex: 1; }
+.btn {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text);
+  padding: 5px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color .15s, color .15s;
+}
+.btn:hover { border-color: var(--accent); color: var(--white); }
+
+/* ── BODY LAYOUT ──────────────────────────────────────────── */
+#main { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ──────────────────────────────────────────────── */
+#sidebar {
+  width: 152px;
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  padding: 12px 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+#sidebar h2 {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .9px;
+  color: var(--dim);
+  margin-bottom: 6px;
+}
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background .1s;
+}
+.filter-item:hover { background: var(--bg3); }
+.filter-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.filter-cb { width: 12px; height: 12px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+.filter-label { font-size: 11px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.filter-count { font-size: 10px; color: var(--dim); flex-shrink: 0; }
+
+/* ── GRAPH AREA ───────────────────────────────────────────── */
+#graph-area { flex: 1; position: relative; overflow: hidden; }
+#graph { width: 100%; height: 100%; display: block; }
+
+/* ── SVG ELEMENTS ─────────────────────────────────────────── */
+.link { stroke: #33334a; stroke-width: 1.2; fill: none; stroke-opacity: .8; }
+.link.include { stroke: #4a6a4a; stroke-dasharray: 5 3; stroke-opacity: .7; }
+.link.hl  { stroke: var(--accent); stroke-width: 2; stroke-opacity: 1; stroke-dasharray: none; }
+.link.dim { stroke-opacity: .1; }
+
+.node circle {
+  stroke-width: 1.8;
+  cursor: pointer;
+  transition: filter .15s;
+}
+.node circle:hover { filter: brightness(1.25); }
+.node.selected circle { stroke: #fff !important; stroke-width: 2.5; filter: drop-shadow(0 0 5px rgba(255,255,255,.4)); }
+.node.dimmed { opacity: .12; pointer-events: none; }
+.node.search-match circle { filter: drop-shadow(0 0 7px currentColor); }
+.node-label {
+  font-size: 9.5px;
+  fill: #9090a8;
+  pointer-events: none;
+  text-shadow: 0 1px 4px rgba(0,0,0,.95), 0 0 8px rgba(0,0,0,.8);
+}
+.cluster-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  pointer-events: none;
+  text-anchor: middle;
+  opacity: .22;
+  text-transform: uppercase;
+}
+#arrow path, #arrow-hl path { fill: none; }
+
+/* ── TOOLTIP ──────────────────────────────────────────────── */
+#tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 5px 9px;
+  font-size: 11px;
+  color: var(--white);
+  opacity: 0;
+  transition: opacity .1s;
+  z-index: 20;
+  white-space: nowrap;
+  max-width: 280px;
+}
+
+/* ── DETAIL PANEL ─────────────────────────────────────────── */
+#detail {
+  width: 272px;
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+#detail-head {
+  padding: 13px 14px 11px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+#detail-path {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--white);
+  word-break: break-all;
+  line-height: 1.45;
+  margin-bottom: 5px;
+}
+#detail-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--dim);
+}
+#detail-group-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+#detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 13px 14px;
+}
+#detail-body.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--dim);
+  font-size: 12px;
+  line-height: 1.7;
+}
+.ds { margin-bottom: 16px; }
+.ds h3 {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--dim);
+  margin-bottom: 7px;
+}
+.ds p { font-size: 12px; line-height: 1.65; color: var(--text); }
+.dep-list { list-style: none; }
+.dep-list li { font-size: 11px; padding: 2px 0; display: flex; align-items: baseline; gap: 4px; }
+.dep-arrow { color: var(--dim); font-size: 10px; flex-shrink: 0; }
+.dep-link { color: var(--accent); cursor: pointer; text-decoration: none; word-break: break-all; line-height: 1.4; }
+.dep-link:hover { text-decoration: underline; }
+.badge {
+  display: inline-block;
+  padding: 0 5px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+.empty-deps { color: var(--dim); font-style: italic; font-size: 11px; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #30304a; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #44445e; }
+</style>
+</head>
+<body>
+
+<div id="toolbar">
+  <h1>Dydra <em>JSUI</em> Codebase</h1>
+  <div id="search-wrap">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input id="search" type="text" placeholder="Search files…" autocomplete="off" spellcheck="false">
+  </div>
+  <span id="stats"></span>
+  <div class="spacer"></div>
+  <button class="btn" id="btn-fit">Zoom Fit</button>
+  <button class="btn" id="btn-reset">Reset</button>
+</div>
+
+<div id="main">
+  <div id="sidebar">
+    <h2>Groups</h2>
+    <div id="filter-list"></div>
+  </div>
+
+  <div id="graph-area">
+    <svg id="graph">
+      <defs>
+        <marker id="arrow" viewBox="0 -4 8 8" refX="8" refY="0" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0,-4L8,0L0,4" fill="#44445c"/>
+        </marker>
+        <marker id="arrow-hl" viewBox="0 -4 8 8" refX="8" refY="0" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0,-4L8,0L0,4" fill="#7c6fff"/>
+        </marker>
+      </defs>
+    </svg>
+    <div id="tooltip"></div>
+  </div>
+
+  <div id="detail">
+    <div id="detail-head">
+      <div id="detail-path">Dydra JSUI</div>
+      <div id="detail-meta">
+        <span id="detail-group-dot"></span>
+        <span id="detail-group-label">Click any node to explore</span>
+      </div>
+    </div>
+    <div id="detail-body" class="empty">
+      Click a node to see its<br>summary, imports, and dependents.
+    </div>
+  </div>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+
+const GROUPS = {
+  'html':            { label: 'HTML',              color: '#f06595', fx: .50, fy: .08 },
+  'root':            { label: 'Root',              color: '#ff6b6b', fx: .50, fy: .48 },
+  'lib':             { label: 'lib/',               color: '#4dd0c4', fx: .26, fy: .36 },
+  'lib/models':      { label: 'lib/models/',        color: '#45b7d1', fx: .12, fy: .54 },
+  'lib/persistence': { label: 'lib/persistence/',   color: '#29b6c9', fx: .17, fy: .72 },
+  'lib/replication': { label: 'lib/replication/',   color: '#b07ddc', fx: .33, fy: .69 },
+  'ui':              { label: 'ui/',                color: '#ffd93d', fx: .64, fy: .30 },
+  'ui/components':   { label: 'ui/components/',     color: '#6bcb77', fx: .80, fy: .47 },
+  'ui/pages':        { label: 'ui/pages/',          color: '#ff9f43', fx: .70, fy: .62 },
+  'ui/admin':        { label: 'ui/admin/',          color: '#cc5de8', fx: .57, fy: .73 },
+  'js':              { label: 'js/',                color: '#8d9db5', fx: .49, fy: .24 },
+};
+
+const SUMMARIES = {
+  'index.html':
+    'Studio SPA shell. Sets up Open Graph / Twitter card meta, loads the main stylesheet, then pulls in js/yasqe-wrapper.js and js/sparql-editor.js as plain scripts before loading app.js as an ES module. The body contains only a single <div id="app"> mount point.',
+  'admin.html':
+    'Admin SPA shell. Minimal entry point that loads admin-app.js as an ES module into a <div id="app"> mount point. Includes inline CSS overrides for the Devise admin login page styling.',
+  'signup.html':
+    'Standalone signup page. Self-contained HTML with inline JavaScript — handles form submission, invite-code pre-fill from URL parameters, and the "Notify Me" beta-invite form. No external local JS dependencies.',
+  'reset_password.html':
+    'Standalone password-reset page. Self-contained HTML with inline JavaScript that POST the account email to /accounts/password. No external local JS dependencies.',
+  'Dydra - Request an Access Code.html':
+    'Legacy static invitation request page from the Rails-era application. References external jQuery CDN scripts and a legacy /javascripts/app.js path. Not part of the current JSUI architecture.',
+  'app.js':
+    'Studio SPA entry point. Instantiates AppState, App, and Router; wires them together and starts client-side routing. Also installs navigation event monitors (popstate, hashchange, location.assign/replace overrides) and global error handlers used during debugging.',
+  'admin-app.js':
+    'Admin SPA entry point. Same bootstrap pattern as app.js but creates AdminApp and scopes the router base path to /admin.',
+  'router.js':
+    'Standalone client-side router with zero dependencies. Compiles named path patterns (e.g. /account/:name) to regexes, intercepts same-origin link clicks via a document-level listener, handles both History API (pushState/popState) and hash-URL navigation (used under file://).',
+  'lib/config.js':
+    'Static APP_CONFIG object: baseHost (dydra.com), blogHost, docsHost, basePath (/ui), requireSignupInvite, and showAccountBalances feature flags.',
+  'lib/app_state.js':
+    'Central state container. Holds Session, AuthStore, RdfStoreAdapter, ReplicationManager, in-memory caches for Accounts/Repositories/Queries/Invitations, and open-pane tracking sets. Async list/get methods fall back to cached sample data when the adapter returns nothing.',
+  'lib/auth.js':
+    'authenticateAccount() — sends GET /system/accounts/:name/configuration with Basic or Bearer credentials and returns an accessToken. Supports bearer prefix variants (:token, Bearer, token:) or basic auth via base64 encoding.',
+  'lib/auth_store.js':
+    'In-memory per-account token store. API: getToken(name), setToken(name, token, host), getAuth(name), listAccounts(), clear(). No persistence — tokens are lost on page reload.',
+  'lib/sample_data.js':
+    'Development fixture data. Pre-populates accounts, repositories, queries, and invitations so the app renders correctly without a live backend.',
+  'lib/models/account.js':
+    'Account domain model. Static _persistentProperties and _editableProperties arrays drive delta-save behaviour in the replication layer.',
+  'lib/models/repository.js':
+    'Repository domain model. Tracks quadCount, diskSize, license, privacy_setting, and prefixes. Provides rpcIdentifier(accountName) for API calls.',
+  'lib/models/query.js':
+    'Query (saved SPARQL view) domain model with friendlyId and repositoryId.',
+  'lib/models/session.js':
+    'Session model tracking accountName and login state. Persists accountName to localStorage so the login form is pre-filled across reloads.',
+  'lib/models/invitation.js':
+    'Invitation model for the invite-gated signup flow.',
+  'lib/models/import_job.js':
+    'Import job model tracking the status and progress of asynchronous data import operations.',
+  'lib/persistence/adapter.js':
+    'Abstract PersistenceAdapter base class defining the data-access contract: listAccounts, getAccountByName, listRepositories, getRepository, listQueries, getQuery, listInvitations.',
+  'lib/persistence/rdf_store_adapter.js':
+    'Concrete adapter delegating all calls to an injected rdfClient. Returns empty arrays / null when no client is configured, allowing AppState to fall back to sample data.',
+  'lib/replication/graph-object.js':
+    'Base class for tracked domain objects. Property sets are intercepted to mark the object as dirty through a _replicator reference. Used by ReplicationManager to record which fields changed.',
+  'lib/replication/graph-environment.js':
+    'Registry of all live GraphObject instances. Manages creation, lookup by identifier, and lifecycle of graph objects.',
+  'lib/replication/graph-database.js':
+    'Higher-level graph store layered on top of GraphEnvironment. Supports create/find/delete of objects using UUID-based revision identifiers.',
+  'lib/replication/replication_manager.js':
+    'Creates and manages GraphObject instances with persistent/editable property metadata. replaceState() updates an object\'s properties without triggering dirty tracking.',
+  'lib/replication/revision-identifier.js':
+    'UUID v1 generation helpers (via uuid-v1.mjs) used to assign unique revision identifiers to graph objects.',
+  'lib/replication/errors.js':
+    'Custom error classes for the replication layer, including NotFoundError.',
+  'ui/app.js':
+    'App class — owns the #app DOM root. Manages the tabbed-pane UI (open/close/save panes, activate tabs), page rendering, location bar, back/forward navigation, logout cleanup, and drag-to-detach editor windows via sessionStorage.',
+  'ui/routes.js':
+    'Studio route table. Maps 30+ URL patterns to page constructors or pane-open handlers for Home, Login, Signup, Account, Repository, SPARQL, View, Import, Invitations, Maintenance, and 404.',
+  'ui/utils.js':
+    'Shared UI utility functions: escapeHtml, joinHtml, and other string/DOM helpers used by pages and components.',
+  'ui/pages/base_page.js':
+    'BasePage abstract class. Defines the page interface: getTitle(), getBodyClass(), renderContent(), renderSidebar(), getPaneTabs(), setContext(), afterRender().',
+  'ui/pages/index.js':
+    'Central hub: re-exports all Studio page classes and pane-open helpers. Contains full implementations of LoginPage, HomePage, SignupPage, AccountRoute, RepositoryRoute, SparqlPage, ViewRoute, RepositoryImportPage, StandaloneEditorPage, InvitationsPage, and more.',
+  'ui/components/layout.js':
+    'LayoutView — assembles the full-page HTML shell: header, tabs bar, content area, sidebar (aside), and footer.',
+  'ui/components/header.js':
+    'HeaderView — renders the top bar with the Dydra logo and the main navigation links.',
+  'ui/components/footer.js':
+    'FooterView — renders the page footer with copyright notice and external links.',
+  'ui/components/navigation.js':
+    'NavigationView — renders the nav link list (About, Docs, Blog, Logout/Signup, Admin), adapting to logged-in state.',
+  'ui/components/flashes.js':
+    'FlashesView — renders transient flash/alert messages (success, error, info) above the main content area.',
+  'ui/admin/app.js':
+    'AdminApp class — analogous to App but for the administration interface. Manages admin layout rendering and pane navigation.',
+  'ui/admin/routes.js':
+    'Admin route table mapping /admin paths to admin page constructors.',
+  'ui/admin/layout.js':
+    'AdminLayoutView — admin-specific page layout (shares the footer component with the Studio app).',
+  'ui/admin/pages.js':
+    'All admin page implementations: AdminLoginPage, AdminDashboardPage, ManageAccountsPage, ManageAccountPage, ManageRepositoriesPage, AdminInvitationsPage, QueryHistoryPage, TransactionHistoryPage.',
+  'js/sparql-editor.js':
+    'SparqlEditor custom element. Wraps YASQE with multi-tab query management, result display in multiple formats (table, JSON, CSV, XML), execution timing display, keyboard shortcuts (Ctrl/Cmd+Enter), an event log, and drag-to-detach support.',
+  'js/yasqe-wrapper.js':
+    'Thin wrapper around the YASQE CodeMirror-based SPARQL editor. Exposes a simplified API (setValue, getValue, setReadOnly, on) used by SparqlEditor.',
+  'js/save-login.js':
+    'Playwright helper script for programmatically saving login credentials during end-to-end test runs.',
+};
+
+const RAW_NODES = [
+  { id: 'index.html',                                      group: 'html' },
+  { id: 'admin.html',                                      group: 'html' },
+  { id: 'signup.html',                                     group: 'html' },
+  { id: 'reset_password.html',                             group: 'html' },
+  { id: 'Dydra - Request an Access Code.html',             group: 'html' },
+  { id: 'app.js',                              group: 'root' },
+  { id: 'admin-app.js',                        group: 'root' },
+  { id: 'router.js',                           group: 'root' },
+  { id: 'lib/config.js',                       group: 'lib' },
+  { id: 'lib/app_state.js',                    group: 'lib' },
+  { id: 'lib/auth.js',                         group: 'lib' },
+  { id: 'lib/auth_store.js',                   group: 'lib' },
+  { id: 'lib/sample_data.js',                  group: 'lib' },
+  { id: 'lib/models/account.js',               group: 'lib/models' },
+  { id: 'lib/models/repository.js',            group: 'lib/models' },
+  { id: 'lib/models/query.js',                 group: 'lib/models' },
+  { id: 'lib/models/session.js',               group: 'lib/models' },
+  { id: 'lib/models/invitation.js',            group: 'lib/models' },
+  { id: 'lib/models/import_job.js',            group: 'lib/models' },
+  { id: 'lib/persistence/adapter.js',          group: 'lib/persistence' },
+  { id: 'lib/persistence/rdf_store_adapter.js',group: 'lib/persistence' },
+  { id: 'lib/replication/graph-object.js',     group: 'lib/replication' },
+  { id: 'lib/replication/graph-environment.js',group: 'lib/replication' },
+  { id: 'lib/replication/graph-database.js',   group: 'lib/replication' },
+  { id: 'lib/replication/replication_manager.js', group: 'lib/replication' },
+  { id: 'lib/replication/revision-identifier.js', group: 'lib/replication' },
+  { id: 'lib/replication/errors.js',           group: 'lib/replication' },
+  { id: 'ui/app.js',                           group: 'ui' },
+  { id: 'ui/routes.js',                        group: 'ui' },
+  { id: 'ui/utils.js',                         group: 'ui' },
+  { id: 'ui/pages/base_page.js',               group: 'ui/pages' },
+  { id: 'ui/pages/index.js',                   group: 'ui/pages' },
+  { id: 'ui/components/layout.js',             group: 'ui/components' },
+  { id: 'ui/components/header.js',             group: 'ui/components' },
+  { id: 'ui/components/footer.js',             group: 'ui/components' },
+  { id: 'ui/components/navigation.js',         group: 'ui/components' },
+  { id: 'ui/components/flashes.js',            group: 'ui/components' },
+  { id: 'ui/admin/app.js',                     group: 'ui/admin' },
+  { id: 'ui/admin/routes.js',                  group: 'ui/admin' },
+  { id: 'ui/admin/layout.js',                  group: 'ui/admin' },
+  { id: 'ui/admin/pages.js',                   group: 'ui/admin' },
+  { id: 'js/sparql-editor.js',                 group: 'js' },
+  { id: 'js/yasqe-wrapper.js',                 group: 'js' },
+  { id: 'js/save-login.js',                    group: 'js' },
+];
+
+const RAW_LINKS = [
+  // HTML → JS (script includes; rendered as dashed edges)
+  { s: 'index.html', t: 'app.js',                type: 'include' },
+  { s: 'index.html', t: 'js/yasqe-wrapper.js',   type: 'include' },
+  { s: 'index.html', t: 'js/sparql-editor.js',   type: 'include' },
+  { s: 'admin.html', t: 'admin-app.js',           type: 'include' },
+  // app.js
+  { s: 'app.js', t: 'router.js' },
+  { s: 'app.js', t: 'lib/app_state.js' },
+  { s: 'app.js', t: 'lib/config.js' },
+  { s: 'app.js', t: 'ui/app.js' },
+  { s: 'app.js', t: 'ui/routes.js' },
+  // admin-app.js
+  { s: 'admin-app.js', t: 'router.js' },
+  { s: 'admin-app.js', t: 'lib/app_state.js' },
+  { s: 'admin-app.js', t: 'lib/config.js' },
+  { s: 'admin-app.js', t: 'ui/admin/app.js' },
+  { s: 'admin-app.js', t: 'ui/admin/routes.js' },
+  // lib/auth.js
+  { s: 'lib/auth.js', t: 'lib/auth_store.js' },
+  // lib/app_state.js
+  { s: 'lib/app_state.js', t: 'lib/models/account.js' },
+  { s: 'lib/app_state.js', t: 'lib/models/repository.js' },
+  { s: 'lib/app_state.js', t: 'lib/models/query.js' },
+  { s: 'lib/app_state.js', t: 'lib/models/invitation.js' },
+  { s: 'lib/app_state.js', t: 'lib/models/session.js' },
+  { s: 'lib/app_state.js', t: 'lib/auth_store.js' },
+  { s: 'lib/app_state.js', t: 'lib/replication/replication_manager.js' },
+  { s: 'lib/app_state.js', t: 'lib/persistence/rdf_store_adapter.js' },
+  { s: 'lib/app_state.js', t: 'lib/sample_data.js' },
+  // lib/persistence
+  { s: 'lib/persistence/rdf_store_adapter.js', t: 'lib/persistence/adapter.js' },
+  // lib/replication
+  { s: 'lib/replication/graph-database.js',    t: 'lib/replication/graph-environment.js' },
+  { s: 'lib/replication/graph-database.js',    t: 'lib/replication/graph-object.js' },
+  { s: 'lib/replication/graph-database.js',    t: 'lib/replication/errors.js' },
+  { s: 'lib/replication/graph-database.js',    t: 'lib/replication/revision-identifier.js' },
+  { s: 'lib/replication/graph-environment.js', t: 'lib/replication/graph-object.js' },
+  { s: 'lib/replication/replication_manager.js', t: 'lib/replication/graph-object.js' },
+  // ui/app.js
+  { s: 'ui/app.js', t: 'ui/components/layout.js' },
+  { s: 'ui/app.js', t: 'ui/pages/index.js' },
+  { s: 'ui/app.js', t: 'lib/config.js' },
+  // ui/routes.js
+  { s: 'ui/routes.js', t: 'ui/pages/index.js' },
+  // ui/components
+  { s: 'ui/components/layout.js',     t: 'ui/components/header.js' },
+  { s: 'ui/components/layout.js',     t: 'ui/components/footer.js' },
+  { s: 'ui/components/layout.js',     t: 'ui/components/flashes.js' },
+  { s: 'ui/components/header.js',     t: 'ui/components/navigation.js' },
+  { s: 'ui/components/navigation.js', t: 'ui/utils.js' },
+  { s: 'ui/components/footer.js',     t: 'ui/utils.js' },
+  // ui/pages
+  { s: 'ui/pages/index.js', t: 'ui/pages/base_page.js' },
+  { s: 'ui/pages/index.js', t: 'ui/utils.js' },
+  { s: 'ui/pages/index.js', t: 'ui/components/navigation.js' },
+  { s: 'ui/pages/index.js', t: 'lib/config.js' },
+  { s: 'ui/pages/index.js', t: 'lib/auth.js' },
+  // ui/admin
+  { s: 'ui/admin/app.js',    t: 'ui/admin/layout.js' },
+  { s: 'ui/admin/app.js',    t: 'lib/config.js' },
+  { s: 'ui/admin/app.js',    t: 'ui/pages/base_page.js' },
+  { s: 'ui/admin/routes.js', t: 'ui/admin/pages.js' },
+  { s: 'ui/admin/layout.js', t: 'ui/components/footer.js' },
+  { s: 'ui/admin/pages.js',  t: 'ui/pages/base_page.js' },
+  { s: 'ui/admin/pages.js',  t: 'ui/utils.js' },
+  { s: 'ui/admin/pages.js',  t: 'lib/config.js' },
+  { s: 'ui/admin/pages.js',  t: 'lib/auth.js' },
+];
+
+// ── SETUP ─────────────────────────────────────────────────────────────────────
+
+const svg    = d3.select('#graph');
+const area   = document.getElementById('graph-area');
+const W = () => area.clientWidth;
+const H = () => area.clientHeight;
+
+// Compute in-degree for node sizing
+const inDeg = {};
+RAW_LINKS.forEach(l => { inDeg[l.t] = (inDeg[l.t] || 0) + 1; });
+const radius = id => 6 + Math.min(inDeg[id] || 0, 6) * 2.2;
+
+// Build adjacency maps
+const adj = {};
+RAW_NODES.forEach(n => { adj[n.id] = { imports: [], importedBy: [] }; });
+RAW_LINKS.forEach(l => {
+  adj[l.s].imports.push({ id: l.t, type: l.type || 'import' });
+  adj[l.t].importedBy.push({ id: l.s, type: l.type || 'import' });
+});
+
+// Clone data for simulation (D3 mutates)
+const nodes = RAW_NODES.map(d => ({
+  ...d,
+  x: W() * GROUPS[d.group].fx + (Math.random() - .5) * 70,
+  y: H() * GROUPS[d.group].fy + (Math.random() - .5) * 70,
+}));
+const links = RAW_LINKS.map(l => ({ source: l.s, target: l.t, ltype: l.type || 'import' }));
+const nodeById = new Map(nodes.map(n => [n.id, n]));
+
+// ── LAYERS ────────────────────────────────────────────────────────────────────
+const canvas      = svg.append('g').attr('id', 'canvas');
+const bgLayer     = canvas.append('g').attr('id', 'bg-layer');
+const linkLayer   = canvas.append('g').attr('id', 'link-layer');
+const nodeLayer   = canvas.append('g').attr('id', 'node-layer');
+
+// ── CLUSTER BACKGROUND LABELS ─────────────────────────────────────────────────
+const clusterLabelSel = bgLayer.selectAll('.cluster-label')
+  .data(Object.entries(GROUPS))
+  .enter().append('text')
+  .attr('class', 'cluster-label')
+  .attr('fill', d => d[1].color)
+  .text(d => d[1].label);
+
+// ── LINKS ─────────────────────────────────────────────────────────────────────
+const linkSel = linkLayer.selectAll('line')
+  .data(links)
+  .enter().append('line')
+  .attr('class', d => 'link' + (d.ltype === 'include' ? ' include' : ''))
+  .attr('marker-end', 'url(#arrow)');
+
+// ── NODES ─────────────────────────────────────────────────────────────────────
+const nodeSel = nodeLayer.selectAll('.node')
+  .data(nodes)
+  .enter().append('g')
+  .attr('class', 'node')
+  .call(d3.drag()
+    .on('start', (ev, d) => { if (!ev.active) sim.alphaTarget(.3).restart(); d.fx = d.x; d.fy = d.y; })
+    .on('drag',  (ev, d) => { d.fx = ev.x; d.fy = ev.y; })
+    .on('end',   (ev, d) => { if (!ev.active) sim.alphaTarget(0); d.fx = null; d.fy = null; })
+  )
+  .on('click', (ev, d) => { ev.stopPropagation(); selectNode(d); })
+  .on('pointerenter', (ev, d) => showTooltip(ev, d))
+  .on('pointermove',  (ev)    => moveTooltip(ev))
+  .on('pointerleave', ()      => hideTooltip());
+
+nodeSel.append('circle')
+  .attr('r', d => radius(d.id))
+  .attr('fill',   d => GROUPS[d.group].color)
+  .attr('stroke', d => d3.color(GROUPS[d.group].color).darker(.9));
+
+nodeSel.append('text')
+  .attr('class', 'node-label')
+  .attr('dy', d => radius(d.id) + 11)
+  .attr('text-anchor', 'middle')
+  .text(d => d.id.split('/').pop());
+
+// ── SIMULATION ────────────────────────────────────────────────────────────────
+const sim = d3.forceSimulation(nodes)
+  .force('link',    d3.forceLink(links).id(d => d.id).distance(85).strength(.65))
+  .force('charge',  d3.forceManyBody().strength(-260).distanceMax(380))
+  .force('center',  d3.forceCenter(W() / 2, H() / 2).strength(.03))
+  .force('cluster', alpha => {
+    const w = W(), h = H();
+    for (const d of nodes) {
+      const g = GROUPS[d.group];
+      d.vx -= (d.x - w * g.fx) * alpha * .055;
+      d.vy -= (d.y - h * g.fy) * alpha * .055;
+    }
+  })
+  .force('collide', d3.forceCollide(d => radius(d.id) + 6))
+  .alphaDecay(.018)
+  .on('tick', ticked);
+
+function ticked() {
+  // Update links (shorten end to stop at node circumference + arrow head)
+  linkSel
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => {
+      const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      return d.target.x - dx / dist * (radius(d.target.id) + 9);
+    })
+    .attr('y2', d => {
+      const dx = d.target.x - d.source.x, dy = d.target.y - d.source.y;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      return d.target.y - dy / dist * (radius(d.target.id) + 9);
+    });
+
+  nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
+
+  // Update floating cluster labels (centroid of each group)
+  const cents = {};
+  Object.keys(GROUPS).forEach(k => { cents[k] = { x: 0, y: 0, n: 0 }; });
+  nodes.forEach(d => { cents[d.group].x += d.x; cents[d.group].y += d.y; cents[d.group].n++; });
+
+  clusterLabelSel
+    .attr('x', d => cents[d[0]].n ? cents[d[0]].x / cents[d[0]].n : 0)
+    .attr('y', d => {
+      if (!cents[d[0]].n) return 0;
+      const cy = cents[d[0]].y / cents[d[0]].n;
+      // Place label 36px above the centroid
+      return cy - 36;
+    });
+}
+
+// ── ZOOM ──────────────────────────────────────────────────────────────────────
+const zoom = d3.zoom().scaleExtent([.1, 5]).on('zoom', ev => canvas.attr('transform', ev.transform));
+svg.call(zoom);
+svg.on('click', () => {
+  selectedId = null;
+  applyHighlight();
+  clearDetail();
+});
+
+function zoomFit() {
+  const xs = nodes.map(d => d.x), ys = nodes.map(d => d.y);
+  const minX = Math.min(...xs) - 50, maxX = Math.max(...xs) + 50;
+  const minY = Math.min(...ys) - 50, maxY = Math.max(...ys) + 50;
+  const w = W(), h = H();
+  const scale = Math.min(w / (maxX - minX), h / (maxY - minY), 2.5) * .88;
+  const tx = w / 2 - scale * (minX + maxX) / 2;
+  const ty = h / 2 - scale * (minY + maxY) / 2;
+  svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+}
+
+document.getElementById('btn-fit').addEventListener('click', zoomFit);
+document.getElementById('btn-reset').addEventListener('click', () => {
+  nodes.forEach(d => {
+    const g = GROUPS[d.group];
+    d.x = W() * g.fx + (Math.random() - .5) * 70;
+    d.y = H() * g.fy + (Math.random() - .5) * 70;
+    d.vx = 0; d.vy = 0; d.fx = null; d.fy = null;
+  });
+  sim.alpha(.9).restart();
+});
+
+// Auto-fit after sim settles
+setTimeout(zoomFit, 2800);
+
+// ── SELECTION & HIGHLIGHT ─────────────────────────────────────────────────────
+let selectedId = null;
+let searchTerm = '';
+let hiddenGroups = new Set();
+
+function applyHighlight() {
+  const sel  = selectedId;
+  const term = searchTerm.toLowerCase();
+
+  nodeSel.classed('selected', d => d.id === sel);
+
+  if (sel) {
+    const { imports, importedBy } = adj[sel];
+    const connected = new Set([sel, ...imports.map(e=>e.id), ...importedBy.map(e=>e.id)]);
+    nodeSel.classed('dimmed', d => hiddenGroups.has(d.group) || !connected.has(d.id));
+    nodeSel.classed('search-match', false);
+    linkSel
+      .classed('hl',  l => l.source.id === sel || l.target.id === sel)
+      .classed('dim', l => l.source.id !== sel && l.target.id !== sel)
+      .attr('marker-end', l =>
+        (l.source.id === sel || l.target.id === sel) ? 'url(#arrow-hl)' : 'url(#arrow)')
+      .attr('stroke-dasharray', l => {
+        if (l.source.id === sel || l.target.id === sel) return null;
+        return l.ltype === 'include' ? '5 3' : null;
+      });
+  } else if (term) {
+    nodeSel.classed('search-match', d => d.id.toLowerCase().includes(term));
+    nodeSel.classed('dimmed', d => hiddenGroups.has(d.group) || !d.id.toLowerCase().includes(term));
+    linkSel.classed('hl', false).classed('dim', false)
+      .attr('marker-end', 'url(#arrow)')
+      .attr('stroke-dasharray', l => l.ltype === 'include' ? '5 3' : null);
+  } else {
+    nodeSel.classed('dimmed', d => hiddenGroups.has(d.group));
+    nodeSel.classed('search-match', false);
+    linkSel.classed('hl', false).classed('dim', false)
+      .attr('marker-end', 'url(#arrow)')
+      .attr('stroke-dasharray', l => l.ltype === 'include' ? '5 3' : null);
+  }
+
+  // Hide links that connect to hidden groups
+  linkSel.style('display', l =>
+    (hiddenGroups.has(l.source.group) || hiddenGroups.has(l.target.group)) ? 'none' : '');
+  nodeSel.style('display', d => hiddenGroups.has(d.group) ? 'none' : '');
+}
+
+function selectNode(d) {
+  selectedId = d.id;
+  applyHighlight();
+  showDetail(d);
+  panTo(d);
+}
+
+function panTo(d) {
+  const t = d3.zoomTransform(svg.node());
+  const w = W(), h = H();
+  svg.transition().duration(450)
+    .call(zoom.transform, d3.zoomIdentity
+      .translate(w / 2 - d.x * t.k, h / 2 - d.y * t.k)
+      .scale(t.k));
+}
+
+// ── DETAIL PANEL ──────────────────────────────────────────────────────────────
+function showDetail(d) {
+  const g = GROUPS[d.group];
+  document.getElementById('detail-path').textContent = d.id;
+  document.getElementById('detail-group-label').textContent = g.label;
+  document.getElementById('detail-group-dot').style.background = g.color;
+
+  const { imports, importedBy } = adj[d.id];
+  const summary = SUMMARIES[d.id] || 'No description available.';
+
+  const mkList = (entries, arrow) => entries.length
+    ? entries.map(({ id, type }) => {
+        const ng = GROUPS[nodeById.get(id)?.group];
+        const dot = ng ? `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${ng.color};margin-right:4px;vertical-align:middle;flex-shrink:0"></span>` : '';
+        const tag = type === 'include'
+          ? `<span style="font-size:9px;color:#4d9e4d;margin-left:3px;opacity:.9">script</span>`
+          : '';
+        return `<li><span class="dep-arrow">${arrow}</span>${dot}<a class="dep-link" data-nodeid="${id}">${id}</a>${tag}</li>`;
+      }).join('')
+    : `<li class="empty-deps">None</li>`;
+
+  const outLabel = d.group === 'html' ? 'Includes' : 'Imports';
+  const inLabel  = d.group === 'html' ? 'Included&nbsp;by' : 'Imported&nbsp;by';
+
+  const body = document.getElementById('detail-body');
+  body.className = '';
+  body.innerHTML = `
+    <div class="ds">
+      <h3>Summary</h3>
+      <p>${summary}</p>
+    </div>
+    <div class="ds">
+      <h3>${outLabel}
+        <span class="badge" style="background:${g.color}28;color:${g.color}">${imports.length}</span>
+      </h3>
+      <ul class="dep-list">${mkList(imports, '→')}</ul>
+    </div>
+    <div class="ds">
+      <h3>${inLabel}
+        <span class="badge" style="background:#ff6b6b28;color:#ff9090">${importedBy.length}</span>
+      </h3>
+      <ul class="dep-list">${mkList(importedBy, '←')}</ul>
+    </div>`;
+}
+
+function clearDetail() {
+  document.getElementById('detail-path').textContent = 'Dydra JSUI';
+  document.getElementById('detail-group-label').textContent = 'Click any node to explore';
+  document.getElementById('detail-group-dot').style.background = 'transparent';
+  const body = document.getElementById('detail-body');
+  body.className = 'empty';
+  body.textContent = 'Click a node to see its\nsummary, imports, and dependents.';
+  body.innerHTML = 'Click a node to see its<br>summary, imports, and dependents.';
+}
+
+// Navigate to node from detail panel links
+document.getElementById('detail-body').addEventListener('click', ev => {
+  const a = ev.target.closest('[data-nodeid]');
+  if (!a) return;
+  const n = nodeById.get(a.dataset.nodeid);
+  if (n) selectNode(n);
+});
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('input', function () {
+  searchTerm = this.value.trim();
+  selectedId = null;
+  clearDetail();
+  applyHighlight();
+});
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+const groupCounts = {};
+RAW_NODES.forEach(n => { groupCounts[n.group] = (groupCounts[n.group] || 0) + 1; });
+
+const filterList = document.getElementById('filter-list');
+Object.entries(GROUPS).forEach(([key, g]) => {
+  const label = document.createElement('label');
+  label.className = 'filter-item';
+  label.innerHTML = `
+    <input type="checkbox" class="filter-cb" checked>
+    <span class="filter-dot" style="background:${g.color}"></span>
+    <span class="filter-label">${g.label}</span>
+    <span class="filter-count">${groupCounts[key] || 0}</span>`;
+  filterList.appendChild(label);
+  label.querySelector('input').addEventListener('change', function () {
+    if (this.checked) hiddenGroups.delete(key);
+    else hiddenGroups.add(key);
+    applyHighlight();
+  });
+});
+
+// ── TOOLTIP ───────────────────────────────────────────────────────────────────
+const tooltipEl = document.getElementById('tooltip');
+function showTooltip(ev, d) {
+  tooltipEl.textContent = d.id;
+  tooltipEl.style.opacity = '1';
+  moveTooltip(ev);
+}
+function moveTooltip(ev) {
+  const r = area.getBoundingClientRect();
+  tooltipEl.style.left = (ev.clientX - r.left + 14) + 'px';
+  tooltipEl.style.top  = (ev.clientY - r.top  - 12) + 'px';
+}
+function hideTooltip() { tooltipEl.style.opacity = '0'; }
+
+// ── STATS ─────────────────────────────────────────────────────────────────────
+const importCount  = RAW_LINKS.filter(l => !l.type || l.type === 'import').length;
+const includeCount = RAW_LINKS.filter(l => l.type === 'include').length;
+document.getElementById('stats').textContent =
+  `${RAW_NODES.length} files · ${importCount} imports · ${includeCount} includes`;
+</script>
+</body>
+</html>
