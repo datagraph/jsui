@@ -91,6 +91,38 @@ const REQ = {
   '9.1.1': { id: 'REQ-9.1.1', title: 'Authentication Error Messages', section: 'error' },
   '9.1.2': { id: 'REQ-9.1.2', title: 'API Error Messages', section: 'error' },
   '9.1.3': { id: 'REQ-9.1.3', title: '404 Page', section: 'error' },
+
+  // Admin Console — Section A.1: Authentication
+  'A.1.1': { id: 'REQ-A.1.1', title: 'Admin Login as Administrator', section: 'admin-authentication' },
+  'A.1.2': { id: 'REQ-A.1.2', title: 'Admin Login as Operator', section: 'admin-authentication' },
+  'A.1.3': { id: 'REQ-A.1.3', title: 'Admin Logout', section: 'admin-authentication' },
+
+  // Admin Console — Section A.2: Dashboard & Navigation
+  'A.2.1': { id: 'REQ-A.2.1', title: 'Dashboard Tab Navigation', section: 'admin-dashboard' },
+  'A.2.2': { id: 'REQ-A.2.2', title: 'Location Bar Navigation', section: 'admin-dashboard' },
+
+  // Admin Console — Section A.3: Account Operations
+  'A.3.1': { id: 'REQ-A.3.1', title: 'View System Accounts', section: 'admin-accounts' },
+  'A.3.2': { id: 'REQ-A.3.2', title: 'Account Details Dialog', section: 'admin-accounts' },
+  'A.3.3': { id: 'REQ-A.3.3', title: 'Create Account', section: 'admin-accounts' },
+  'A.3.4': { id: 'REQ-A.3.4', title: 'Delete Account', section: 'admin-accounts' },
+
+  // Admin Console — Section A.4: Repository Operations
+  'A.4.1': { id: 'REQ-A.4.1', title: 'View Account Repositories', section: 'admin-repositories' },
+  'A.4.2': { id: 'REQ-A.4.2', title: 'Create Repository', section: 'admin-repositories' },
+  'A.4.3': { id: 'REQ-A.4.3', title: 'Delete Repository', section: 'admin-repositories' },
+
+  // Admin Console — Section A.5: Invitation Management
+  'A.5.1': { id: 'REQ-A.5.1', title: 'View Invitations', section: 'admin-invitations' },
+  'A.5.2': { id: 'REQ-A.5.2', title: 'Create Invitation', section: 'admin-invitations' },
+  'A.5.3': { id: 'REQ-A.5.3', title: 'Delete Invitation', section: 'admin-invitations' },
+
+  // Admin Console — Section A.6: System Monitoring
+  'A.6.1': { id: 'REQ-A.6.1', title: 'Query History Table', section: 'admin-monitoring' },
+  'A.6.2': { id: 'REQ-A.6.2', title: 'Query History Graph', section: 'admin-monitoring' },
+  'A.6.3': { id: 'REQ-A.6.3', title: 'Transaction History', section: 'admin-monitoring' },
+  'A.6.4': { id: 'REQ-A.6.4', title: 'Import History Table', section: 'admin-monitoring' },
+  'A.6.5': { id: 'REQ-A.6.5', title: 'Import History Graph', section: 'admin-monitoring' },
 };
 
 /**

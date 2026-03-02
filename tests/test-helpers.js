@@ -5,14 +5,17 @@
  * in ui/pages/index.js. The test ID is based on the 'field' property, not the key.
  */
 
+export const USER_URL  = 'https://dydra.com/ui/user';
+export const ADMIN_URL = 'https://dydra.com/ui/admin';
+
 /**
- * Login to the application
+ * Login to the user (Studio) application.
  * @param {import('@playwright/test').Page} page
  * @param {string} username
  * @param {string} password
  */
 export async function login(page, username = 'playwright', password = 'shakespear') {
-  await page.goto('https://dydra.com/ui/user');
+  await page.goto(USER_URL);
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(1000);
   await page.getByTestId('login-username-input').click();
@@ -23,6 +26,32 @@ export async function login(page, username = 'playwright', password = 'shakespea
   await page.getByTestId('login-submit').click();
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
+}
+
+/**
+ * Login to the admin console.
+ *
+ * The admin app is served only at the exact path /ui/admin (nginx exact-match
+ * rule); any suffix returns 404.  waitForLoadState('networkidle') is used
+ * because it waits for the ES-module chain to finish loading before we interact
+ * with the form — the same form HTML and testids as the user app are used.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} username
+ * @param {string} password
+ */
+export async function adminLogin(page, username = 'playwright', password = 'shakespear') {
+  await page.goto(ADMIN_URL);
+  await page.waitForLoadState('networkidle');
+  const hostInput = page.getByTestId('login-host-input');
+  if (await hostInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await hostInput.fill('dydra.com');
+  }
+  await page.getByTestId('login-username-input').fill(username);
+  await page.getByTestId('login-password-input').fill(password);
+  await page.getByTestId('login-submit').click();
+  await page.waitForLoadState('networkidle');
+  await page.waitForTimeout(500);
 }
 
 /**

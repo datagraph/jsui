@@ -1,0 +1,46 @@
+[
+  {
+    "requirement": "REQ-A.6.4",
+    "title": "Import History Table",
+    "section": "admin-monitoring",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Navigating to Import History tab",
+    "filename": "req-a-6-4-import-history-table-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-28T18:52:00.929Z"
+  },
+  {
+    "requirement": "REQ-A.6.4",
+    "title": "Import History Table",
+    "section": "admin-monitoring",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Import history table displayed",
+    "filename": "req-a-6-4-import-history-table-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-28T18:52:03.110Z"
+  },
+  {
+    "requirement": "REQ-A.6.5",
+    "title": "Import History Graph",
+    "section": "admin-monitoring",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Import history table view",
+    "filename": "req-a-6-5-import-history-graph-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-28T18:52:03.368Z"
+  },
+  {
+    "requirement": "REQ-A.6.5",
+    "title": "Import History Graph",
+    "section": "admin-monitoring",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Graph sub-tab not available — skipped",
+    "filename": "req-a-6-5-import-history-graph-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-02-28T18:52:03.609Z"
+  }
+]
