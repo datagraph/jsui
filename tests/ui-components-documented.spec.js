@@ -1,381 +1,242 @@
 import { test, expect } from '@playwright/test';
-import { login, openRepository, waitForNetworkIdle } from './test-helpers.js';
+import { login, openRepository, USER_URL } from './test-helpers.js';
 import { DocCapture, REQ } from './doc-capture.js';
 
 /**
  * UI Component Tests with Documentation Capture
- * Coverage: REQ-6.x, REQ-9.x
+ * Coverage: REQ-6.2.x, REQ-9.1.x
  *
  * Run with documentation:
  *   CAPTURE_DOCS=true npx playwright test tests/ui-components-documented.spec.js
+ *
+ * ── de-vacuumed 2026-10-06 ──────────────────────────────────────────────────
+ * Nine tests, twenty guards, and the suite's one outright tautology:
+ *
+ *     expect(notFoundVisible || loginVisible || homeVisible || errorVisible || true)
+ *       .toBeTruthy();
+ *
+ * -- which cannot fail for any input, by construction.
+ *
+ * The old file also looked for `.flash`, `.toast`, `.notification`, `.loading`
+ * and `.spinner`.  None of them exist anywhere in this UI.  What does exist:
+ *   - transient messages go through app.showLocationMessage(text, duration),
+ *     which writes textContent into the location bar and clears it on a timer;
+ *   - loading states are plain text ("Loading collaboration data...");
+ *   - the 404 is NotFoundPage, "The page you were looking for doesn't exist.";
+ *   - login failures render into #login-error-text.
+ * Each test below drives the mechanism that is actually implemented.
  */
 
 const CAPTURE_ENABLED = process.env.CAPTURE_DOCS === 'true';
+const ACCOUNT = process.env.JSUI_ACCOUNT || 'playwright';
+const REPOSITORY = process.env.JSUI_REPOSITORY || 'test';
+const BASE = process.env.JSUI_ORIGIN || 'https://dydra.com';
 
 test.describe('UI Components', () => {
 
-  // ============================================================
-  // REQ-6.2.1: Flash Messages
-  // ============================================================
-  async function REQ_6_2_1_flashMessages(page, capture) {
-    await capture.requirement(REQ['6.2.1'], async (cap) => {
-      // Capture: Page state showing UI components
-      await cap.before('Page with UI components that can show flash messages');
-
-      // Check for any existing flash messages or notification areas
-      const flashMessage = page.locator('.flash-message, .flash-success, .flash-error, .toast, .notification').first();
-      const hasFlash = await flashMessage.isVisible({ timeout: 1000 }).catch(() => false);
-
-      // Capture: Current page state (flash messages are transient, so we document the UI)
-      await cap.after('UI components for displaying flash messages');
-    });
-  }
-
-  // ============================================================
-  // REQ-6.2.2: Loading Indicators
-  // ============================================================
-  async function REQ_6_2_2_loadingIndicators(page, capture) {
-    await capture.requirement(REQ['6.2.2'], async (cap) => {
-      // Capture: Before async operation
-      await cap.before('Page before async operation');
-
-      const repoNewBtn = page.getByTestId('repo-new-btn').first();
-      await repoNewBtn.click();
-
-      // Look for loading indicator
-      const loadingIndicator = page.locator('.loading, .spinner, [data-loading], .loading-indicator').first();
-      const loadingVisible = await loadingIndicator.isVisible({ timeout: 1000 }).catch(() => false);
-
-      // Capture: Loading state
-      await cap.after('Loading indicator during async operation');
-    });
-  }
-
-  // ============================================================
-  // REQ-6.2.3: Form Validation
-  // ============================================================
-  async function REQ_6_2_3_formValidation(page, capture) {
-    await capture.requirement(REQ['6.2.3'], async (cap) => {
-      // Open new repository modal
-      const repoNewBtn = page.getByTestId('repo-new-btn').first();
-      await repoNewBtn.click();
-
-      const modal = page.locator('.modal, .modal-overlay, [role="dialog"]').first();
-      await expect(modal).toBeVisible({ timeout: 5000 });
-
-      // Capture: Form with validation
-      await cap.before('Form ready for input with validation');
-
-      // Try to submit empty form (may trigger validation)
-      const createBtn = page.getByRole('button', { name: 'Create' });
-      if (await createBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await createBtn.click();
-
-        // Check for validation feedback
-        const validationMsg = page.locator('.validation-error, .error, .invalid-feedback').first();
-        const hasValidation = await validationMsg.isVisible({ timeout: 1000 }).catch(() => false);
-
-        // Capture: Validation feedback
-        await cap.after('Form validation feedback displayed');
-      }
-    });
-  }
-
-  // ============================================================
-  // REQ-9.1.2: API Error Messages
-  // ============================================================
-  async function REQ_9_1_2_apiErrorMessages(page, capture) {
-    await capture.requirement(REQ['9.1.2'], async (cap) => {
-      // Navigate to non-existent repository to trigger error
-      // Capture: Before navigation
-      await cap.before('Page before navigating to non-existent resource');
-
-      await page.goto('https://dydra.com/playwright/nonexistent-repo-12345');
-      await waitForNetworkIdle(page);
-
-      // Capture: Error message
-      await cap.after('Error message displayed for API failure');
-
-      const errorMessage = page.locator('.flash-error, .error-message, .alert-danger, .not-found').first();
-      const errorVisible = await errorMessage.isVisible({ timeout: 5000 }).catch(() => false);
-    });
-  }
-
-  // ============================================================
-  // REQ-9.1.3: 404 Page
-  // ============================================================
-  async function REQ_9_1_3_404Page(page, capture) {
-    await capture.requirement(REQ['9.1.3'], async (cap) => {
-      // Capture: Before navigating to unknown route
-      await cap.before('Valid page before 404 navigation');
-
-      await page.goto('https://dydra.com/this-does-not-exist-12345/nope');
-      await waitForNetworkIdle(page);
-      await page.waitForTimeout(1000);
-
-      // Capture: 404 page
-      await cap.after('404 page displayed for unknown route');
-
-      // Check for various 404 indicators - any of these is valid
-      const notFoundText = page.locator('text=/404|not found|does not exist/i').first();
-      const loginInput = page.getByTestId('login-username-input');
-      const homeLink = page.locator('a[href="/"], .home-link').first();
-      const errorPage = page.locator('.error-page, .not-found-page').first();
-
-      const notFoundVisible = await notFoundText.isVisible({ timeout: 3000 }).catch(() => false);
-      const loginVisible = await loginInput.isVisible({ timeout: 2000 }).catch(() => false);
-      const homeVisible = await homeLink.isVisible({ timeout: 2000 }).catch(() => false);
-      const errorVisible = await errorPage.isVisible({ timeout: 2000 }).catch(() => false);
-
-      // Any response to invalid URL is acceptable
-      expect(notFoundVisible || loginVisible || homeVisible || errorVisible || true).toBeTruthy();
-    });
-  }
-
-  // ============================================================
-  // Modal Dialog Behavior
-  // ============================================================
-  async function testModalDialogBehavior(page, capture) {
-    await capture.requirement(REQ['6.2.3'], async (cap) => {
-      await page.waitForTimeout(500);
-
-      const repoNewBtn = page.getByTestId('repo-new-btn').first();
-      const altNewBtn = page.locator('.repo-new-btn, button:has-text("New Repository")').first();
-
-      if (await repoNewBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await repoNewBtn.click();
-      } else if (await altNewBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await altNewBtn.click();
-      }
-
-      await page.waitForTimeout(500);
-
-      const modal = page.locator('.modal, .modal-overlay, [role="dialog"]').first();
-      const modalVisible = await modal.isVisible({ timeout: 3000 }).catch(() => false);
-
-      // Capture: Modal open
-      await cap.before('Modal dialog displayed');
-
-      // Find cancel/close button
-      const cancelBtn = page.getByRole('button', { name: /cancel|close/i }).first();
-      const closeBtn = page.locator('.modal-close, [aria-label="Close"]').first();
-
-      if (await cancelBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await cancelBtn.click();
-      } else if (await closeBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await closeBtn.click();
-      } else {
-        await page.keyboard.press('Escape');
-      }
-
-      await page.waitForTimeout(500);
-
-      // Capture: Modal closed
-      await cap.after('Modal closed after user action');
-    });
-  }
-
-  // ============================================================
-  // Confirmation Dialog
-  // ============================================================
-  async function testConfirmationDialog(page, capture) {
-    await capture.requirement(REQ['6.2.3'], async (cap) => {
-      const clearBtn = page.getByTestId('repo-clear-btn').first();
-
-      if (await clearBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        // Capture: Before confirmation
-        await cap.before('Action button that requires confirmation');
-
-        page.once('dialog', async dialog => {
-          expect(dialog.type()).toBe('confirm');
-          await dialog.dismiss();
-        });
-
-        await clearBtn.click();
-
-        // Capture: After dismissing
-        await cap.after('Confirmation dialog handled');
-      }
-    });
-  }
-
-  // ============================================================
-  // Combined Tests
-  // ============================================================
-
+  // ── REQ-6.2.1 flash messages ────────────────────────────────────────────────
   test('flash message display [REQ-6.2.1]', async ({ page }) => {
-    test.setTimeout(30000);
-    const capture = new DocCapture(page, 'tests/pdfs/ui', { enabled: CAPTURE_ENABLED });
-
+    const capture = new DocCapture(page, 'tests/pdfs/ui-components', { enabled: CAPTURE_ENABLED });
     await login(page);
-    await page.waitForTimeout(2000);
 
-    try {
-      await REQ_6_2_1_flashMessages(page, capture);
-    } catch (e) {
-      console.log('Flash message note:', e.message);
-    }
+    await capture.requirement(REQ['6.2.1'], async (cap) => {
+      await cap.before('Before a transient message');
+      // showLocationMessage writes into #location-bar > #location-display
+      // specifically (ui/app.js:331), restoring the previous text on a timer.
+      const bar = page.locator('#location-display');
+      await expect(bar).toBeVisible({ timeout: 15000 });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+      // The mechanism is app.showLocationMessage: there is no .flash or .toast
+      // element in this UI, which is why the old selectors never matched.
+      await page.evaluate(() => window.appInstance.showLocationMessage('probe message', 2000));
+      await expect(bar, 'a transient message should be shown').toContainText('probe message',
+                                                                            { timeout: 10000 });
+      await cap.step('shown', 'Transient message displayed');
+
+      // ...and it must clear itself again.
+      await expect(bar, 'the message should clear on its own').not.toContainText('probe message',
+                                                                                { timeout: 15000 });
+      await cap.after('Message cleared');
+    });
+
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-6.2.2 loading indicators ────────────────────────────────────────────
   test('loading indicator [REQ-6.2.2]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/ui', { enabled: CAPTURE_ENABLED });
+    const capture = new DocCapture(page, 'tests/pdfs/ui-components', { enabled: CAPTURE_ENABLED });
+
+    // Hold the collaboration request open so the loading state is observable
+    // rather than raced against.  Without this the fetch finishes long before an
+    // assertion can see it, which is why the old test could only shrug.
+    await page.route('**/collaboration**', async (route) => {
+      await new Promise((r) => setTimeout(r, 4000));
+      await route.continue();
+    });
 
     await login(page);
+    await openRepository(page, ACCOUNT, REPOSITORY);
 
-    await REQ_6_2_2_loadingIndicators(page, capture);
+    await capture.requirement(REQ['6.2.2'], async (cap) => {
+      await cap.before('Repository pane before loading collaboration');
+      await page.locator(`#tab-repository-${ACCOUNT}-${REPOSITORY} [data-tab="collaboration"]`)
+                .first().click();
+      await expect(page.getByText(/Loading collaboration data/i),
+                   'a loading state should be shown while the request is open')
+        .toBeVisible({ timeout: 10000 });
+      await cap.step('loading', 'Loading indicator while data is fetched');
 
-    // Clean up - close modal
-    const cancelBtn = page.getByRole('button', { name: /cancel|close/i }).first();
-    if (await cancelBtn.isVisible({ timeout: 1000 }).catch(() => false)) {
-      await cancelBtn.click();
-    }
+      await expect(page.getByTestId('collab-new-btn').first(),
+                   'the section should finish loading').toBeVisible({ timeout: 25000 });
+      await cap.after('Loaded');
+    });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-9.1.2 error messages ────────────────────────────────────────────────
   test('error message display [REQ-9.1.2]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/ui', { enabled: CAPTURE_ENABLED });
+    const capture = new DocCapture(page, 'tests/pdfs/ui-components', { enabled: CAPTURE_ENABLED });
 
-    await login(page);
+    await capture.requirement(REQ['9.1.2'], async (cap) => {
+      await page.goto(USER_URL);
+      await expect(page.getByTestId('login-username-input')).toBeVisible({ timeout: 15000 });
+      await cap.before('Login form before a failed attempt');
 
-    await REQ_9_1_2_apiErrorMessages(page, capture);
+      await page.getByTestId('login-username-input').fill(ACCOUNT);
+      await page.getByTestId('login-password-input').fill('wrong-password-on-purpose');
+      await page.getByTestId('login-submit').click();
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+      // A rejected API call must say so, in #login-error-text.
+      const errorText = page.locator('#login-error-text');
+      await expect(errorText, 'a failed login should report an error').toBeVisible({ timeout: 20000 });
+      expect((await errorText.textContent() || '').trim().length,
+             'the error message should not be empty').toBeGreaterThan(0);
+      await cap.after('Error message displayed');
+    });
+
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-9.1.3 404 ───────────────────────────────────────────────────────────
   test('404 page [REQ-9.1.3]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/ui', { enabled: CAPTURE_ENABLED });
+    const capture = new DocCapture(page, 'tests/pdfs/ui-components', { enabled: CAPTURE_ENABLED });
+    await login(page);
 
-    await REQ_9_1_3_404Page(page, capture);
+    await capture.requirement(REQ['9.1.3'], async (cap) => {
+      await cap.before('Before navigating to an unknown route');
+      // Routed in-app rather than by page.goto: a full load would drop the
+      // in-memory session and show the login page, which is not a 404.
+      await page.evaluate(() => window.appInstance.router.navigate('/no/such/route/at/all'));
+      await expect(page.getByText(/page you were looking for doesn't exist/i),
+                   'an unknown route should render the not-found page').toBeVisible({ timeout: 15000 });
+      await cap.after('Not-found page displayed');
+    });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-6.2.3 modal ─────────────────────────────────────────────────────────
   test('modal dialog behavior [REQ-6.2.3]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/ui', { enabled: CAPTURE_ENABLED });
-
+    const capture = new DocCapture(page, 'tests/pdfs/ui-components', { enabled: CAPTURE_ENABLED });
     await login(page);
+    await openRepository(page, ACCOUNT, REPOSITORY);
 
-    await testModalDialogBehavior(page, capture);
+    await capture.requirement(REQ['6.2.3'], async (cap) => {
+      await cap.before('Repository pane before opening a dialog');
+      await page.getByTestId('view-new-btn').first().click();
+      const nameInput = page.getByTestId('new-view-name-input');
+      await expect(nameInput, 'the dialog should open').toBeVisible({ timeout: 15000 });
+      await cap.step('open', 'Modal dialog open');
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+      await page.getByTestId('new-view-cancel-btn').click();
+      await expect(nameInput, 'Cancel should dismiss the dialog').toBeHidden({ timeout: 10000 });
+      await cap.after('Modal dialog dismissed');
+    });
+
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-6.2.3 confirmation ──────────────────────────────────────────────────
   test('confirmation dialog [REQ-6.2.3]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/ui', { enabled: CAPTURE_ENABLED });
-
+    const capture = new DocCapture(page, 'tests/pdfs/ui-components', { enabled: CAPTURE_ENABLED });
     await login(page);
-    await openRepository(page, 'playwright', 'test');
+    await openRepository(page, ACCOUNT, REPOSITORY);
 
-    await testConfirmationDialog(page, capture);
+    await capture.requirement(REQ['6.2.3'], async (cap) => {
+      await cap.before('Before a destructive action');
+      let asked = null;
+      // Dismissed, not accepted: this repository is the fixture the rest of the
+      // suite reads from.  What is asserted is that the guard exists.
+      page.once('dialog', async (d) => { asked = d.message(); await d.dismiss(); });
+      await page.getByTestId('repo-clear-btn').first().click();
+      await page.waitForTimeout(2000);
+      expect(asked, 'a destructive action should ask for confirmation').toContain('clear');
+      await cap.after('Confirmation requested and declined');
+    });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── responsive ──────────────────────────────────────────────────────────────
   test('responsive layout elements', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/ui', { enabled: CAPTURE_ENABLED });
-
+    const capture = new DocCapture(page, 'tests/pdfs/ui-components', { enabled: CAPTURE_ENABLED });
     await login(page);
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await openRepository(page, ACCOUNT, REPOSITORY);
+    const tabs = page.locator('[data-tab-link]').first();
 
     await capture.requirement(REQ['6.2.1'], async (cap) => {
-      // Desktop size
-      await page.setViewportSize({ width: 1200, height: 800 });
-      await page.waitForTimeout(500);
+      await page.setViewportSize({ width: 1440, height: 900 });
+      await expect(tabs, 'tabs should be usable at desktop width').toBeVisible();
+      await cap.before('Desktop layout');
 
-      const accountPane = page.locator('.account-pane');
-      const paneVisible = await accountPane.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Capture: Desktop layout
-      await cap.before('Desktop layout (1200x800)');
-
-      const navigation = page.locator('.navigation, nav, .tab-bar').first();
-      const navVisible = await navigation.isVisible({ timeout: 2000 }).catch(() => false);
-
-      // Mobile size
       await page.setViewportSize({ width: 375, height: 667 });
-      await page.waitForTimeout(500);
-
-      // Capture: Mobile layout
-      await cap.after('Mobile layout (375x667)');
-
-      const mobileContent = page.locator('.account-pane, .login-form, main, body').first();
-      const mobileVisible = await mobileContent.isVisible({ timeout: 3000 }).catch(() => false);
+      await page.waitForTimeout(800);
+      // The navigation must survive the narrow viewport rather than vanish.
+      await expect(tabs, 'tabs should still be usable at mobile width').toBeVisible();
+      await expect(page.locator(`#tab-repository-${ACCOUNT}-${REPOSITORY}`)).toBeVisible();
+      await cap.after('Mobile layout');
     });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── keyboard navigation ─────────────────────────────────────────────────────
   test('keyboard navigation', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/ui', { enabled: CAPTURE_ENABLED });
-
-    await login(page);
+    const capture = new DocCapture(page, 'tests/pdfs/ui-components', { enabled: CAPTURE_ENABLED });
+    await page.goto(USER_URL);
+    await expect(page.getByTestId('login-username-input')).toBeVisible({ timeout: 15000 });
 
     await capture.requirement(REQ['6.2.1'], async (cap) => {
-      // Capture: Before keyboard navigation
-      await cap.before('Page ready for keyboard navigation');
-
+      await cap.before('Login form before keyboard navigation');
+      await page.getByTestId('login-username-input').focus();
+      const first = await page.evaluate(() => document.activeElement?.getAttribute('data-testid'));
       await page.keyboard.press('Tab');
-      await page.keyboard.press('Tab');
-      await page.keyboard.press('Tab');
-
-      const focusedElement = page.locator(':focus');
-      const tagName = await focusedElement.evaluate(el => el.tagName.toLowerCase());
-      expect(['a', 'button', 'input', 'select', 'textarea']).toContain(tagName);
-
-      // Capture: After keyboard navigation
-      await cap.after('Focus moved to interactive element via Tab');
+      const second = await page.evaluate(() => document.activeElement?.getAttribute('data-testid'));
+      // Tab must move focus somewhere else: a form that traps focus is unusable
+      // from the keyboard.
+      expect(second, 'Tab should move focus off the first field').not.toBe(first);
+      await cap.after('Focus moved by keyboard');
     });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── tooltips ────────────────────────────────────────────────────────────────
   test('tooltip display', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/ui', { enabled: CAPTURE_ENABLED });
-
+    const capture = new DocCapture(page, 'tests/pdfs/ui-components', { enabled: CAPTURE_ENABLED });
     await login(page);
-    await openRepository(page, 'playwright', 'test');
+    await openRepository(page, ACCOUNT, REPOSITORY);
 
     await capture.requirement(REQ['6.2.1'], async (cap) => {
-      const elementsWithTitle = page.locator('[title]').first();
-
-      if (await elementsWithTitle.isVisible({ timeout: 2000 }).catch(() => false)) {
-        // Capture: Before hover
-        await cap.before('Element with tooltip');
-
-        await elementsWithTitle.hover();
-        await page.waitForTimeout(500);
-
-        const titleText = await elementsWithTitle.getAttribute('title');
-        expect(titleText).toBeTruthy();
-
-        // Capture: Tooltip visible
-        await cap.after('Tooltip displayed on hover');
-      }
+      await cap.before('Repository controls');
+      // Tooltips here are title attributes on the icon controls; the import and
+      // clear buttons carry them and are the ones a user needs explained.
+      await expect(page.getByTestId('repo-import-btn').first()).toHaveAttribute('title', /import/i);
+      await expect(page.getByTestId('repo-clear-btn').first()).toHaveAttribute('title', /clear/i);
+      await cap.after('Controls carry explanatory titles');
     });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
-
 });

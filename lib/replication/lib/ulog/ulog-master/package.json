@@ -1,0 +1,65 @@
+{
+  "name": "ulog",
+  "version": "2.0.0-beta.7",
+  "description": "Microscopically small universal logging library",
+  "main": "node.js",
+  "unpkg": "ulog.min.js",
+  "browser": "browser.js",
+  "scripts": {
+    "clean": "rimraf ulog.umd.js && rimraf ulog.min.js",
+    "build-umd": "node ./build/build-umd.js",
+    "build-min": "uglifyjs ./ulog.umd.js -o ulog.min.js -c -m --screw-ie8",
+    "build-all": "npm run -S build-umd && npm run -S build-min",
+    "build": "cross-env NODE_ENV=production npm run -S build-all",
+    "release": "npm run -S clean && npm run -S build && npm run -S test",
+    "test": "mocha *.spec.js",
+    "dev": "webpack-dev-server --output-path /test --output-filename ulog.spec.js \"mocha-loader!./ulog.spec.js\" --content-base test --port 8888",
+    "debug": "webpack-dev-server --output-path /test --output-filename debug.spec.js \"mocha-loader!./debug.spec.js\" --content-base test --port 8888"
+  },
+  "keywords": [
+    "universal-components",
+    "microscopically small",
+    "small",
+    "tiny",
+    "universal",
+    "isomorphic",
+    "logging",
+    "logger",
+    "browser",
+    "node",
+    "nashorn",
+    "console",
+    "polyfill",
+    "1kB"
+  ],
+  "author": {
+    "name": "Stijn de Witt",
+    "email": "StijnDeWitt@hotmail.com",
+    "url": "http://StijnDeWitt.com"
+  },
+  "copyright": "Copyright 2017 by [Stijn de Witt](http://StijnDeWitt.com). Some rights reserved.",
+  "license": "CC-BY-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/download/ulog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/download/ulog/issues"
+  },
+  "homepage": "http://github.com/download/ulog",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "cross-env": "^5.1.3",
+    "mocha": "^4.0.1",
+    "mocha-loader": "^1.1.1",
+    "path": "^0.12.7",
+    "rimraf": "^2.6.2",
+    "sinon": "^7.1.1",
+    "uglify-js": "^3.4.9",
+    "webpack": "^4.26.1",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10"
+  },
+  "dependencies": {}
+}

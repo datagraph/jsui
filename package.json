@@ -1,5 +1,16 @@
 {
   "dependencies": {
     "@playwright/test": "^1.58.2"
+  },
+  "scripts": {
+    "manual": "node doc/restyle-manual.js",
+    "manual:install": "node doc/restyle-manual.js --install",
+    "test:router": "node tests/router-query.test.mjs",
+    "clean:test-repos": "node tests/clean-test-repos.mjs",
+    "test:adapter": "node tests/tool-adapter.test.mjs",
+    "test:unit": "npm run test:router && npm run test:adapter && npm run test:log && npm run test:format",
+    "test:log": "node tests/session-log.test.mjs",
+    "test:format": "node tests/transcript.test.mjs",
+    "test:pane": "node tests/exploration-pane.browser.mjs"
   }
 }

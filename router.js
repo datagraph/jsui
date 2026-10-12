@@ -44,6 +44,7 @@ export class Router {
     this.updateLocation = updateLocation;
     this.onRouteChange = onRouteChange;
     this.currentPath = null;
+    this.currentSearch = "";
     this.historyStack = [];
     this.historyIndex = -1;
     this.isHistoryNavigation = false;
@@ -74,7 +75,10 @@ export class Router {
     } else if (rawPath.endsWith(".html")) {
       rawPath = rawPath.replace(/\.html$/, "");
     }
-    return normalizePath(this.stripBasePath(rawPath));
+    // The query string is part of the location but not of the pathname, so it
+    // is appended here; handlePath takes it off again before matching.  In hash
+    // mode it is already inside the hash and arrives by the branch above.
+    return `${normalizePath(this.stripBasePath(rawPath))}${window.location.search}`;
   }
 
   findRoute(path) {
@@ -91,20 +95,32 @@ export class Router {
     console.log("[Router] handlePath() called with:", path);
     const normalized = normalizePath(path);
     console.log("[Router] Normalized to:", normalized);
-    this.currentPath = normalized;
-    const match = this.findRoute(normalized);
+    // A route is compiled to ^pattern$ over the path alone, so a query string
+    // has to come off before matching -- otherwise ".../views/new?query=..."
+    // matches no route at all and falls through to onNotFound.  It reaches the
+    // handler as ctx.query rather than through window.location, which under
+    // updateLocation:false is never written and would be stale or empty.
+    const queryIndex = normalized.indexOf("?");
+    const routePath = queryIndex === -1 ? normalized : normalized.slice(0, queryIndex);
+    const search = queryIndex === -1 ? "" : normalized.slice(queryIndex + 1);
+    this.currentPath = routePath;
+    this.currentSearch = search;
+    const match = this.findRoute(routePath);
     console.log("[Router] Route match found:", !!match, match ? match.route.path : "none");
     if (match) {
       console.log("[Router] Calling route handler for:", match.route.path);
-      match.route.handler({ params: match.params, path: normalized });
+      match.route.handler({ params: match.params, path: routePath, search,
+                            query: new URLSearchParams(search) });
       console.log("[Router] Route handler completed");
     } else if (this.onNotFound) {
       console.log("[Router] No route match, calling onNotFound");
-      this.onNotFound({ path: normalized });
+      this.onNotFound({ path: routePath, search, query: new URLSearchParams(search) });
     }
     if (this.onRouteChange) {
-      console.log("[Router] Calling onRouteChange with:", normalized);
-      this.onRouteChange(normalized);
+      // the path without the query: this drives the location bar and the pane
+      // comparisons, both of which key on the route.
+      console.log("[Router] Calling onRouteChange with:", routePath);
+      this.onRouteChange(routePath);
     }
     this.isHistoryNavigation = false;
   }

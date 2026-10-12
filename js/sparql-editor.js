@@ -202,12 +202,14 @@ function createSparqlEditor(config) {
     var accessToken = config.accessToken ? ensureBearerTokenPrefix(config.accessToken) : null;
     var container = config.container;
     var initialQuery = config.sparql || '';
-    
+
     // DydraClient-specific parameters
     var dydraClient = config.dydraClient || null;
     var accountName = config.accountName || '';
     var repositoryName = config.repositoryName || '';
     var viewName = config.viewName || '';
+    var viewDisplayName = config.viewDisplayName || '';
+    var viewSlug = config.viewSlug || viewName;
     var accountAuth = config.accountAuth || null;
     var dialog = config.dialog || null;
     var repositoryClass = config.repositoryClass || '';
@@ -266,10 +268,10 @@ function createSparqlEditor(config) {
     }
     
     // Tab management functions
-    function createQueryTab(query, results, executionTime, etag) {
+    function createQueryTab(query, results, executionTime, etag, urlArguments) {
         var tabId = 'tab-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
         var timestamp = new Date().toLocaleTimeString();
-        
+
         // Calculate result count
         var resultCount = 0;
         if (results.error) {
@@ -281,7 +283,7 @@ function createSparqlEditor(config) {
         } else {
             resultCount = 'Unknown';
         }
-        
+
         var tab = {
             id: tabId,
             label: timestamp,
@@ -290,6 +292,7 @@ function createSparqlEditor(config) {
             executionTime: executionTime,
             resultCount: resultCount,
             etag: etag || '',
+            urlArguments: urlArguments || '',
             createdAt: new Date()
         };
         
@@ -300,9 +303,9 @@ function createSparqlEditor(config) {
         tabButton.type = 'button';
         tabButton.className = 'query-tab';
         tabButton.dataset.tabId = tabId;
-        tabButton.title = 'Executed: ' + tab.createdAt.toLocaleString() + '\nTime: ' + executionTime + 'ms\nResults: ' + resultCount + (etag ? '\nRevision: ' + etag : '');
+        tabButton.title = 'Executed: ' + tab.createdAt.toLocaleString() + '\nTime: ' + executionTime + 'ms\nResults: ' + resultCount + (etag ? '\nRevision: ' + etag : '') + (tab.urlArguments ? '\nArgs: ' + tab.urlArguments : '');
         tabButton.style.cssText = 'background: #007bff; color: white; border: none; padding: 4px 8px; border-radius: 4px 4px 0 0; cursor: pointer; font-size: 12px; margin-right: 2px; display: flex; align-items: center; gap: 4px;';
-        
+
         // Avoid nested button inside button to preserve drag behavior
         tabButton.innerHTML = '<span>' + timestamp + '</span><span class="close-tab" style="display:inline-block; color: white; cursor: pointer; padding: 0; margin-left: 4px; font-size: 14px; line-height: 1; user-select: none;" title="Close Tab">×</span>';
         
@@ -340,6 +343,7 @@ function createSparqlEditor(config) {
                 timestamp: Date.now(),
                 tabId: tabId,
                 tab: tab,
+                urlArguments: tab.urlArguments || '',
                 dialogId: rootDialog,
                 key: `view:${accountName}/${repositoryName}/${viewName}`
                 // No dialog id here; external handler can use these fields
@@ -398,7 +402,12 @@ function createSparqlEditor(config) {
         
         // Restore query text
         textarea.value = tab.query;
-        
+
+        // Restore URL arguments
+        if (urlArgumentsInput) {
+            urlArgumentsInput.value = tab.urlArguments || '';
+        }
+
         // Display results
         displayQueryResults(tab.results, tab.executionTime);
     }
@@ -1148,6 +1157,51 @@ function createSparqlEditor(config) {
         el.style.cursor = 'pointer';
     });
 
+    // URL arguments input (editable text line below path text for query parameters)
+    var urlArgumentsContainer = createElement('div', {
+        className: 'url-arguments-container',
+        style: {
+            display: options.initialState === 'open' ? 'flex' : 'none',
+            alignItems: 'center',
+            padding: '2px 4px 2px 22px',
+            borderBottom: '1px solid #e5e7eb',
+            background: '#f9fafb',
+            gap: '4px',
+            fontSize: '12px'
+        }
+    });
+
+    var urlArgumentsLabel = createElement('span', {
+        style: {
+            color: '#6b7280',
+            fontSize: '11px',
+            whiteSpace: 'nowrap'
+        }
+    }, ['args:']);
+
+    var urlArgumentsInput = createElement('input', {
+        type: 'text',
+        placeholder: 'name=value name2=value2',
+        title: 'URL query arguments (space-separated name=value pairs)',
+        'data-testid': 'sparql-editor-url-arguments',
+        style: {
+            flex: '1',
+            padding: '1px 4px',
+            border: '1px solid #d1d5db',
+            borderRadius: '3px',
+            fontSize: '11px',
+            fontFamily: 'monospace',
+            outline: 'none',
+            height: '18px',
+            background: '#fff',
+            color: '#111827'
+        }
+    });
+
+    urlArgumentsInput.style.cursor = 'text';
+    urlArgumentsContainer.appendChild(urlArgumentsLabel);
+    urlArgumentsContainer.appendChild(urlArgumentsInput);
+
     // Query editor (Yasqe or textarea fallback)
     var queryEditorContainer = createElement('div', {
         id: 'view-query-container',
@@ -1163,13 +1217,14 @@ function createSparqlEditor(config) {
     if (options.showEditorToggle) {
         headerText.addEventListener('dblclick', function() {
             isContentVisible = !isContentVisible;
-            
-            // Show/hide query editor and results (always together)
+
+            // Show/hide URL arguments, query editor and results (always together)
+            urlArgumentsContainer.style.display = isContentVisible ? 'flex' : 'none';
             queryEditorContainer.style.display = isContentVisible ? 'block' : 'none';
             if (resultsTabsContainer) {
                 resultsTabsContainer.style.display = isContentVisible ? 'block' : 'none';
             }
-            
+
             // Show/hide log if it exists
             if (eventLogContainer) {
                 eventLogContainer.style.display = isContentVisible ? 'block' : 'none';
@@ -1451,7 +1506,10 @@ function createSparqlEditor(config) {
     // SIMPLE STRUCTURE: Exactly as requested
     // 1. Header at the top
     panel.appendChild(header);
-    
+
+    // 1b. URL arguments input below the header
+    panel.appendChild(urlArgumentsContainer);
+
     // 2. Query editor element under that (Yasqe or textarea)
     panel.appendChild(queryEditorContainer);
     
@@ -1560,6 +1618,7 @@ function createSparqlEditor(config) {
     
     // Set initial visibility - collapsed shows only header, expanded shows all
     var isExpanded = options.initialState === 'open';
+    urlArgumentsContainer.style.display = isExpanded ? 'flex' : 'none';
     queryEditorContainer.style.display = isExpanded ? 'block' : 'none';
     if (resultsTabsContainer) {
         resultsTabsContainer.style.display = isExpanded ? 'block' : 'none';
@@ -1620,8 +1679,9 @@ function createSparqlEditor(config) {
     // SIMPLE TOGGLE: Collapsed = header only, Expanded = header + textarea + results + log
     toggleButton.addEventListener('click', function() {
         isContentVisible = !isContentVisible;
-        
-        // Show/hide editor container and results (always together)
+
+        // Show/hide URL arguments, editor container and results (always together)
+        urlArgumentsContainer.style.display = isContentVisible ? 'flex' : 'none';
         if (textarea) {
             textarea.style.display = isContentVisible ? 'block' : 'none';
         }
@@ -1631,7 +1691,7 @@ function createSparqlEditor(config) {
         if (resultsTabsContainer) {
             resultsTabsContainer.style.display = isContentVisible ? 'block' : 'none';
         }
-        
+
         // Show/hide log if it exists
         if (eventLogContainer) {
             eventLogContainer.style.display = isContentVisible ? 'block' : 'none';
@@ -1726,6 +1786,22 @@ function createSparqlEditor(config) {
             logEvent('Added revision parameter: ' + revisionSelect.value);
         }
 
+        // Add URL arguments from the arguments input field
+        var currentUrlArguments = '';
+        if (urlArgumentsInput && urlArgumentsInput.value.trim()) {
+            currentUrlArguments = urlArgumentsInput.value.trim();
+            var argPairs = currentUrlArguments.split(/\s+/);
+            argPairs.forEach(function(pair) {
+                var eqIndex = pair.indexOf('=');
+                if (eqIndex > 0) {
+                    var argName = pair.substring(0, eqIndex);
+                    var argValue = pair.substring(eqIndex + 1);
+                    endpoint += (endpoint.includes('?') ? '&' : '?') + encodeURIComponent(argName) + '=' + encodeURIComponent(argValue);
+                    logEvent('Added URL argument: ' + argName + ' = ' + argValue);
+                }
+            });
+        }
+
         if (!endpoint) {
             logEvent('No endpoint available, showing error', 'error');
             logEvent('No SPARQL endpoint configured');
@@ -1797,7 +1873,7 @@ function createSparqlEditor(config) {
             if (response.status === 202) {
                 var jobLocation = response.headers.get('Location') || '';
                 logEvent('Asynchronous request accepted. Job: ' + jobLocation);
-                createQueryTab(query, { type: 'async', message: 'Asynchronous request accepted.\nJob location: ' + jobLocation }, executionTime, responseEtag);
+                createQueryTab(query, { type: 'async', message: 'Asynchronous request accepted.\nJob location: ' + jobLocation }, executionTime, responseEtag, currentUrlArguments);
                 isExecuting = false;
                 setExecuteButtonState('ready');
                 return;
@@ -1840,7 +1916,7 @@ function createSparqlEditor(config) {
                     
                     // Create tab for this execution
                     console.log('Creating tab for JSON results');
-                    createQueryTab(query, data, executionTime, responseEtag);
+                    createQueryTab(query, data, executionTime, responseEtag, currentUrlArguments);
                 });
             } else if (selectedMediaType === 'application/sparql-results+xml') {
                 return response.text().then(function(text) {
@@ -1853,7 +1929,7 @@ function createSparqlEditor(config) {
                         content: text,
                         formatted: formatXml(text)
                     };
-                    createQueryTab(query, xmlResults, executionTime, responseEtag);
+                    createQueryTab(query, xmlResults, executionTime, responseEtag, currentUrlArguments);
                 });
             } else if (selectedMediaType === 'image/vnd.dydra.SPARQL-RESULTS+GRAPHVIZ+SVG+XML') {
                 return response.text().then(function(text) {
@@ -1865,7 +1941,7 @@ function createSparqlEditor(config) {
                         type: 'svg',
                         content: text
                     };
-                    createQueryTab(query, svgResults, executionTime, responseEtag);
+                    createQueryTab(query, svgResults, executionTime, responseEtag, currentUrlArguments);
                 });
             } else if (selectedMediaType === 'text/html') {
                 console.log('=== HTML PROCESSING START ===');
@@ -1976,16 +2052,22 @@ function createSparqlEditor(config) {
             return;
         }
 
+        // When a display name differs from the slug, send JSON so the server
+        // stores both the human-readable name and the URL-safe cached_slug.
+        var useJson = viewDisplayName && viewDisplayName !== viewSlug;
         var headers = {
-            'Content-Type': 'application/sparql-query',
+            'Content-Type': useJson ? 'application/json' : 'application/sparql-query',
             'Accept': 'application/n-quads',
             'Authorization': effectiveToken
         };
+        var body = useJson
+            ? JSON.stringify({ name: viewDisplayName, cached_slug: viewSlug, query: query })
+            : query;
 
         fetch(viewUrl, {
             method: 'PUT',
             headers: headers,
-            body: query
+            body: body
         })
         .then(function(response) {
             if (!response.ok) {
@@ -2514,6 +2596,8 @@ function createSparqlEditor(config) {
                 options.onQueryChanged(query);
             }
         },
+        getUrlArguments: function() { return urlArgumentsInput ? urlArgumentsInput.value : ''; },
+        setUrlArguments: function(args) { if (urlArgumentsInput) urlArgumentsInput.value = args || ''; },
         execute: executeQuery,
         save: saveQuery,
         getQueryTabs: function() {
@@ -2527,6 +2611,7 @@ function createSparqlEditor(config) {
                     executionTime: tab.executionTime,
                     resultCount: tab.resultCount,
                     etag: tab.etag,
+                    urlArguments: tab.urlArguments || '',
                     createdAt: tab.createdAt ? tab.createdAt.toISOString() : null
                 };
             });
@@ -2554,16 +2639,17 @@ function createSparqlEditor(config) {
                     executionTime: tabData.executionTime,
                     resultCount: tabData.resultCount,
                     etag: tabData.etag || '',
+                    urlArguments: tabData.urlArguments || '',
                     createdAt: tabData.createdAt ? new Date(tabData.createdAt) : new Date()
                 };
                 queryTabs.push(tab);
-                
+
                 // Create tab button manually to preserve the original tab ID
                 var tabButton = document.createElement('button');
                 tabButton.type = 'button';
                 tabButton.className = 'query-tab';
                 tabButton.dataset.tabId = tabId;
-                tabButton.title = 'Executed: ' + tab.createdAt.toLocaleString() + '\nTime: ' + tab.executionTime + 'ms\nResults: ' + tab.resultCount + (tab.etag ? '\nRevision: ' + tab.etag : '');
+                tabButton.title = 'Executed: ' + tab.createdAt.toLocaleString() + '\nTime: ' + tab.executionTime + 'ms\nResults: ' + tab.resultCount + (tab.etag ? '\nRevision: ' + tab.etag : '') + (tab.urlArguments ? '\nArgs: ' + tab.urlArguments : '');
                 tabButton.style.cssText = 'background: #6c757d; color: white; border: none; padding: 4px 8px; border-radius: 4px 4px 0 0; cursor: pointer; font-size: 12px; margin-right: 2px; display: flex; align-items: center; gap: 4px;';
                 tabButton.innerHTML = '<span>' + label + '</span><span class="close-tab" style="display:inline-block; color: white; cursor: pointer; padding: 0; margin-left: 4px; font-size: 14px; line-height: 1; user-select: none;" title="Close Tab">×</span>';
                 
@@ -2596,15 +2682,16 @@ function createSparqlEditor(config) {
                 activateTab(queryTabs[queryTabs.length - 1].id);
             }
         },
-        show: function() { 
+        show: function() {
             isContentVisible = true;
-            
-            // Show query editor and results (always together)
+
+            // Show URL arguments, query editor and results (always together)
+            urlArgumentsContainer.style.display = 'flex';
             queryEditorContainer.style.display = 'block';
             if (resultsTabsContainer) {
                 resultsTabsContainer.style.display = 'block';
             }
-            
+
             // Show log if it exists
             if (eventLogContainer) {
                 eventLogContainer.style.display = 'block';
@@ -2617,15 +2704,16 @@ function createSparqlEditor(config) {
             // Adjust panel size
             setTimeout(adjustEditorSize, 10);
         },
-        hide: function() { 
+        hide: function() {
             isContentVisible = false;
-            
-            // Hide query editor and results (always together)
+
+            // Hide URL arguments, query editor and results (always together)
+            urlArgumentsContainer.style.display = 'none';
             queryEditorContainer.style.display = 'none';
             if (resultsTabsContainer) {
                 resultsTabsContainer.style.display = 'none';
             }
-            
+
             // Hide log if it exists
             if (eventLogContainer) {
                 eventLogContainer.style.display = 'none';

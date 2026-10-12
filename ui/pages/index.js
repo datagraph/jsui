@@ -1,8 +1,10 @@
 import { BasePage } from "./base_page.js";
-import { escapeHtml, joinHtml } from "../utils.js";
+import { escapeHtml, joinHtml, parameterize } from "../utils.js";
 import { NavigationView } from "../components/navigation.js";
 import { APP_CONFIG } from "../../lib/config.js";
 import { authenticateAccount } from "../../lib/auth.js";
+import { buildLoginFormHtml, readLastUsername } from "../components/login-form.js";
+import { installExplorationLauncher } from "../components/exploration-pane.js";
 
 export const errorMessages = () => `
   <div class="widget">
@@ -35,12 +37,21 @@ const getResponseText = async (response) => {
   }
 };
 
+// Safely decode percent-encoded URI characters (e.g. %20 → space).
+// Returns the original string unchanged if decoding fails.
+const safeDecodeURIComponent = (s) => {
+  if (!s) return s;
+  try { return decodeURIComponent(s); } catch { return s; }
+};
+
 // Helper function to ensure view name is just the base name (not a full path)
-// This ensures that even if a view name somehow contains a path, we extract just the base name
+// and that any percent-encoding is decoded so the canonical internal form uses
+// raw characters (e.g. spaces).  API call sites re-encode via encodeURIComponent.
 const ensureBaseViewName = (viewName) => {
   if (!viewName) return viewName;
   // If it contains slashes, extract just the last part
-  return viewName.includes("/") ? viewName.split("/").pop() : viewName;
+  const base = viewName.includes("/") ? viewName.split("/").pop() : viewName;
+  return safeDecodeURIComponent(base);
 };
 
 // Helper function to extract local part from an IRI
@@ -443,21 +454,7 @@ const loadRepositoryHistoryTab = async (app, accountName, repositoryName, conten
 
     // Format data based on tab type
     if (tabName === "events") {
-      if (Array.isArray(data) && data.length > 0) {
-        let formattedHistory = "";
-        data.forEach((entry, index) => {
-          const timestamp = entry.timestamp || "Unknown time";
-          const agent = entry.agent || "Unknown agent";
-          const summary = entry.summary || "No summary available";
-          formattedHistory += `${timestamp} - ${agent}\n${summary}`;
-          if (index < data.length - 1) {
-            formattedHistory += "\n\n";
-          }
-        });
-        contentElement.textContent = formattedHistory;
-      } else {
-        contentElement.textContent = "No history data available";
-      }
+      contentElement.innerHTML = renderHistoryTable(Array.isArray(data) ? data : []);
     } else {
       // For other tabs, display as formatted JSON
       contentElement.textContent = typeof data === "string" ? data : JSON.stringify(data, null, 2);
@@ -1809,40 +1806,8 @@ const handleRepositoryClear = async (app, accountName, repositoryName, button) =
 };
 
 export const buildLoginContent = (state = null) => {
-  // Get last username from localStorage if available
-  let lastUsername = "";
-  if (state) {
-    try {
-      const stored = JSON.parse(window.localStorage.getItem("dydra.session"));
-      lastUsername = stored?.accountName || "";
-    } catch (error) {
-      // Ignore errors
-    }
-  }
-  
-  return `
-  <div id="login-error" class="widget" style="display:none;">
-    <div class="alert-error rounded">
-      <p class="message">
-        <span class="icon icon-alert"></span>
-        <span id="login-error-text"></span>
-      </p>
-    </div>
-  </div>
-  <form id="inline-login-form" class="formtastic" onsubmit="return false;" data-testid="login-form">
-    <fieldset class="inputs">
-      <ol>
-        <li class="string optional"><label>Host</label><input type="text" name="host" placeholder="dydra.com" data-testid="login-host-input" /></li>
-        <li class="string optional"><label>Username</label><input type="text" name="login" value="${escapeHtml(lastUsername)}" data-testid="login-username-input" /></li>
-        <li class="password optional"><label>Password or Token</label><input type="password" name="password" data-testid="login-password-input" /></li>
-      </ol>
-    </fieldset>
-    <fieldset class="buttons">
-      <ol>
-        <li class="commit"><input type="submit" value="Log in" data-testid="login-submit" /></li>
-      </ol>
-    </fieldset>
-  </form>
+  const lastUsername = state ? readLastUsername() : '';
+  return `${buildLoginFormHtml(lastUsername)}
   <div id="login-status" class="small text-muted" data-testid="login-status"></div>
   <p class="password-recovery-link"><a href="${BASE_PATH}/reset_password.html" data-testid="login-forgot-password-link">Forgot your password?</a></p>
   <p class="invite-request-link"><a href="${BASE_PATH}/invite" data-testid="login-invite-link">Request an invitation</a></p>
@@ -2105,13 +2070,21 @@ const renderRepositoryPane = async (state, accountName, repositoryName) => {
             <div class="block">
               <div class="repository-views-layout">
                 <div class="query-catalog">
-                  <h2>Views <button type="button" class="view-new-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-testid="view-new-btn" style="
-                    font-size: 13px; padding: 2px 8px; margin-left: 8px; cursor: pointer; vertical-align: middle;
-                  ">New</button></h2>
+                  <h2 style="display: flex; align-items: center;">Views
+                    <span style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
+                      <button type="button" class="view-explore-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-testid="view-explore-btn" title="Open an exploration pane: prompt an LLM, which surveys this repository over MCP" style="
+                        font-size: 13px; padding: 2px 8px; cursor: pointer;
+                        display: inline-flex; align-items: center; gap: 4px;
+                      "><img src="${BASE_PATH}/images/explore.svg" alt="" width="14" height="14" />Explore</button>
+                      <button type="button" class="view-new-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-testid="view-new-btn" style="
+                        font-size: 13px; padding: 2px 8px; cursor: pointer;
+                      ">New</button>
+                    </span>
+                  </h2>
                   <div class="query-container">
                     ${views.length ? joinHtml(views.map((view, index) => `
                       <div class="query ${index % 2 === 0 ? "even" : "odd"}">
-                        <a class="view-edit" data-view-name="${escapeHtml(view.friendlyId)}" data-action="open-view" data-testid="view-edit-${escapeHtml(view.friendlyId)}" href="#">${escapeHtml(view.name)}</a>
+                        <a class="view-edit" data-view-name="${escapeHtml(view.friendlyId)}" data-view-display-name="${escapeHtml(view.name)}" data-action="open-view" data-testid="view-edit-${escapeHtml(view.friendlyId)}" href="#">${escapeHtml(view.name)}</a>
                         <span style="float: right; display: flex; align-items: center; gap: 4px;">
                           <span class="owner"> <a href="${BASE_PATH}/account/${escapeHtml(accountName)}">${escapeHtml(accountName)}</a> </span>
                           <button type="button" class="view-pane-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${escapeHtml(view.friendlyId)}" data-testid="view-pane-btn-${escapeHtml(view.friendlyId)}" style="
@@ -2148,7 +2121,7 @@ const renderRepositoryPane = async (state, accountName, repositoryName) => {
                   </div>
                 </div>
                 <div class="view-editors">
-                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <div class="view-editors-head" style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; align-items: center; gap: 8px;">
                       <h2 style="margin: 0;">Editors</h2>
                       ${/revisioned/i.test(classValue) ? `
@@ -2447,13 +2420,13 @@ const buildGlobalTabs = async (state, { includeInfo = false } = {}) => {
   }
 
   const views = state.listOpenViews();
-  for (const { accountName, repositoryName, viewName } of views) {
+  for (const { accountName, repositoryName, viewName, displayName } of views) {
     const accountPath = encodeURIComponent(accountName);
     const repositoryPath = encodeURIComponent(repositoryName);
     const viewPath = encodeURIComponent(viewName);
     tabs.push({
       id: paneIdView(accountName, repositoryName, viewName),
-      label: escapeHtml(viewName),
+      label: escapeHtml(displayName || viewName),
       location: `${BASE_PATH}/account/${accountPath}/repositories/${repositoryPath}/views/${viewPath}`,
       showAside: false,
       closeable: true,
@@ -2943,25 +2916,26 @@ export const openRepositoryPane = async (app, accountName, repositoryName) => {
   }
 };
 
-export const openViewPane = async (app, accountName, repositoryName, viewName) => {
+export const openViewPane = async (app, accountName, repositoryName, viewName, displayName = null) => {
   // Ensure we always use just the base name for the view
   const baseViewName = ensureBaseViewName(viewName);
+  const viewLabel = displayName || baseViewName;
   // Check if the pane already exists in the DOM
   const paneId = paneIdView(accountName, repositoryName, baseViewName);
   const existingPane = document.getElementById(paneId);
-  
+
   if (existingPane) {
     // Pane already exists - just activate its tab
     app.activateTab(`#${paneId}`);
     return;
   }
-  
+
   // Ensure account and repository are in open state (needed for tabs)
   app.state.addOpenAccount(accountName);
   app.state.addOpenRepository(accountName, repositoryName);
-  
+
   // Add the view to the open views state (this prevents duplicates at state level)
-  app.state.addOpenView(accountName, repositoryName, baseViewName);
+  app.state.addOpenView(accountName, repositoryName, baseViewName, viewLabel);
   
   // Instead of re-rendering the entire page, manipulate the DOM directly
   // This preserves all existing DOM elements including repository pane editors
@@ -2984,7 +2958,7 @@ export const openViewPane = async (app, accountName, repositoryName, viewName) =
       const tabLi = document.createElement("li");
       tabLi.innerHTML = `
         <a href="#${paneId}" data-tab-link data-location="${location}" data-show-aside="false" data-body-class="queries show">
-          <span class="tab-label">${escapeHtml(baseViewName)}</span>
+          <span class="tab-label">${escapeHtml(viewLabel)}</span>
           <span class="tab-actions-vertical">
             <span class="tab-icon tab-close" data-tab-action="close" data-tab-id="${paneId}" data-tab-type="view" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${escapeHtml(baseViewName)}" data-testid="tab-close-${paneId}"></span>
           </span>
@@ -3186,6 +3160,10 @@ const initializePaneEditing = (app) => {
     console.log("[ViewEditor] No app provided, returning");
     return;
   }
+  // The Explore button beside New opens the exploration pane into this same
+  // editor column.  Delegated once at the document, because the repository pane
+  // is rendered from more than one place and re-rendered on tab changes.
+  installExplorationLauncher(app);
   document.querySelectorAll(".account-pane .foaf-value[data-editable='true']:not([data-pane-handler-bound])").forEach((field) => {
     field.dataset.paneHandlerBound = "true";
     field.addEventListener("dblclick", () => {
@@ -3719,18 +3697,19 @@ const initializePaneEditing = (app) => {
         : '';
 
       const createEditorPanel = async (view) => {
-        // Ensure we always use just the base name for the view
-        const baseViewName = ensureBaseViewName(view.friendlyId);
-        console.log("[ViewEditor] createEditorPanel called for view", baseViewName);
-        if (openViews.has(view.friendlyId)) {
-          const existing = openViews.get(view.friendlyId);
+        // Use slug for URL routing when available, otherwise fall back to friendlyId
+        const viewSlug = view.slug || ensureBaseViewName(view.friendlyId);
+        const viewDisplayName = view.name || viewSlug;
+        console.log("[ViewEditor] createEditorPanel called for view", viewSlug, "(display:", viewDisplayName, ")");
+        if (openViews.has(viewSlug)) {
+          const existing = openViews.get(viewSlug);
           existing.scrollIntoView({ behavior: "smooth", block: "start" });
           return;
         }
         const wrapper = document.createElement("div");
         wrapper.className = "view-editor";
         wrapper.draggable = true;
-        wrapper.dataset.viewName = baseViewName;
+        wrapper.dataset.viewName = viewSlug;
 
         const body = document.createElement("div");
         body.className = "view-editor-body";
@@ -3748,9 +3727,9 @@ const initializePaneEditing = (app) => {
 
         wrapper.appendChild(body);
         container.appendChild(wrapper);
-        openViews.set(view.friendlyId, wrapper);
+        openViews.set(viewSlug, wrapper);
 
-        const viewUrl = `${auth?.host || window.location.origin}/system/accounts/${encodeURIComponent(accountName)}/repositories/${encodeURIComponent(repositoryName)}/views/${encodeURIComponent(baseViewName)}`;
+        const viewUrl = `${auth?.host || window.location.origin}/system/accounts/${encodeURIComponent(accountName)}/repositories/${encodeURIComponent(repositoryName)}/views/${encodeURIComponent(viewSlug)}`;
         // Fetch view text based on queryText value:
         // - null: new view, don't fetch (use default)
         // - undefined: existing view, fetch it
@@ -3768,7 +3747,7 @@ const initializePaneEditing = (app) => {
           auth,
           accountName,
           repositoryName,
-            viewName: baseViewName,
+            viewName: viewSlug,
         });
         }
         const editorApi = window.createSparqlEditor({
@@ -3780,10 +3759,12 @@ const initializePaneEditing = (app) => {
           repositoryName,
           repositoryClass: repoClass,
           revisionsEndpoint,
-          viewName: baseViewName,
+          viewName: viewSlug,
+          viewDisplayName,
+          viewSlug,
           sparql: viewText !== null ? (viewText || "SELECT * WHERE { ?s ?p ?o } LIMIT 10") : "SELECT * WHERE { ?s ?p ?o } LIMIT 10",
           options: {
-            title: `/${accountName}/${repositoryName}/${baseViewName}`,
+            title: `/${accountName}/${repositoryName}/${viewDisplayName}`,
             initialState: "open",
             showEventLog: true,
             showEditorToggle: true,
@@ -3793,7 +3774,7 @@ const initializePaneEditing = (app) => {
             showCloseButton: true,
             onQueryBlur: (queryText) => {
               // Synchronize query text to all other editors for this view
-              const otherEditors = findEditorsForView(app, accountName, repositoryName, baseViewName).filter(e => e !== editorApi);
+              const otherEditors = findEditorsForView(app, accountName, repositoryName, viewSlug).filter(e => e !== editorApi);
               otherEditors.forEach((otherEditor) => {
                 if (otherEditor && otherEditor.setQuery) {
                   try {
@@ -3805,22 +3786,22 @@ const initializePaneEditing = (app) => {
               });
             },
             onClose: () => {
-              openViews.delete(view.friendlyId);
+              openViews.delete(viewSlug);
               // Remove editor instance from map if app is available
               // Use a different key for repository pane editors to avoid conflicts with separate pane editors
               if (app && app.editorInstances) {
-                const repoEditorId = `repo-editor-${accountName.replace(/[^a-z0-9_-]/gi, "-")}-${repositoryName.replace(/[^a-z0-9_-]/gi, "-")}-${baseViewName.replace(/[^a-z0-9_-]/gi, "-")}`;
+                const repoEditorId = `repo-editor-${accountName.replace(/[^a-z0-9_-]/gi, "-")}-${repositoryName.replace(/[^a-z0-9_-]/gi, "-")}-${viewSlug.replace(/[^a-z0-9_-]/gi, "-")}`;
                 app.editorInstances.delete(repoEditorId);
               }
               wrapper.remove();
             },
           },
         });
-        
+
         // Store editor API instance if app is available
         // Use a different key for repository pane editors to avoid conflicts with separate pane editors
         if (app && app.editorInstances) {
-          const repoEditorId = `repo-editor-${accountName.replace(/[^a-z0-9_-]/gi, "-")}-${repositoryName.replace(/[^a-z0-9_-]/gi, "-")}-${baseViewName.replace(/[^a-z0-9_-]/gi, "-")}`;
+          const repoEditorId = `repo-editor-${accountName.replace(/[^a-z0-9_-]/gi, "-")}-${repositoryName.replace(/[^a-z0-9_-]/gi, "-")}-${viewSlug.replace(/[^a-z0-9_-]/gi, "-")}`;
           app.editorInstances.set(repoEditorId, editorApi);
         }
       };
@@ -3892,7 +3873,8 @@ const initializePaneEditing = (app) => {
           console.log("[ViewEditor] Creating editor panel for view:", clickedViewName);
           const view = {
             friendlyId: clickedViewName,
-            name: link.textContent.trim(),
+            name: link.dataset.viewDisplayName || link.textContent.trim(),
+            slug: clickedViewName,
             // Don't set queryText - let createEditorPanel fetch it for existing views
           };
           await createEditorPanel(view);
@@ -3997,6 +3979,12 @@ const initializePaneEditing = (app) => {
       if (newBtn) {
         newBtn.dataset.handlerBound = "true";
         newBtn.addEventListener("click", () => {
+          // The ?query= seed handed over by the views/new route (routes.js).  Taken
+          // when the dialog opens rather than in submit(): an empty name makes
+          // submit() return with the dialog still up, and clearing it there would
+          // lose the seed on the retry.
+          const seededQuery = newBtn.dataset.seedQuery || "";
+          delete newBtn.dataset.seedQuery;
           // Show a name input dialog
           const overlay = document.createElement("div");
           overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;";
@@ -4031,15 +4019,25 @@ const initializePaneEditing = (app) => {
             const name = input.value.trim();
             if (!name) return;
 
+            // Generate a URL-safe slug from the user-entered name
+            const slug = parameterize(name);
+            if (!slug) {
+              errorDiv.textContent = "Name must contain at least one alphanumeric character.";
+              errorDiv.style.display = "block";
+              return;
+            }
+
             const queryContainer = pane.querySelector(".query-container");
             if (!queryContainer) {
               close();
               return;
             }
 
-            // Check if view already exists
+            // Check if view already exists (by name or slug)
             const existingViews = await fetchRepositoryViews(app.state, accountName, repositoryName);
-            const existingView = existingViews.find(v => v.name === name || v.friendlyId === name || ensureBaseViewName(v.friendlyId) === name);
+            const existingView = existingViews.find(v =>
+              v.name === name || v.friendlyId === slug || v.slug === slug ||
+              ensureBaseViewName(v.friendlyId) === slug || ensureBaseViewName(v.friendlyId) === name);
             if (existingView) {
               errorDiv.textContent = `View "${name}" already exists.`;
               errorDiv.style.display = "block";
@@ -4047,12 +4045,12 @@ const initializePaneEditing = (app) => {
               setTimeout(() => {
                 close();
                 // Open the existing view in the editor
-                const viewEditLink = queryContainer.querySelector(`.view-edit[data-view-name="${escapeHtml(name)}"]`);
+                const viewEditLink = queryContainer.querySelector(`.view-edit[data-view-name="${escapeHtml(existingView.friendlyId)}"]`);
                 if (viewEditLink) {
                   viewEditLink.click();
                 } else {
                   // Fallback: create editor for the existing view
-                  createEditorPanel({ friendlyId: name, queryText: undefined });
+                  createEditorPanel({ friendlyId: existingView.friendlyId, name: existingView.name, slug: existingView.slug, queryText: undefined });
                 }
               }, 1500);
               return;
@@ -4063,14 +4061,15 @@ const initializePaneEditing = (app) => {
             if (placeholder) placeholder.closest(".query")?.remove();
 
             // Build the new entry - order must match the initial render
+            // Use slug for data attributes (routing key), name for display
             const entry = document.createElement("div");
             entry.className = "query";
             const host = auth?.host || window.location.origin;
             entry.innerHTML = `
-              <a class="view-edit" data-view-name="${escapeHtml(name)}" data-action="open-view" data-testid="view-edit-${escapeHtml(name)}" href="#">${escapeHtml(name)}</a>
+              <a class="view-edit" data-view-name="${slug}" data-view-display-name="${escapeHtml(name)}" data-action="open-view" data-testid="view-edit-${slug}" href="#">${escapeHtml(name)}</a>
               <span style="float: right; display: flex; align-items: center; gap: 4px;">
                 <span class="owner"> <a href="${BASE_PATH}/account/${encodeURIComponent(accountName)}">${escapeHtml(accountName)}</a> </span>
-                <button type="button" class="view-pane-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${escapeHtml(name)}" data-testid="view-pane-btn-${escapeHtml(name)}" style="
+                <button type="button" class="view-pane-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${slug}" data-testid="view-pane-btn-${slug}" style="
                   background: transparent;
                   border: none;
                   padding: 2px;
@@ -4078,7 +4077,7 @@ const initializePaneEditing = (app) => {
                   title="Open view in new pane">
                   <img src="${BASE_PATH}/images/folder-plus.svg" alt="Edit Pane" style="width: 16px; height: 16px; opacity: 0.6;" />
                 </button>
-                <button type="button" class="view-window-button" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${escapeHtml(name)}" data-testid="view-window-btn-${escapeHtml(name)}" style="
+                <button type="button" class="view-window-button" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${slug}" data-testid="view-window-btn-${slug}" style="
                   background: transparent;
                   border: none;
                   padding: 2px;
@@ -4086,7 +4085,7 @@ const initializePaneEditing = (app) => {
                 " title="Open view results in new window">
                   <img src="${BASE_PATH}/images/link.svg" alt="Open in window" style="width: 16px; height: 16px; opacity: 0.6;" />
                 </button>
-                <button type="button" class="view-delete-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${escapeHtml(name)}" data-testid="view-delete-btn-${escapeHtml(name)}" style="
+                <button type="button" class="view-delete-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${slug}" data-testid="view-delete-btn-${slug}" style="
                   background: transparent;
                   border: none;
                   padding: 2px;
@@ -4126,18 +4125,19 @@ const initializePaneEditing = (app) => {
                   event.preventDefault();
                   event.stopPropagation();
                   event.stopImmediatePropagation();
-                  const clickedViewName = editLink.dataset.viewName;
-                  if (!clickedViewName) return;
+                  const clickedSlug = editLink.dataset.viewName;
+                  if (!clickedSlug) return;
                   const view = {
-                    friendlyId: clickedViewName,
-                    name: editLink.textContent.trim(),
+                    friendlyId: clickedSlug,
+                    name: editLink.dataset.viewDisplayName || editLink.textContent.trim(),
+                    slug: clickedSlug,
                     // Don't set queryText - let createEditorPanel fetch it for existing views
                   };
                   await createEditorPanel(view);
                 }, true);
               }
             }
-            
+
             // Attach view-pane-btn handler
             const paneBtn = entry.querySelector(".view-pane-btn");
             if (paneBtn) {
@@ -4145,10 +4145,10 @@ const initializePaneEditing = (app) => {
                 event.preventDefault();
                 event.stopPropagation();
                 event.stopImmediatePropagation();
-                await openViewPane(app, accountName, repositoryName, name);
+                await openViewPane(app, accountName, repositoryName, slug);
               }, true); // Use capture phase to intercept before router
             }
-            
+
             // Attach view-window-button handler
             const windowBtn = entry.querySelector(".view-window-button");
             if (windowBtn) {
@@ -4156,8 +4156,8 @@ const initializePaneEditing = (app) => {
                 event.preventDefault();
                 event.stopPropagation();
                 event.stopImmediatePropagation();
-                const viewHtmlUrl = `${host}/${encodeURIComponent(accountName)}/${encodeURIComponent(repositoryName)}/${encodeURIComponent(name)}.html`;
-                
+                const viewHtmlUrl = `${host}/${encodeURIComponent(accountName)}/${encodeURIComponent(repositoryName)}/${encodeURIComponent(slug)}.html`;
+
                 try {
                   const response = await fetch(viewHtmlUrl, {
                     headers: {
@@ -4165,13 +4165,13 @@ const initializePaneEditing = (app) => {
                       'Authorization': `Bearer ${accessToken}`
                     }
                   });
-                  
+
                   if (!response.ok) {
                     const errorText = await getResponseText(response);
                     alert(`Failed to load view: ${response.status} ${response.statusText}${errorText ? ` - ${errorText}` : ""}`);
                     return;
                   }
-                  
+
                   const htmlContent = await response.text();
                   const newWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                   if (newWindow) {
@@ -4197,7 +4197,7 @@ const initializePaneEditing = (app) => {
                 }
               }, true);
             }
-            
+
             // Attach view-delete-btn handler
             const deleteBtn = entry.querySelector(".view-delete-btn");
             if (deleteBtn) {
@@ -4205,17 +4205,17 @@ const initializePaneEditing = (app) => {
                 event.preventDefault();
                 event.stopPropagation();
                 event.stopImmediatePropagation();
-                await handleViewDelete(app, accountName, repositoryName, name, deleteBtn);
+                await handleViewDelete(app, accountName, repositoryName, slug, deleteBtn);
               }, true);
             }
-            
+
             // Attach view-editor-btn handler
             const editorBtn = entry.querySelector(".view-editor-btn");
             if (editorBtn) {
               editorBtn.addEventListener("click", async (event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                const viewHtmlUrl = `${host}/${encodeURIComponent(accountName)}/${encodeURIComponent(repositoryName)}/${encodeURIComponent(name)}.html`;
+                const viewHtmlUrl = `${host}/${encodeURIComponent(accountName)}/${encodeURIComponent(repositoryName)}/${encodeURIComponent(slug)}.html`;
                 window.open(viewHtmlUrl, '_blank');
               });
             }
@@ -4244,8 +4244,10 @@ const initializePaneEditing = (app) => {
             confirmOverlay.addEventListener("click", (e) => { if (e.target === confirmOverlay) closeConfirm(); });
             confirmOkBtn.focus();
             
-            // Create editor panel with null queryText to indicate it's a new view (don't fetch)
-            await createEditorPanel({ friendlyId: name, name, queryText: null });
+            // queryText is three-valued in createEditorPanel: a string is used as
+            // given, null means a new view whose text must not be fetched.  A seed
+            // is therefore passed straight through.
+            await createEditorPanel({ friendlyId: slug, name, slug, queryText: seededQuery || null });
           };
 
           okBtn.addEventListener("click", (e) => { e.stopPropagation(); submit(); });
@@ -4435,13 +4437,23 @@ const normalizeViews = (views = []) => {
     if (typeof view === "string") {
       // Extract base name from path (e.g., "account/repo/view" -> "view")
       const baseName = view.split("/").pop();
-      return { friendlyId: baseName, name: baseName };
+      // Decode percent-encoding so the canonical form uses raw characters;
+      // name (display) shows decoded spaces, friendlyId re-encodes via
+      // encodeURIComponent at API call sites.
+      const decoded = safeDecodeURIComponent(baseName);
+      return { friendlyId: decoded, name: decoded, slug: null };
     }
+    const slug = view?.cached_slug || view?.cachedSlug || view?.["cached-slug"] || view?.slug || null;
     const id = view?.name || view?.id || view?.key;
     // Extract base name from path if it contains slashes
     const baseId = id ? (id.includes("/") ? id.split("/").pop() : id) : "view";
     const baseName = view?.name ? (view.name.includes("/") ? view.name.split("/").pop() : view.name) : baseId;
-    return { friendlyId: baseId, name: baseName || baseId || "View" };
+    // Decode so display name shows spaces; friendlyId uses decoded form
+    // to avoid double-encoding when encodeURIComponent is applied.
+    const decodedId = safeDecodeURIComponent(baseId);
+    const decodedName = safeDecodeURIComponent(baseName || baseId || "View");
+    // When a slug is available, use it as the friendlyId (routing key)
+    return { friendlyId: slug || decodedId, name: decodedName, slug };
   }).filter((view) => view.friendlyId);
 };
 
@@ -4461,10 +4473,13 @@ const fetchRepositoryViews = async (state, accountName, repositoryName, config =
   // Fall back to listQueries if config doesn't have views
   const queries = await state.listQueries(accountName, repositoryName);
   return queries.map((query) => {
-    // Extract base name from path if it contains slashes
-    const friendlyId = query.friendlyId ? (query.friendlyId.includes("/") ? query.friendlyId.split("/").pop() : query.friendlyId) : "";
-    const name = query.name ? (query.name.includes("/") ? query.name.split("/").pop() : query.name) : friendlyId;
-    return { friendlyId, name, queryText: query.queryText };
+    // Extract base name from path if it contains slashes, then decode
+    const rawId = query.friendlyId ? (query.friendlyId.includes("/") ? query.friendlyId.split("/").pop() : query.friendlyId) : "";
+    const rawName = query.name ? (query.name.includes("/") ? query.name.split("/").pop() : query.name) : rawId;
+    const friendlyId = safeDecodeURIComponent(rawId);
+    const name = safeDecodeURIComponent(rawName);
+    const slug = query.slug || null;
+    return { friendlyId: slug || friendlyId, name, slug, queryText: query.queryText };
   })
     .sort((a, b) => a.name.localeCompare(b.name));
 };
@@ -4485,6 +4500,52 @@ const fetchViewText = async ({ auth, accountName, repositoryName, viewName }) =>
     return "";
   }
   return response.text();
+};
+
+const fetchHistory = async (auth, resourcePath) => {
+  if (!auth?.token || !auth?.host) return [];
+  try {
+    const response = await fetch(`${auth.host}/system/accounts/${resourcePath}/history`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${auth.token}`,
+      },
+    });
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (e) {
+    console.error("fetchHistory error:", e);
+    return [];
+  }
+};
+
+const renderHistoryTable = (events) => {
+  if (!Array.isArray(events) || events.length === 0) {
+    return `<p style="color: #666; font-style: italic;">No events recorded.</p>`;
+  }
+  return `
+    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+      <thead>
+        <tr style="border-bottom: 2px solid #dee2e6;">
+          <th style="text-align: left; padding: 6px 8px;">Time</th>
+          <th style="text-align: left; padding: 6px 8px;">Action</th>
+          <th style="text-align: left; padding: 6px 8px;">Actor</th>
+          <th style="text-align: left; padding: 6px 8px;">Details</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${events.map((e, i) => `
+          <tr style="border-bottom: 1px solid #eee; background: ${i % 2 === 0 ? "#fff" : "#f8f9fa"};">
+            <td style="padding: 4px 8px; white-space: nowrap;">${escapeHtml(e.timestamp || "")}</td>
+            <td style="padding: 4px 8px;">${escapeHtml(e.action || "")}</td>
+            <td style="padding: 4px 8px;">${escapeHtml(e.actor || "")}</td>
+            <td style="padding: 4px 8px; word-break: break-word;">${escapeHtml(e.details || "")}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  `;
 };
 
 const fetchAccountRepositories = async (state, accountName) => {
@@ -4716,6 +4777,7 @@ const renderAccountSidebar = ({ account, accountName, containerId = "", config =
           <button type="button" class="manage-tab" data-tab="settings" title="Configuration"><img src="./images/settings.svg" alt="Configuration" width="16" height="16" /></button>
           <button type="button" class="manage-tab" data-tab="authentication" title="Authentication"><img src="./images/lock.svg" alt="Authentication" width="16" height="16" /></button>
           <button type="button" class="manage-tab" data-tab="prefixes" title="Prefixes"><img src="./images/puzzle.svg" alt="Prefixes" width="16" height="16" /></button>
+          <button type="button" class="manage-tab" data-tab="history" title="History"><img src="./images/logs.svg" alt="History" width="16" height="16" /></button>
         </div>
         <div class="manage-tab-content">
           <div class="tab-panel active" data-panel="profile">
@@ -4788,6 +4850,11 @@ const renderAccountSidebar = ({ account, accountName, containerId = "", config =
               <span class="foaf-label">Prefixes:</span>
               <textarea class="prefix-input" data-field="prefixes" rows="8" placeholder="Enter prefixes (one per line, separated by newlines)">${escapeHtml(prefixesText)}</textarea>
               </div>
+          </div>
+          <div class="tab-panel" data-panel="history">
+            <div class="account-history-content" data-account="${escapeHtml(accountName)}" style="font-size: 12px;">
+              <p style="color: #666; font-style: italic;">Click to load account history...</p>
+            </div>
           </div>
         </div>
       </div>
@@ -5001,13 +5068,26 @@ const attachAccountSidebarHandlers = (app) => {
   document.querySelectorAll(".account-pane").forEach((pane) => {
     pane.querySelectorAll(".account-sidebar .manage-tab:not([data-handler-bound])").forEach((tab) => {
       tab.dataset.handlerBound = "true";
-      tab.addEventListener("click", () => {
+      tab.addEventListener("click", async () => {
         const target = tab.getAttribute("data-tab");
         pane.querySelectorAll(".account-sidebar .manage-tab").forEach((item) => item.classList.remove("active"));
         pane.querySelectorAll(".account-sidebar .tab-panel").forEach((panel) => {
           panel.classList.toggle("active", panel.getAttribute("data-panel") === target);
         });
         tab.classList.add("active");
+        if (target === "history") {
+          const historyContent = pane.querySelector(".account-history-content");
+          if (historyContent && !historyContent.dataset.loaded) {
+            const accountName = pane.dataset.account;
+            if (accountName && app?.state) {
+              historyContent.innerHTML = `<p style="color: #666;">Loading...</p>`;
+              const auth = app.state.getAuthContext(accountName);
+              const events = await fetchHistory(auth, encodeURIComponent(accountName));
+              historyContent.innerHTML = renderHistoryTable(events);
+              historyContent.dataset.loaded = "true";
+            }
+          }
+        }
       });
     });
   });
@@ -6013,7 +6093,8 @@ export class RepositoryRoute extends BasePage {
             console.log("[RepositoryRoute] Creating editor panel for view:", viewName);
             const view = {
               friendlyId: viewName,
-              name: link.textContent.trim(),
+              name: link.dataset.viewDisplayName || link.textContent.trim(),
+              slug: viewName,
               // Don't set queryText - let createEditorPanel fetch it for existing views
             };
             await createEditorPanel(view);
@@ -6109,6 +6190,12 @@ export class RepositoryRoute extends BasePage {
         if (newBtn) {
           newBtn.dataset.handlerBound = "true";
           newBtn.addEventListener("click", () => {
+            // The ?query= seed handed over by the views/new route (routes.js).  Taken
+            // when the dialog opens rather than in submit(): an empty name makes
+            // submit() return with the dialog still up, and clearing it there would
+            // lose the seed on the retry.
+            const seededQuery = newBtn.dataset.seedQuery || "";
+            delete newBtn.dataset.seedQuery;
             const overlay = document.createElement("div");
             overlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;";
             const dialog = document.createElement("div");
@@ -6140,15 +6227,25 @@ export class RepositoryRoute extends BasePage {
               const name = input.value.trim();
               if (!name) return;
 
+              // Generate a URL-safe slug from the user-entered name
+              const slug = parameterize(name);
+              if (!slug) {
+                errorDiv.textContent = "Name must contain at least one alphanumeric character.";
+                errorDiv.style.display = "block";
+                return;
+              }
+
               const queryContainer = catalog.querySelector(".query-container");
               if (!queryContainer) {
                 close();
                 return;
               }
 
-              // Check if view already exists
+              // Check if view already exists (by name or slug)
               const existingViews = await fetchRepositoryViews(this.state, accountName, repositoryName);
-              const existingView = existingViews.find(v => v.name === name || v.friendlyId === name || ensureBaseViewName(v.friendlyId) === name);
+              const existingView = existingViews.find(v =>
+                v.name === name || v.friendlyId === slug || v.slug === slug ||
+                ensureBaseViewName(v.friendlyId) === slug || ensureBaseViewName(v.friendlyId) === name);
               if (existingView) {
                 errorDiv.textContent = `View "${name}" already exists.`;
                 errorDiv.style.display = "block";
@@ -6156,7 +6253,7 @@ export class RepositoryRoute extends BasePage {
                 setTimeout(() => {
                   close();
                   // Open the existing view - click on the view-edit link
-                  const viewEditLink = queryContainer.querySelector(`.view-edit[data-view-name="${escapeHtml(name)}"]`);
+                  const viewEditLink = queryContainer.querySelector(`.view-edit[data-view-name="${escapeHtml(existingView.friendlyId)}"]`);
                   if (viewEditLink) {
                     viewEditLink.click();
                   }
@@ -6170,10 +6267,10 @@ export class RepositoryRoute extends BasePage {
               entry.className = "query";
               const host = auth?.host || window.location.origin;
               entry.innerHTML = `
-                <a class="view-edit" data-view-name="${escapeHtml(name)}" data-action="open-view" href="#">${escapeHtml(name)}</a>
+                <a class="view-edit" data-view-name="${slug}" data-view-display-name="${escapeHtml(name)}" data-action="open-view" href="#">${escapeHtml(name)}</a>
                 <span style="float: right; display: flex; align-items: center; gap: 4px;">
                   <span class="owner"> <a href="${BASE_PATH}/account/${encodeURIComponent(accountName)}">${escapeHtml(accountName)}</a> </span>
-                  <button type="button" class="view-pane-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${escapeHtml(name)}" style="
+                  <button type="button" class="view-pane-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${slug}" style="
                     background: transparent;
                     border: none;
                     padding: 2px;
@@ -6181,7 +6278,7 @@ export class RepositoryRoute extends BasePage {
                     title="Open view in new pane">
                     <img src="${BASE_PATH}/images/folder-plus.svg" alt="Edit Pane" style="width: 16px; height: 16px; opacity: 0.6;" />
                   </button>
-                  <button type="button" class="view-window-button" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${escapeHtml(name)}" style="
+                  <button type="button" class="view-window-button" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${slug}" style="
                     background: transparent;
                     border: none;
                     padding: 2px;
@@ -6189,7 +6286,7 @@ export class RepositoryRoute extends BasePage {
                   " title="Open view results in new window">
                     <img src="${BASE_PATH}/images/link.svg" alt="Open in window" style="width: 16px; height: 16px; opacity: 0.6;" />
                   </button>
-                  <button type="button" class="view-delete-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${escapeHtml(name)}" style="
+                  <button type="button" class="view-delete-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${slug}" style="
                     background: transparent;
                     border: none;
                     padding: 2px;
@@ -6232,7 +6329,8 @@ export class RepositoryRoute extends BasePage {
                   // The view text will be fetched by createEditorPanel
                   const view = {
                     friendlyId: viewName,
-                    name: editLink.textContent.trim(),
+                    name: editLink.dataset.viewDisplayName || editLink.textContent.trim(),
+                    slug: viewName,
                     queryText: null,
                   };
                   await createEditorPanel(view);
@@ -6249,11 +6347,11 @@ export class RepositoryRoute extends BasePage {
                   event.stopImmediatePropagation();
                   const app = this.context?.app;
                   if (app) {
-                    await openViewPane(app, accountName, repositoryName, name);
+                    await openViewPane(app, accountName, repositoryName, slug);
                   }
                 }, true);
               }
-              
+
               // Attach view-window-button handler
               const windowBtn = entry.querySelector(".view-window-button");
               if (windowBtn) {
@@ -6261,8 +6359,8 @@ export class RepositoryRoute extends BasePage {
                   event.preventDefault();
                   event.stopPropagation();
                   event.stopImmediatePropagation();
-                  const viewHtmlUrl = `${host}/${encodeURIComponent(accountName)}/${encodeURIComponent(repositoryName)}/${encodeURIComponent(name)}.html`;
-                  
+                  const viewHtmlUrl = `${host}/${encodeURIComponent(accountName)}/${encodeURIComponent(repositoryName)}/${encodeURIComponent(slug)}.html`;
+
                   try {
                     const response = await fetch(viewHtmlUrl, {
                       headers: {
@@ -6270,13 +6368,13 @@ export class RepositoryRoute extends BasePage {
                         'Authorization': `Bearer ${accessToken}`
                       }
                     });
-                    
+
                     if (!response.ok) {
                       const errorText = await getResponseText(response);
                       alert(`Failed to load view: ${response.status} ${response.statusText}${errorText ? ` - ${errorText}` : ""}`);
                       return;
                     }
-                    
+
                     const htmlContent = await response.text();
                     const newWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                     if (newWindow) {
@@ -6302,7 +6400,7 @@ export class RepositoryRoute extends BasePage {
                   }
                 }, true);
               }
-              
+
               // Attach view-delete-btn handler
               const deleteBtn = entry.querySelector(".view-delete-btn");
               if (deleteBtn) {
@@ -6310,23 +6408,23 @@ export class RepositoryRoute extends BasePage {
                   event.preventDefault();
                   event.stopPropagation();
                   event.stopImmediatePropagation();
-                  await handleViewDelete(this.context?.app, accountName, repositoryName, name, deleteBtn);
+                  await handleViewDelete(this.context?.app, accountName, repositoryName, slug, deleteBtn);
                 }, true);
               }
-              
+
               const editorBtn = entry.querySelector(".view-editor-btn");
               if (editorBtn) {
                 editorBtn.addEventListener("click", async (event) => {
                   event.preventDefault();
                   event.stopPropagation();
-                  const viewHtmlUrl = `${host}/${encodeURIComponent(accountName)}/${encodeURIComponent(repositoryName)}/${encodeURIComponent(name)}.html`;
+                  const viewHtmlUrl = `${host}/${encodeURIComponent(accountName)}/${encodeURIComponent(repositoryName)}/${encodeURIComponent(slug)}.html`;
                   window.open(viewHtmlUrl, '_blank');
                 });
               }
-              
+
               // Close dialog
               close();
-              
+
               // Show confirmation popup indicating the view needs to be edited and saved
               const confirmOverlay = document.createElement("div");
               confirmOverlay.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10001;";
@@ -6341,17 +6439,17 @@ export class RepositoryRoute extends BasePage {
               `;
               confirmOverlay.appendChild(confirmDialog);
               document.body.appendChild(confirmOverlay);
-              
+
               const confirmOkBtn = confirmDialog.querySelector(".view-created-ok");
               const closeConfirm = () => confirmOverlay.remove();
               confirmOkBtn.addEventListener("click", closeConfirm);
               confirmOverlay.addEventListener("click", (e) => { if (e.target === confirmOverlay) closeConfirm(); });
               confirmOkBtn.focus();
-              
-              // Create editor panel with null queryText to indicate it's a new view (don't fetch)
-              // Ensure name is just the base name (should already be, but be defensive)
-              const baseName = ensureBaseViewName(name);
-              await createEditorPanel({ friendlyId: baseName, name: baseName, queryText: null });
+
+              // queryText is three-valued in createEditorPanel: a string is used as
+              // given, null means a new view whose text must not be fetched.  A seed
+              // is therefore passed straight through.
+              await createEditorPanel({ friendlyId: slug, name, slug, queryText: seededQuery || null });
             };
             okBtn.addEventListener("click", (e) => { e.stopPropagation(); submit(); });
             input.addEventListener("keydown", (e) => {

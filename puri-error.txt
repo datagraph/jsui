@@ -1,0 +1,20 @@
+the puri librry is used by the server to manipulate urls and iri.
+the source code is prsent in the lib/puri and lib/puri/puri-ppcre directories.
+it sets constraints on syntax which intefere with use.
+for example, sparql view names can include blanks, but if the name is included in the view's identifer, that fails to parse.
+eg:
+
+2026-03-12T23:40:10.424948+01:00 [info] spocq-server[2006288]: 4: (ERROR PURI:URI-PARSE-ERROR :FMT-CONTROL "
+2026-03-12T23:40:10.425009+01:00 [info] spocq-server[2006288]: Invalid PATH syntax @ ~d: ~s" :FMT-ARGUMENTS (72 "/accounts/vimalktv/repositories/chemical-content-schema-test/views/Fetch all the components in a product t\
+ype"))
+2026-03-12T23:40:10.425064+01:00 [info] spocq-server[2006288]: 5: (PURI::.PARSE-ERROR #<unavailable argument> #<unavailable &REST argument>)
+2026-03-12T23:40:10.425117+01:00 [info] spocq-server[2006288]: 6: (PURI::PARSE-URI-STRING #<unavailable argument> :PCHAR-P #<unavailable argument> :FCHAR-P #<unavailable argument> :QCHAR-P #<unavailable argument>)
+
+in order to avoid this, remove that restriction.
+instead keep a cached value in the url instance which holds the url-encoded version of the url string
+and ensure tht is used when performing http operations,.
+
+the server uses the puri-ppcre librars, which used the puri library.
+the parse process appears to decode components and save them in original form.
+modify the logic so that it is willing to parse paths with components which are not urlencoded, but still contain spaces.
+

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Repository Operations - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 3: Repository Operations</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">← Previous: Chapter 2</a>
+            <a href="view-operations.html">Next: Chapter 4 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>3.1 Giving Your Data a Home</h2>
+            <p>A repository is where your data lives. Not scattered across files on your desktop, not buried in a spreadsheet, not lost somewhere in an email attachment from six months ago — but organized, named, and ready to answer questions. When you create a repository in Dydra, you are giving your data a proper home.</p>
+
+            <p>Formally speaking, a repository is a persistent, named collection of RDF quads — statements that each carry a subject, a predicate, an object, and a graph context. But you do not need to think about it that way. Think of it as a container. You put data in, you ask questions of it, you take data out. This chapter covers all of that.</p>
+
+            <h2>3.2 Creating a Repository</h2>
+            <p>Starting a new repository takes only a moment:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to your account view, where your existing repositories are listed.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click <strong>New Repository</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                A dialog appears and asks you for two things:
+                <ul>
+                    <li>A name for your repository — something that will still make sense to you six months from now</li>
+                    <li>A storage type:
+                        <ul>
+                            <li><strong>lmdb</strong> — standard persistent storage, and the right choice for most purposes</li>
+                            <li><strong>lmdb-revisioned</strong> — the same, but with a full revision history; choose this when you need to track how your data has changed over time</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="float-left">
+            <img src="../user-manual-knuth/images/repository-creation-dialog.png" alt="Repository creation dialog">
+            <p class="image-caption">Figure 3.1: The repository creation dialog.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Press Enter or click OK to confirm.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                The system creates your repository and opens it for you.
+            </div>
+
+            <div class="note">
+                <strong>On naming:</strong> Repository names must be unique within your account. Stick to letters, numbers, hyphens, and underscores. The name is case-sensitive — <code>MyData</code> and <code>mydata</code> would be two different repositories.
+            </div>
+
+            <h2>3.3 What You Will See in a Repository</h2>
+            <p>Open a repository and the system shows you its story:</p>
+            <ul>
+                <li>The name and a brief summary of what it holds</li>
+                <li>A longer description and abstract, if you have written one</li>
+                <li>A link to a homepage, if relevant</li>
+                <li>How many quads are stored — the count of individual statements</li>
+                <li>How much disk space it is using</li>
+                <li>The license under which the data is shared</li>
+                <li>The status of any import operations in progress</li>
+                <li>The list of saved query views</li>
+            </ul>
+
+            <h2>3.4 Updating Repository Information</h2>
+            <p>The metadata fields you can edit:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>What It Holds</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>homepage</code></td><td>A web page about this dataset</td></tr>
+                    <tr><td><code>summary</code></td><td>A short description — a sentence or two</td></tr>
+                    <tr><td><code>description</code></td><td>A fuller description of the data and its purpose</td></tr>
+                    <tr><td><code>abstract</code></td><td>An overview or synopsis</td></tr>
+                    <tr><td><code>privacy_setting</code></td><td>Whether the repository is public or private</td></tr>
+                    <tr><td><code>permissible_ip_addresses</code></td><td>A list of IP addresses allowed to access it</td></tr>
+                    <tr><td><code>prefixes</code></td><td>Namespace prefix declarations for SPARQL queries</td></tr>
+                </tbody>
+            </table>
+
+            <h3>3.4.1 How to Edit</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open the repository view.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the field you want to change.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Double-click the current value to open it for editing.
+            </div>
+
+            <div class="float-right">
+            <img src="../user-manual-knuth/images/repository-metadata-editing.png" alt="Repository metadata editing">
+            <p class="image-caption">Figure 3.2: A metadata field in edit mode.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Enter the new value.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Press Enter or click away to confirm.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click <strong>Save</strong>. That is what makes it real.
+            </div>
+
+            <div class="float-left">
+            <img src="../user-manual-knuth/images/repository-save-button.png" alt="Save button">
+            <p class="image-caption">Figure 3.3: The Save button.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>3.5 Bringing Data In</h2>
+            <p>A repository without data is just an empty room. Here is how to fill it.</p>
+
+            <h3>3.5.1 The Formats You Can Import</h3>
+            <p>Dydra accepts data in a good variety of standard RDF formats:</p>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl) — compact and human-readable, a popular choice</li>
+                <li><strong>RDF/XML</strong> (.rdf, .xml) — the original W3C format</li>
+                <li><strong>N-Triples</strong> (.nt) — one statement per line, simple and reliable</li>
+                <li><strong>N-Quads</strong> (.nq) — like N-Triples, but includes graph context</li>
+                <li><strong>TriG</strong> (.trig) — Turtle with named graph support</li>
+                <li><strong>JSON-LD</strong> (.jsonld, .json) — RDF expressed in JSON, for those who come from that world</li>
+                <li><strong>CSV</strong> (.csv) — tabular data, transformed into RDF</li>
+            </ul>
+
+            <h3>3.5.2 Importing a File from Your Computer</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open the repository you want to add data to.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click the <strong>Import</strong> button.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Choose file upload and select your file.
+            </div>
+
+            <div class="float-right">
+            <img src="../user-manual-knuth/images/dataset-import-file-selected.png" alt="Import dialog with file">
+            <p class="image-caption">Figure 3.4: The import dialog with a file selected.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                The system reads the file extension and figures out the format for you. You do not usually have to specify it yourself.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Click Import to start the process.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Watch the progress indicator and wait for the confirmation that it is done.
+            </div>
+
+            <h3>3.5.3 Importing from a URL</h3>
+            <p>If your data lives somewhere on the web, you can pull it in directly:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open the target repository and click <strong>Import</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Enter the URL where the data can be found.
+            </div>
+
+            <div class="float-left">
+            <img src="../user-manual-knuth/images/dataset-import-url-entered.png" alt="Import dialog with URL">
+            <p class="image-caption">Figure 3.5: The import dialog with a URL specified.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                If the system cannot determine the format from the URL alone, you can specify it yourself.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Click Import and let it run.
+            </div>
+
+            <div class="note">
+                <strong>Large datasets:</strong> When you are importing a lot of data, the system can handle it asynchronously — meaning you do not have to sit there watching. The application will continue to be usable while the import runs in the background, and it will let you know when it is done.
+            </div>
+
+            <h2>3.6 Getting Data Out</h2>
+
+            <h3>3.6.1 Export Formats</h3>
+            <p>You can take your data out in any of these forms:</p>
+            <ul>
+                <li><strong>Turtle</strong> (.ttl)</li>
+                <li><strong>N-Triples</strong> (.nt)</li>
+                <li><strong>RDF/XML</strong> (.rdf)</li>
+                <li><strong>JSON-LD</strong> (.jsonld)</li>
+                <li><strong>TriG</strong> (.trig)</li>
+                <li><strong>CSV</strong> (.csv)</li>
+                <li><strong>Graphviz</strong> (.gv) — for turning your graph into a visual diagram</li>
+            </ul>
+
+            <h3>3.6.2 How to Export</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open the repository you want to export from.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Click <strong>Export</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Choose your format.
+            </div>
+
+            <div class="float-left">
+            <img src="../user-manual-knuth/images/dataset-export-format-selected.png" alt="Export format selection">
+            <p class="image-caption">Figure 3.6: Choosing an export format.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Click to start the download.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Your browser will download the file with the right extension already in place.
+            </div>
+
+            <h2>3.7 Sharing With Others</h2>
+            <p>Data is often more useful when it can be shared. Dydra lets you invite collaborators to a repository and control what they can do there.</p>
+
+            <h3>3.7.1 Adding a Collaborator</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open the repository.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Go to the Collaboration section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click <strong>Add Collaborator</strong>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Enter the collaborator's Dydra account name.
+            </div>
+
+            <div class="float-right">
+            <img src="../user-manual-knuth/images/collaborator-addition-form.png" alt="Collaborator addition form">
+            <p class="image-caption">Figure 3.7: Adding a collaborator and choosing their permission level.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Choose what they are allowed to do:
+                <ul>
+                    <li><strong>Read</strong> — they can query and export, but not change anything</li>
+                    <li><strong>Write</strong> — they can modify data and configuration</li>
+                </ul>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Confirm, then click <strong>Save</strong>.
+            </div>
+
+            <h3>3.7.2 A Word on Permissions</h3>
+            <div class="note">
+                <ul>
+                    <li><strong>Start with the minimum.</strong> Give people read access first. You can always grant more later.</li>
+                    <li><strong>Review periodically.</strong> Check your collaborator list now and then. Remove access that is no longer needed.</li>
+                    <li><strong>Keep a record.</strong> It is good practice to note who has access and why, especially for sensitive datasets.</li>
+                </ul>
+            </div>
+
+            <h3>3.7.3 Removing a Collaborator</h3>
+            <p>Find the collaborator's entry in the list, click the delete control next to their name, confirm the removal, and save. That is all there is to it.</p>
+
+            <div class="float-right">
+            <img src="../user-manual-knuth/images/collaborator-removal-confirmation.png" alt="Removal confirmation">
+            <p class="image-caption">Figure 3.8: Confirming a collaborator removal.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h3>3.7.4 Changing a Collaborator's Permissions</h3>
+            <p>Click the permission level shown next to a collaborator's name, select the new level from the options that appear, and save your changes.</p>
+
+            <div class="float-left">
+            <img src="../user-manual-knuth/images/collaborator-permission-editing.png" alt="Permission editing">
+            <p class="image-caption">Figure 3.9: Editing a collaborator's permission level.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>3.8 Clearing All the Data</h2>
+            <p>Sometimes you need to start fresh — keep the repository itself but empty it out entirely. That is what the clear operation does. It removes every quad stored in the repository, while leaving the repository structure, settings, and views intact.</p>
+
+            <div class="warning">
+                <strong>This cannot be undone.</strong> Once the data is gone, it is gone. Export a copy first if there is any chance you will want it later.
+            </div>
+
+            <div class="float-right">
+            <img src="../user-manual-knuth/images/repository-clear-confirmation.png" alt="Clear confirmation">
+            <p class="image-caption">Figure 3.10: The clear confirmation dialog.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>3.9 Deleting a Repository Entirely</h2>
+            <p>Deleting a repository removes everything: the data, the views, the configuration, all of it. It is a complete and final removal.</p>
+
+            <div class="warning">
+                <strong>There is no recovery from this.</strong> When a repository is deleted, it is gone permanently. Be certain before you proceed.
+            </div>
+
+            <h2>3.10 When Things Go Sideways</h2>
+
+            <h3>3.10.1 Import Problems</h3>
+            <ul>
+                <li>Make sure the file format is one the system supports</li>
+                <li>Check that the RDF syntax in the file is valid</li>
+                <li>For URL imports, verify your network connection can reach the source</li>
+                <li>Confirm you have write permission on the repository</li>
+                <li>Read the error message carefully — it usually points right at the problem</li>
+            </ul>
+
+            <h3>3.10.2 Export Problems</h3>
+            <ul>
+                <li>Make sure the repository actually contains data</li>
+                <li>Try a different format if one is not working</li>
+                <li>Check your browser's download settings — it may be blocking the file</li>
+                <li>Confirm you have read permission</li>
+            </ul>
+
+            <h2>3.11 What Comes Next</h2>
+            <p>With your repositories in hand, the next natural step is learning to ask them questions — which is what Chapter 4 is all about:</p>
+            <ul>
+                <li>Creating and running SPARQL views — <a href="view-operations.html">Chapter 4</a></li>
+                <li>Habits that serve you well in the long run — <a href="tips-and-best-practices.html">Chapter 5</a></li>
+                <li>Format reference tables — <a href="appendices.html">Appendices</a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

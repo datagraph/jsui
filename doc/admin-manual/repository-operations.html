@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 4: Repository Operations - Dydra Admin Console Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 4: Repository Operations</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">← Previous: Chapter 3</a>
+            <a href="invitations.html">Next: Chapter 5 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>4.1 The Repositories Tab</h2>
+            <p>The <strong>Repositories</strong> tab presents the repositories belonging to the accounts selected in the Accounts tab. Its contents are determined by the account selection state, making it the second stage in the cross-tab filtering chain described in Section 2.5.</p>
+
+            <p>Data is fetched from <code>GET {host}/system/accounts/{accountName}/repositories</code> for each checked account. Results from multiple accounts are aggregated and sorted by the combined account/repository path.</p>
+
+            <div class="float-left">
+                <img src="images/admin-repositories-list.png" alt="Repositories tab">
+                <p class="image-caption">Figure 4.1: The Repositories tab with repositories from selected accounts.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="note">
+                <strong>Prerequisite:</strong> The Repositories tab requires at least one account to be selected in the Accounts tab. If no accounts are selected, the tab displays "No accounts selected" and no data is fetched.
+            </div>
+
+            <h2>4.2 Table Structure</h2>
+            <table>
+                <thead>
+                    <tr><th>Column</th><th>Contents</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Checkbox</td>
+                        <td>Selection control</td>
+                        <td>Checked repositories determine which repositories' query history is fetched in the Query History tab. See Section 2.5.</td>
+                    </tr>
+                    <tr>
+                        <td>Repository Path</td>
+                        <td><code>{accountName}/{repositoryName}</code>, rendered as a link</td>
+                        <td>The link target is the repository's management view in the user application: <code>{host}/ui/user/{accountName}/repositories/{repositoryName}</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>Actions</td>
+                        <td>View link; Delete button (Admin only)</td>
+                        <td>The View link opens the user application's repository view. The Delete button is suppressed for operator-level sessions.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>4.3 Tab Controls</h2>
+            <table>
+                <thead>
+                    <tr><th>Control</th><th>Availability</th><th>Function</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Refresh</strong></td><td>Always</td><td>Re-fetches repositories for all currently selected accounts. Clears and rebuilds the table.</td></tr>
+                    <tr><td><strong>New</strong></td><td>Admin only</td><td>Opens the New Repository dialog. See Section 4.4.</td></tr>
+                    <tr><td><strong>Check All</strong></td><td>Always</td><td>Toggles the selection state of all repository checkboxes. Displays an indeterminate state when some but not all repositories are selected.</td></tr>
+                </tbody>
+            </table>
+
+            <h2>4.4 Creating a Repository (Admin only)</h2>
+            <p>New repositories are created from the New Repository dialog. A repository is always created under an existing account.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Click <strong>New</strong> in the tab controls. The New Repository dialog opens.
+            </div>
+
+            <div class="float-right">
+                <img src="images/admin-repository-new-dialog.png" alt="New repository dialog">
+                <p class="image-caption">Figure 4.2: The New Repository dialog.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Select the target account from the dropdown. The dropdown is populated by fetching <code>GET {host}/system/accounts</code>; it reflects the complete account list, not merely those currently checked in the Accounts tab.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Enter the repository name in the text field. Repository names are case-sensitive and must be unique within the account.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Click <strong>Create</strong> (or press Enter). The application issues <code>POST {host}/system/accounts/{accountName}/repositories</code>.
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                On success, the dialog closes and the repository is appended to the table if its account is currently selected. If the selected account set does not include the target account, the new repository will appear only after that account is checked and the tab is refreshed.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                On error, the response message is displayed within the dialog. Correct the inputs and resubmit.
+            </div>
+
+            <h2>4.5 Viewing a Repository in the User Application</h2>
+            <p>The <strong>View</strong> link on each row opens the repository's management page within the user application. This provides access to the repository's data, views, and collaborator configuration — operations that fall outside the scope of the admin console.</p>
+
+            <div class="note">
+                <strong>Session context:</strong> Navigating to the user application via the View link opens it in the same browser tab. The admin session remains in memory; use the browser's back button to return to the admin console without re-authenticating.
+            </div>
+
+            <h2>4.6 Deleting a Repository (Admin only)</h2>
+            <p>Repository deletion permanently removes the repository and all of its data, views, and access control settings.</p>
+
+            <div class="warning">
+                <strong>Irreversibility:</strong> Deleted repositories and their contents cannot be recovered. Export any data that must be preserved before proceeding.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Click <strong>Delete</strong> on the row of the repository to remove.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                A confirmation dialog appears, identifying the repository by its full path.
+            </div>
+
+            <div class="float-left">
+                <img src="images/admin-repository-delete-confirmation.png" alt="Repository deletion confirmation">
+                <p class="image-caption">Figure 4.3: The repository deletion confirmation dialog.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Confirm the deletion. The application issues <code>DELETE {host}/system/accounts/{accountName}/repositories/{repositoryName}</code>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                The server response (N-Triples format) is briefly displayed. The repository is removed from the table.
+            </div>
+
+            <h2>4.7 Using Repository Selection to Filter Query History</h2>
+            <p>Repository checkboxes control which repositories' query history is displayed in the Query History tab:</p>
+            <ul>
+                <li>When no repositories are checked, the Query History tab displays no data.</li>
+                <li>When one or more repositories are checked, the Query History tab fetches history for exactly those repositories.</li>
+                <li>Changing the repository selection triggers an automatic refresh of the Query History tab if that tab has already been loaded.</li>
+            </ul>
+            <p>The Transaction History and Import History tabs are system-wide and are not filtered by repository selection.</p>
+
+            <h2>4.8 Proceeding</h2>
+            <ul>
+                <li>Invitation management — <a href="invitations.html">Chapter 5</a></li>
+                <li>Query history, transaction history, and import history — <a href="system-monitoring.html">Chapter 6</a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

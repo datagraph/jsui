@@ -98,6 +98,11 @@ export const buildRoutes = ({ app }) => [
   { path: "/account/:account_name/repositories/:repository_name/views/new", handler: async (ctx) => {
     const accountName = ctx.params.account_name;
     const repositoryName = ctx.params.repository_name;
+    // ?query=... seeds the new view's editor.  This is how a query arrives from
+    // somewhere that composed one rather than typed it -- an MCP materialize, an
+    // LLM answer -- so that what is registered as a view is the SPARQL itself and
+    // not a reference to the session that produced it.
+    const seedQuery = ctx.query?.get("query") || "";
     const paneId = `tab-repository-${accountName.replace(/[^a-z0-9_-]/gi, "-")}-${repositoryName.replace(/[^a-z0-9_-]/gi, "-")}`;
     const existingPane = document.getElementById(paneId);
     
@@ -115,6 +120,14 @@ export const buildRoutes = ({ app }) => [
       if (pane) {
         const newBtn = pane.querySelector(".view-new-btn");
         if (newBtn) {
+          // Hand the seed to the dialog on the button it is bound to.  The
+          // dialog's submit handler consumes and clears it, so a later New View
+          // raised by hand starts empty.
+          if (seedQuery) {
+            newBtn.dataset.seedQuery = seedQuery;
+          } else {
+            delete newBtn.dataset.seedQuery;
+          }
           // Trigger the click event to open the view creation dialog
           // The dialog's submit handler will add the view to the repository list and create the editor in the repository pane
           newBtn.click();

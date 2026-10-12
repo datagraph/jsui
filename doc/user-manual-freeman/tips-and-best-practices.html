@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 5: Practical Wisdom - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 5: Practical Wisdom</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="view-operations.html">← Previous: Chapter 4</a>
+            <a href="appendices.html">Next: Appendices →</a>
+        </nav>
+
+        <div class="content">
+            <h2>5.1 What Experience Teaches</h2>
+            <p>There are things you learn from a manual, and then there are things you only learn from sitting down and doing the work. This chapter is an attempt to bridge that gap — to offer you, before you have made the mistakes, some of what you would eventually figure out on your own.</p>
+
+            <p>Think of it as advice from someone who has been watching people work with this system for a long time. Not rules. Just habits that tend to serve people well.</p>
+
+            <h2>5.2 Moving Around Efficiently</h2>
+            <ul>
+                <li><strong>Use the location bar directly.</strong> You can type a URL right into the bar and go there — no need to click through a chain of links. When you know where you are going, go directly.</li>
+                <li><strong>The browser's back and forward buttons work.</strong> The application is designed to cooperate with them. Do not be afraid to use the navigation you already know.</li>
+                <li><strong>Open things in multiple tabs.</strong> Working on two repositories at once? Keep them in separate tabs. The browser was designed for this.</li>
+                <li><strong>Learn the keyboard shortcuts.</strong> A few keystrokes will carry you far:
+                    <ul>
+                        <li>Ctrl+Enter on Windows and Linux, Cmd+Enter on a Mac: Run the current SPARQL query</li>
+                        <li>Enter: Submit whatever form you are filling out</li>
+                        <li>Escape: Close a dialog when you have changed your mind</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h2>5.3 Working Well in the Query Editor</h2>
+            <ul>
+                <li><strong>Pay attention to the syntax highlighting.</strong> The editor colors your SPARQL as you type — keywords one shade, variables another. When something looks wrong, it often is. Trust the visual cues before you trust your memory.</li>
+                <li><strong>Let autocomplete help you.</strong> The editor will offer suggestions as you type. Accept them. They reduce the chance of a simple spelling mistake turning into a mysterious error.</li>
+                <li><strong>Keep multiple tabs open.</strong> If you are refining a query — trying one variation, then another — use separate tabs for each version. That way you can compare results without losing your work.</li>
+                <li><strong>Choose your format thoughtfully.</strong> An HTML table is easy on the eyes. JSON is better if you are feeding results to something else. Pick the format that serves what you are actually doing with the data.</li>
+                <li><strong>When something goes wrong, check the event log.</strong> It is quiet, but it sees everything — every run, every save, every error. The answer to what happened is usually in there.</li>
+            </ul>
+
+            <h2>5.4 Taking Care of Your Data</h2>
+            <ul>
+                <li><strong>Export before you change anything significant.</strong> A copy of your data sitting safely elsewhere costs you a few minutes. Losing data you cannot get back costs you much more. This is not pessimism — it is prudence.</li>
+                <li><strong>Test imports with small files first.</strong> Before you load thousands of records, load ten. Make sure the format is right, the data looks the way you expect. Then scale up.</li>
+                <li><strong>Use asynchronous import for large datasets.</strong> If your file is large, do not make the browser wait for it. The async mode lets the work happen in the background while you carry on.</li>
+                <li><strong>Watch the progress indicators.</strong> When an import is running, the system tells you where it stands. Watching that progress bar is not impatience — it is staying informed.</li>
+                <li><strong>After importing, verify with a query.</strong> Run a simple SPARQL query against your newly imported data. Make sure it is there. Make sure it looks right. A minute of checking saves hours of wondering.</li>
+            </ul>
+
+            <h2>5.5 Sharing Access Wisely</h2>
+            <ul>
+                <li><strong>Start people with read access.</strong> You can always grant more later. It is much harder to undo the consequences of too much access given too soon.</li>
+                <li><strong>Keep track of who has access to what.</strong> Write it down somewhere. People change roles. Projects end. A list you can refer to makes it much easier to keep things tidy over time.</li>
+                <li><strong>Review your collaborator lists from time to time.</strong> Access granted for one project does not always need to persist forever. A periodic review keeps things clean.</li>
+                <li><strong>Talk to your collaborators.</strong> Tell them what the data is, what they can do with it, and what you would prefer they not do. The system handles permissions, but expectations are set by people.</li>
+            </ul>
+
+            <h2>5.6 Keeping Things Running Smoothly</h2>
+            <ul>
+                <li><strong>Close tabs you are not using.</strong> Every open tab holds state. Dozens of open editors can slow things down. Close what you have finished with.</li>
+                <li><strong>Search and filter rather than scroll.</strong> If you have many repositories or views, use the search tools to find what you need. Scrolling through long lists is slower and less accurate.</li>
+                <li><strong>Write efficient queries.</strong> An open-ended pattern that could match everything will try to. Be specific about what you are looking for. Your queries will run faster, and the results will be more useful.</li>
+            </ul>
+
+            <h2>5.7 When Things Go Wrong</h2>
+
+            <h3>5.7.1 An Import Did Not Work</h3>
+            <p>It happens. When it does, run through this list:</p>
+            <ul>
+                <li>Check that the file format is one the system knows how to read</li>
+                <li>Make sure the file is not too large for the synchronous import path — if it is, switch to async</li>
+                <li>Confirm that you have write permission on the repository you are importing into</li>
+                <li>Look at the event log — it will usually tell you exactly what went wrong</li>
+            </ul>
+
+            <h3>5.7.2 A Query Returned an Error</h3>
+            <p>SPARQL is precise. A small mistake can produce a cryptic error. Try this:</p>
+            <ul>
+                <li>Read the SPARQL carefully — look for missing brackets, mismatched braces, undefined prefixes</li>
+                <li>Check that the data you expect to be there actually is there</li>
+                <li>Open the event log and read what it says — the error message is often quite specific about what went wrong</li>
+                <li>Simplify the query. Remove parts of it until it runs, then add them back one at a time. You will find the problem.</li>
+            </ul>
+
+            <h3>5.7.3 Authentication Is Not Working</h3>
+            <p>Before you assume something is broken, check the simple things:</p>
+            <ul>
+                <li>Is Caps Lock on? Passwords are case-sensitive.</li>
+                <li>Is the host URL exactly right?</li>
+                <li>Is your network connection alive?</li>
+                <li>If nothing else works, try clearing the browser cache and starting fresh</li>
+            </ul>
+
+            <h3>5.7.4 Collaboration Features Are Behaving Oddly</h3>
+            <p>When something in the sharing or permissions area seems off:</p>
+            <ul>
+                <li>Double-check the collaborator's account name — a single character difference makes it a different person</li>
+                <li>Make sure you have the permission to manage collaborators on this repository</li>
+                <li>Confirm you actually clicked Save — changes do not take effect until they are sent to the server</li>
+                <li>Refresh the browser and look again</li>
+            </ul>
+
+            <h2>5.8 Five Things Worth Remembering</h2>
+            <ol>
+                <li><strong>Save explicitly.</strong> The system does not save for you. When you are done, click Save.</li>
+                <li><strong>Export before you delete.</strong> If a repository or query matters, keep a copy before you remove it.</li>
+                <li><strong>Test small before going big.</strong> Whatever you are about to do with a thousand records, do it first with ten.</li>
+                <li><strong>The event log knows.</strong> When something goes wrong and you are not sure why, the event log usually is.</li>
+                <li><strong>Give only the access that is needed.</strong> You can always add more later. Taking it away is harder.</li>
+            </ol>
+
+            <h2>5.9 Where to Go From Here</h2>
+            <ul>
+                <li>Format tables and keyboard shortcuts — <a href="appendices.html">Appendices</a></li>
+                <li>Signing in and out — <a href="login.html">Chapter 1</a></li>
+                <li>Working with repositories and data — <a href="repository-operations.html">Chapter 3</a></li>
+                <li>Writing and saving queries — <a href="view-operations.html">Chapter 4</a></li>
+            </ul>
+
+            <p><em>You have everything you need now. Go do good work.</em></p>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

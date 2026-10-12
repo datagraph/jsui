@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Authentication - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 1: Authentication</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">Next: Chapter 2 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>1.1 Walking Through the Door</h2>
+            <p>The first thing this application will ask of you is a simple question: who are you? It is a fair question. A system that holds your data ought to know who is asking for it.</p>
+
+            <p>Authentication is just the formal word for that exchange. You tell the system your name and offer your credential — your password, or your token — and the system decides whether to let you in. When it does, a session begins. Think of it as an open conversation between you and the server, one that lasts until you close the tab or choose to walk away.</p>
+
+            <h2>1.2 Where to Begin</h2>
+            <p>You start here:</p>
+            <div class="note">
+                <strong>Your Starting Point:</strong> <code>https://dydra.com/ui/user</code>
+            </div>
+            <p>If you have not yet signed in, the application will show you a login form. If you have already signed in during this session, it will take you straight to your account. Either way, you will know where you stand.</p>
+
+            <h2>1.3 Signing In</h2>
+            <p>The login form asks you for three things. Here is how to fill it in:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open your browser and go to <code>https://dydra.com/ui/user</code>.
+            </div>
+
+            <div class="float-right">
+            <img src="../user-manual-knuth/images/login-form-filled.png" alt="Login form with credentials entered">
+            <p class="image-caption">Figure 1.1: The login form, ready to go.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Fill in the three fields:
+                <ul>
+                    <li><strong>Host:</strong> The address of the server — usually <code>https://dydra.com</code></li>
+                    <li><strong>Login:</strong> Your username</li>
+                    <li><strong>Password:</strong> Your password, or your API token if you prefer that route</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Press the <strong>Login</strong> button, or simply press Enter. Either will do.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                If your credentials are correct, the system will open up for you and take you to your account view. If something is wrong, it will tell you so — no harm done, just try again.
+            </div>
+
+            <div class="note">
+                <strong>Something worth knowing:</strong> You can be signed in to more than one account at a time, within the same browser session. This comes in handy when you are managing both a personal account and one that belongs to an organization.
+            </div>
+
+            <h2>1.4 Two Ways to Prove Who You Are</h2>
+            <p>The system gives you two options when it comes to credentials:</p>
+
+            <h3>1.4.1 Password Authentication</h3>
+            <p>The familiar approach. You enter your username and your password, and the system checks them. This is the right choice for day-to-day use in a browser — straightforward and reliable.</p>
+
+            <h3>1.4.2 Token Authentication</h3>
+            <p>For situations where you are connecting programmatically — writing a script, calling an API, automating something — a token is the better choice. Tokens are long, unique strings that serve the same purpose as a password but are easier to manage in code. You can find yours in the account management section, which Chapter 2 will show you. To use one, enter it where the password field is.</p>
+
+            <p>The rule of thumb is simple: if a person is sitting at the keyboard, use a password. If a program is doing the work, use a token.</p>
+
+            <h2>1.5 What the System Remembers</h2>
+
+            <h3>1.5.1 What Persists</h3>
+            <p>When you sign in, the application makes a small note of your username in your browser's local storage. That means when you come back — tomorrow, or next week — your username will already be filled in, waiting for you. One less thing to type.</p>
+
+            <div class="warning">
+                <strong>What it does not keep:</strong> Your password, your token, and your active session are <em>not</em> stored anywhere persistent. When you close the tab, the session ends. This is intentional — it protects you on shared or public computers.
+            </div>
+
+            <h3>1.5.2 Signing Out</h3>
+            <p>When you are done, signing out is easy:</p>
+            <ol>
+                <li>Find the <strong>Logout</strong> link in the navigation bar at the top</li>
+                <li>Click it</li>
+                <li>The application returns to the login view, ready for whoever comes next</li>
+                <li>Your username stays in the field — a small convenience for your next visit</li>
+            </ol>
+
+            <h2>1.6 When Things Go Wrong</h2>
+
+            <h3>1.6.1 If the Login Fails</h3>
+            <p>It happens to everyone. If the system turns you away, run through this short list before anything else:</p>
+            <ul>
+                <li>Check that Caps Lock is not on — passwords are case-sensitive</li>
+                <li>Make sure the host field says the right address</li>
+                <li>Confirm that you have a network connection</li>
+                <li>Verify that your account exists and has been activated</li>
+            </ul>
+
+            <h3>1.6.2 Reading the Error Message</h3>
+            <p>The system tries to be helpful when something goes wrong:</p>
+            <ul>
+                <li>"Invalid credentials" — your username or password does not match what the server has on file</li>
+                <li>A network error — the browser could not reach the server at all</li>
+            </ul>
+            <p>If you have tried everything and still cannot get through, write to <strong>support@dydra.com</strong>. Tell them what browser you are using and what the error message says.</p>
+
+            <h2>1.7 Once You Are In</h2>
+            <p>With authentication behind you, a whole system opens up. Here is where the rest of this manual picks up:</p>
+            <ul>
+                <li>Your account details and settings — <a href="account-operations.html">Chapter 2</a></li>
+                <li>Creating and managing repositories — <a href="repository-operations.html">Chapter 3</a></li>
+                <li>Writing and running SPARQL queries — <a href="view-operations.html">Chapter 4</a></li>
+                <li>Reference material, when you need it — <a href="appendices.html">Appendices</a></li>
+            </ul>
+
+            <p><em>Go ahead and turn the page. Chapter 2 is waiting.</em></p>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

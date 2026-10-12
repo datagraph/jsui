@@ -1,0 +1,365 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - link "Dydra" [ref=e4] [cursor=pointer]:
+      - /url: https://dydra.com/
+    - generic [ref=e5]:
+      - list [ref=e6]:
+        - listitem [ref=e7]:
+          - link "Signup" [ref=e8] [cursor=pointer]:
+            - /url: https://dydra.com/signup
+        - listitem [ref=e9]:
+          - link "Login" [ref=e10] [cursor=pointer]:
+            - /url: https://dydra.com/login
+      - list [ref=e11]:
+        - listitem [ref=e12]:
+          - link "Home" [ref=e13] [cursor=pointer]:
+            - /url: https://dydra.com/home
+        - listitem [ref=e14]:
+          - link "About" [ref=e15] [cursor=pointer]:
+            - /url: https://dydra.com/about
+        - listitem [ref=e16]:
+          - link "Docs" [ref=e17] [cursor=pointer]:
+            - /url: https://docs.dydra.com/
+        - listitem [ref=e18]:
+          - link "Blog" [ref=e19] [cursor=pointer]:
+            - /url: https://blog.dydra.com/
+  - generic [ref=e22]:
+    - generic [ref=e23]:
+      - heading "playwright / test" [level=1] [ref=e24]:
+        - generic [ref=e25]:
+          - link "playwright" [ref=e26] [cursor=pointer]:
+            - /url: /playwright
+          - text: /
+          - link "test" [ref=e27] [cursor=pointer]:
+            - /url: /playwright/test
+      - paragraph [ref=e30]: Test summary 1791445087125
+      - generic [ref=e32]:
+        - heading "Views" [level=2] [ref=e33]
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - link "playwright" [ref=e37] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e38] [cursor=pointer]:
+              - /url: /playwright/test/another.html
+            - link "another" [ref=e39] [cursor=pointer]:
+              - /url: /playwright/test/@query#another
+          - generic [ref=e40]:
+            - link "james" [ref=e42] [cursor=pointer]:
+              - /url: /james
+            - link [ref=e43] [cursor=pointer]:
+              - /url: /playwright/test/another-blank.html
+            - link "another blank" [ref=e44] [cursor=pointer]:
+              - /url: /playwright/test/@query#another-blank
+          - generic [ref=e45]:
+            - link "playwright" [ref=e47] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e48] [cursor=pointer]:
+              - /url: /playwright/test/aView.html
+            - link "aView" [ref=e49] [cursor=pointer]:
+              - /url: /playwright/test/@query#aView
+          - generic [ref=e50]:
+            - link "james" [ref=e52] [cursor=pointer]:
+              - /url: /james
+            - link [ref=e53] [cursor=pointer]:
+              - /url: /playwright/test/blank-name.html
+            - link "blank name" [ref=e54] [cursor=pointer]:
+              - /url: /playwright/test/@query#blank-name
+          - generic [ref=e55]:
+            - link "playwright" [ref=e57] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e58] [cursor=pointer]:
+              - /url: /playwright/test/edit-view-1791286261793.html
+            - link "edit-view-1791286261793" [ref=e59] [cursor=pointer]:
+              - /url: /playwright/test/@query#edit-view-1791286261793
+          - generic [ref=e60]:
+            - link "playwright" [ref=e62] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e63] [cursor=pointer]:
+              - /url: /playwright/test/edit-view-1791286333316.html
+            - link "edit-view-1791286333316" [ref=e64] [cursor=pointer]:
+              - /url: /playwright/test/@query#edit-view-1791286333316
+          - generic [ref=e65]:
+            - link "playwright" [ref=e67] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e68] [cursor=pointer]:
+              - /url: /playwright/test/edit-view-1791286516268.html
+            - link "edit-view-1791286516268" [ref=e69] [cursor=pointer]:
+              - /url: /playwright/test/@query#edit-view-1791286516268
+          - generic [ref=e70]:
+            - link "playwright" [ref=e72] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e73] [cursor=pointer]:
+              - /url: /playwright/test/edit-view-1791286596879.html
+            - link "edit-view-1791286596879" [ref=e74] [cursor=pointer]:
+              - /url: /playwright/test/@query#edit-view-1791286596879
+          - generic [ref=e75]:
+            - link "playwright" [ref=e77] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e78] [cursor=pointer]:
+              - /url: /playwright/test/edit-view-1791286654815.html
+            - link "edit-view-1791286654815" [ref=e79] [cursor=pointer]:
+              - /url: /playwright/test/@query#edit-view-1791286654815
+          - generic [ref=e80]:
+            - link "playwright" [ref=e82] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e83] [cursor=pointer]:
+              - /url: /playwright/test/edit-view-1791286713378.html
+            - link "edit-view-1791286713378" [ref=e84] [cursor=pointer]:
+              - /url: /playwright/test/@query#edit-view-1791286713378
+          - generic [ref=e85]:
+            - link "mgr" [ref=e87] [cursor=pointer]:
+              - /url: /mgr
+            - link [ref=e88] [cursor=pointer]:
+              - /url: /playwright/test/g.html
+            - link "g" [ref=e89] [cursor=pointer]:
+              - /url: /playwright/test/@query#g
+          - generic [ref=e90]:
+            - link "playwright" [ref=e92] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e93] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791286290242.html
+            - link "pane-view-1791286290242" [ref=e94] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791286290242
+          - generic [ref=e95]:
+            - link "playwright" [ref=e97] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e98] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791286380677.html
+            - link "pane-view-1791286380677" [ref=e99] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791286380677
+          - generic [ref=e100]:
+            - link "playwright" [ref=e102] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e103] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791286546963.html
+            - link "pane-view-1791286546963" [ref=e104] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791286546963
+          - generic [ref=e105]:
+            - link "playwright" [ref=e107] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e108] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791286578027.html
+            - link "pane-view-1791286578027" [ref=e109] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791286578027
+          - generic [ref=e110]:
+            - link "playwright" [ref=e112] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e113] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791286682920.html
+            - link "pane-view-1791286682920" [ref=e114] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791286682920
+          - generic [ref=e115]:
+            - link "playwright" [ref=e117] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e118] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791286736499.html
+            - link "pane-view-1791286736499" [ref=e119] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791286736499
+          - generic [ref=e120]:
+            - link "playwright" [ref=e122] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e123] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791286802108.html
+            - link "pane-view-1791286802108" [ref=e124] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791286802108
+          - generic [ref=e125]:
+            - link "playwright" [ref=e127] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e128] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791286911744.html
+            - link "pane-view-1791286911744" [ref=e129] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791286911744
+          - generic [ref=e130]:
+            - link "playwright" [ref=e132] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e133] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791287084641.html
+            - link "pane-view-1791287084641" [ref=e134] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791287084641
+          - generic [ref=e135]:
+            - link "playwright" [ref=e137] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e138] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791287125402.html
+            - link "pane-view-1791287125402" [ref=e139] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791287125402
+          - generic [ref=e140]:
+            - link "playwright" [ref=e142] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e143] [cursor=pointer]:
+              - /url: /playwright/test/pane-view-1791287177041.html
+            - link "pane-view-1791287177041" [ref=e144] [cursor=pointer]:
+              - /url: /playwright/test/@query#pane-view-1791287177041
+          - generic [ref=e145]:
+            - link "playwright" [ref=e147] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e148] [cursor=pointer]:
+              - /url: /playwright/test/probe-pane-1791286978445.html
+            - link "probe-pane-1791286978445" [ref=e149] [cursor=pointer]:
+              - /url: /playwright/test/@query#probe-pane-1791286978445
+          - generic [ref=e150]:
+            - link "playwright" [ref=e152] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e153] [cursor=pointer]:
+              - /url: /playwright/test/probe-pane-1791286992583.html
+            - link "probe-pane-1791286992583" [ref=e154] [cursor=pointer]:
+              - /url: /playwright/test/@query#probe-pane-1791286992583
+          - generic [ref=e155]:
+            - link "playwright" [ref=e157] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e158] [cursor=pointer]:
+              - /url: /playwright/test/probe-pane-1791287008227.html
+            - link "probe-pane-1791287008227" [ref=e159] [cursor=pointer]:
+              - /url: /playwright/test/@query#probe-pane-1791287008227
+          - generic [ref=e160]:
+            - link "playwright" [ref=e162] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e163] [cursor=pointer]:
+              - /url: /playwright/test/probe-pane-1791287030413.html
+            - link "probe-pane-1791287030413" [ref=e164] [cursor=pointer]:
+              - /url: /playwright/test/@query#probe-pane-1791287030413
+          - generic [ref=e165]:
+            - link "playwright" [ref=e167] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e168] [cursor=pointer]:
+              - /url: /playwright/test/run-view-1791286296888.html
+            - link "run-view-1791286296888" [ref=e169] [cursor=pointer]:
+              - /url: /playwright/test/@query#run-view-1791286296888
+          - generic [ref=e170]:
+            - link "playwright" [ref=e172] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e173] [cursor=pointer]:
+              - /url: /playwright/test/test-view-1791286254267.html
+            - link "test-view-1791286254267" [ref=e174] [cursor=pointer]:
+              - /url: /playwright/test/@query#test-view-1791286254267
+          - generic [ref=e175]:
+            - link "playwright" [ref=e177] [cursor=pointer]:
+              - /url: /playwright
+            - link [ref=e178] [cursor=pointer]:
+              - /url: /playwright/test/test-view-1791286310023.html
+            - link "test-view-1791286310023" [ref=e179] [cursor=pointer]:
+              - /url: /playwright/test/@query#test-view-1791286310023
+          - generic [ref=e180]:
+            - link "james" [ref=e182] [cursor=pointer]:
+              - /url: /james
+            - link [ref=e183] [cursor=pointer]:
+              - /url: /playwright/test/titled4.html
+            - link "titled4" [ref=e184] [cursor=pointer]:
+              - /url: /playwright/test/@query#titled4
+          - generic [ref=e185]:
+            - link "james" [ref=e187] [cursor=pointer]:
+              - /url: /james
+            - link [ref=e188] [cursor=pointer]:
+              - /url: /playwright/test/untitled.html
+            - link "untitled" [ref=e189] [cursor=pointer]:
+              - /url: /playwright/test/@query#untitled
+      - generic [ref=e190]:
+        - heading "Readme" [level=2] [ref=e191]
+        - paragraph [ref=e193]: Test description 1791285662311
+    - generic [ref=e194]:
+      - generic [ref=e195]:
+        - link "Query" [ref=e197] [cursor=pointer]:
+          - /url: /playwright/test/@query
+          - text: Query
+        - link "Download" [ref=e200] [cursor=pointer]:
+          - /url: /playwright/test
+          - text: Download
+      - generic [ref=e202]:
+        - generic [ref=e203]:
+          - paragraph [ref=e204]:
+            - text: "Homepage:"
+            - link "https://example.com/test-1791285662311" [ref=e206] [cursor=pointer]:
+              - /url: https://example.com/test-1791285662311
+          - paragraph [ref=e207]: "Data: 1,585 statements"
+          - paragraph [ref=e208]: "Size: 1.4 MB"
+          - paragraph [ref=e209]: "License:"
+        - generic [ref=e210]:
+          - heading "Recent Activity" [level=4] [ref=e211]
+          - generic [ref=e212]:
+            - link "james" [ref=e214] [cursor=pointer]:
+              - /url: /james
+            - text: created
+            - link "playwright/test/another-blank" [ref=e215] [cursor=pointer]:
+              - /url: /playwright/test/another-blank
+            - time [ref=e217]: 7 months ago
+          - generic [ref=e218]:
+            - link "playwright" [ref=e220] [cursor=pointer]:
+              - /url: /playwright
+            - text: created
+            - link "playwright/test/another" [ref=e221] [cursor=pointer]:
+              - /url: /playwright/test/another
+            - time [ref=e223]: 7 months ago
+          - generic [ref=e224]:
+            - link "james" [ref=e226] [cursor=pointer]:
+              - /url: /james
+            - text: created
+            - link "playwright/test/untitled" [ref=e227] [cursor=pointer]:
+              - /url: /playwright/test/untitled
+            - time [ref=e229]: 7 months ago
+          - generic [ref=e230]:
+            - link "james" [ref=e232] [cursor=pointer]:
+              - /url: /james
+            - text: created
+            - link "playwright/test/titled4" [ref=e233] [cursor=pointer]:
+              - /url: /playwright/test/titled4
+            - time [ref=e235]: 7 months ago
+          - generic [ref=e236]:
+            - link "james" [ref=e238] [cursor=pointer]:
+              - /url: /james
+            - text: created
+            - link "playwright/test/blank-name" [ref=e239] [cursor=pointer]:
+              - /url: /playwright/test/blank-name
+            - time [ref=e241]: 7 months ago
+          - generic [ref=e242]:
+            - link "mgr" [ref=e244] [cursor=pointer]:
+              - /url: /mgr
+            - text: created
+            - link "playwright/test/g" [ref=e245] [cursor=pointer]:
+              - /url: /playwright/test/g
+            - time [ref=e247]: 7 months ago
+  - generic [ref=e249]:
+    - paragraph [ref=e250]:
+      - text: A product of
+      - link "Datagraph GmbH" [ref=e251] [cursor=pointer]:
+        - /url: http://datagraph.org/
+      - text: •
+      - link "Home" [ref=e253] [cursor=pointer]:
+        - /url: https://dydra.com/home
+      - text: •
+      - link "About" [ref=e255] [cursor=pointer]:
+        - /url: https://dydra.com/about
+      - text: •
+      - link "Docs" [ref=e257] [cursor=pointer]:
+        - /url: https://docs.dydra.com/
+      - text: •
+      - link "Blog" [ref=e259] [cursor=pointer]:
+        - /url: https://blog.dydra.com/
+      - generic [ref=e260]:
+        - text: •
+        - link "Signup" [ref=e262] [cursor=pointer]:
+          - /url: https://dydra.com/signup
+        - text: •
+        - link "Login" [ref=e264] [cursor=pointer]:
+          - /url: https://dydra.com/login
+      - text: •
+      - link "Legal" [ref=e266] [cursor=pointer]:
+        - /url: /legal
+      - text: •
+      - link "Contact" [ref=e268] [cursor=pointer]:
+        - /url: /legal#contact
+    - paragraph [ref=e269]:
+      - link "Support" [ref=e270] [cursor=pointer]:
+        - /url: https://github.com/dydra/support/blob/master/README.rst#readme
+      - text: •
+      - link "GitHub" [ref=e271] [cursor=pointer]:
+        - /url: https://github.com/dydra
+      - text: •
+      - link "Twitter" [ref=e272] [cursor=pointer]:
+        - /url: http://twitter.com/dydradata
+      - text: •
+      - link "RSS" [ref=e273] [cursor=pointer]:
+        - /url: http://feeds.feedburner.com/dydra
+```

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Dydra Studio User Manual</h1>
+            <p>A Gentle Guide to Graph Data Management</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <ul>
+                <li>
+                    <a href="login.html">
+                        <h2>Chapter 1: Authentication</h2>
+                        <p>Walking through the door — who you are and how to say so.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="account-operations.html">
+                        <h2>Chapter 2: Account Management</h2>
+                        <p>The story the system tells about you, and how to shape it.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="repository-operations.html">
+                        <h2>Chapter 3: Repository Operations</h2>
+                        <p>Giving your data a home — and taking good care of it.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="view-operations.html">
+                        <h2>Chapter 4: Query Views</h2>
+                        <p>The questions worth keeping — and how to ask them well.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="tips-and-best-practices.html">
+                        <h2>Chapter 5: Practical Wisdom</h2>
+                        <p>What experience teaches, for those willing to listen.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="appendices.html">
+                        <h2>Appendices</h2>
+                        <p>The reference tables. Consult them when you need to.</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <h2>Preface</h2>
+            <p>There is a quiet satisfaction in knowing where your data lives. In knowing that somewhere, out there, it is waiting for you — organized, patient, ready to answer whatever question you care to ask of it. <em>Dydra Studio</em> is the door to that place.</p>
+
+            <p>This manual is your guide. It is not a technical treatise — there are shelves full of those, and they have their place. This is something simpler: a straightforward telling of how things work, and what to do when you sit down in front of this application for the first time.</p>
+
+            <p>Dydra Studio manages RDF data — the Resource Description Framework, if you want the full name. Think of RDF as a language for describing relationships between things. Every fact in RDF takes the form of three parts: a subject, a predicate, and an object. Sometimes there is a fourth — a named graph that says where the fact belongs. The people who built this system have been thinking about these structures for a long time, and they have built something worthy of your attention.</p>
+
+            <h3>What This Application Does</h3>
+            <p>At its heart, Dydra Studio is a single-page web application. That means it updates itself as you work — no waiting for full page reloads, no losing your place. It is designed to get out of your way and let you focus on your data.</p>
+
+            <p>Here is what it offers you:</p>
+            <ul>
+                <li>A place to store your RDF datasets, organized into named repositories</li>
+                <li>A way to ask questions of that data, using the SPARQL query language</li>
+                <li>Tools for moving data in and out in a variety of formats</li>
+                <li>The ability to save your most useful queries as views, ready to run again</li>
+                <li>Simple access control so you can share repositories with collaborators</li>
+                <li>The means to keep your account and repository information up to date</li>
+            </ul>
+
+            <h2>Before You Begin</h2>
+
+            <h3>What You Will Need</h3>
+            <p>A modern web browser is all the software you need. Chrome, Firefox, Safari, or Edge — any recent version will do the job. The application runs in your browser, so there is nothing to install. Just bring yourself and your curiosity.</p>
+
+            <div class="note">
+                <strong>Where to Go:</strong> Point your browser to <code>https://dydra.com/ui/user</code>. That is your starting point — everything begins there.
+            </div>
+
+            <h3>Two Interfaces</h3>
+            <p>Dydra has two faces, so to speak:</p>
+            <ul>
+                <li><strong>The User Application</strong> — the one this manual describes. It is where you do your work with data.</li>
+                <li><strong>The Administrative Console</strong> — a separate interface for those who administer the system. That story is told elsewhere.</li>
+            </ul>
+
+            <h3>Getting Started</h3>
+            <p>Getting started is refreshingly simple:</p>
+            <ol>
+                <li>Open your browser and go to <strong>https://dydra.com/ui/user</strong></li>
+                <li>Sign in — Chapter 1 will walk you through it</li>
+                <li>From there, the rest of this manual will be your companion</li>
+            </ol>
+
+            <h3>How This Manual Is Organized</h3>
+            <p>We move from the simple to the more involved:</p>
+            <ul>
+                <li><strong><a href="login.html">Chapter 1: Authentication</a></strong> — Signing in and out</li>
+                <li><strong><a href="account-operations.html">Chapter 2: Account Management</a></strong> — Your identity in the system</li>
+                <li><strong><a href="repository-operations.html">Chapter 3: Repository Operations</a></strong> — Working with your data</li>
+                <li><strong><a href="view-operations.html">Chapter 4: Query Views</a></strong> — Writing and saving queries</li>
+                <li><strong><a href="tips-and-best-practices.html">Chapter 5: Practical Wisdom</a></strong> — Habits worth developing</li>
+                <li><strong><a href="appendices.html">Appendices</a></strong> — Formats, shortcuts, and definitions</li>
+            </ul>
+
+            <h3>A Word About Help</h3>
+            <p>If you find yourself in difficulty — and we all do, sooner or later — the people at Dydra are available at <strong>support@dydra.com</strong>. When you write to them, tell them what you expected to happen, what actually happened, and what browser you are using. The more you give them, the more they can help you.</p>
+
+            <p><em>Now then. Let us begin.</em></p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Dydra. All rights reserved.</p>
+            <p>Manual Version: 2026-02-20 (Freeman Edition)</p>
+        </div>
+    </footer>
+    <script src="manual.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "name": "spocq-client-replication",
+  "version": "1.0.0",
+  "description": "Client-side replication library for SPOCQ, vendored into jsui. The library is ES modules; jsui's root package.json declares no type, so this scopes the subtree as ESM for node tooling without affecting the rest of jsui. Browsers load these through <script type=\"module\"> regardless.",
+  "type": "module",
+  "private": true
+}

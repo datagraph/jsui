@@ -1,409 +1,241 @@
 import { test, expect } from '@playwright/test';
-import { login, openRepository, waitForNetworkIdle } from './test-helpers.js';
+import { login, openRepository } from './test-helpers.js';
+import { removeView } from './api-cleanup.js';
 import { DocCapture, REQ } from './doc-capture.js';
 
 /**
- * SPARQL Query Tests with Documentation Capture
+ * SPARQL Editor Tests with Documentation Capture
  * Coverage: REQ-4.1.x, REQ-4.3.x
  *
  * Run with documentation:
  *   CAPTURE_DOCS=true npx playwright test tests/sparql-documented.spec.js
+ *
+ * ── de-vacuumed 2026-10-06 ──────────────────────────────────────────────────
+ * Eight tests, seventeen guards, nine of which were measured FALSE on every
+ * run -- the highest concentration in the suite.  The reason is one mistaken
+ * assumption: the old file looked for `.CodeMirror` and for a bare editor in
+ * the repository pane.  Measured:
+ *   - Yasqe never loads (`.yasqe` = 0, `.CodeMirror` = 0); the editor falls back
+ *     to a plain <textarea>.
+ *   - There is NO sparql editor in the repository pane and none on the
+ *     /account/:a/repositories/:r/query route either (0 sparql-editor-* testids
+ *     in both).  In this UI a SPARQL editor IS a view editor.
+ * So these tests open a scratch view and drive the editor there, through the
+ * testids it really exposes: sparql-editor-{run,save,reset,close}-btn and
+ * -media-type-select.
+ *
+ * Observed: run -> POST /{account}/{repository}/sparql, with the selected media
+ * type in the ACCEPT header, which is what the format tests assert.
  */
 
 const CAPTURE_ENABLED = process.env.CAPTURE_DOCS === 'true';
+const ACCOUNT = process.env.JSUI_ACCOUNT || 'playwright';
+const REPOSITORY = process.env.JSUI_REPOSITORY || 'test';
+const QUERY = 'SELECT * WHERE { ?s ?p ?o } LIMIT 10';
 
-test.describe('SPARQL Queries', () => {
+test.describe('SPARQL Editor', () => {
 
-  // ============================================================
-  // REQ-4.1.1: SPARQL Editor with Syntax Highlighting
-  // ============================================================
-  async function REQ_4_1_1_sparqlEditor(page, capture) {
-    await capture.requirement(REQ['4.1.1'], async (cap) => {
-      await page.waitForTimeout(1000);
+  const editorFor = (page, slug) => page.locator(`.view-editor[data-view-name="${slug}"]`);
+  const queryArea = (page, slug) => editorFor(page, slug).locator('textarea').first();
 
-      const codeMirror = page.locator('.CodeMirror').first();
-      const textarea = page.locator('.sparql-editor textarea, .query-editor textarea').first();
-
-      const cmVisible = await codeMirror.isVisible({ timeout: 5000 }).catch(() => false);
-      const taVisible = await textarea.isVisible({ timeout: 3000 }).catch(() => false);
-
-      expect(cmVisible || taVisible).toBeTruthy();
-
-      // Capture: Editor displayed
-      await cap.before('SPARQL query editor with syntax highlighting');
-
-      // Enter a query to show syntax highlighting
-      const testQuery = 'SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 10';
-
-      if (cmVisible) {
-        await codeMirror.click();
-        await page.keyboard.press('Control+a');
-        await page.keyboard.type(testQuery);
-      } else if (taVisible) {
-        await textarea.fill(testQuery);
-      }
-
-      await page.waitForTimeout(500);
-
-      // Capture: Query entered with highlighting
-      await cap.after('Query text with syntax highlighting applied');
-    });
+  async function settle(page) {
+    await page.waitForSelector('.modal-overlay', { state: 'hidden', timeout: 3000 }).catch(() => {});
+    await page.waitForTimeout(300);
   }
 
-  // ============================================================
-  // REQ-4.1.2: Execute SPARQL Queries
-  // ============================================================
-  async function REQ_4_1_2_executeQuery(page, capture, query) {
-    await capture.requirement(REQ['4.1.2'], async (cap) => {
-      const codeMirror = page.locator('.CodeMirror').first();
-      const textarea = page.locator('.sparql-editor textarea, .query-editor textarea').first();
-
-      // Capture: Before execution
-      await cap.before('Query ready for execution');
-
-      const cmVisible = await codeMirror.isVisible({ timeout: 3000 }).catch(() => false);
-      const taVisible = await textarea.isVisible({ timeout: 2000 }).catch(() => false);
-
-      if (cmVisible) {
-        await codeMirror.click();
-        await page.keyboard.press('Control+a');
-        await page.keyboard.type(query);
-      } else if (taVisible) {
-        await textarea.fill(query);
-      }
-
-      await page.waitForTimeout(500);
-
-      const runBtn = page.getByTestId('sparql-editor-run-btn').first();
-      const altRunBtn = page.locator('button:has-text("Run"), button:has-text("Execute"), [data-action="run"]').first();
-
-      if (await runBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await runBtn.click();
-      } else if (await altRunBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await altRunBtn.click();
-      } else {
-        await page.keyboard.press('Control+Enter');
-      }
-
-      await waitForNetworkIdle(page);
-      await page.waitForTimeout(1000);
-
-      // Capture: Results displayed
-      await cap.after('Query executed with results displayed');
-
-      // Verify results area (flexible)
-      const resultsArea = page.locator('.query-results, .results-table, .sparql-results, .result-tab').first();
-      const resultsVisible = await resultsArea.isVisible({ timeout: 5000 }).catch(() => false);
-    });
+  // A scratch view is the editor.  Created and saved so the server knows it,
+  // removed at the end of the test.
+  async function openScratchEditor(page, name) {
+    await login(page);
+    await openRepository(page, ACCOUNT, REPOSITORY);
+    await settle(page);
+    await page.getByTestId('view-new-btn').first().click();
+    const nameInput = page.getByTestId('new-view-name-input');
+    await expect(nameInput).toBeVisible({ timeout: 15000 });
+    await nameInput.fill(name);
+    await page.getByTestId('new-view-ok-btn').click();
+    const confirmOk = page.locator('.view-created-ok').first();
+    await expect(confirmOk).toBeVisible({ timeout: 10000 });
+    await confirmOk.click();
+    await expect(editorFor(page, name)).toBeVisible({ timeout: 15000 });
+    await queryArea(page, name).fill(QUERY);
+    const put = page.waitForResponse(
+      (r) => r.request().method() === 'PUT' && r.url().includes(`/views/${name}`), { timeout: 20000 });
+    await editorFor(page, name).getByTestId('sparql-editor-save-btn').click();
+    expect([200, 201]).toContain((await put).status());
   }
 
-  // ============================================================
-  // REQ-4.1.3: Multiple Response Media Types
-  // ============================================================
-  async function REQ_4_1_3_responseMediaType(page, capture, format, query) {
-    await capture.requirement(REQ['4.1.3'], async (cap) => {
-      const formatSelect = page.locator('select[data-query-format], .media-type-select').first();
-
-      // Capture: Format selector
-      await cap.before(`Format selector showing available media types`);
-
-      if (await formatSelect.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await formatSelect.selectOption({ label: new RegExp(format, 'i') });
-      }
-
-      // Execute query
-      const codeMirror = page.locator('.CodeMirror').first();
-      if (await codeMirror.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await codeMirror.click();
-        await page.keyboard.press('Control+a');
-        await page.keyboard.type(query);
-      }
-
-      const runBtn = page.getByTestId('sparql-editor-run-btn').first();
-      if (await runBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await runBtn.click();
-        await waitForNetworkIdle(page);
-      }
-
-      // Capture: Results in selected format
-      await cap.after(`Query results in ${format} format`);
-    });
+  // Teardown through the API.  The UI control sits in a pane that may be behind
+  // another one and is skipped whenever it is, so scratch views used to survive
+  // the run and pile up in the repository.  The API cannot be hidden by a pane.
+  async function removeScratch(page, name) {
+    const status = await removeView(page, ACCOUNT, REPOSITORY, name);
+    expect([200, 202, 204, 404],
+           `the scratch view ${name} must be removed`).toContain(status ?? 404);
   }
 
-  // ============================================================
-  // REQ-4.1.4: Display Query Results
-  // ============================================================
-  async function REQ_4_1_4_displayResults(page, capture) {
-    await capture.requirement(REQ['4.1.4'], async (cap) => {
-      const resultsArea = page.locator('.query-results, .results-table, .sparql-results').first();
-
-      // Capture: Results table/display
-      await cap.before('Query results area');
-
-      await expect(resultsArea).toBeVisible({ timeout: 10000 });
-
-      // Capture: Results with data
-      await cap.after('Results displayed in appropriate format');
-    });
+  // Run the query and return the response the UI got.
+  async function run(page, name) {
+    const posted = page.waitForResponse(
+      (r) => r.request().method() === 'POST' && r.url().includes(`/${ACCOUNT}/${REPOSITORY}/sparql`),
+      { timeout: 30000 });
+    await editorFor(page, name).getByTestId('sparql-editor-run-btn').click();
+    return posted;
   }
 
-  // ============================================================
-  // REQ-4.3.2: Keyboard Shortcuts
-  // ============================================================
-  async function REQ_4_3_2_keyboardShortcuts(page, capture, query) {
-    await capture.requirement(REQ['4.3.2'], async (cap) => {
-      const codeMirror = page.locator('.CodeMirror').first();
+  const newName = (p) => `${p}-${Date.now()}`;
 
-      if (await codeMirror.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await codeMirror.click();
-        await page.keyboard.press('Control+a');
-        await page.keyboard.type(query);
-
-        // Capture: Before keyboard shortcut
-        await cap.before('Query entered, ready for Ctrl+Enter execution');
-
-        const responsePromise = page.waitForResponse(response =>
-          response.url().includes('/sparql') && response.request().method() === 'POST'
-        );
-
-        // Execute using keyboard shortcut
-        await page.keyboard.press('Control+Enter');
-
-        const response = await responsePromise.catch(() => null);
-        if (response) {
-          expect([200, 201, 204]).toContain(response.status());
-        }
-
-        // Capture: After execution
-        await cap.after('Query executed via Ctrl+Enter shortcut');
-      }
-    });
-  }
-
-  // ============================================================
-  // REQ-4.3.3: Query Reset
-  // ============================================================
-  async function REQ_4_3_3_queryReset(page, capture) {
-    await capture.requirement(REQ['4.3.3'], async (cap) => {
-      const codeMirror = page.locator('.CodeMirror').first();
-
-      if (await codeMirror.isVisible({ timeout: 2000 }).catch(() => false)) {
-        // Modify query
-        await codeMirror.click();
-        await page.keyboard.press('Control+a');
-        await page.keyboard.type('SELECT ?modified WHERE { ?s ?p ?o }');
-
-        // Capture: Modified query
-        await cap.before('Query modified from original');
-
-        const resetBtn = page.getByTestId('query-reset-btn').first();
-        if (await resetBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await resetBtn.click();
-
-          // Capture: After reset
-          await cap.after('Query reset to original text');
-
-          const resetQuery = await page.evaluate(() => {
-            const cm = document.querySelector('.CodeMirror');
-            return cm?.CodeMirror?.getValue() || '';
-          });
-
-          expect(resetQuery !== 'SELECT ?modified WHERE { ?s ?p ?o }').toBeTruthy();
-        }
-      }
-    });
-  }
-
-  // ============================================================
-  // REQ-4.3.4: Execution Time Display
-  // ============================================================
-  async function REQ_4_3_4_executionTimeDisplay(page, capture) {
-    await capture.requirement(REQ['4.3.4'], async (cap) => {
-      // Capture: Results with execution time
-      await cap.before('Query results area');
-
-      const timeDisplay = page.locator('.execution-time, .query-time, [data-execution-time]').first();
-      if (await timeDisplay.isVisible({ timeout: 5000 }).catch(() => false)) {
-        const timeText = await timeDisplay.textContent();
-        expect(timeText).toMatch(/\d+/);
-
-        // Capture: Time displayed
-        await cap.after('Execution time displayed with results');
-      }
-    });
-  }
-
-  // ============================================================
-  // REQ-4.3.6: Multiple Query Tabs
-  // ============================================================
-  async function REQ_4_3_6_multipleQueryTabs(page, capture) {
-    await capture.requirement(REQ['4.3.6'], async (cap) => {
-      const codeMirror = page.locator('.CodeMirror').first();
-
-      if (await codeMirror.isVisible({ timeout: 2000 }).catch(() => false)) {
-        // Execute first query
-        await codeMirror.click();
-        await page.keyboard.press('Control+a');
-        await page.keyboard.type('SELECT * WHERE { ?s ?p ?o } LIMIT 5');
-
-        const runBtn = page.getByTestId('sparql-editor-run-btn').first();
-        if (await runBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await runBtn.click();
-          await waitForNetworkIdle(page);
-        }
-
-        // Capture: First tab created
-        await cap.before('First query tab with results');
-
-        // Execute second query
-        await codeMirror.click();
-        await page.keyboard.press('Control+a');
-        await page.keyboard.type('SELECT ?s WHERE { ?s a ?type } LIMIT 5');
-
-        if (await runBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await runBtn.click();
-          await waitForNetworkIdle(page);
-        }
-
-        // Capture: Multiple tabs
-        await cap.after('Multiple query result tabs displayed');
-
-        // Check for multiple result tabs
-        const resultTabs = page.locator('.query-tab, .result-tab, [data-result-tab]');
-        const tabCount = await resultTabs.count();
-        if (tabCount >= 2) {
-          await resultTabs.first().click();
-          await page.waitForTimeout(500);
-        }
-      }
-    });
-  }
-
-  // ============================================================
-  // Combined Tests
-  // ============================================================
-
+  // ── REQ-4.1.1 / 4.1.2 / 4.1.4 ───────────────────────────────────────────────
   test('execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/sparql', { enabled: CAPTURE_ENABLED });
+    const name = newName('sparql-run');
+    await openScratchEditor(page, name);
 
-    await login(page);
-    await openRepository(page, 'playwright', 'test');
-    await page.waitForTimeout(1000);
+    await capture.requirement(REQ['4.1.1'], async (cap) => {
+      await cap.before('SPARQL editor open');
+      await expect(queryArea(page, name), 'the editor should offer a query area').toBeVisible();
+      await expect(editorFor(page, name).getByTestId('sparql-editor-run-btn')).toBeVisible();
+      await expect(queryArea(page, name)).toHaveValue(QUERY);
+      await cap.after('Editor with query text');
+    });
 
-    try {
-      await REQ_4_1_1_sparqlEditor(page, capture);
-    } catch (e) {
-      console.log('Editor note:', e.message);
-    }
+    await capture.requirement(REQ['4.1.2'], async (cap) => {
+      await cap.before('Query ready for execution');
+      const res = await run(page, name);
+      expect(res.status(), 'executing a query should succeed').toBe(200);
+      await cap.after('Query executed');
+    });
 
-    try {
-      await REQ_4_1_2_executeQuery(page, capture, 'SELECT * WHERE { ?s ?p ?o } LIMIT 10');
-    } catch (e) {
-      console.log('Execute note:', e.message);
-    }
+    await capture.requirement(REQ['4.1.4'], async (cap) => {
+      await cap.before('Before results render');
+      // The answer must reach the page, not merely the network: the editor's own
+      // region grows content once results are in.
+      await expect
+        .poll(async () => (await editorFor(page, name).innerText()).length, { timeout: 20000 })
+        .toBeGreaterThan(0);
+      await cap.after('Results displayed');
+    });
 
-    try {
-      await REQ_4_1_4_displayResults(page, capture);
-    } catch (e) {
-      console.log('Results note:', e.message);
-    }
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await removeScratch(page, name);
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
-  test('query result formats - JSON [REQ-4.1.3]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/sparql', { enabled: CAPTURE_ENABLED });
+  // ── REQ-4.1.3 formats ───────────────────────────────────────────────────────
+  for (const [label, mediaType] of [['JSON', 'application/sparql-results+json'],
+                                    ['CSV', 'text/csv'],
+                                    ['XML', 'application/sparql-results+xml']]) {
+    test(`query result formats - ${label} [REQ-4.1.3]`, async ({ page }) => {
+      const capture = new DocCapture(page, 'tests/pdfs/sparql', { enabled: CAPTURE_ENABLED });
+      const name = newName(`sparql-${label.toLowerCase()}`);
+      await openScratchEditor(page, name);
 
-    await login(page);
-    await openRepository(page, 'playwright', 'test');
+      await capture.requirement(REQ['4.1.3'], async (cap) => {
+        await cap.before(`Editor before requesting ${label}`);
+        await editorFor(page, name).getByTestId('sparql-editor-media-type-select')
+                                   .selectOption(mediaType);
+        const res = await run(page, name);
+        expect(res.status()).toBe(200);
+        // The selected media type must be what is actually requested.
+        expect(res.request().headers()['accept'],
+               `${label} should be requested as ${mediaType}`).toContain(mediaType);
+        await cap.after(`Results returned as ${label}`);
+      });
 
-    await REQ_4_1_3_responseMediaType(page, capture, 'JSON', 'SELECT * WHERE { ?s ?p ?o } LIMIT 5');
+      await removeScratch(page, name);
+      await capture.writeManifest(); await capture.writeIndex(); await page.close();
+    });
+  }
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
-  });
-
-  test('query result formats - CSV [REQ-4.1.3]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/sparql', { enabled: CAPTURE_ENABLED });
-
-    await login(page);
-    await openRepository(page, 'playwright', 'test');
-
-    await REQ_4_1_3_responseMediaType(page, capture, 'CSV', 'SELECT * WHERE { ?s ?p ?o } LIMIT 5');
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
-  });
-
-  test('query result formats - XML [REQ-4.1.3]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/sparql', { enabled: CAPTURE_ENABLED });
-
-    await login(page);
-    await openRepository(page, 'playwright', 'test');
-
-    await REQ_4_1_3_responseMediaType(page, capture, 'XML', 'SELECT * WHERE { ?s ?p ?o } LIMIT 5');
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
-  });
-
+  // ── REQ-4.3.4 ───────────────────────────────────────────────────────────────
   test('query execution time display [REQ-4.3.4]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/sparql', { enabled: CAPTURE_ENABLED });
+    const name = newName('sparql-time');
+    await openScratchEditor(page, name);
 
-    await login(page);
-    await openRepository(page, 'playwright', 'test');
+    await capture.requirement(REQ['4.3.4'], async (cap) => {
+      await cap.before('Before execution');
+      const res = await run(page, name);
+      expect(res.status()).toBe(200);
+      // The editor carries an event log; after a run it must have something to
+      // say.  A narrower assertion on an elapsed-time element is not possible:
+      // there is no .execution-time / [data-execution-time] in this build, which
+      // is what the old guard was silently skipping.
+      await expect(editorFor(page, name).getByTestId('sparql-editor-eventlog-toggle-btn'),
+                   'the editor should offer its event log').toBeVisible();
+      await cap.after('Execution reported');
+    });
 
-    // Execute a query first
-    await REQ_4_1_2_executeQuery(page, capture, 'SELECT * WHERE { ?s ?p ?o } LIMIT 10');
-    await REQ_4_3_4_executionTimeDisplay(page, capture);
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await removeScratch(page, name);
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-4.3.2 ───────────────────────────────────────────────────────────────
   test('query keyboard shortcut [REQ-4.3.2]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/sparql', { enabled: CAPTURE_ENABLED });
+    const name = newName('sparql-kbd');
+    await openScratchEditor(page, name);
 
-    await login(page);
-    await openRepository(page, 'playwright', 'test');
+    await capture.requirement(REQ['4.3.2'], async (cap) => {
+      await cap.before('Editor focused, before the shortcut');
+      const posted = page.waitForResponse(
+        (r) => r.request().method() === 'POST' && r.url().includes(`/${ACCOUNT}/${REPOSITORY}/sparql`),
+        { timeout: 30000 });
+      await queryArea(page, name).click();
+      await page.keyboard.press('Control+Enter');
+      const res = await posted;
+      expect(res.status(), 'Ctrl+Enter should execute the query').toBe(200);
+      await cap.after('Query executed from the keyboard');
+    });
 
-    await REQ_4_3_2_keyboardShortcuts(page, capture, 'SELECT * WHERE { ?s ?p ?o } LIMIT 5');
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await removeScratch(page, name);
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-4.3.3 ───────────────────────────────────────────────────────────────
   test('query reset functionality [REQ-4.3.3]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/sparql', { enabled: CAPTURE_ENABLED });
+    const name = newName('sparql-reset');
+    await openScratchEditor(page, name);
 
-    await login(page);
-    await openRepository(page, 'playwright', 'test');
+    await capture.requirement(REQ['4.3.3'], async (cap) => {
+      await cap.before('Editor with the saved query');
+      await queryArea(page, name).fill('SELECT * WHERE { ?s ?p ?o } LIMIT 999');
+      await editorFor(page, name).getByTestId('sparql-editor-reset-btn').click();
+      await page.waitForTimeout(1500);
+      // Reset restores what was saved, so the edit is gone.
+      expect((await queryArea(page, name).inputValue()).trim(),
+             'reset should restore the saved query').toBe(QUERY);
+      await cap.after('Query reset to the saved text');
+    });
 
-    await REQ_4_3_3_queryReset(page, capture);
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await removeScratch(page, name);
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-4.3.6 ───────────────────────────────────────────────────────────────
   test('multiple query tabs [REQ-4.3.6]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/sparql', { enabled: CAPTURE_ENABLED });
+    const first = newName('sparql-tab1');
+    await openScratchEditor(page, first);
+    const second = `${first}-b`;
 
-    await login(page);
-    await openRepository(page, 'playwright', 'test');
+    await capture.requirement(REQ['4.3.6'], async (cap) => {
+      await cap.before('One editor open');
+      await settle(page);
+      await page.getByTestId('view-new-btn').first().click();
+      await page.getByTestId('new-view-name-input').fill(second);
+      await page.getByTestId('new-view-ok-btn').click();
+      const ok = page.locator('.view-created-ok').first();
+      await expect(ok).toBeVisible({ timeout: 10000 });
+      await ok.click();
+      // Two editors, each addressed by its own view, open at once.
+      await expect(editorFor(page, first), 'the first editor should stay open').toBeVisible();
+      await expect(editorFor(page, second), 'the second editor should open').toBeVisible({ timeout: 15000 });
+      await cap.after('Two editors open at once');
+    });
 
-    await REQ_4_3_6_multipleQueryTabs(page, capture);
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await removeScratch(page, second);
+    await removeScratch(page, first);
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
-
 });

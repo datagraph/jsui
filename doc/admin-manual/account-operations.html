@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 3: Account Operations - Dydra Admin Console Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 3: Account Operations</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="dashboard.html">← Previous: Chapter 2</a>
+            <a href="repository-operations.html">Next: Chapter 4 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>3.1 The Accounts Tab</h2>
+            <p>The <strong>Accounts</strong> tab is the leftmost tab of the admin dashboard and the first to load on page render. It displays the complete list of accounts registered in the system, retrieved from <code>GET {host}/system/accounts</code>. Accounts are presented in a table sorted alphabetically by account name (case-insensitive comparison).</p>
+
+            <div class="float-left">
+                <img src="images/admin-accounts-list.png" alt="Accounts tab with account list">
+                <p class="image-caption">Figure 3.1: The Accounts tab displaying the system account list.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>3.2 Table Structure</h2>
+            <table>
+                <thead>
+                    <tr><th>Column</th><th>Contents</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Checkbox</td>
+                        <td>Selection control</td>
+                        <td>Checked accounts determine which repositories are fetched in the Repositories tab. See Section 2.5.</td>
+                    </tr>
+                    <tr>
+                        <td>Account Name</td>
+                        <td>The account identifier, rendered as a link</td>
+                        <td>The link target is <code>{host}/ui/user/{accountName}</code> — the account's view in the user application.</td>
+                    </tr>
+                    <tr>
+                        <td>Actions</td>
+                        <td>Details link; Delete button (Admin only)</td>
+                        <td>The Delete button is suppressed for operator-level sessions.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>3.3 Tab Controls</h2>
+            <table>
+                <thead>
+                    <tr><th>Control</th><th>Availability</th><th>Function</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Refresh</strong></td><td>Always</td><td>Re-fetches the complete account list from <code>/system/accounts</code>. Clears and rebuilds the table.</td></tr>
+                    <tr><td><strong>New</strong></td><td>Admin only</td><td>Opens the New Account dialog. See Section 3.5.</td></tr>
+                    <tr><td><strong>Check All</strong></td><td>Always</td><td>Toggles the selection state of all account checkboxes. Displays an indeterminate state when some but not all accounts are selected.</td></tr>
+                </tbody>
+            </table>
+
+            <h2>3.4 Inspecting an Account</h2>
+            <p>The <strong>Details</strong> link on each row opens a modal dialog presenting the account's full configuration as a key-value table. The data is fetched from <code>GET {host}/system/accounts/{accountName}/configuration</code>. The <code>accessToken</code> property is excluded from the display.</p>
+
+            <div class="float-right">
+                <img src="images/admin-account-details-dialog.png" alt="Account details dialog">
+                <p class="image-caption">Figure 3.2: The account details dialog.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Click <strong>Details</strong> on the row of the account to inspect.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                The dialog opens, displaying all configuration properties in a two-column table (property name, value).
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Close the dialog by clicking the close button or clicking outside the dialog boundary.
+            </div>
+
+            <div class="note">
+                <strong>Navigation to the account's repositories:</strong> To view repositories belonging to a specific account, check that account's checkbox and navigate to the <strong>Repositories</strong> tab. Direct links to the account in the user application are available via the account name link in the table.
+            </div>
+
+            <h2>3.5 Creating an Account (Admin only)</h2>
+            <p>New accounts are created from the New Account dialog.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Click <strong>New</strong> in the tab controls. The New Account dialog opens.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Enter the desired account name in the text field. Account names are case-sensitive identifiers and must conform to the naming constraints enforced by the system.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click <strong>Create</strong> (or press Enter). The application issues <code>POST {host}/system/accounts</code> with the supplied name.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                On success, the dialog closes and the new account is appended to the table. If the Repositories tab has been loaded, it is refreshed to reflect the new account's (initially empty) repository list.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                On error, the response message is displayed within the dialog. The dialog remains open for correction.
+            </div>
+
+            <div class="warning">
+                <strong>Account naming:</strong> The account name becomes part of the URL path for all of that account's repositories and views. Choose identifiers that are stable and meaningful; renaming accounts is not supported through this interface.
+            </div>
+
+            <h2>3.6 Deleting an Account (Admin only)</h2>
+            <p>Account deletion is a permanent, irreversible operation. All repositories belonging to the account are also deleted.</p>
+
+            <div class="warning">
+                <strong>Irreversibility:</strong> Deleting an account destroys all associated repositories, views, and data. This operation cannot be undone. Verify the account name before confirming.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Click <strong>Delete</strong> on the row of the account to remove.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                A confirmation dialog appears, displaying the account name and requesting confirmation.
+            </div>
+
+            <div class="float-left">
+                <img src="images/admin-account-delete-confirmation.png" alt="Account deletion confirmation dialog">
+                <p class="image-caption">Figure 3.3: The deletion confirmation dialog.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Confirm the deletion. The application issues <code>DELETE {host}/system/accounts/{accountName}</code>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                The server response (in N-Triples format) is displayed briefly. The account is removed from the table. The Repositories tab, if loaded, is refreshed.
+            </div>
+
+            <h2>3.7 Using Account Selection to Filter Repositories</h2>
+            <p>Account checkboxes serve a secondary function: they determine the scope of the <strong>Repositories</strong> tab. The relationship is defined as follows:</p>
+            <ul>
+                <li>When no accounts are checked, the Repositories tab displays the message "No accounts selected".</li>
+                <li>When one or more accounts are checked, the Repositories tab fetches and displays repositories for exactly those accounts.</li>
+                <li>Changes to the account selection automatically refresh the Repositories tab if that tab has already been loaded.</li>
+            </ul>
+            <p>To view repositories for a specific subset of accounts: check exactly those accounts, then click the <strong>Repositories</strong> tab.</p>
+
+            <h2>3.8 Proceeding</h2>
+            <ul>
+                <li>Repository enumeration, creation, and deletion — <a href="repository-operations.html">Chapter 4</a></li>
+                <li>Invitation management — <a href="invitations.html">Chapter 5</a></li>
+                <li>System monitoring — <a href="system-monitoring.html">Chapter 6</a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

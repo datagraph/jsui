@@ -1,0 +1,19 @@
+there is a customer request to gain more visibility into changes made to accounts, repositories, and views.
+this will require  a display of the entries in an "events" metatable for each of them.
+the necessary sql access is defined by read-sql-events in                                                                 
+  /Users/Shared/Development/Source/Library/org/datagraph/spocq/gensrc/odbc/views.lisp .
+the rest interface should be added to the admin operator in                                                       
+  /Users/Shared/Development/Source/Library/org/datagraph/spocq/gensrc/spocq-server/admin.lisp  
+for the resources
+ /system/accounts/<account>/history 
+ /system/accounts/<account>/repositories/<repository>/history 
+ /system/accounts/<account>/repositories/<repository>/views/<view>/history 
+the current implementation reads from the events table, but the instance identity is applied to the event creator (events.created_by) rather than the event target (events.eventable_id).
+
+the requests should use a common method which reads the table for account, repository, and view targets, allows time constraints, and filters for operation (events.type), target (events.eventable_id), and/or instance class (events.eventable_type)
+
+describe first a plan for
+- the logic in the admin operator methods
+- the logic for the detailed events table accessor
+- the response json data model
+- the change to jsui to display the reports either as additional panes or on the existing instance panes.

@@ -1,362 +1,233 @@
 import { test, expect } from '@playwright/test';
-import { login, openRepository, waitForNetworkIdle } from './test-helpers.js';
+import { login, openRepository } from './test-helpers.js';
 import { DocCapture, REQ } from './doc-capture.js';
 
 /**
  * Navigation Tests with Documentation Capture
- * Coverage: REQ-5.x
+ * Coverage: REQ-5.1.x, REQ-5.2.x, REQ-6.3.x
  *
  * Run with documentation:
  *   CAPTURE_DOCS=true npx playwright test tests/navigation-documented.spec.js
+ *
+ * ── de-vacuumed 2026-10-06 ──────────────────────────────────────────────────
+ * Seven tests, ZERO expect() calls, every step behind a visibility guard and
+ * two whole requirements inside `try {} catch (e) { console.log(...) }`.
+ *
+ * Selectors confirmed against the live UI before being asserted on:
+ *   [data-tab-type="account"|"repository"]  the tabs            (present)
+ *   [data-tab-link][href="#<paneId>"]       the tab anchors     (present)
+ *   [data-tab-action="close"]               the tab × control   (present)
+ *   .repository-pane / .account-pane        the panes           (present)
+ *   [data-location]                         the location bar    (present)
+ * `.breadcrumb` and `[data-tab-action]`-less `.tab-close` spellings the old
+ * file also tried do not exist, and `.account-pane` is in the DOM but NOT
+ * visible while another pane is in front -- so it is asserted attached, not
+ * visible, which is the distinction the old guards silently blurred.
  */
 
 const CAPTURE_ENABLED = process.env.CAPTURE_DOCS === 'true';
+const ACCOUNT = process.env.JSUI_ACCOUNT || 'playwright';
+const REPOSITORY = process.env.JSUI_REPOSITORY || 'test';
+const BASE = (process.env.JSUI_ORIGIN || 'https://dydra.com');
 
 test.describe('Navigation', () => {
 
-  // ============================================================
-  // REQ-5.1.1: Client-Side Routing
-  // ============================================================
-  async function REQ_5_1_1_clientSideRouting(page, capture) {
-    await capture.requirement(REQ['5.1.1'], async (cap) => {
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
+  const tab = (page, type) => page.locator(`[data-tab-type="${type}"]`).first();
+  const repoPaneId = `#tab-repository-${ACCOUNT}-${REPOSITORY}`;
 
-      // Capture: Initial page state
-      await cap.before('Initial page with account loaded');
-
-      const accountTab = page.locator('[data-tab-type="account"]').first();
-      const accountPane = page.locator('.account-pane').first();
-
-      // Click account tab if visible, otherwise we're already on account page
-      if (await accountTab.isVisible({ timeout: 3000 }).catch(() => false)) {
-        await accountTab.click();
-        await waitForNetworkIdle(page);
-      }
-
-      const url1 = page.url();
-      // URL should contain account name or be on user page
-      const hasAccount = url1.includes('/playwright') || url1.includes('/user');
-
-      // Capture: URL after navigation
-      await cap.step('account-route', 'URL reflects account route');
-
-      // Open repository
-      await openRepository(page, 'playwright', 'test');
-      await page.waitForTimeout(500);
-
-      const url2 = page.url();
-
-      // Capture: Repository route
-      await cap.after('URL updated to reflect repository route');
-    });
-  }
-
-  // ============================================================
-  // REQ-5.1.2: Browser Back/Forward
-  // ============================================================
-  async function REQ_5_1_2_browserBackForward(page, capture) {
-    await capture.requirement(REQ['5.1.2'], async (cap) => {
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
-
-      const accountPane = page.locator('.account-pane');
-      const paneVisible = await accountPane.isVisible({ timeout: 5000 }).catch(() => false);
-      const initialUrl = page.url();
-
-      // Open repository
-      await openRepository(page, 'playwright', 'test');
-      await page.waitForTimeout(500);
-      const repoUrl = page.url();
-
-      // Capture: Before back navigation
-      await cap.before('Repository page before back navigation');
-
-      // Go back
-      await page.goBack();
-      await waitForNetworkIdle(page);
-      await page.waitForTimeout(500);
-
-      // Capture: After back
-      await cap.step('after-back', 'Page after browser back button');
-
-      // Go forward
-      await page.goForward();
-      await waitForNetworkIdle(page);
-      await page.waitForTimeout(500);
-
-      // Capture: After forward
-      await cap.after('Page after browser forward button');
-    });
-  }
-
-  // ============================================================
-  // REQ-5.2.4: Location Bar Display
-  // ============================================================
-  async function REQ_5_2_4_locationBarDisplay(page, capture) {
-    await capture.requirement(REQ['5.2.4'], async (cap) => {
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
-
-      const accountPane = page.locator('.account-pane');
-      const paneVisible = await accountPane.isVisible({ timeout: 5000 }).catch(() => false);
-
-      const locationBar = page.locator('.location-bar, .breadcrumb, [data-location]').first();
-
-      // Capture: Location bar showing account (or URL bar)
-      await cap.before('Location bar showing current account path');
-
-      // Open repository
-      await openRepository(page, 'playwright', 'test');
-      await page.waitForTimeout(500);
-
-      // Capture: Location bar showing repository
-      await cap.after('Location bar updated to show repository path');
-    });
-  }
-
-  // ============================================================
-  // REQ-5.2.5: Tabbed Interface
-  // ============================================================
-  async function REQ_5_2_5_tabbedInterface(page, capture) {
-    await capture.requirement(REQ['5.2.5'], async (cap) => {
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
-
-      const accountTab = page.locator('[data-tab-type="account"]').first();
-      const tabVisible = await accountTab.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Capture: Account tab visible
-      await cap.before('Tab bar with account tab');
-
-      // Open repository to create another tab
-      await openRepository(page, 'playwright', 'test');
-      await page.waitForTimeout(500);
-
-      const repoTab = page.locator('[data-tab-type="repository"]').first();
-      const repoTabVisible = await repoTab.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Capture: Multiple tabs
-      await cap.step('multiple-tabs', 'Tab bar with account and repository tabs');
-
-      // Switch between tabs if both are visible
-      if (tabVisible && repoTabVisible) {
-        await accountTab.click();
-        await waitForNetworkIdle(page);
-        await page.waitForTimeout(300);
-
-        await repoTab.click();
-        await waitForNetworkIdle(page);
-        await page.waitForTimeout(300);
-      }
-
-      // Capture: Tab switching
-      await cap.after('Content area updated after tab switch');
-    });
-  }
-
-  // ============================================================
-  // REQ-6.3.1: Tab Management
-  // ============================================================
-  async function REQ_6_3_1_tabManagement(page, capture) {
-    await capture.requirement(REQ['6.3.1'], async (cap) => {
-      await page.waitForLoadState('networkidle');
-      await page.waitForTimeout(1000);
-
-      const accountTab = page.locator('[data-tab-type="account"]').first();
-      const tabVisible = await accountTab.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Open repository
-      await openRepository(page, 'playwright', 'test');
-      await page.waitForTimeout(500);
-
-      const repoTab = page.locator('[data-tab-type="repository"]').first();
-      const repoTabVisible = await repoTab.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Capture: Tabs displayed
-      await cap.before('Multiple tabs in tab bar');
-
-      // Click account tab if visible
-      if (tabVisible) {
-        await accountTab.click();
-        await waitForNetworkIdle(page);
-        await page.waitForTimeout(300);
-      }
-
-      // Capture: After tab switch
-      await cap.after('Active tab changed, content updated');
-    });
-  }
-
-  // ============================================================
-  // REQ-6.3.2: Close Tabs
-  // ============================================================
-  async function REQ_6_3_2_closeTabs(page, capture) {
-    await capture.requirement(REQ['6.3.2'], async (cap) => {
-      // Open repository
-      await openRepository(page, 'playwright', 'test');
-      await page.waitForTimeout(500);
-
-      const repoTab = page.locator('[data-tab-type="repository"]').first();
-      const repoTabVisible = await repoTab.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Capture: Tab with close button
-      await cap.before('Repository tab with close button');
-
-      const closeBtn = page.locator('[data-tab-type="repository"] .tab-close, [data-tab-action="close"]').first();
-      if (await closeBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await closeBtn.click();
-        await waitForNetworkIdle(page);
-        await page.waitForTimeout(300);
-      }
-
-      // Capture: Tab closed (or state after attempt)
-      await cap.after('Tab closed, removed from tab bar');
-    });
-  }
-
-  // ============================================================
-  // Combined Tests
-  // ============================================================
-
+  // ── REQ-5.1.1 ───────────────────────────────────────────────────────────────
   test('client-side routing [REQ-5.1.1]', async ({ page }) => {
-    test.setTimeout(20000); // Shorter timeout
     const capture = new DocCapture(page, 'tests/pdfs/navigation', { enabled: CAPTURE_ENABLED });
-
     await login(page);
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
 
-    try {
-      await REQ_5_1_1_clientSideRouting(page, capture);
-    } catch (e) {
-      console.log('Routing test note:', e.message);
-    }
+    await capture.requirement(REQ['5.1.1'], async (cap) => {
+      await cap.before('Application after login');
+      // Routing is client-side: opening a repository must not reload the
+      // document.  A reload would reset this counter, since the app sets it on
+      // the window object it is running in.
+      await page.evaluate(() => { window.__navProbe = 'alive'; });
+      await openRepository(page, ACCOUNT, REPOSITORY);
+      await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 15000 });
+      expect(await page.evaluate(() => window.__navProbe),
+             'opening a repository must not reload the document').toBe('alive');
+      await cap.after('Repository pane opened without a page load');
+    });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-5.1.2 ───────────────────────────────────────────────────────────────
+  // REQ-5.1.2 IS UNDER REVIEW -- the requirement may be wrong for this UI, not
+  // merely unimplemented, and the earlier note here overstated it as a defect.
+  //
+  // This is a single page whose panes accumulate on a canvas: opening a
+  // repository does not replace the account, it puts another pane in front of
+  // it.  "Back" in the page-navigation sense has nothing to undo, because
+  // nothing was replaced.  What the router actually implements is narrower and
+  // does fit: goBack() re-runs the PREVIOUS route's handler, which brings that
+  // pane to the front again -- a pane-activation history.  It never closes
+  // anything.  So the assertion below is "the previous pane comes forward", not
+  // "the current pane disappears", which is what this test used to claim.
+  //
+  // Two things are true at once:
+  //   - the mechanism exists: Router.historyStack + goBack/goForward, with
+  //     updatePaneNav() enabling [data-action="nav-back"]/"nav-forward";
+  //   - no such control is rendered anywhere (measured: 0 in the DOM), and
+  //     updateLocation:false means the BROWSER's buttons are deliberately never
+  //     driven either.
+  // So nothing can exercise it, by either route, and whether anything should is
+  // a product question: either expose the two controls and call the requirement
+  // "pane activation history", or retire REQ-5.1.2 and delete this test.
+  // test.fail() holds the question open without pretending either way.
   test('browser back/forward [REQ-5.1.2]', async ({ page }) => {
+    test.fail();   // see the note above
     const capture = new DocCapture(page, 'tests/pdfs/navigation', { enabled: CAPTURE_ENABLED });
-
     await login(page);
+    await openRepository(page, ACCOUNT, REPOSITORY);
+    await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 15000 });
 
-    await REQ_5_1_2_browserBackForward(page, capture);
+    await capture.requirement(REQ['5.1.2'], async (cap) => {
+      await cap.before('Repository open, before going back');
+      // Back/Forward are the APP's, not the browser's.  app.js constructs the
+      // Router with updateLocation:false, so nothing is ever pushed onto the
+      // browser history: the router keeps its own historyStack and the UI drives
+      // it through [data-action="nav-back"] / "nav-forward" (ui/app.js:358).
+      // page.goBack() therefore leaves the application altogether, which is why
+      // asserting on it could only ever have failed -- and did, until this test
+      // was pointed at the mechanism that actually exists.
+      await page.locator('[data-action="nav-back"]').first().click();
+      // The ACCOUNT pane comes forward; the repository pane is not closed, and
+      // asserting that it vanishes would be asserting the wrong model.
+      await expect(page.locator(`#tab-account-${ACCOUNT}`).first(),
+                   'Back should bring the previous pane forward').toBeVisible({ timeout: 15000 });
+      await cap.step('back', 'After Back');
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+      await page.locator('[data-action="nav-forward"]').first().click();
+      await expect(page.locator(repoPaneId),
+                   'Forward should bring the repository pane forward again').toBeVisible({ timeout: 15000 });
+      await cap.after('After Forward');
+    });
+
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-6.3.1 / REQ-6.3.2 ───────────────────────────────────────────────────
   test('tab management [REQ-6.3.1, REQ-6.3.2]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/navigation', { enabled: CAPTURE_ENABLED });
-
     await login(page);
+    await openRepository(page, ACCOUNT, REPOSITORY);
 
-    await REQ_6_3_1_tabManagement(page, capture);
+    await capture.requirement(REQ['6.3.1'], async (cap) => {
+      await cap.before('Tabs for account and repository');
+      await expect(tab(page, 'account'), 'an account tab should exist').toBeVisible();
+      await expect(tab(page, 'repository'), 'a repository tab should exist').toBeVisible();
+      await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 15000 });
+      await cap.after('Both tabs present, repository active');
+    });
 
-    // Close and reopen for close test
-    await page.goto('https://dydra.com/ui/user');
-    await login(page);
+    await capture.requirement(REQ['6.3.2'], async (cap) => {
+      await cap.before('Repository tab before closing');
+      const before = await page.locator('[data-tab-link]').count();
+      await page.locator(`[data-tab-action="close"][data-repository="${REPOSITORY}"]`).first().click();
+      await expect(page.locator(repoPaneId),
+                   'closing a tab should remove its pane').toBeHidden({ timeout: 15000 });
+      expect(await page.locator('[data-tab-link]').count(),
+             'closing a tab should remove exactly one tab').toBe(before - 1);
+      await cap.after('Repository tab closed');
+    });
 
-    await REQ_6_3_2_closeTabs(page, capture);
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-5.2.4 ───────────────────────────────────────────────────────────────
   test('location bar display [REQ-5.2.4]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/navigation', { enabled: CAPTURE_ENABLED });
-
     await login(page);
 
-    await REQ_5_2_4_locationBarDisplay(page, capture);
+    await capture.requirement(REQ['5.2.4'], async (cap) => {
+      await cap.before('Location bar after login');
+      const bar = page.locator('[data-location]').last();
+      await expect(bar, 'a location bar should be shown').toBeVisible();
+      await openRepository(page, ACCOUNT, REPOSITORY);
+      await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 15000 });
+      // It is a LOCATION bar: opening the repository must be reflected in it.
+      await expect(bar, 'the location bar should name the open repository')
+        .toContainText(REPOSITORY, { timeout: 15000 });
+      await cap.after('Location bar showing the repository');
+    });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-5.2.5 ───────────────────────────────────────────────────────────────
   test('tabbed interface [REQ-5.2.5]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/navigation', { enabled: CAPTURE_ENABLED });
-
     await login(page);
-
-    await REQ_5_2_5_tabbedInterface(page, capture);
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
-  });
-
-  test('direct URL navigation [REQ-5.1.1]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/navigation', { enabled: CAPTURE_ENABLED });
-
-    await capture.requirement(REQ['5.1.1'], async (cap) => {
-      await login(page);
-      await page.waitForTimeout(1000);
-
-      // Capture: Before direct navigation
-      await cap.before('Application before direct URL navigation');
-
-      // Navigate directly to repository URL
-      await page.goto('https://dydra.com/playwright/test');
-      await waitForNetworkIdle(page);
-      await page.waitForTimeout(1000);
-
-      // Capture: After direct navigation
-      await cap.after('Page loaded from direct URL');
-
-      // Any response is acceptable - we're testing that navigation works
-    });
-
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
-  });
-
-  test('navigation between account and repositories [REQ-5.2.5]', async ({ page }) => {
-    const capture = new DocCapture(page, 'tests/pdfs/navigation', { enabled: CAPTURE_ENABLED });
-
-    await login(page);
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(1000);
+    await openRepository(page, ACCOUNT, REPOSITORY);
 
     await capture.requirement(REQ['5.2.5'], async (cap) => {
-      const accountPane = page.locator('.account-pane');
-      const paneVisible = await accountPane.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Capture: At account
-      await cap.before('Account pane displayed');
-
-      // Open repository
-      await openRepository(page, 'playwright', 'test');
-      await page.waitForTimeout(500);
-
-      const repoPane = page.locator('.repository-pane');
-      const repoVisible = await repoPane.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Capture: At repository
-      await cap.step('at-repository', 'Repository pane displayed');
-
-      // Go back to account
-      const accountLink = page.locator('[data-tab-type="account"], a:has-text("playwright")').first();
-      if (await accountLink.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await accountLink.click();
-        await waitForNetworkIdle(page);
-        await page.waitForTimeout(500);
-      }
-
-      // Capture: Back at account
-      await cap.after('Account pane displayed after navigation');
+      await cap.before('Tabbed interface');
+      const links = page.locator('[data-tab-link]');
+      expect(await links.count(), 'login, account and repository tabs').toBeGreaterThanOrEqual(3);
+      await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 15000 });
+      // Exactly one pane is in front at a time: the account pane is still in the
+      // DOM behind the repository pane, which is why it is checked attached.
+      await expect(page.locator(`#tab-account-${ACCOUNT}`).first()).toBeAttached();
+      await expect(page.locator(`#tab-account-${ACCOUNT}`).first()).toBeHidden();
+      await cap.after('Repository pane in front, account pane behind');
     });
 
-    await capture.writeManifest();
-    await capture.writeIndex();
-    await page.close();
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
   });
 
+  // ── REQ-5.1.1 direct URL ────────────────────────────────────────────────────
+  test('direct URL navigation [REQ-5.1.1]', async ({ page }) => {
+    const capture = new DocCapture(page, 'tests/pdfs/navigation', { enabled: CAPTURE_ENABLED });
+    await login(page);
+
+    await capture.requirement(REQ['5.1.1'], async (cap) => {
+      await cap.before('Before direct navigation');
+      await page.goto(`${BASE}/${ACCOUNT}/${REPOSITORY}`);
+      await page.waitForLoadState('domcontentloaded');
+      await page.waitForTimeout(2000);
+      // A direct URL must resolve to the repository, not to a 404 shell.  Note
+      // that a full page load drops the in-memory AuthStore, so this asserts the
+      // route resolved, not that the session survived.
+      await expect(page.locator('body'), 'the app should render').not.toBeEmpty();
+      expect(page.url(), 'the repository URL should be reachable directly').toContain(REPOSITORY);
+      await cap.after('Direct URL navigation resolved');
+    });
+
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
+  });
+
+  // ── REQ-5.2.5 account <-> repositories ──────────────────────────────────────
+  // KNOWN DEFECT, same treatment.  Measured: while the repository pane is in
+  // front, clicking the account tab leaves NEITHER pane visible -- the account
+  // pane stays hidden and the repository pane is hidden too, so the user is left
+  // facing an empty frame.  Related, and probably the cause: #tab-account-<name>
+  // exists TWICE in the DOM (two div.account-pane with the same id, which is
+  // invalid HTML), and one of the two is discarded on that click.
+  test('navigation between account and repositories [REQ-5.2.5]', async ({ page }) => {
+    test.fail();   // see the note above
+    const capture = new DocCapture(page, 'tests/pdfs/navigation', { enabled: CAPTURE_ENABLED });
+    await login(page);
+
+    await capture.requirement(REQ['5.2.5'], async (cap) => {
+      await cap.before('Account pane after login');
+      await expect(page.locator(`#tab-account-${ACCOUNT}`).first()).toBeAttached({ timeout: 15000 });
+
+      await openRepository(page, ACCOUNT, REPOSITORY);
+      await expect(page.locator(repoPaneId),
+                   'the repository pane should come forward').toBeVisible({ timeout: 15000 });
+      await cap.step('repository', 'Repository pane in front');
+
+      await tab(page, 'account').click();
+      await expect(page.locator(`#tab-account-${ACCOUNT}`).first(),
+                   'clicking the account tab should bring it back').toBeVisible({ timeout: 15000 });
+      await cap.after('Account pane in front again');
+    });
+
+    await capture.writeManifest(); await capture.writeIndex(); await page.close();
+  });
 });

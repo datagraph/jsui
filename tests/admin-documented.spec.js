@@ -40,35 +40,48 @@ async function saveManualImage(page, name) {
 
 /** Click a dashboard tab and wait briefly for its panel to render. */
 async function clickTab(page, panelId) {
+  // Asserted, not guarded.  This is the backbone of nearly every admin test: if
+  // a tab is missing the old version returned quietly and the test carried on to
+  // make its captures of whatever happened to be on screen.
   const link = page.locator(`[data-tab-link][href="#${panelId}"]`);
-  if (await link.isVisible({ timeout: 3000 }).catch(() => false)) {
-    await link.click();
-    await page.waitForTimeout(1500);
-  }
+  await expect(link, `the ${panelId} tab should be offered`).toBeVisible({ timeout: 10000 });
+  await link.click();
+  await expect(page.locator(`#${panelId}`), `${panelId} should open`).toBeVisible({ timeout: 15000 });
+  await page.waitForTimeout(800);
 }
 
 /** Click the graph sub-tab within whichever history panel is active. */
-async function clickGraphSubTab(page) {
-  const btn = page.locator('[data-history-tab="graph"]').first();
-  if (await btn.isVisible({ timeout: 3000 }).catch(() => false)) {
-    await btn.click();
-    await page.waitForTimeout(800);
-    return true;
-  }
-  return false;
+async function clickGraphSubTab(page, panelId) {
+  // Scoped to the panel.  An unscoped `[data-history-tab="graph"]`.first() picks
+  // the QUERY-history pane's button -- it comes first in the DOM -- which is
+  // hidden whenever another history pane is in front, so the click reports the
+  // wrong panel as having no graph.
+  const btn = page.locator(`#${panelId} [data-history-tab="graph"]`).first();
+  await expect(btn, `${panelId} should offer a graph view`).toBeVisible({ timeout: 10000 });
+  await btn.click();
+  await page.waitForTimeout(800);
+  return true;
 }
 
 /** Wait for a pane to contain something other than the Loading placeholder. */
 async function waitForPaneLoaded(page, panelId) {
+  // No .catch(() => {}) here: a pane that never finishes loading is the failure
+  // this helper exists to detect, and swallowing the timeout turned every pane
+  // test into a screenshot of a spinner.
   await page.waitForFunction(
     (id) => {
       const el = document.getElementById(id);
       return el && el.dataset.loaded === 'true';
     },
     panelId,
-    { timeout: 12000 }
-  ).catch(() => {});
+    { timeout: 20000 }
+  );
   await page.waitForTimeout(400);
+  // `loaded` only means the pane's render finished -- an error stub sets it too,
+  // so a pane reading "Error loading ...: 500" counted as loaded and every
+  // assertion below it was made against an error message.
+  await expect(page.locator(`#${panelId}`),
+               `${panelId} should load its data, not an error`).not.toContainText(/Error loading|Error:/);
 }
 
 /** Accept browser confirm() dialogs automatically for the duration of fn(). */
@@ -160,11 +173,9 @@ async function REQ_A_2_1_dashboardNavigation(page, capture) {
 async function REQ_A_2_2_locationBar(page, capture) {
   await capture.requirement(REQ['A.2.2'], async (cap) => {
     const bar = page.locator('#location-bar');
-    if (!await bar.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await cap.before('Location bar not visible — skipped');
-      await cap.after('Skipped');
-      return;
-    }
+    // Asserted, not skipped: the old block captured a "skipped" screenshot
+    // and returned, so the requirement below it never ran.
+    await expect(bar, 'this control should be present').toBeVisible({ timeout: 3000 });
 
     await cap.before('Location bar displaying current route');
 
@@ -213,11 +224,9 @@ async function REQ_A_3_2_accountDetails(page, capture) {
       ? ownDetails
       : anyDetails;
 
-    if (!await link.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await cap.before('No Details links available — skipped');
-      await cap.after('Skipped');
-      return;
-    }
+    // Asserted, not skipped: the old block captured a "skipped" screenshot
+    // and returned, so the requirement below it never ran.
+    await expect(link, 'this control should be present').toBeVisible({ timeout: 3000 });
 
     await cap.before('Accounts list before opening details dialog');
     await link.click();
@@ -241,11 +250,9 @@ async function REQ_A_3_3_createAccount(page, capture) {
 
   await capture.requirement(REQ['A.3.3'], async (cap) => {
     const newBtn = page.getByTestId('admin-new-account-btn');
-    if (!await newBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await cap.before('New Account button not available (operator session)');
-      await cap.after('Skipped');
-      return null;
-    }
+    // Asserted: the test.skip() above already established that this session
+    // is an administrator, so the control must be here.
+    await expect(newBtn, 'the New control should be present').toBeVisible({ timeout: 3000 });
 
     await cap.before('Accounts list before creating new account');
     await newBtn.click();
@@ -268,11 +275,9 @@ async function REQ_A_3_3_createAccount(page, capture) {
 async function REQ_A_3_4_deleteAccount(page, capture, accountName) {
   await capture.requirement(REQ['A.3.4'], async (cap) => {
     const deleteBtn = page.getByTestId(`admin-account-delete-btn-${accountName}`);
-    if (!await deleteBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await cap.before('Delete button not visible — skipped');
-      await cap.after('Skipped');
-      return;
-    }
+    // Asserted, not skipped: the old block captured a "skipped" screenshot
+    // and returned, so the requirement below it never ran.
+    await expect(deleteBtn, 'this control should be present').toBeVisible({ timeout: 5000 });
 
     await cap.before('Accounts list before deletion');
 
@@ -323,11 +328,9 @@ async function REQ_A_4_2_createRepository(page, capture, accountName) {
 
   await capture.requirement(REQ['A.4.2'], async (cap) => {
     const newBtn = page.getByTestId('admin-new-repo-btn');
-    if (!await newBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await cap.before('New Repository button not available (operator session)');
-      await cap.after('Skipped');
-      return null;
-    }
+    // Asserted: the test.skip() above already established that this session
+    // is an administrator, so the control must be here.
+    await expect(newBtn, 'the New control should be present').toBeVisible({ timeout: 3000 });
 
     await cap.before('Repositories list before creating new repository');
     await newBtn.click();
@@ -361,11 +364,9 @@ async function REQ_A_4_2_createRepository(page, capture, accountName) {
 async function REQ_A_4_3_deleteRepository(page, capture, accountName, repoName) {
   await capture.requirement(REQ['A.4.3'], async (cap) => {
     const deleteBtn = page.getByTestId(`admin-repo-delete-btn-${accountName}-${repoName}`);
-    if (!await deleteBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await cap.before('Delete button not visible — skipped');
-      await cap.after('Skipped');
-      return;
-    }
+    // Asserted, not skipped: the old block captured a "skipped" screenshot
+    // and returned, so the requirement below it never ran.
+    await expect(deleteBtn, 'this control should be present').toBeVisible({ timeout: 5000 });
 
     await cap.before('Repositories list before deletion');
 
@@ -403,11 +404,9 @@ async function REQ_A_5_2_createInvitation(page, capture) {
 
   await capture.requirement(REQ['A.5.2'], async (cap) => {
     const newBtn = page.getByTestId('admin-new-invite-btn');
-    if (!await newBtn.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await cap.before('New Invitation button not available (operator session)');
-      await cap.after('Skipped');
-      return null;
-    }
+    // Asserted: the test.skip() above already established that this session
+    // is an administrator, so the control must be here.
+    await expect(newBtn, 'the New control should be present').toBeVisible({ timeout: 3000 });
 
     await cap.before('Invitations list before creating new invitation');
     await newBtn.click();
@@ -432,11 +431,9 @@ async function REQ_A_5_2_createInvitation(page, capture) {
 async function REQ_A_5_3_deleteInvitation(page, capture, email) {
   await capture.requirement(REQ['A.5.3'], async (cap) => {
     const deleteLink = page.locator(`.invite-delete[data-email="${email}"]`);
-    if (!await deleteLink.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await cap.before('Invite-delete link not found — skipped');
-      await cap.after('Skipped');
-      return;
-    }
+    // Asserted, not skipped: the old block captured a "skipped" screenshot
+    // and returned, so the requirement below it never ran.
+    await expect(deleteLink, 'this control should be present').toBeVisible({ timeout: 5000 });
 
     await cap.before('Invitations list before deletion');
 
@@ -467,7 +464,7 @@ async function REQ_A_6_2_queryHistoryGraph(page, capture) {
   await capture.requirement(REQ['A.6.2'], async (cap) => {
     await cap.before('Query history table view');
 
-    const switched = await clickGraphSubTab(page);
+    const switched = await clickGraphSubTab(page, 'admin-query-history');
     if (switched) {
       await cap.after('Query history graph displayed');
       await saveManualImage(page, 'admin-query-history-graph.png');
@@ -509,7 +506,7 @@ async function REQ_A_6_5_importHistoryGraph(page, capture) {
   await capture.requirement(REQ['A.6.5'], async (cap) => {
     await cap.before('Import history table view');
 
-    const switched = await clickGraphSubTab(page);
+    const switched = await clickGraphSubTab(page, 'admin-import-history');
     if (switched) {
       await cap.after('Import history graph displayed');
       await saveManualImage(page, 'admin-import-history-graph.png');
@@ -531,8 +528,10 @@ test.describe('Admin Console', () => {
     await REQ_A_1_1_adminLogin(page, capture);
 
     const dashboard = page.locator('#admin-accounts, #admin-tabs');
-    const loaded = await dashboard.first().isVisible({ timeout: 8000 }).catch(() => false);
-    if (!loaded) console.log('Login note: dashboard elements not detected after login');
+    // Asserted: this used to be a console.log, so a login that silently failed
+    // to produce a dashboard still passed.
+    await expect(dashboard.first(),
+                 'the admin dashboard should load after login').toBeVisible({ timeout: 15000 });
 
     await capture.writeManifest();
     await capture.writeIndex();
@@ -601,6 +600,14 @@ test.describe('Admin Console', () => {
   test('create and delete account [REQ-A.3.3, REQ-A.3.4]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/admin', { enabled: CAPTURE_ENABLED });
     await adminLogin(page, ADMIN_USERNAME, ADMIN_PASSWORD);
+    // These three requirements need an ADMINISTRATOR.  ui/admin/pages.js renders
+    // the New controls as `${isAdmin ? ... : ""}`, and the test account is not an
+    // admin, so the control is absent -- not broken.  Measured: no
+    // pw-admin-test-* account was ever created by the old suite's runs, because
+    // its guard skipped the whole flow and reported a pass.  A stated skip says
+    // what a silent pass could not: this is unverified, and why.
+    test.skip(!(await page.getByTestId('admin-new-account-btn').isVisible().catch(() => false)),
+              'requires an administrator account (the New control is rendered only when isAdmin)');
     await waitForPaneLoaded(page, 'admin-accounts');
     await page.waitForSelector('#admin-accounts table', { timeout: 10000 }).catch(() => {});
 
@@ -630,6 +637,14 @@ test.describe('Admin Console', () => {
   test('create and delete repository [REQ-A.4.2, REQ-A.4.3]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/admin', { enabled: CAPTURE_ENABLED });
     await adminLogin(page, ADMIN_USERNAME, ADMIN_PASSWORD);
+    // These three requirements need an ADMINISTRATOR.  ui/admin/pages.js renders
+    // the New controls as `${isAdmin ? ... : ""}`, and the test account is not an
+    // admin, so the control is absent -- not broken.  Measured: no
+    // pw-admin-test-* account was ever created by the old suite's runs, because
+    // its guard skipped the whole flow and reported a pass.  A stated skip says
+    // what a silent pass could not: this is unverified, and why.
+    test.skip(!(await page.getByTestId('admin-new-repo-btn').isVisible().catch(() => false)),
+              'requires an administrator account (the New control is rendered only when isAdmin)');
     await waitForPaneLoaded(page, 'admin-accounts');
 
     // Ensure our account is checked and the Repositories tab is loaded
@@ -665,6 +680,14 @@ test.describe('Admin Console', () => {
   test('create and delete invitation [REQ-A.5.2, REQ-A.5.3]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/admin', { enabled: CAPTURE_ENABLED });
     await adminLogin(page, ADMIN_USERNAME, ADMIN_PASSWORD);
+    // These three requirements need an ADMINISTRATOR.  ui/admin/pages.js renders
+    // the New controls as `${isAdmin ? ... : ""}`, and the test account is not an
+    // admin, so the control is absent -- not broken.  Measured: no
+    // pw-admin-test-* account was ever created by the old suite's runs, because
+    // its guard skipped the whole flow and reported a pass.  A stated skip says
+    // what a silent pass could not: this is unverified, and why.
+    test.skip(!(await page.getByTestId('admin-new-invite-btn').isVisible().catch(() => false)),
+              'requires an administrator account (the New control is rendered only when isAdmin)');
     await clickTab(page, 'admin-invitations');
     await waitForPaneLoaded(page, 'admin-invitations');
 
@@ -708,6 +731,11 @@ test.describe('Admin Console', () => {
   test('transaction history [REQ-A.6.3]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/admin', { enabled: CAPTURE_ENABLED });
     await adminLogin(page, ADMIN_USERNAME, ADMIN_PASSWORD);
+    // Measured: this pane reports "Error loading transactions: 401" for a
+    // non-administrator -- a permission boundary, not a defect -- so it is
+    // skipped on the same ground as the create/delete tests rather than failed.
+    test.skip(!(await page.getByTestId('admin-new-account-btn').isVisible().catch(() => false)),
+              'requires an administrator account (the transactions endpoint answers 401 otherwise)');
 
     await REQ_A_6_3_transactionHistory(page, capture);
 
@@ -716,9 +744,35 @@ test.describe('Admin Console', () => {
   });
 
   // ============================================================
+  // The graph view IS implemented: renderImportHistoryPane plots quad_count
+  // against timestamp on a log scale and renders the table/graph switch
+  // unconditionally (ui/admin/pages.js:1022-1087).  An earlier note here claimed
+  // it was missing; that was wrong -- clickGraphSubTab searched the whole page
+  // and kept finding the QUERY pane's button, hidden behind the active pane.
+  //
+  // This is ADMIN-ONLY, like transaction history.  The handler's first branch is
+  //     (cond ((not (dydra:administrator-p (http:request-agent request)))
+  //            (http:not-found))   ; not unauthorized
+  // so a non-administrator is meant to get a 404 that discloses nothing.  What
+  // the test account actually receives is a 500 -- the 404 fails while being
+  // produced:
+  //   [NO-APPLICABLE-METHOD-ERROR] #<STANDARD-GENERIC-FUNCTION PURI:URI (5)>
+  //   when called with (<http://dydra.com/system/service_history/imports>)
+  // -- and the pane renders "Error loading import history: 500".  That
+  // 500-instead-of-404 is a real but separate fault, and it is the reason this
+  // test cannot simply be skipped on a clean refusal the way transaction history
+  // is.
+  //
+  // So: skipped on the same administrator ground as its siblings.  Reinstate the
+  // assertions once an admin session is available, and raise the
+  // 500-instead-of-404 separately -- it affects every non-admin caller of this
+  // endpoint, not just the tests.
   test('import history table and graph [REQ-A.6.4, REQ-A.6.5]', async ({ page }) => {
+    test.fail();   // see the note above
     const capture = new DocCapture(page, 'tests/pdfs/admin', { enabled: CAPTURE_ENABLED });
     await adminLogin(page, ADMIN_USERNAME, ADMIN_PASSWORD);
+    test.skip(!(await page.getByTestId('admin-new-account-btn').isVisible().catch(() => false)),
+              'requires an administrator account (the endpoint answers non-admins with a 404 that currently 500s)');
 
     await REQ_A_6_4_importHistoryTable(page, capture);
     await REQ_A_6_5_importHistoryGraph(page, capture);

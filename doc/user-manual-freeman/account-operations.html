@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: Account Management - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 2: Account Management</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="login.html">← Previous: Chapter 1</a>
+            <a href="repository-operations.html">Next: Chapter 3 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>2.1 The Story the System Tells About You</h2>
+            <p>Your account is, in a sense, the story the system tells about you. It holds your name, your email address, the repositories you have built over time, and the credentials that let you work with them. It is worth knowing what is in there — and knowing how to change it when you need to.</p>
+
+            <p>An account in Dydra is your identity within the system. It is the name by which others know you, the address at which notifications find you, and the container that holds everything you have created here.</p>
+
+            <h2>2.2 What You Will See</h2>
+            <p>When you navigate to your account view, the system presents you with a picture of who you are within Dydra:</p>
+            <ul>
+                <li>Your username — the unique name you chose when you joined</li>
+                <li>Your email address, where system notifications are sent</li>
+                <li>Your full name, as it appears to others</li>
+                <li>A homepage URL and blog URL, if you care to share them</li>
+                <li>Your company and geographic location</li>
+                <li>The list of repositories that belong to you</li>
+            </ul>
+
+            <h2>2.3 What You Can Change</h2>
+            <p>Most of what is in your account can be updated whenever you like. Here is the full list of fields that are yours to edit:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>What It Holds</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>firstname</code></td><td>Your given name</td></tr>
+                    <tr><td><code>familyname</code></td><td>Your surname</td></tr>
+                    <tr><td><code>fullname</code></td><td>Your full name as a single string</td></tr>
+                    <tr><td><code>email</code></td><td>Your email address</td></tr>
+                    <tr><td><code>homepage</code></td><td>Your personal website</td></tr>
+                    <tr><td><code>blog</code></td><td>Your blog, if you have one</td></tr>
+                    <tr><td><code>company</code></td><td>Where you work</td></tr>
+                    <tr><td><code>location</code></td><td>Where in the world you are</td></tr>
+                    <tr><td><code>phone</code></td><td>A phone number</td></tr>
+                    <tr><td><code>skype_id</code></td><td>Your Skype handle</td></tr>
+                    <tr><td><code>jabber_id</code></td><td>Your XMPP address</td></tr>
+                    <tr><td><code>workinfo</code></td><td>A note about your professional context</td></tr>
+                </tbody>
+            </table>
+
+            <h2>2.4 Updating a Field</h2>
+            <p>Editing your account information is designed to be quick and direct. Here is the flow:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Navigate to your account view by clicking your account name in the interface.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the field you want to change in the profile section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Double-click on the current value. It will transform into an editable input, ready for you.
+            </div>
+
+            <div class="float-right">
+            <img src="../user-manual-knuth/images/account-metadata-editing.png" alt="Editing a field">
+            <p class="image-caption">Figure 2.1: A field open for editing after a double-click.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Type your new value.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Press Enter, or click somewhere else on the page, to confirm the change.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                When you are happy with your edits, press the <strong>Save</strong> button. That is the moment your changes are sent to the server and made permanent.
+            </div>
+
+            <div class="float-left">
+            <img src="../user-manual-knuth/images/account-save-button.png" alt="Save button">
+            <p class="image-caption">Figure 2.2: The Save button in the tab bar.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="note">
+                <strong>A thoughtful detail:</strong> The application is smart about what it sends to the server. It only transmits the fields you actually changed — not everything. This is efficient, and it means there is less chance of a conflict if someone else is making changes at the same time.
+            </div>
+
+            <div class="warning">
+                <strong>Do not forget to save:</strong> Until you press that Save button, your edits exist only in the browser. Navigate away without saving, and they are gone. It is a simple habit to build: change things, then save.
+            </div>
+
+            <h2>2.5 Your Authentication Token</h2>
+            <p>Every account comes with an authentication token — a long, unique string of characters that serves as an alternative to your password. Where passwords are for people, tokens are for programs. If you write scripts that interact with Dydra's API, this is the credential you will use.</p>
+
+            <h3>2.5.1 Finding Your Token</h3>
+            <ol>
+                <li>Go to your account view</li>
+                <li>Scroll to the Token section</li>
+                <li>There it is — copy it and keep it somewhere safe</li>
+            </ol>
+
+            <h3>2.5.2 Generating a New Token</h3>
+            <p>If you have reason to think your token has been compromised — or if your security policy calls for regular rotation — you can generate a fresh one:</p>
+            <ol>
+                <li>Navigate to the Token section in your account view</li>
+                <li>Click <strong>Reset Token</strong></li>
+                <li>A new token appears immediately</li>
+                <li>Update any scripts or services that were using the old token — they will need the new one from this point on</li>
+            </ol>
+
+            <div class="float-right">
+            <img src="../user-manual-knuth/images/account-token-reset.png" alt="Token reset">
+            <p class="image-caption">Figure 2.3: The token reset control.</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="warning">
+                <strong>Treat your token like a key:</strong> Anyone who has your token has the same access to your account that your password provides. Keep it private. If you suspect it has fallen into the wrong hands, reset it right away.
+            </div>
+
+            <h2>2.6 Getting to Your Repositories</h2>
+            <p>From your account view, you can reach everything that belongs to you:</p>
+            <ul>
+                <li>The full list of your repositories</li>
+                <li>The controls to create a new repository</li>
+                <li>Individual repository management views</li>
+                <li>All the operations that go with them</li>
+            </ul>
+
+            <h2>2.7 More Than One Account at a Time</h2>
+            <p>Here is something that surprises some people when they discover it: you can be signed in to multiple Dydra accounts simultaneously, all within the same browser session. Each account maintains its own independent state — you are not mixing anything together.</p>
+
+            <p>This turns out to be useful in more ways than you might expect:</p>
+            <ul>
+                <li>Managing your personal account alongside an organizational one</li>
+                <li>Testing access across different permission levels</li>
+                <li>Verifying that data is visible from another account's perspective</li>
+            </ul>
+
+            <h2>2.8 If Something Is Not Working</h2>
+
+            <h3>2.8.1 Save Did Not Seem to Take Effect</h3>
+            <ul>
+                <li>Make sure you actually clicked Save — it is easy to think you did without quite doing it</li>
+                <li>Look for any error message the application might be showing you</li>
+                <li>Confirm you have permission to modify this account</li>
+                <li>Check that your network connection is alive</li>
+            </ul>
+
+            <h3>2.8.2 The Token Is Not Showing Up</h3>
+            <ul>
+                <li>Make sure you are looking at the right account</li>
+                <li>Try refreshing the browser</li>
+                <li>Verify that you have the access rights needed to see the token</li>
+            </ul>
+
+            <h2>2.9 Where to Go Next</h2>
+            <p>With your account in order, you are ready for the real work:</p>
+            <ul>
+                <li>Creating and managing repositories — <a href="repository-operations.html">Chapter 3</a></li>
+                <li>Importing and exporting data</li>
+                <li>Building SPARQL views — <a href="view-operations.html">Chapter 4</a></li>
+                <li>Practical habits and best practices — <a href="tips-and-best-practices.html">Chapter 5</a></li>
+            </ul>
+
+            <p><em>Chapter 3 is where the data work really begins. Shall we?</em></p>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

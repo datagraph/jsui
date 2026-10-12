@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 5: Invitation Management - Dydra Admin Console Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 5: Invitation Management</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="repository-operations.html">← Previous: Chapter 4</a>
+            <a href="system-monitoring.html">Next: Chapter 6 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>5.1 The Invitations Tab</h2>
+            <p>The <strong>Invitations</strong> tab presents the list of pending access invitations. An invitation is a record associating an email address with an invite code; when a prospective user follows the invitation link, the code is validated and an account is created. The tab provides controls to create new invitations, resend existing ones, and delete invitations that are no longer required.</p>
+
+            <p>Invitation data is retrieved from the application's state model, which sources it from the system's invitation endpoint.</p>
+
+            <div class="float-left">
+                <img src="images/admin-invitations-list.png" alt="Invitations tab">
+                <p class="image-caption">Figure 5.1: The Invitations tab showing pending invitations.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>5.2 Table Structure</h2>
+            <table>
+                <thead>
+                    <tr><th>Column</th><th>Contents</th><th>Notes</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Email</td>
+                        <td>The invited email address</td>
+                        <td>The address to which the invitation email is sent.</td>
+                    </tr>
+                    <tr>
+                        <td>Referred Via</td>
+                        <td>HTTP referrer recorded at invitation origin</td>
+                        <td>The URL from which the invitation request originated. Useful for auditing invitation sources.</td>
+                    </tr>
+                    <tr>
+                        <td>Invite Code</td>
+                        <td>The unique invitation token</td>
+                        <td>The opaque string embedded in the invitation URL. Presented in the interface for reference and verification purposes.</td>
+                    </tr>
+                    <tr>
+                        <td>Account</td>
+                        <td>The account created from this invitation, if any</td>
+                        <td>Rendered as a link to that account's profile in the user application. Empty if the invitation has not yet been accepted.</td>
+                    </tr>
+                    <tr>
+                        <td>Actions</td>
+                        <td>Send; Delete (both Admin only)</td>
+                        <td>Suppressed for operator-level sessions.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>5.3 Tab Controls</h2>
+            <table>
+                <thead>
+                    <tr><th>Control</th><th>Availability</th><th>Function</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>New</strong></td><td>Admin only</td><td>Opens the New Invitation dialog. See Section 5.4.</td></tr>
+                </tbody>
+            </table>
+
+            <h2>5.4 Issuing a New Invitation (Admin only)</h2>
+            <p>New invitations are issued from the New Invitation dialog.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Click <strong>New</strong> in the tab controls. The New Invitation dialog opens.
+            </div>
+
+            <div class="float-right">
+                <img src="images/admin-invitation-new-dialog.png" alt="New invitation dialog">
+                <p class="image-caption">Figure 5.2: The New Invitation dialog.</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Enter the recipient's email address in the provided field.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click <strong>Send</strong> (or press Enter). The application issues <code>POST {host}/invitations</code> with the email address as the request body parameter.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                On success, the dialog closes and a confirmation alert is displayed. The new invitation record appears in the table.
+            </div>
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                On error, the response message is displayed within the dialog. The dialog remains open for correction.
+            </div>
+
+            <h2>5.5 Resending an Invitation (Admin only)</h2>
+            <p>The <strong>Send</strong> action on each row retransmits the invitation email to the recorded address. This is useful when the original email was not received or has expired from the recipient's inbox.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Click <strong>Send</strong> on the row of the invitation to resend.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                The application issues <code>POST {host}/invitations</code> with the email address. The invitation record is not modified; only the email is retransmitted.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                A brief confirmation message is displayed in the location bar.
+            </div>
+
+            <h2>5.6 Deleting an Invitation (Admin only)</h2>
+            <p>Deleting an invitation removes the record from the system. If the invitation has not yet been accepted, the associated invite code is invalidated and the recipient will be unable to use it to create an account.</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Click <strong>Delete</strong> on the row of the invitation to remove.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                A confirmation prompt is displayed, identifying the invitation by email address.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Confirm the deletion. The application issues <code>DELETE {host}/invitations/{email}</code>.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                The invitation record is removed from the table.
+            </div>
+
+            <div class="warning">
+                <strong>Accepted invitations:</strong> Deleting the invitation record for an email address that has already been used to create an account does not affect the account itself. The account remains active. The invitation record is merely a bookkeeping entry and its deletion has no effect on established accounts.
+            </div>
+
+            <h2>5.7 Interpretation of Invitation States</h2>
+            <table>
+                <thead>
+                    <tr><th>Account Column Value</th><th>Interpretation</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>(empty)</td>
+                        <td>The invitation has been issued but not yet accepted. The invite code remains valid.</td>
+                    </tr>
+                    <tr>
+                        <td>Account link present</td>
+                        <td>The invitation has been accepted and the linked account was created. The invitation record is retained for audit purposes.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>5.8 Proceeding</h2>
+            <ul>
+                <li>Query history, transaction history, and import history — <a href="system-monitoring.html">Chapter 6</a></li>
+                <li>Reference material — <a href="appendices.html">Appendices</a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

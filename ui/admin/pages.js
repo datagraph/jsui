@@ -2,6 +2,7 @@ import { BasePage } from "../pages/base_page.js";
 import { escapeHtml, joinHtml } from "../utils.js";
 import { APP_CONFIG } from "../../lib/config.js";
 import { authenticateAccount } from "../../lib/auth.js";
+import { buildLoginFormHtml, readLastUsername } from "../components/login-form.js";
 
 const BASE_PATH = APP_CONFIG.basePath || "";
 const ADMIN_PATH = `${BASE_PATH}/admin`;
@@ -26,36 +27,7 @@ export class AdminLoginPage extends BasePage {
   }
 
   async renderContent() {
-    let lastUsername = "";
-    try {
-      const stored = JSON.parse(window.localStorage.getItem("dydra.session"));
-      lastUsername = stored?.accountName || "";
-    } catch (e) { /* ignore */ }
-
-    return `
-      <div id="login-error" class="widget" style="display:none;">
-        <div class="alert-error rounded">
-          <p class="message">
-            <span class="icon icon-alert"></span>
-            <span id="login-error-text"></span>
-          </p>
-        </div>
-      </div>
-      <form id="inline-login-form" class="formtastic" onsubmit="return false;" data-testid="admin-login-form">
-        <fieldset class="inputs">
-          <ol>
-            <li class="string optional"><label>Host</label><input type="text" name="host" placeholder="dydra.com" data-testid="admin-login-host-input" /></li>
-            <li class="string optional"><label>Username</label><input type="text" name="login" value="${escapeHtml(lastUsername)}" data-testid="admin-login-username-input" /></li>
-            <li class="password optional"><label>Password or Token</label><input type="password" name="password" data-testid="admin-login-password-input" /></li>
-          </ol>
-        </fieldset>
-        <fieldset class="buttons">
-          <ol>
-            <li class="commit"><input type="submit" value="Log in" data-testid="admin-login-submit" /></li>
-          </ol>
-        </fieldset>
-      </form>
-    `;
+    return buildLoginFormHtml(readLastUsername());
   }
 
   async afterRender() {
@@ -83,28 +55,10 @@ export class AdminLoginPage extends BasePage {
         // Step 1: authenticate
         const result = await authenticateAccount({ host, accountName, secret });
 
-        app.showLocationMessage?.("Checking privileges\u2026", 30000);
-
-        // Step 2: check admin privileges (but allow any authenticated user)
-        let isAdmin = false;
-        try {
-          const userConfigUrl = `${result.baseUrl}/system/users/${encodeURIComponent(accountName)}/configuration`;
-          const userResp = await fetch(userConfigUrl, {
-            method: "GET",
-            headers: {
-              Accept: "application/json",
-              Authorization: `Bearer ${result.token}`,
-            },
-          });
-
-          if (userResp.ok) {
-            const userConfig = await userResp.json();
-            isAdmin = userConfig.administrator_of === "http://dydra.com"
-              || (Array.isArray(userConfig.administrator_of) && userConfig.administrator_of.includes("http://dydra.com"));
-          }
-        } catch (e) {
-          console.warn("Could not determine admin status:", e.message);
-        }
+        // Determine admin status from the config already returned by authenticateAccount
+        const adminOf = result.config.administrator_of;
+        const isAdmin = adminOf === "http://dydra.com"
+          || (Array.isArray(adminOf) && adminOf.includes("http://dydra.com"));
 
         // Store auth, admin status, and navigate
         app.state.authStore.setAuth(accountName, result.token, result.config, result.baseUrl);
@@ -249,29 +203,33 @@ export class AdminDashboardPage extends BasePage {
   async renderAccountsPane(auth) {
     if (!auth) return "<p>Not authenticated.</p>";
 
-    const url = `${auth.host}/system/accounts?_=${Date.now()}`;
-    const resp = await fetch(url, {
-      cache: "no-store",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${auth.token}`,
-        "Cache-Control": "no-cache",
-      },
-    });
+    const isAdmin = this.context?.app?.state?.isAdmin;
 
-    if (!resp.ok) {
-      return `<p>Error loading accounts: ${resp.status}</p>`;
+    let accounts;
+    if (isAdmin) {
+      const url = `${auth.host}/system/accounts?_=${Date.now()}`;
+      const resp = await fetch(url, {
+        cache: "no-store",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${auth.token}`,
+          "Cache-Control": "no-cache",
+        },
+      });
+      if (!resp.ok) {
+        return `<p>Error loading accounts: ${resp.status}</p>`;
+      }
+      const data = await resp.json();
+      accounts = Array.isArray(data)
+        ? data.map((item) => typeof item === "string" ? item : (item.id || item.name || item.friendlyId))
+        : Object.keys(data);
+      accounts.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+    } else {
+      // Non-admin: show only the authenticated user's own account
+      const ownAccount = this.context?.app?.state?.session?.accountName;
+      accounts = ownAccount ? [ownAccount] : [];
     }
 
-    const data = await resp.json();
-    // Handle array of objects with id field, array of strings, or object with keys
-    const accounts = Array.isArray(data)
-      ? data.map((item) => typeof item === "string" ? item : (item.id || item.name || item.friendlyId))
-      : Object.keys(data);
-    // Sort alphabetically (case-insensitive)
-    accounts.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-
-    const isAdmin = this.context?.app?.state?.isAdmin;
     return `
       <h2>
         <span class="action">

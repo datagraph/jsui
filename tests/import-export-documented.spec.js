@@ -13,8 +13,72 @@ import * as fs from 'fs';
  */
 
 const CAPTURE_ENABLED = process.env.CAPTURE_DOCS === 'true';
+const ACCOUNT = process.env.JSUI_ACCOUNT || 'playwright';
+const REPOSITORY = process.env.JSUI_REPOSITORY || 'test';
 
 test.describe('Import/Export', () => {
+
+  // ── the import flow, as it actually is ──────────────────────────────────────
+  //
+  // These specs predate a change to it, and because every step below used to sit
+  // behind `if (await x.isVisible().catch(() => false))`, the change did not fail
+  // them -- it silently emptied them.  Three of the four file-import tests were
+  // asserting nothing at all.  The guards are gone from this file: a dialog that
+  // does not appear is now a failure, which is the only way a test can report
+  // that the thing it covers has moved.
+  //
+  // The flow is three dialogs:
+  //   1. Import Source      local | remote   -> [data-testid=import-source-continue]
+  //   2. local:  a NATIVE FILE CHOOSER.  The input is created in JS, left
+  //              detached and display:none, so there is no element to call
+  //              setInputFiles on -- it has to be taken as a 'filechooser' event.
+  //      remote: [data-testid=import-remote-url-input] + -continue
+  //   3. Import options     media type, async -> [data-testid=import-confirm-btn]
+
+  async function openImportSource(page, source) {
+    await page.getByTestId('repo-import-btn').first().click();
+    const continueBtn = page.getByTestId('import-source-continue');
+    await expect(continueBtn, 'the Import Source dialog should open').toBeVisible();
+    if (source === 'remote') {
+      await page.locator('input[name="import-source"][value="remote"]').check();
+    }
+    return continueBtn;
+  }
+
+  // Returns the media type the UI detected, so a caller can assert on it.
+  async function confirmImportOptions(page, { expectMediaType } = {}) {
+    const confirmBtn = page.getByTestId('import-confirm-btn');
+    await expect(confirmBtn, 'the import options popup should open').toBeVisible();
+    const mediaSelect = page.getByTestId('import-media-type-select');
+    const detected = await mediaSelect.inputValue().catch(() => null);
+    if (expectMediaType) {
+      expect(detected, 'media type auto-detected from the file extension').toBe(expectMediaType);
+    }
+    const posted = page.waitForResponse(
+      (r) => r.request().method() === 'POST' && r.url().includes('/playwright/test'),
+      { timeout: 30000 }
+    ).catch(() => null);
+    await confirmBtn.click();
+    return { detected, response: await posted };
+  }
+
+  async function importLocalFile(page, filePath, { expectMediaType } = {}) {
+    const continueBtn = await openImportSource(page, 'local');
+    const chooserPromise = page.waitForEvent('filechooser');
+    await continueBtn.click();
+    (await chooserPromise).setFiles(filePath);
+    return confirmImportOptions(page, { expectMediaType });
+  }
+
+  async function importRemoteUrl(page, url) {
+    const continueBtn = await openImportSource(page, 'remote');
+    await continueBtn.click();
+    const urlInput = page.getByTestId('import-remote-url-input');
+    await expect(urlInput, 'the remote URL dialog should open').toBeVisible();
+    await urlInput.fill(url);
+    await page.getByTestId('import-remote-url-continue').click();
+    return confirmImportOptions(page);
+  }
 
   test.beforeEach(async ({ page }) => {
     await login(page);
@@ -26,48 +90,14 @@ test.describe('Import/Export', () => {
   // ============================================================
   async function REQ_3_4_3_importFromURL(page, capture, url) {
     await capture.requirement(REQ['3.4.3'], async (cap) => {
-      const importBtn = page.getByTestId('repo-import-btn').first();
-      const altImportBtn = page.locator('.repo-import-btn, button:has-text("Import")').first();
-
-      let btnToClick = null;
-      if (await importBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        btnToClick = importBtn;
-      } else if (await altImportBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        btnToClick = altImportBtn;
+      await cap.before('Repository with import button');
+      const { response } = await importRemoteUrl(page, url);
+      await cap.step('url-entered', 'Import URL entered and submitted');
+      if (response) {
+        expect([200, 201, 202, 204]).toContain(response.status());
       }
-
-      if (btnToClick) {
-        // Capture: Import button
-        await cap.before('Repository with import button');
-
-        await btnToClick.click();
-        await page.waitForTimeout(500);
-
-        const urlInput = page.locator('input[type="url"], input[placeholder*="URL"], input[name="url"]').first();
-        if (await urlInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await urlInput.fill(url);
-
-          // Capture: URL entered
-          await cap.step('url-entered', 'Import URL entered in form');
-
-          const importUrlBtn = page.getByRole('button', { name: /import|fetch/i }).first();
-          if (await importUrlBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-            await importUrlBtn.click();
-            await page.waitForLoadState('networkidle').catch(() => {});
-            await page.waitForTimeout(1000);
-          }
-
-          // Capture: Import complete
-          await cap.after('URL import initiated');
-        } else {
-          // No URL input - just capture current state
-          await cap.after('Import dialog (no URL field)');
-        }
-      } else {
-        // No import button - capture current state
-        await cap.before('Repository page');
-        await cap.after('After import check');
-      }
+      await waitForNetworkIdle(page);
+      await cap.after('URL import initiated');
     });
   }
 
@@ -76,41 +106,14 @@ test.describe('Import/Export', () => {
   // ============================================================
   async function REQ_3_4_4_importFromFile(page, capture, filePath, format) {
     await capture.requirement(REQ['3.4.4'], async (cap) => {
-      const importBtn = page.getByTestId('repo-import-btn').first();
-
-      if (await importBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        // Capture: Before import
-        await cap.before('Repository ready for file import');
-
-        await importBtn.click();
-        await page.waitForTimeout(500);
-
-        const modalFileInput = page.locator('.modal input[type="file"], .import-modal input[type="file"]').first();
-        if (await modalFileInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await modalFileInput.setInputFiles(filePath);
-
-          // Capture: File selected
-          await cap.step('file-selected', `${format} file selected for import`);
-
-          const uploadBtn = page.getByRole('button', { name: /import|upload/i }).first();
-          if (await uploadBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-            const importResponsePromise = page.waitForResponse(response =>
-              response.request().method() === 'POST' &&
-              (response.url().includes('/import') || response.url().includes('/upload'))
-            );
-
-            await uploadBtn.click();
-            const importResponse = await importResponsePromise.catch(() => null);
-
-            if (importResponse) {
-              expect([200, 201, 202, 204]).toContain(importResponse.status());
-            }
-          }
-
-          // Capture: Import complete
-          await cap.after('File import completed');
-        }
+      await cap.before('Repository ready for file import');
+      const { response } = await importLocalFile(page, filePath);
+      await cap.step('file-selected', `${format} file selected for import`);
+      if (response) {
+        expect([200, 201, 202, 204]).toContain(response.status());
       }
+      await waitForNetworkIdle(page);
+      await cap.after('File import completed');
     });
   }
 
@@ -119,33 +122,18 @@ test.describe('Import/Export', () => {
   // ============================================================
   async function REQ_3_4_6_importProgressDisplay(page, capture, filePath) {
     await capture.requirement(REQ['3.4.6'], async (cap) => {
-      const importBtn = page.getByTestId('repo-import-btn').first();
-
-      if (await importBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await importBtn.click();
-        await page.waitForTimeout(500);
-
-        const modalFileInput = page.locator('.modal input[type="file"]').first();
-        if (await modalFileInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-          await modalFileInput.setInputFiles(filePath);
-
-          const uploadBtn = page.getByRole('button', { name: /import|upload/i }).first();
-          if (await uploadBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-            await uploadBtn.click();
-
-            // Capture: Progress indicator
-            await cap.before('Import in progress with progress indicator');
-
-            const progressIndicator = page.locator('.progress-bar, .import-progress, [role="progressbar"]').first();
-            const progressVisible = await progressIndicator.isVisible({ timeout: 1000 }).catch(() => false);
-
-            await waitForNetworkIdle(page);
-
-            // Capture: Import complete
-            await cap.after('Import completed');
-          }
-        }
+      await cap.before('Repository before a larger import');
+      // There is no progress element to assert on -- no .progress, no
+      // [data-progress], nothing the old guard could ever have found -- so what
+      // is asserted is that a larger import is accepted and completes.  Giving
+      // the import a progress hook is the fix; until then this is the honest
+      // extent of the coverage.
+      const { response } = await importLocalFile(page, filePath);
+      if (response) {
+        expect([200, 201, 202, 204], 'a larger import should be accepted').toContain(response.status());
       }
+      await waitForNetworkIdle(page);
+      await cap.after('Larger import completed');
     });
   }
 
@@ -154,80 +142,51 @@ test.describe('Import/Export', () => {
   // ============================================================
   async function REQ_3_4_7_autoDetectFormat(page, capture, filePath, expectedFormat) {
     await capture.requirement(REQ['3.4.7'], async (cap) => {
-      const importBtn = page.getByTestId('repo-import-btn').first();
-
-      if (await importBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        await importBtn.click();
-        await page.waitForTimeout(500);
-
-        const modalFileInput = page.locator('.modal input[type="file"]').first();
-        if (await modalFileInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-          // Capture: Before file selection
-          await cap.before('Import dialog before file selection');
-
-          await modalFileInput.setInputFiles(filePath);
-
-          // Check if format was auto-detected
-          const formatSelect = page.locator('select[name="format"], .format-select').first();
-          if (await formatSelect.isVisible({ timeout: 1000 }).catch(() => false)) {
-            const selectedFormat = await formatSelect.inputValue();
-            // Format should be auto-detected
-          }
-
-          // Capture: Format auto-detected
-          await cap.after(`Format auto-detected from ${path.extname(filePath)} extension`);
-        }
-      }
+      await cap.before('Import dialog before file selection');
+      // The assertion lives in confirmImportOptions: the media type the UI put
+      // in the select must be the one the extension implies.
+      const { detected } = await importLocalFile(page, filePath,
+                                                 { expectMediaType: expectedFormat });
+      await cap.step('format-detected', `format auto-detected as ${detected}`);
+      await waitForNetworkIdle(page);
+      await cap.after('Import with auto-detected format completed');
     });
   }
 
   // ============================================================
   // REQ-3.5.1: Export Repository Data
   // ============================================================
+  // `format` is the MEDIA TYPE, which is both what the select's options carry as
+  // values and what the request must end up asking for -- so one argument serves
+  // the action and the assertion, with no label-to-type mapping to drift.
   async function REQ_3_5_1_exportRepositoryData(page, capture, format) {
     await capture.requirement(REQ['3.5.1'], async (cap) => {
+      await cap.before('Repository before export');
+      // Export opens #export-data-form-<account>-<repository>, whose media-type
+      // select drives an ACCEPT header on GET /<account>/<repository>/service.
+      // The export control disables itself for the duration of an export and is
+      // re-enabled by restoreButtonState(), so a second export in the same test
+      // can arrive while it is still disabled -- which surfaces as a click
+      // timeout, not as a visible failure.  Wait for it rather than race it.
       const exportBtn = page.getByTestId('repo-export-btn').first();
-      const altExportBtn = page.locator('.repo-export-btn, button:has-text("Export"), a:has-text("Export")').first();
+      await expect(exportBtn, 'the export control should be ready').toBeEnabled({ timeout: 25000 });
+      await exportBtn.click();
+      const form = page.locator(`#export-data-form-${ACCOUNT}-${REPOSITORY}`);
+      await expect(form, 'the export form should open').toBeVisible({ timeout: 15000 });
 
-      let btnToClick = null;
-      if (await exportBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        btnToClick = exportBtn;
-      } else if (await altExportBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-        btnToClick = altExportBtn;
-      }
+      await form.locator('select').first().selectOption(format);
+      await cap.step('format', `Export format set to ${format}`);
 
-      if (btnToClick) {
-        // Capture: Export button
-        await cap.before('Repository with export button');
-
-        await btnToClick.click();
-        await page.waitForTimeout(500);
-
-        const formatSelect = page.locator('select[name="format"], .export-format-select').first();
-        if (await formatSelect.isVisible({ timeout: 2000 }).catch(() => false)) {
-          try {
-            await formatSelect.selectOption({ label: new RegExp(format, 'i') });
-          } catch (e) {
-            // Format might not be available
-          }
-
-          // Capture: Format selected
-          await cap.step('format-selected', `Export format ${format} selected`);
-
-          const downloadBtn = page.getByRole('button', { name: /download|export/i }).first();
-          if (await downloadBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-            await downloadBtn.click();
-            await page.waitForTimeout(1000);
-          }
-        }
-
-        // Capture: Export complete
-        await cap.after(`Repository exported in ${format} format`);
-      } else {
-        // No export button - capture current state
-        await cap.before('Repository page');
-        await cap.after('After export check');
-      }
+      const got = page.waitForResponse(
+        (r) => r.request().method() === 'GET' &&
+               r.url().includes(`/${ACCOUNT}/${REPOSITORY}/service`),
+        { timeout: 30000 });
+      await page.getByTestId('export-confirm-btn').click();
+      const res = await got;
+      expect(res.status(), 'the export request should succeed').toBe(200);
+      expect(res.request().headers()['accept'],
+             `export should request ${format}`).toContain(format);
+      await cap.after('Export completed');
     });
   }
 
@@ -236,19 +195,24 @@ test.describe('Import/Export', () => {
   // ============================================================
   async function REQ_3_5_2_directDownloadURL(page, capture) {
     await capture.requirement(REQ['3.5.2'], async (cap) => {
-      // Look for direct download link
-      const downloadLink = page.locator('a[href*="/data"], a[download]').first();
-
-      // Capture: Download link available
-      await cap.before('Repository page with direct download link');
-
-      if (await downloadLink.isVisible({ timeout: 2000 }).catch(() => false)) {
-        const href = await downloadLink.getAttribute('href');
-        expect(href).toBeTruthy();
-
-        // Capture: Link details
-        await cap.after('Direct download URL available for repository data');
-      }
+      await cap.before('Repository before a direct download');
+      // The export hands the bytes to the browser as a blob download, so the
+      // evidence is a download event with a filename, not a link in the page.
+      // The export control disables itself for the duration of an export and is
+      // re-enabled by restoreButtonState(), so a second export in the same test
+      // can arrive while it is still disabled -- which surfaces as a click
+      // timeout, not as a visible failure.  Wait for it rather than race it.
+      const exportBtn = page.getByTestId('repo-export-btn').first();
+      await expect(exportBtn, 'the export control should be ready').toBeEnabled({ timeout: 25000 });
+      await exportBtn.click();
+      const form = page.locator(`#export-data-form-${ACCOUNT}-${REPOSITORY}`);
+      await expect(form).toBeVisible({ timeout: 15000 });
+      const download = page.waitForEvent('download', { timeout: 30000 });
+      await page.getByTestId('export-confirm-btn').click();
+      const file = await download;
+      expect(file.suggestedFilename(),
+             'the download should be named after the repository').toContain(REPOSITORY);
+      await cap.after('Export downloaded');
     });
   }
 
@@ -292,8 +256,14 @@ test.describe('Import/Export', () => {
   test('import N-Triples file [REQ-3.4.4, REQ-3.4.7]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/import', { enabled: CAPTURE_ENABLED });
 
+    // The terminating newline is load-bearing: the N-Triples and N-Quads
+    // importer rejects a document whose last statement is not followed by one
+    // (400, "Graph import failed: 65: invalid input"), where Turtle accepts it.
+    // RDF 1.1 makes the final EOL optional -- ntriplesDoc ::= triple? (EOL triple?)*
+    // -- so that is a server-side conformance gap, recorded in the plan; these
+    // fixtures end with a newline because real files do.
     const tempFile = createTempFile('test-import.nt',
-      '<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .');
+      '<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .\n');
 
     try {
       await REQ_3_4_4_importFromFile(page, capture, tempFile, 'N-Triples');
@@ -310,7 +280,7 @@ test.describe('Import/Export', () => {
     const capture = new DocCapture(page, 'tests/pdfs/import', { enabled: CAPTURE_ENABLED });
 
     const tempFile = createTempFile('test-import.nq',
-      '<http://example.org/s> <http://example.org/p> <http://example.org/o> <http://example.org/g> .');
+      '<http://example.org/s> <http://example.org/p> <http://example.org/o> <http://example.org/g> .\n');
 
     try {
       await REQ_3_4_4_importFromFile(page, capture, tempFile, 'N-Quads');
@@ -357,7 +327,7 @@ test.describe('Import/Export', () => {
   test('export Turtle format [REQ-3.5.1]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/export', { enabled: CAPTURE_ENABLED });
 
-    await REQ_3_5_1_exportRepositoryData(page, capture, 'Turtle');
+    await REQ_3_5_1_exportRepositoryData(page, capture, 'text/turtle');
 
     await capture.writeManifest();
     await capture.writeIndex();
@@ -367,7 +337,7 @@ test.describe('Import/Export', () => {
   test('export N-Triples format [REQ-3.5.1, REQ-3.5.2]', async ({ page }) => {
     const capture = new DocCapture(page, 'tests/pdfs/export', { enabled: CAPTURE_ENABLED });
 
-    await REQ_3_5_1_exportRepositoryData(page, capture, 'N-Triples');
+    await REQ_3_5_1_exportRepositoryData(page, capture, 'application/n-triples');
     await REQ_3_5_2_directDownloadURL(page, capture);
 
     await capture.writeManifest();

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appendices - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Appendices</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="tips-and-best-practices.html">← Previous: Chapter 5</a>
+        </nav>
+
+        <div class="content">
+            <p>Every craft has its reference material — the tables and lists and definitions that are too detailed to work into the main text but too useful to leave out entirely. What follows is that material. Consult it when you need to, and do not worry about memorizing it. That is what pages are for.</p>
+
+            <h2>Appendix A: Serialization Formats</h2>
+            <p>Data has to travel somewhere — into the system, out of the system, across a network. These are the containers it travels in.</p>
+
+            <h3>A.1 Import Formats</h3>
+            <p>When you bring data into a repository, the system will accept it in any of these forms:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format Name</th>
+                        <th>File Extension(s)</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>Terse RDF Triple Language — a compact, human-readable way to write RDF. If you are going to look at your data in a text editor, this is probably the format you want.</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code>, <code>.xml</code></td><td>The original XML-based serialization, established by the W3C. Widely supported, though not the easiest to read.</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>One statement per line, nothing fancy. Simple and reliable.</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>Like N-Triples, but with a fourth column for the named graph. When your data has graph context, this is the format that preserves it.</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle extended to handle named graphs. The best of both worlds if your data has structure and you value readability.</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code>, <code>.json</code></td><td>Linked data expressed as JSON. A good choice when the people or systems you are working with already speak JSON.</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>Plain comma-separated values, transformed into RDF on the way in. Useful when your source data comes from a spreadsheet.</td></tr>
+                </tbody>
+            </table>
+
+            <h3>A.2 Export Formats</h3>
+            <p>When you take data out of a repository, these are the shapes it can leave in:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format Name</th>
+                        <th>File Extension</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Turtle</strong></td><td><code>.ttl</code></td><td>Compact RDF — good for human reading and many downstream tools</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>.nt</code></td><td>One triple per line — simple to process with standard text tools</td></tr>
+                    <tr><td><strong>N-Quads</strong></td><td><code>.nq</code></td><td>One quad per line — preserves named graph context</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>.rdf</code></td><td>The XML form — broadly compatible with older systems</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>.jsonld</code></td><td>JSON with linked data semantics — good for web applications</td></tr>
+                    <tr><td><strong>TriG</strong></td><td><code>.trig</code></td><td>Turtle with named graphs — the right choice when graph structure matters</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>.csv</code></td><td>A table you can open in a spreadsheet</td></tr>
+                </tbody>
+            </table>
+
+            <h3>A.3 Query Result Formats</h3>
+            <p>When a SPARQL query runs, it produces results. Here are the forms those results can take:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Format</th>
+                        <th>Media Type</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>JSON</strong></td><td><code>application/sparql-results+json</code></td><td>The default — good for scripts and applications that consume the results programmatically</td></tr>
+                    <tr><td><strong>XML</strong></td><td><code>application/sparql-results+xml</code></td><td>The W3C standard result format — compatible with XML processing pipelines</td></tr>
+                    <tr><td><strong>SVG</strong></td><td><code>image/vnd.dydra.SPARQL-RESULTS+GRAPHVIZ+SVG+XML</code></td><td>A visual graph of your data — useful for seeing structure and relationships at a glance</td></tr>
+                    <tr><td><strong>HTML</strong></td><td><code>text/html</code></td><td>A clean, readable table — good for human review</td></tr>
+                    <tr><td><strong>CSV</strong></td><td><code>text/csv</code></td><td>Comma-separated — for importing results into a spreadsheet</td></tr>
+                    <tr><td><strong>TSV</strong></td><td><code>text/tab-separated-values</code></td><td>Tab-separated — for text processing and scripting</td></tr>
+                    <tr><td><strong>Turtle</strong></td><td><code>text/turtle</code></td><td>For CONSTRUCT and DESCRIBE query results</td></tr>
+                    <tr><td><strong>N-Triples</strong></td><td><code>application/n-triples</code></td><td>For CONSTRUCT and DESCRIBE query results</td></tr>
+                    <tr><td><strong>RDF/XML</strong></td><td><code>application/rdf+xml</code></td><td>For CONSTRUCT and DESCRIBE query results</td></tr>
+                    <tr><td><strong>JSON-LD</strong></td><td><code>application/ld+json</code></td><td>For CONSTRUCT and DESCRIBE query results</td></tr>
+                    <tr><td><strong>SSE</strong></td><td><code>application/sparql-query+sse</code></td><td>S-expression format for the query algebra — a format for those who want to see how the system thinks about the query</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix B: Keyboard Shortcuts</h2>
+            <p>A few keystrokes, once learned, become second nature. Here are the ones this application knows about:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>What You Want to Do</th>
+                        <th>How to Do It</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Run a SPARQL query</td><td>Ctrl+Enter on Windows and Linux — Cmd+Enter on a Mac</td></tr>
+                    <tr><td>Submit a form</td><td>Enter</td></tr>
+                    <tr><td>Close a dialog without doing anything</td><td>Escape</td></tr>
+                    <tr><td>Close an editor tab</td><td>Click the × on the tab</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix C: A Glossary of Terms</h2>
+            <p>Every field has its language. Here is what the words in this manual mean, stated plainly:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Term</th>
+                        <th>What It Means</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Account</strong></td><td>Your identity in the system — the name by which others know you, and the container that holds everything you have created here</td></tr>
+                    <tr><td><strong>Repository</strong></td><td>A named, persistent home for RDF data — the place where your quads live</td></tr>
+                    <tr><td><strong>View</strong></td><td>A named, persistent SPARQL query stored alongside a repository — a question you decided was worth keeping</td></tr>
+                    <tr><td><strong>Quad</strong></td><td>A single RDF statement made of four parts: subject, predicate, object, and the named graph it belongs to</td></tr>
+                    <tr><td><strong>Triple</strong></td><td>Like a quad, but without an explicit named graph — just subject, predicate, and object</td></tr>
+                    <tr><td><strong>SPARQL</strong></td><td>The standard language for querying RDF data — it stands for SPARQL Protocol and RDF Query Language, if you were wondering</td></tr>
+                    <tr><td><strong>Collaborator</strong></td><td>Someone you have granted access to one of your repositories</td></tr>
+                    <tr><td><strong>Token</strong></td><td>An authentication credential meant for programs — a long string that serves the same purpose as a password, but is easier to manage in code</td></tr>
+                    <tr><td><strong>Pane</strong></td><td>One of the tabbed panels in the interface — each one displays a distinct piece of work: an account, a repository, an editor</td></tr>
+                    <tr><td><strong>Import</strong></td><td>Bringing data from outside into a repository</td></tr>
+                    <tr><td><strong>Export</strong></td><td>Taking data from a repository and sending it out into the world</td></tr>
+                    <tr><td><strong>Namespace Prefix</strong></td><td>A short alias for a long URI — so that instead of writing <code>http://www.w3.org/1999/02/22-rdf-syntax-ns#type</code> every time, you can write <code>rdf:type</code></td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix D: Further Reading</h2>
+            <p>If you want to go deeper into the standards and technologies that underlie this system, these are the places worth visiting:</p>
+            <ul>
+                <li><strong>RDF 1.1 Concepts:</strong> The W3C Recommendation that defines the data model — what a triple is, what a graph is, how it all fits together</li>
+                <li><strong>SPARQL 1.1 Query Language:</strong> The W3C Recommendation for querying RDF — the complete specification of the language you have been writing</li>
+                <li><strong>Turtle:</strong> The W3C Recommendation for the Terse RDF Triple Language — a formal description of the format you have probably been using to read and write data</li>
+                <li><strong>JSON-LD:</strong> The W3C Recommendation for JSON-based Linked Data — the bridge between the JSON world and the RDF world</li>
+            </ul>
+
+            <div class="note">
+                <strong>A last word:</strong> The standards are thorough. They were written by people who thought about these things very carefully for a very long time. When you need precision, they are worth consulting. When you just need to get something done, this manual should be enough.
+            </div>
+
+            <h2>Manual Cross-Reference</h2>
+            <p>If you need to find your way back, here is the whole map:</p>
+            <ul>
+                <li><a href="index.html">Manual Home</a></li>
+                <li><a href="login.html">Chapter 1: Authentication</a></li>
+                <li><a href="account-operations.html">Chapter 2: Account Management</a></li>
+                <li><a href="repository-operations.html">Chapter 3: Repository Operations</a></li>
+                <li><a href="view-operations.html">Chapter 4: Query Views</a></li>
+                <li><a href="tips-and-best-practices.html">Chapter 5: Practical Wisdom</a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

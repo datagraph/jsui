@@ -1,0 +1,104 @@
+/*
+ * Proposed: OAuth 2.1 for the dydra service credential.
+ *
+ * Drawn against what exists.  Solid boxes are present today; dashed boxes and
+ * dashed edges are the proposal.  The point of the picture is that the thing
+ * being added is an authorization server and a token format — the resource
+ * server, its ACLs and its stores are unchanged, and the legacy bearer path
+ * (edge T) keeps working beside the new one.
+ *
+ * Numbered edges follow the discovery-then-grant order an MCP client takes:
+ * it calls the endpoint with no credential (1), is told where the metadata
+ * lives (2), reads the metadata (3–4), finds the authorization server (5–6),
+ * registers itself by URL (7), sends the user to consent (8–11), redeems the
+ * code (12–13) and finally calls the endpoint with an audience-bound token (14).
+ *
+ *   dot -Tsvg mcp-oauth-flow.dot -o mcp-oauth-flow.svg
+ */
+digraph mcp_oauth {
+  rankdir = TB;
+  compound = true;
+  fontname = "Helvetica";
+  node [fontname = "Helvetica", fontsize = 10, shape = box, style = "rounded,filled",
+        fillcolor = white, color = "#555555", margin = "0.12,0.07"];
+  edge [fontname = "Helvetica", fontsize = 9, color = "#555555", arrowsize = 0.7];
+
+  subgraph cluster_clients {
+    label = "clients — each a public client, no secret";
+    fontsize = 11; style = "rounded"; color = "#999999"; bgcolor = "#fbfbf9";
+    host   [label = "External MCP host\nClaude Desktop · Claude Code · a connector\nhas no prior relationship with this server",
+            fillcolor = "#eef3ee"];
+    jsui   [label = "jsui\nfirst-party, same origin", fillcolor = "#eef3ee"];
+    cimd   [label = "Client ID Metadata Document\nhttps://…/client.json\nclient_id IS this URL",
+            style = "rounded,filled,dashed", fillcolor = "#f4f4ee"];
+  }
+
+  subgraph cluster_as {
+    label = "authorization server   — proposed, spocq-hosted —";
+    fontsize = 11; style = "rounded,dashed"; color = "#1f4e79"; penwidth = 2; bgcolor = "#f3f7fb";
+    asmeta  [label = "/.well-known/oauth-authorization-server\nRFC 8414 · S256 only\nclient_id_metadata_document_supported",
+             style = "rounded,filled,dashed", shape = component];
+    authz   [label = "/oauth/authorize\nPKCE S256 · resource indicator\nconsent names client, repository, scope",
+             style = "rounded,filled,dashed"];
+    tokenep [label = "/oauth/token\nauthorization_code + verifier\nrefresh_token (rotating)",
+             style = "rounded,filled,dashed"];
+    jwks    [label = "/.well-known/jwks.json\nsigning keys, kid rotation",
+             style = "rounded,filled,dashed", shape = component];
+    revoke  [label = "/oauth/revoke\nRFC 7009", style = "rounded,filled,dashed"];
+  }
+
+  subgraph cluster_rs {
+    label = "resource server   — spocq today, two additions —";
+    fontsize = 11; style = "rounded"; color = "#1f4e79"; penwidth = 2; bgcolor = "#f3f7fb";
+    prmeta  [label = "/.well-known/oauth-protected-resource/{a}/{r}/mcp\nRFC 9728 · names the authorization server",
+             style = "rounded,filled,dashed", shape = component];
+    mcpep   [label = "MCP endpoint\nPOST /{a}/{r}/mcp", shape = component];
+    authn   [label = "http:authenticate-request-token\n:around dispatches on token shape",
+             style = "rounded,filled,dashed"];
+    legacy  [label = "agent-authenticated-by-token\nSPARQL over <urn:dydra:users>\n*users* cache"];
+    authzreq[label = "http:authorize-request\nacl:Read / Write / Control"];
+    scope   [label = "scope ∩ acl\n:around on access-authorized-p",
+             style = "rounded,filled,dashed"];
+    store   [label = "repository quads · <account>/mcp", shape = component];
+  }
+
+  grants [label = "<urn:dydra:grants>\nconsent recorded as RDF\nrevocable by SPARQL",
+          style = "rounded,filled,dashed", shape = component, fillcolor = "#f6f6f6"];
+
+  /* discovery */
+  host    -> mcpep   [label = "1  POST, no credential"];
+  mcpep   -> host    [label = "2  401 + WWW-Authenticate:\nBearer resource_metadata=… , scope=…", style = dashed];
+  host    -> prmeta  [label = "3  GET the metadata", style = dashed];
+  prmeta  -> host    [label = "4  authorization_servers, scopes_supported", style = dashed];
+  host    -> asmeta  [label = "5  GET", style = dashed];
+  asmeta  -> host    [label = "6  endpoints + S256 + CIMD support", style = dashed];
+
+  /* client identity */
+  host    -> cimd    [label = "7a  publishes its own metadata once", style = dashed];
+  authz   -> cimd    [label = "7b  fetches client_id URL\n(https only, SSRF-guarded, cached)", style = dashed];
+
+  /* grant */
+  host    -> authz   [label = "8  redirect user:\ncode_challenge · resource=/{a}/{r}/mcp · scope", style = dashed];
+  authz   -> grants  [label = "9  user authenticates (session or password)\nand consents → recorded", style = dashed];
+  authz   -> host    [label = "10  code + iss (RFC 9207)", style = dashed];
+  host    -> tokenep [label = "11  code + code_verifier", style = dashed];
+  tokenep -> jwks    [label = "12a  sign", style = dashed];
+  tokenep -> host    [label = "12b  access token (at+jwt, short)\naud = that one repository\n+ refresh token", style = dashed];
+
+  /* use */
+  host    -> mcpep   [label = "13  POST + Bearer <jwt>", style = bold, color = "#1f4e79"];
+  mcpep   -> authn   [label = "14  resolve agent", color = "#1f4e79"];
+  authn   -> jwks    [label = "15a  verify sig, iss, aud, exp\nno store round-trip", style = dashed, color = "#1f4e79"];
+  authn   -> legacy  [label = "15b  not a JWT ⇒ call-next-method\nTHE LEGACY PATH SURVIVES", color = "#1f4e79"];
+  authn   -> authzreq[label = "16  agent + granted scope", color = "#1f4e79"];
+  authzreq-> scope   [label = "17  narrow", style = dashed, color = "#1f4e79"];
+  scope   -> store   [label = "18  read / write, as today", color = "#1f4e79"];
+
+  /* jsui takes the same road */
+  jsui    -> authz   [label = "J  same flow, client_id = a static\nCIMD document under /ui/", style = dashed];
+
+  /* revocation */
+  grants  -> revoke  [label = "R  the grant is the thing revoked,\nnot a password", style = dashed];
+
+  { rank = same; host; jsui; }
+}
