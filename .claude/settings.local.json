@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(open:*)",
+      "Bash(ls:*)",
+      "Bash(wc:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(/tmp/diag-admin.spec.js:*)",
+      "Bash(node -c /Users/Shared/Development/Source/Library/org/datagraph/jsui/js/sparql-editor.js 2>&1)",
+      "Bash(npm test:*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}

@@ -15,7 +15,8 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const scratch = mkdtempSync(join(tmpdir(), "jsui-log-"));
 cpSync(join(root, "lib"), join(scratch, "lib"), { recursive: true });
 writeFileSync(join(scratch, "package.json"), JSON.stringify({ type: "module" }));
-const { listSessions, readSession, universalToDate, sessionRepository } =
+const { listSessions, readSession, listJournals, readJournal, readSessionRequests,
+        universalToDate, sessionRepository } =
   await import(pathToFileURL(join(scratch, "lib", "mcp", "session-log.js")).href);
 
 let pass = 0, fail = 0;
@@ -104,5 +105,81 @@ console.log("\na store that will not answer");
 }
 
 rmSync(scratch, { recursive: true, force: true });
+const J = "http://dydra.com/mcp/journal/test/foaf/2026-10-15";
+const R = `${J}#7F3A1C00-C460-11F1-95F7-3BCB8CEB8DDD`;
+
+console.log("\nlisting the request journals");
+{
+  const fetchImpl = async () => bind([
+    { journal: J, repository: "test/foaf", date: "2026-10-15" },
+    { journal: J.replace("15", "13"), repository: "test/foaf", date: "2026-10-13" },
+  ]);
+  const r = await listJournals({ host: "https://h", account: "test", token: "T", fetchImpl });
+  ok(r.ok && r.journals.length === 2, "both days are returned");
+  ok(r.journals[0].date === "2026-10-15", "newest day first");
+  ok(r.journals[0].repository === "test/foaf", "the target repository is carried, not the log's own");
+}
+
+console.log("\nreading a journal");
+{
+  const rows = [
+    { s: J, p: M + "type", o: M + "Journal" },
+    { s: J, p: M + "repository", o: "test/foaf" },
+    { s: J, p: M + "date", o: "2026-10-15" },
+    { s: R, p: M + "type", o: M + "Request" },
+    { s: R, p: M + "agent", o: "james" },
+    { s: R, p: M + "repository", o: "test/foaf" },
+    { s: R, p: M + "method", o: "tools/call" },
+    { s: R, p: M + "tool", o: "sparql" },
+    { s: R, p: M + "era", o: "modern" },
+    { s: R, p: M + "client", o: "claude-cli/1.2" },
+    { s: R, p: M + "startedAt", o: 4000594400 },
+    { s: R, p: M + "duration", o: 184 },
+    { s: R, p: M + "status", o: M + "complete" },
+    { s: R, p: M + "request", o: '{"jsonrpc":"2.0","id":7,"method":"tools/call"}' },
+    { s: R, p: M + "requestSize", o: 46 },
+    { s: R, p: M + "response", o: '{"jsonrpc":"2.0","id":7,"result":{}}' },
+    { s: R, p: M + "responseSize", o: 900000 },
+    { s: R, p: M + "truncated", o: "true" },
+    { s: R, p: M + "exploration", o: G },
+    // a second request, earlier, to prove the ordering is by time
+    { s: J + "#aa", p: M + "type", o: M + "Request" },
+    { s: J + "#aa", p: M + "method", o: "tools/list" },
+    { s: J + "#aa", p: M + "startedAt", o: 4000594000 },
+    { s: J + "#aa", p: M + "status", o: M + "error" },
+    { s: J + "#aa", p: M + "errorCode", o: -32601 },
+  ];
+  const r = await readJournal({ host: "https://h", account: "test", token: "T",
+                                journalUri: J, fetchImpl: async () => bind(rows) });
+  ok(r.ok && r.requests.length === 2, "the journal's own header is not read as a request");
+  ok(r.requests[0].method === "tools/list", "requests come back in the order they were made");
+  const call = r.requests[1];
+  ok(call.agent === "james" && call.repository === "test/foaf",
+     "the authorized agent and the target repository are both kept");
+  ok(call.request.includes("tools/call") && call.response.includes("result"),
+     "what was asked and what came back are both kept");
+  ok(call.responseSize === 900000 && call.truncated === true,
+     "a clipped payload still reports its true size");
+  ok(call.status === "complete" && call.duration === 184,
+     "status and duration are shaped for the presentation");
+  ok(call.exploration === G, "a call made during an exploration names it");
+  ok(r.requests[0].errorCode === -32601, "a protocol error keeps its code");
+}
+
+console.log("\nthe requests of one exploration");
+{
+  let sent = null;
+  const fetchImpl = async (url, init) => { sent = { url, init }; return bind([
+    { s: R, p: M + "type", o: M + "Request" },
+    { s: R, p: M + "method", o: "tools/call" },
+    { s: R, p: M + "exploration", o: G },
+  ]); };
+  const r = await readSessionRequests({ host: "https://h", account: "test", token: "T",
+                                        sessionUri: G, fetchImpl });
+  ok(r.ok && r.requests.length === 1, "the exploration's calls are found");
+  ok(sent.init.body.includes(`mcp:exploration <${G}>`),
+     "the graph is left unbound: an exploration may span more than one day's journal");
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);

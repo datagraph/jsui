@@ -51,7 +51,78 @@ const bind = (rows) => ({ head: {}, results: { bindings: rows.map((r) =>
   Object.fromEntries(Object.entries(r).map(([k, v]) => [k, { type: "literal", value: String(v) }]))) } });
 const G = "http://dydra.com/explorations/AAAA-1111";
 const M = "http://dydra.com/ns/mcp#";
-const SESSION_ROWS = (query) => query.includes("mcp:Exploration")
+const TX = G + "/transcript";
+const TRANSCRIPT_ROWS = bind([
+  { s: TX, p: M + "exploration", o: G },
+  { s: TX, p: M + "model", o: "claude-opus-5" },
+  { s: TX + "#r-1", p: M + "prompt", o: "samples with a temperature above 20" },
+  { s: TX + "#r-1", p: M + "iterations", o: 2 },
+  { s: TX + "#r-1", p: M + "ended", o: "2026-10-13T09:00:06.000Z" },
+  { s: TX + "#r-1-x1", p: M + "run", o: TX + "#r-1" },
+  { s: TX + "#r-1-x1", p: M + "ordinal", o: 1 },
+  { s: TX + "#r-1-x1", p: M + "kind", o: "primer" },
+  { s: TX + "#r-1-x1", p: M + "document", o: "score://grammar" },
+  { s: TX + "#r-1-x1", p: M + "content", o: "operations: catalog, profile, select" },
+  { s: TX + "#r-1-x2", p: M + "run", o: TX + "#r-1" },
+  { s: TX + "#r-1-x2", p: M + "ordinal", o: 2 },
+  { s: TX + "#r-1-x2", p: M + "kind", o: "tool_result" },
+  { s: TX + "#r-1-x2", p: M + "tool", o: "survey" },
+  { s: TX + "#r-1-x2", p: M + "op", o: "catalog" },
+  { s: TX + "#r-1-x2", p: M + "rows", o: 8 },
+  { s: TX + "#r-1-x2", p: M + "content", o: "catalog scope: types\\nresultCount: 8\\n  foaf:Person 4" },
+]);
+
+/* The endpoint's own record of the calls it served.  Written by the server for
+   every client, which is what makes it the half an autonomous model also leaves
+   behind; here it stands for one day against one repository. */
+const J = "http://dydra.com/mcp/journal/playwright/test/2026-10-15";
+const JOURNAL_ROWS = bind([
+  { s: J, p: M + "type", o: M + "Journal" },
+  { s: J, p: M + "repository", o: "playwright/test" },
+  { s: J, p: M + "date", o: "2026-10-15" },
+  { s: J + "#c1", p: M + "type", o: M + "Request" },
+  { s: J + "#c1", p: M + "agent", o: "playwright" },
+  { s: J + "#c1", p: M + "repository", o: "playwright/test" },
+  { s: J + "#c1", p: M + "method", o: "tools/call" },
+  { s: J + "#c1", p: M + "tool", o: "survey" },
+  { s: J + "#c1", p: M + "client", o: "claude-cli/1.2" },
+  { s: J + "#c1", p: M + "startedAt", o: 4000594310 },
+  { s: J + "#c1", p: M + "duration", o: 184 },
+  { s: J + "#c1", p: M + "status", o: M + "complete" },
+  { s: J + "#c1", p: M + "request", o: '{"method":"tools/call","params":{"name":"survey"}}' },
+  { s: J + "#c1", p: M + "response", o: '{"result":{"content":[]}}' },
+  { s: J + "#c1", p: M + "responseSize", o: 24 },
+  { s: J + "#c1", p: M + "exploration", o: G },
+  { s: J + "#c2", p: M + "type", o: M + "Request" },
+  { s: J + "#c2", p: M + "agent", o: "robot" },
+  { s: J + "#c2", p: M + "method", o: "tools/call" },
+  { s: J + "#c2", p: M + "tool", o: "sparql" },
+  { s: J + "#c2", p: M + "startedAt", o: 4000594395 },
+  { s: J + "#c2", p: M + "status", o: M + "error" },
+  { s: J + "#c2", p: M + "errorCode", o: -32602 },
+  { s: J + "#c2", p: M + "request", o: '{"method":"tools/call","params":{"name":"sparql"}}' },
+  { s: J + "#c2", p: M + "response", o: '{"error":{"code":-32602}}' },
+]);
+
+/* The list of journals answers in its own shape, as the service does, and the
+   per-exploration query answers only the call that named one -- the server
+   filters it in SPARQL, so a stub that returned both would be testing the
+   presentation against data the endpoint cannot produce. */
+const JOURNAL_LIST = bind([{ journal: J, repository: "playwright/test", date: "2026-10-15" }]);
+const EXPLORATION_CALLS = bind(
+  JOURNAL_ROWS.results.bindings
+    .map((b) => Object.fromEntries(Object.entries(b).map(([k, v]) => [k, v.value])))
+    .filter((r) => r.s === J + "#c1"));
+
+const SESSION_ROWS = (query) => query.includes("/transcript>")
+  ? TRANSCRIPT_ROWS
+  : query.includes("a mcp:Journal")
+  ? JOURNAL_LIST
+  : query.includes("mcp:exploration <")
+  ? EXPLORATION_CALLS
+  : query.includes(J)
+  ? JOURNAL_ROWS
+  : query.includes("mcp:Exploration")
   ? bind([{ session: G, repository: "playwright/test", created: 4000594300,
             lastActive: 4000594400, version: 3, active: G + "#n2" }])
   : bind([
@@ -77,6 +148,7 @@ let mcpCalls = 0, llmCalls = 0;
 const modelListCalls = [];
 window.__calls = () => ({ mcpCalls, llmCalls, modelListCalls });
 
+window.__updates = [];
 window.fetch = async (url, init = {}) => {
   // a SPARQL body is a query, not JSON -- parse defensively or the session log
   // request dies here instead of reaching its own branch
@@ -86,8 +158,16 @@ window.fetch = async (url, init = {}) => {
     { status, headers: { "Content-Type": "application/json" } });
 
   // The session log reads <account>/mcp over SPARQL, so it arrives here too --
-  // with a query for a body rather than JSON-RPC.
-  if (String(url).includes("/sparql")) return reply(SESSION_ROWS(String(init.body || "")));
+  // with a query for a body rather than JSON-RPC.  The transcript is written
+  // back to the same endpoint, which the content type tells apart from a read.
+  if (String(url).includes("/sparql")) {
+    const ct = (init.headers || {})["Content-Type"] || "";
+    if (ct.includes("sparql-update")) {
+      window.__updates.push(String(init.body || ""));
+      return new Response("", { status: 200 });
+    }
+    return reply(SESSION_ROWS(String(init.body || "")));
+  }
 
   if (String(url).includes("/mcp")) {
     mcpCalls += 1;
@@ -325,7 +405,7 @@ console.log("\nthe transcript reads as a conversation");
 
 console.log("\nthe answer, and the query inside it");
 {
-  const last = page.locator(".exp-exchanges details.exp-x").last();
+  const last = page.locator(".exp-exchanges .exp-row-llm details.exp-x").last();
   ok(await last.evaluate((d) => d.open) === true, "the final turn opens itself");
   ok((await last.locator("p.exp-prose").count()) >= 2, "the prose is paragraphs, not one block");
   ok(await last.locator("pre.exp-kind-sparql").count() === 1, "the fenced query is kept as a query");
@@ -337,6 +417,32 @@ console.log("\nthe answer, and the query inside it");
   const raws = await last.locator("details.exp-raw > summary").allTextContents();
   ok(raws.includes("the request in full") && raws.includes("the response in full"),
      "both envelopes are there, collapsed, for when they are needed");
+}
+
+console.log("\nthe run is recorded, not just run");
+{
+  // The service records which operations ran.  Only this side ever saw what
+  // they returned, so if the payload is not written from here it is written
+  // nowhere -- which is the whole reason this write exists.
+  const updates = await page.evaluate(() => window.__updates);
+  ok(updates.length === 1, "one update per run, written once the run is over");
+  const u = updates[0];
+  ok(/INSERT DATA/.test(u) && u.includes("/transcript>"),
+     "into the transcript graph, beside the exploration rather than inside it");
+  ok(u.includes("mcp:exploration <http://dydra.com/explorations/AAAA-1111>"),
+     "pointing at the exploration the handle names");
+  ok(u.includes("resultCount: 8") && u.includes("foaf:Person 4"),
+     "and it carries the payload the model was shown, not a count of it");
+  ok(u.includes("operations: catalog, profile, select, materialize"),
+     "including the primer -- the schema half of what it read");
+  ok(/mcp:prompt "collect statistics on the subjects"/.test(u),
+     "and the prompt that started it");
+  ok(u.includes('mcp:kind "tool_result"') && u.includes('mcp:direction "received"'),
+     "each exchange says what it was and which way it moved");
+
+  const note = page.locator(".exp-exchanges .exp-row-note").last();
+  ok((await note.textContent()).includes("transcript"),
+     "the pane says the record was kept, where it says everything else");
 }
 
 console.log("\na failure opens itself");
@@ -418,8 +524,51 @@ console.log("\nthe session button, and the log it opens");
     getComputedStyle(el.closest("summary") || el, "::before").content);
   ok(stray === "none" || stray === "" || stray === "normal",
      "the pane's disclosure triangle does not leak into the log nested inside it");
-  ok(await panel.locator(".sl-caret").count() === 2,
+  ok(await panel.locator('[data-testid="session-log-nodes"] .sl-caret').count() === 2,
      "the log draws its own caret column, on every row, so the columns line up");
+
+  // The second half of the record: the operations say what ran, these say what
+  // was shown.  They are separate graphs and one reading.
+  const tx = panel.locator('[data-testid="session-log-transcript"]');
+  await tx.waitFor({ timeout: 5000 });
+  ok(await tx.locator(".sl-run").count() === 1, "the run is listed under the operations");
+  ok((await tx.locator(".sl-run-prompt").textContent()).includes("temperature above 20"),
+     "headed by what was asked of it");
+  const ex = tx.locator('[data-testid^="session-log-exchange-"]');
+  ok(await ex.count() === 2, "with one row per exchange that carried content");
+  ok((await ex.first().textContent()).includes("score://grammar"),
+     "a document the model read is named");
+  const payload = await tx.locator('[data-testid="session-log-content-2"]').textContent();
+  ok(payload.includes("foaf:Person 4"),
+     "and the payload itself is there to be read, which the operation log never held");
+  ok((await panel.locator('[data-testid="session-log-status"]').textContent())
+       .includes("2 exchange(s) recorded"),
+     "the status counts what was recovered");
+
+  // The third record: what the ENDPOINT was asked, which is the only one of the
+  // three an autonomous client also produces.
+  const calls = panel.locator('[data-testid="session-log-requests"] .sl-req');
+  ok(await calls.count() === 1,
+     "the calls that named this exploration are shown under it");
+  ok((await calls.first().textContent()).includes("tools/call survey"),
+     "a call is named by its method and its tool");
+
+  await panel.locator('[data-testid="session-log-journal-2026-10-15"]').click();
+  const day = panel.locator('[data-testid="session-log-requests"] .sl-req');
+  // wait for a row only the journal view has: the session view also holds one
+  // .sl-req, so waiting for the first would resolve against the old paint
+  await panel.locator('[data-testid="session-log-call-c2"]').waitFor({ timeout: 5000 });
+  ok(await day.count() === 2,
+     "a day's journal shows every call it served, exploration or not");
+  const agents = await panel.locator(".sl-req-agent").allTextContents();
+  ok(agents.includes("playwright") && agents.includes("robot"),
+     "each call is attributed to the agent the token authorized");
+  ok((await day.nth(1).textContent()).includes("error -32602"),
+     "a call that failed says how");
+  await day.nth(1).locator("summary").click();
+  const body = await panel.locator('[data-testid="session-log-response-c2"]').textContent();
+  ok(body.includes("-32602"),
+     "and the response itself is one disclosure away, as the request is");
 
   await page.locator('[data-testid="exploration-session"]').click();
   ok(await panel.isHidden(), "and hides it again");

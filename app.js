@@ -3,12 +3,18 @@ import { AppState } from "./lib/app_state.js";
 import { APP_CONFIG } from "./lib/config.js";
 import { App } from "./ui/app.js";
 import { buildRoutes } from "./ui/routes.js";
+import { installNamePolicy, installNameControls } from "./ui/components/name-input.js";
 
 console.log("[App] Initializing application");
 const state = new AppState();
 const app = new App({ state });
 window.appState = state;
 window.appInstance = app;
+// The reserved-name lists are configuration, read once; the controls that
+// use them attach themselves to any marked field the router renders.
+installNamePolicy(APP_CONFIG.basePath || "");
+installNameControls(document);
+
 console.log("[App] Creating router");
 const router = new Router(
   buildRoutes({ app }),

@@ -5,6 +5,8 @@ import { APP_CONFIG } from "../../lib/config.js";
 import { authenticateAccount } from "../../lib/auth.js";
 import { buildLoginFormHtml, readLastUsername } from "../components/login-form.js";
 import { installExplorationLauncher } from "../components/exploration-pane.js";
+import { attachNameControl, installNamePolicy } from "../components/name-input.js";
+import { makeDragHandleOnly } from "../components/drag-handle.js";
 
 export const errorMessages = () => `
   <div class="widget">
@@ -3530,6 +3532,19 @@ const initializePaneEditing = (app) => {
       const cancelBtn = dialog.querySelector(".new-repo-cancel");
       nameInput.focus();
 
+      // The field keeps itself to what a path segment may hold, and Create is
+      // offered only for a name the service would accept.
+      const nameControl = attachNameControl(nameInput, {
+        kind: "repository",
+        onState: (res) => {
+          okBtn.disabled = !res.ok;
+          okBtn.style.opacity = res.ok ? "" : "0.5";
+          okBtn.style.cursor = res.ok ? "pointer" : "not-allowed";
+        },
+      });
+      okBtn.disabled = true;
+      okBtn.style.opacity = "0.5";
+
       const close = () => overlay.remove();
       cancelBtn.addEventListener("click", close);
       overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
@@ -3540,8 +3555,9 @@ const initializePaneEditing = (app) => {
       dialog.querySelector("h3").after(errorDiv);
 
       const submit = async () => {
-        const name = nameInput.value.trim();
-        if (!name) return;
+        const verdict = nameControl.check();
+        if (!verdict.ok) { nameInput.focus(); return; }
+        const name = verdict.name;
 
         // Check if repository already exists
         const existingRepos = await fetchAccountRepositories(app.state, accountName);
@@ -3708,22 +3724,11 @@ const initializePaneEditing = (app) => {
         }
         const wrapper = document.createElement("div");
         wrapper.className = "view-editor";
-        wrapper.draggable = true;
+        makeDragHandleOnly(wrapper);
         wrapper.dataset.viewName = viewSlug;
 
         const body = document.createElement("div");
         body.className = "view-editor-body";
-
-        // Prevent drag from starting when interacting with editor content (textarea, CodeMirror)
-        // Use dragstart event which is more reliable than mousedown for preventing unwanted drags
-        wrapper.addEventListener("dragstart", (event) => {
-          const target = event.target;
-          // Only allow drag if it starts on the wrapper itself or its title bar
-          // Cancel drag if it starts within editor content
-          if (target.closest("textarea, .CodeMirror, .yasqe, .CodeMirror-scroll, .sparql-editor-content, input, select")) {
-            event.preventDefault();
-          }
-        });
 
         wrapper.appendChild(body);
         container.appendChild(wrapper);
@@ -4006,6 +4011,20 @@ const initializePaneEditing = (app) => {
           const cancelBtn = dialog.querySelector(".new-view-cancel");
           input.focus();
 
+          // A view name is addressed under its repository, and `query' and
+          // `sparql' are already taken there; the field says so before Create
+          // rather than after.
+          const nameControl = attachNameControl(input, {
+            kind: "view",
+            onState: (res) => {
+              okBtn.disabled = !res.ok;
+              okBtn.style.opacity = res.ok ? "" : "0.5";
+              okBtn.style.cursor = res.ok ? "pointer" : "not-allowed";
+            },
+          });
+          okBtn.disabled = true;
+          okBtn.style.opacity = "0.5";
+
           // Add error message element to dialog
           const errorDiv = document.createElement("div");
           errorDiv.style.cssText = "color: #dc3545; font-size: 12px; margin-top: 8px; display: none;";
@@ -4016,8 +4035,9 @@ const initializePaneEditing = (app) => {
           overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
 
           const submit = async () => {
-            const name = input.value.trim();
-            if (!name) return;
+            const verdict = nameControl.check();
+            if (!verdict.ok) { input.focus(); return; }
+            const name = verdict.name;
 
             // Generate a URL-safe slug from the user-entered name
             const slug = parameterize(name);
@@ -5431,7 +5451,7 @@ export class SignupPage extends BasePage {
         <fieldset class="inputs">
           <ol>
             ${APP_CONFIG.requireSignupInvite ? `<li class="string optional"><label>Invite code</label><input type="text" name="invite_code" /></li>` : ""}
-            <li class="string optional"><label>Username</label><input type="text" name="name" /></li>
+            <li class="string optional"><label>Username</label><input type="text" name="name" data-name-kind="account" data-testid="signup-username-input" /></li>
             <li class="email optional"><label>Email</label><input type="email" name="email" /></li>
             <li class="password optional"><label>Password</label><input type="password" name="password" /></li>
             <li class="password optional"><label>Confirm Password</label><input type="password" name="password_confirmation" /></li>
@@ -5769,7 +5789,7 @@ export class AccountNewPage extends BasePage {
       <form class="formtastic" onsubmit="return false;">
         <fieldset class="inputs">
           <ol>
-            <li class="string optional"><label>Username</label><input type="text" /></li>
+            <li class="string optional"><label>Username</label><input type="text" data-name-kind="account" data-testid="new-account-username-input" /></li>
             <li class="email optional"><label>Email</label><input type="email" /></li>
             <li class="password optional"><label>Password</label><input type="password" /></li>
             <li class="password optional"><label>Confirm Password</label><input type="password" /></li>
@@ -5925,22 +5945,11 @@ export class RepositoryRoute extends BasePage {
         }
         const wrapper = document.createElement("div");
         wrapper.className = "view-editor";
-        wrapper.draggable = true;
+        makeDragHandleOnly(wrapper);
         wrapper.dataset.viewName = baseViewName;
 
         const body = document.createElement("div");
         body.className = "view-editor-body";
-
-        // Prevent drag from starting when interacting with editor content (textarea, CodeMirror)
-        // Use dragstart event which is more reliable than mousedown for preventing unwanted drags
-        wrapper.addEventListener("dragstart", (event) => {
-          const target = event.target;
-          // Only allow drag if it starts on the wrapper itself or its title bar
-          // Cancel drag if it starts within editor content
-          if (target.closest("textarea, .CodeMirror, .yasqe, .CodeMirror-scroll, .sparql-editor-content, input, select")) {
-            event.preventDefault();
-          }
-        });
 
         wrapper.appendChild(body);
         container.appendChild(wrapper);

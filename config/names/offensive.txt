@@ -1,0 +1,50 @@
+# Names refused as offensive.
+#
+# This list is configuration, not policy carved into the client: a deployment
+# is expected to replace it with whatever list it is obliged to enforce.  A
+# fuller standard list -- the LDNOOBW "List of Dirty, Naughty, Obscene and
+# Otherwise Bad Words", or a vendor's -- can be pasted in wholesale, one term
+# per line.
+#
+# How a term is matched (lib/names/name-policy.js):
+#
+#   * case-insensitively, against the name reduced to its slug;
+#   * against the whole name, and against each '-' or '_' separated segment;
+#   * a segment that BEGINS with a term matches it, so a term also catches its
+#     inflections -- `shit' catches `shitty', `shit-list' and `bullshit-o-meter'
+#     without listing each.
+#
+# The last rule is why short stems that are common substrings of ordinary words
+# do not belong here: a three-letter term would refuse `assistant', `analysis'
+# and `classics', and a name policy that refuses real words is worse than one
+# that misses a joke.  Prefer the whole word.
+#
+# Terms are compared after punctuation has already been replaced, so `f.u.c.k'
+# arrives as `f-u-c-k'; add such spellings explicitly if they matter to you.
+
+arse
+arsehole
+bastard
+bitch
+bollocks
+bugger
+cocksucker
+cunt
+dickhead
+fuck
+motherfucker
+nigger
+nigga
+paki
+piss
+prick
+pussy
+rape
+rapist
+retard
+shit
+slut
+spastic
+twat
+wanker
+whore

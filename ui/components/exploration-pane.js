@@ -25,9 +25,13 @@
  */
 
 import { connect as mcpConnect, sparqlFrom } from "../../lib/mcp/mcp-client.js";
-import { createToolAdapter } from "../../lib/llm/tool-adapter.js";
+import { createToolAdapter, FIGURE_TOOLS, DEFAULT_SYSTEM } from "../../lib/llm/tool-adapter.js";
+import { figureSystem } from "../../lib/llm/figure-prompt.js";
+import { openFigureGate } from "./figure-gate.js";
 import { renderSessionLog } from "./session-log.js";
+import { recordRun } from "../../lib/mcp/transcript-store.js";
 import { paneState } from "./mcp-pane-state.js";
+import { openDashboardPane } from "./dashboard-pane.js";
 import { locationControl, modelControl, bindLlmSettings } from "./llm-settings.js";
 import {
   formatBlock, fences, summarize, duration, MARK, clip, rowsIn, digestRequest, prettyJson,
@@ -162,6 +166,9 @@ const STYLE = `
 .exploration-pane .exp-empty { color: #999; padding: 6px 2px; }
 .exploration-pane .exp-addview {
   margin-top: 6px; padding: 3px 10px; cursor: pointer; font-size: 11px; }
+.exploration-pane .exp-mode { display: inline-flex; align-items: center; gap: 4px;
+  color: #555; cursor: pointer; }
+.exploration-pane .exp-gate-holder:empty { display: none; }
 `;
 
 function ensureStyle(doc) {
@@ -322,6 +329,13 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
       <div class="exp-actions">
         <button type="button" class="exp-run" data-testid="exploration-run">Run</button>
         <button type="button" class="exp-session" data-testid="exploration-session">Session</button>
+        <button type="button" class="exp-dashboard" data-testid="exploration-dashboard"
+                title="Ask for a whole page rather than one query">Dashboard</button>
+        <label class="exp-mode" title="Ask for a figure drawn from the result, in three steps:
+explore, propose a query, then draw from what the interface fetched">
+          <input type="checkbox" class="exp-figure-mode"
+                 data-testid="exploration-figure-mode" /> Figure
+        </label>
         <span class="exp-status" data-testid="exploration-status"></span>
       </div>
 
@@ -340,6 +354,7 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
   const statusEl = q(".exp-status");
   const list = q(".exp-exchanges");
   const sessionPanel = q(".exp-session-panel");
+  const figureMode = q(".exp-figure-mode");
 
   const setStatus = (s) => { statusEl.textContent = s || ""; };
   const setChip = (kind, text) => {
@@ -415,7 +430,45 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
         if (app?.router?.navigate) app.router.navigate(url); else window.location.assign(url);
       });
       holder.appendChild(b);
+
+      // U-13: the second thing one can do with a query the model wrote.
+      // Beside "Add as a view" because it is the same decision one step
+      // further on -- this query, run now, and drawn -- and because the
+      // prose it sits under is most of what makes the query reviewable.
+      const draw = doc.createElement("button");
+      draw.type = "button";
+      draw.className = "exp-addview";
+      draw.dataset.testid = `exploration-draw-${n}`;
+      draw.textContent = "Draw it…";
+      draw.title = "Run this query here and ask the model to draw the result";
+      const gateHolder = doc.createElement("div");
+      gateHolder.className = "exp-gate-holder";
+      gateHolder.dataset.testid = `exploration-gate-holder-${n}`;
+      let gate = null;
+      draw.addEventListener("click", () => {
+        if (gate) { gate.destroy(); gate = null; draw.textContent = "Draw it…"; return; }
+        draw.textContent = "Close the gate";
+        gate = openFigureGate(gateHolder, {
+          doc, host, account: accountName, repository: repositoryName, state: st,
+          prompt: entry.promptText || st.lastPrompt || "",
+          text: entry.response || "", query: entry.sparql, session: st.session,
+          onStatus: setStatus,
+          onDone: ({ figure, recorded }) => {
+            add({ kind: "note", title: `figure · ${figure.disposition || "drawn"}`,
+                  status: recorded?.ok ? "ok" : "fail",
+                  response: `${figure.kind} figure, drawn from ${figure.rows ?? "?"} row(s) `
+                          + `of ${figure.mimeType || "the result"} (digest ${figure.resultDigest}).\n`
+                          + (figure.promotedTo ? `Kept as the view ${figure.promotedTo}.\n` : "")
+                          + (recorded?.ok
+                              ? `Recorded in <${recorded.graph}>, with the query and the result digest.`
+                              : `Not recorded: ${recorded?.error}`) });
+          },
+        });
+        d.open = true;
+      });
+      holder.appendChild(draw);
       d.appendChild(holder);
+      d.appendChild(gateHolder);
     }
 
     // Failures and the final answer open themselves; routine traffic does not,
@@ -496,6 +549,21 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
     }
   });
 
+  /* ── the dashboard pane ── */
+
+  // A dashboard is not a bigger exploration, it is a different shape of
+  // consent: authority granted once up front rather than a query confirmed at
+  // the end (D-O).  So it opens its own pane, beside this one, seeded with
+  // whatever has been typed here -- the prompt is usually most of the way
+  // there already, and retyping it is the kind of friction that stops people
+  // trying the thing at all.
+  q(".exp-dashboard").addEventListener("click", () => {
+    openDashboardPane(app, {
+      container, accountName, repositoryName,
+      prompt: (prompt.innerText || "").trim(),
+    });
+  });
+
   /* ── run ── */
 
   let running = false;
@@ -511,6 +579,12 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
       return;
     }
     running = true;
+    const started = new Date();
+    // The gate opened under a later turn needs the question the run started
+    // from: a figure drawn without it is a generic rendering of the columns
+    // rather than an answer to what was asked.
+    st.lastPrompt = text;
+    const figuring = figureMode.checked;
     setStatus("running…");
     add({ kind: "note", title: "prompt", status: "note", response: text, responseLabel: "sent" });
 
@@ -543,6 +617,7 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
             tokensIn: e.usage?.input_tokens, tokensOut: e.usage?.output_tokens,
             request: digestRequest(e.request) || e.request || null,
             requestLabel: "sent to the model",
+            promptText: text,
             response: e.text || "(no text in this turn)", responseLabel: "answer", prose: true,
             raw: [{ label: "the request in full", text: e.request },
                   { label: "the response in full", text: e.response }],
@@ -596,11 +671,39 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
         workspaceId: st.llmWorkspace,
         model: st.llmModel,
         mcp: st.mcpEndpoint ? { endpoint: st.mcpEndpoint, token: st.token } : null,
+        // Figure mode changes two things and nothing else: the model is told
+        // that drawing is step 3 and that this call ends at a proposal
+        // (U-12), and `query' joins the offered tools, because a figure is
+        // drawn from a query and a model that can only survey must guess at
+        // what its own SPARQL would return (U-11).  The argument screen in
+        // the adapter is what keeps that from being a write tool.
+        ...(figuring ? { system: figureSystem(DEFAULT_SYSTEM),
+                         allowTools: FIGURE_TOOLS } : {}),
         onEvent,
       });
       const result = await adapter.run(text);
       st.session = result.session || st.session;
       setStatus(result.ok ? `done · ${result.iterations} turn(s)` : `failed · ${result.error}`);
+
+      // Keep the run.  The service records which operations ran; only this side
+      // ever saw what they returned, or what the model was told, so if it is
+      // not written here it is not written anywhere.  A failed run is recorded
+      // too: what it got through before it stopped is the part worth reading.
+      const kept = await recordRun({
+        host, account: accountName, token: st.token,
+        repository: `${accountName}/${repositoryName}`,
+        session: st.session, result, prompt: text, started,
+      });
+      add({
+        kind: "note", title: "transcript", status: kept.ok ? "ok" : "fail",
+        ms: kept.ms,
+        response: kept.ok
+          ? `${kept.exchanges} exchange(s) written to <${kept.graph}>\n\n`
+          + `in <${accountName}>/mcp, beside the exploration the service records. `
+          + `The payloads are kept whole, so what the model read can be read again.`
+          : `not recorded: ${kept.error}\n\n`
+          + `The run itself is unaffected; the record of it is what is missing.`,
+      });
       if (refreshLog && !sessionPanel.hidden) refreshLog();
     } catch (e) {
       add({ kind: "note", title: "run failed", status: "fail", response: String(e) });

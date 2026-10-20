@@ -1,0 +1,13 @@
+# Reserved repository names, from the rails service
+# (config/reserved_names/repositories.txt).  These are the path segments the
+# service itself claims under an account, so a repository of the same name
+# would be unreachable.  One per line; '#' comments; case-insensitive.
+_billing
+_repositories
+auth_token
+edit
+export
+query
+repositories
+service
+sparql

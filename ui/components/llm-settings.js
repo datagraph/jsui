@@ -179,16 +179,21 @@ export function bindLlmSettings(root, st, { keyInput = null, workspaceInput = nu
     if (v) st.llmModel = v;
   });
 
+  // `change' alone fires on blur, which is one event too late: a field that is
+  // filled and then acted on without leaving it leaves the STATE holding the
+  // previous value while the field shows the new one -- and the request then
+  // fails with an authentication error that the field on screen contradicts.
+  // `input' closes that gap; `change' still drives the model list, which is a
+  // network call and has no business running per keystroke.
   if (keyInput) {
-    keyInput.addEventListener("change", () => {
-      st.llmKey = keyInput.value.trim();
-      refresh();
-    });
+    const take = () => { st.llmKey = keyInput.value.trim(); };
+    keyInput.addEventListener("input", take);
+    keyInput.addEventListener("change", () => { take(); refresh(); });
   }
   if (workspaceInput) {
-    workspaceInput.addEventListener("change", () => {
-      st.llmWorkspace = workspaceInput.value.trim();
-    });
+    const take = () => { st.llmWorkspace = workspaceInput.value.trim(); };
+    workspaceInput.addEventListener("input", take);
+    workspaceInput.addEventListener("change", take);
   }
 
   showWorkspaceHint();

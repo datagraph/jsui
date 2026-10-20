@@ -1,0 +1,17 @@
+{
+  "comment": [
+    "Length and shape limits for entered names, as configuration.",
+    "The maximum follows the rails implementation, where account.name,",
+    "repository.name and query.name are each a plain `t.string' column --",
+    "varchar(255) -- with no shorter validation in the model.  The minimum and",
+    "the separator are this client's own: a name has to have something in it,",
+    "and a punctuation character typed into a name has to become something."
+  ],
+  "separator": "-",
+  "kinds": {
+    "account":    { "min": 1, "max": 255, "reserved": "accounts.txt" },
+    "repository": { "min": 1, "max": 255, "reserved": "repositories.txt" },
+    "view":       { "min": 1, "max": 255, "reserved": "views.txt" }
+  },
+  "offensive": "offensive.txt"
+}

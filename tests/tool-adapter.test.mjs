@@ -494,7 +494,10 @@ section("which provider a location speaks, and where it lists its models");
      "the Anthropic list is read with the key, by GET, and keeps the display names");
   const refused = await listModels({ endpoint: "https://api.anthropic.com/v1/messages",
                                      apiKey: "bad", fetchImpl });
-  ok(!refused.ok && refused.error === "invalid x-api-key", "a refusal is returned, not thrown");
+  ok(!refused.ok && /^invalid x-api-key/.test(refused.error),
+     "a refusal is returned, not thrown");
+  ok(/3-character key ending \u2026bad,/.test(refused.error),
+     "and the listing is where a bad key is usually met first, so it says what was sent");
 }
 
 // ------------------------------------------------------------------ OpenCode
@@ -586,6 +589,106 @@ section("a request the browser refuses is explained");
   const r = await createToolAdapter({ provider: "opencode", apiKey: "k", model: "kimi-k2.6",
                                       fetchImpl }).run("hi");
   ok(!r.ok && /CORS/.test(r.error), "a TypeError from fetch names CORS as the likely cause");
+}
+
+section("a run says how it ENDED, not only what it last said");
+{
+  // The failure a live dashboard run found.  Seven turns of exploring, then a
+  // final turn that reached the output ceiling while writing the page: the
+  // block never closes, so nothing parses, and the turn carries no text the
+  // adapter can keep.  `finalText' then reaches back to the last turn that
+  // DID carry text -- turn 1, "I'll start by reading the vocabulary" -- and
+  // the gate presented that opening line to the user as the model's answer.
+  const opening = "I'll start by reading the vocabulary and cataloguing the repository.";
+  const { fetchImpl } = stub([
+    async () => jsonResponse(200, toolsList),
+    async () => jsonResponse(200, {
+      id: "m1", type: "message", role: "assistant", stop_reason: "tool_use",
+      content: [{ type: "text", text: opening },
+                { type: "tool_use", id: "t1", name: "survey", input: { op: "catalog" } }],
+      usage: { input_tokens: 10, output_tokens: 20 },
+    }),
+    async () => jsonResponse(200, surveyReply("a catalogue")),
+    // The ceiling, reached mid-answer: the API cannot emit a block the model
+    // did not finish, so the content comes back empty and the turn says why.
+    async () => jsonResponse(200, {
+      id: "m2", type: "message", role: "assistant", stop_reason: "max_tokens",
+      content: [], usage: { input_tokens: 37989, output_tokens: 32000 },
+    }),
+  ]);
+  const r = await createToolAdapter({
+    provider: "anthropic", apiKey: "k", model: "claude-opus-5",
+    mcp: { endpoint: MCP, token: "t" }, primeWith: [], fetchImpl,
+  }).run("draw me a dashboard");
+
+  ok(r.truncated === true && r.stopReason === "max_tokens",
+     "the run reports that it was cut off at the ceiling, which is not the same as declining");
+  ok(r.finalText === opening && r.textFromTurn === 1 && r.iterations === 2,
+     "finalText is still the last turn that spoke, and says which turn that was");
+  ok(r.lastTurn.text === "" && r.lastTurn.iteration === 2,
+     "so a caller can tell that the LAST turn said nothing at all");
+  ok(!r.dashboard,
+     "and no dashboard was read, because an unclosed block is not a block");
+  const done = r.events.find((e) => e.type === "done");
+  ok(done.truncated === true && done.stopReason === "max_tokens",
+     "the transcript carries the same verdict as the return");
+}
+
+section("a refused key is answered with what was sent");
+{
+  const { credentialNote } = await import(
+    pathToFileURL(join(scratch, "lib", "llm", "providers.js")).href);
+
+  // "invalid x-api-key" says the string sent is not a key, to a user looking
+  // at a field holding a key.  Only the string settles it, and none of what
+  // settles it is the secret part.
+  const good = credentialNote({ apiKey: "sk-ant-api03-" + "x".repeat(80) + "AbC9" });
+  ok(/97-character key ending \u2026AbC9/.test(good),
+     "the length and the last four identify the key without disclosing it");
+  ok(!/x{10}/.test(good), "and the key itself is not in the message");
+  ok(/No workspace header went with it/.test(good),
+     "the workspace header is reported too, because its absence is also an answer");
+
+  ok(/non-printing character/.test(credentialNote({ apiKey: "sk-ant-api03-abc\u200bdef" })),
+     "a zero-width character picked up in the copy is named");
+  ok(/space or a non-printing/.test(credentialNote({ apiKey: "sk-ant-api03 abc" })),
+     "and so is an interior space");
+  ok(/Admin API key/.test(credentialNote({ apiKey: "sk-ant-admin01-abcd" })),
+     "an Admin key is a key of the wrong kind, which no retry fixes");
+  ok(/does not begin with/.test(credentialNote({ apiKey: "sess-01HQ…" })),
+     "and a console session token is not an API key at all");
+  ok(/no key was sent at all/.test(credentialNote({ apiKey: "" })),
+     "an empty value is the one case the field cannot be showing");
+
+  const { fetchImpl } = stub([
+    async () => jsonResponse(401, { type: "error",
+      error: { type: "authentication_error", message: "invalid x-api-key" } }),
+  ]);
+  const r = await createToolAdapter({ provider: "anthropic", apiKey: "sk-ant-api03-nope1234",
+                                      model: "claude-opus-5", mcp: null, primeWith: [],
+                                      fetchImpl }).run("hi");
+  ok(!r.ok && /invalid x-api-key/.test(r.error) && /21-character key ending \u20261234/.test(r.error),
+     "a 401 from the provider carries the note with it");
+
+  const { fetchImpl: f2 } = stub([
+    async () => jsonResponse(500, { type: "error", error: { message: "overloaded" } }),
+  ]);
+  const r2 = await createToolAdapter({ provider: "anthropic", apiKey: "sk-ant-api03-nope1234",
+                                       model: "claude-opus-5", mcp: null, primeWith: [],
+                                       fetchImpl: f2 }).run("hi");
+  ok(!r2.ok && /overloaded/.test(r2.error) && !/character key/.test(r2.error),
+     "and no other failure is treated as a credential problem");
+}
+
+section("a run that simply finishes says so too");
+{
+  const { fetchImpl } = stub([
+    async () => jsonResponse(200, finishes(ANSWER)),
+  ]);
+  const r = await createToolAdapter({ provider: "anthropic", apiKey: "k", model: "claude-opus-5",
+                                      mcp: null, primeWith: [], fetchImpl }).run("ask");
+  ok(r.truncated === false && r.stopReason === "end_turn" && r.textFromTurn === 1,
+     "end_turn is reported as itself, so `truncated' means something");
 }
 
 rmSync(scratch, { recursive: true, force: true });

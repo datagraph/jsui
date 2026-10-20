@@ -1,29 +1,40 @@
 /*
- * jsui prompt pane — from authentication to a view in a new pane.
+ * jsui — the two control flows that reach a model: Run, and Dashboard.
  *
- * Edge labels are numbered in execution order.  Where the order branches the
- * number repeats with a letter, and the tool loop (12–19) repeats until the
- * model stops asking for tools.
+ * Revised 2026-10-19 against the implementation.  Earlier versions of this
+ * picture also carried authentication, the pane chain and the path by which a
+ * suggested query becomes a saved view; those are ordinary jsui and they
+ * crowded out the part that is not.  What is left is the two flows in which
+ * a language model is involved, drawn in enough detail to be checked against
+ * the code.
  *
- * Two credentials govern this picture and they are deliberately drawn apart:
+ *   R0–R8    RUN.  One prompt, a tool loop, a transcript.  The model asks;
+ *            the browser decides and calls.  `ui/components/exploration-pane.js'
+ *   D0–D14   DASHBOARD.  Authority granted once, then a reviewed panel set,
+ *            runs the INTERFACE makes, and a page the model wrote running in
+ *            a frame with no origin.  `ui/components/dashboard-pane.js'
+ *
+ * Both loops are the same loop: `lib/llm/tool-adapter.js' is the only thing
+ * in this picture that speaks to both domains, and therefore the only place
+ * where a datum from the LLM domain becomes an action in the service domain.
+ * It is drawn once and entered twice.
+ *
+ * Two credentials govern the picture and are deliberately drawn apart:
  *
  *   BLUE   the service credential.  Issued by dydra, held by AuthStore, and
- *          presented on every request to a dydra resource.  Everything inside
- *          "service authority" is reachable only with it, and what it reaches
- *          is settled per resource by http:authorize-request and again when
- *          the transaction is created.
+ *          presented on every request to a dydra resource.  The model never
+ *          holds it: it emits tool_use blocks, which are requests *to the
+ *          browser*, and the adapter decides whether to honour each one and
+ *          then makes the call itself.
  *
- *   ORANGE the LLM credential.  Issued by the model provider, held by the
- *          prompt pane's settings row, and presented only to the provider.
- *          It grants nothing in the dydra domain.  It is a bearer token and
- *          remains one: OAuth is being added to the service credential only.
+ *   ORANGE the LLM credential.  Issued by the model provider, held in the
+ *          exploration pane's settings, and presented only to the provider.
+ *          It grants nothing in the dydra domain.
  *
- * The model holds neither.  It cannot address the MCP endpoint: it emits
- * tool_use blocks, which are requests *to the browser*, and the adapter
- * decides whether to honour each one and then makes the call itself under the
- * user's service credential.  The adapter is therefore the one place where a
- * datum from the LLM domain becomes an action in the service domain, and edge
- * 19e is the one place where repository content leaves it.
+ * Two edges are worth finding before the rest: R6e, where repository content
+ * leaves the service domain for the provider, and D9, where code the model
+ * wrote is executed — in a frame with no origin, no credential and no
+ * network, which is the whole reason it may be executed at all.
  *
  *   dot -Tsvg prompt-pane-architecture.dot -o prompt-pane-architecture.svg
  *   dot -Tpdf prompt-pane-architecture.dot -o prompt-pane-architecture.pdf
@@ -32,6 +43,12 @@ digraph prompt_pane {
   rankdir = TB;
   compound = true;
   newrank = true;
+  ranksep = 1.15;
+  nodesep = 0.6;
+  /* Edge labels are placed as nodes; without room they stack on one another,
+     which is how the previous revision of this picture became unreadable in
+     the corner where the tool loop lives.  Labels here are kept to a line or
+     two and the explanation is in the comment above and the legend below. */
   fontname = "Helvetica";
   node  [fontname = "Helvetica", fontsize = 10, shape = box, style = "rounded,filled",
          fillcolor = white, color = "#555555", margin = "0.12,0.07"];
@@ -45,53 +62,40 @@ digraph prompt_pane {
     color = "#999999";
     bgcolor = "#fbfbf9";
 
-    subgraph cluster_auth {
-      label = "authentication";
-      fontsize = 10; style = "rounded"; color = "#cccccc"; bgcolor = "#ffffff";
-      login      [label = "Login form\nhost · account · secret", fillcolor = "#eef3ee"];
-      authstore  [label = "AuthStore\ntoken + config, in memory only",
-                  fillcolor = "#e8eef6", color = "#1f4e79"];
-      svccred    [label = "SERVICE CREDENTIAL\npassword · bearer token\n(· OAuth — proposed)",
-                  shape = note, fillcolor = "#dce6f1", color = "#1f4e79", fontsize = 9];
-    }
-
-    subgraph cluster_panes {
-      label = "panes";
-      fontsize = 10; style = "rounded"; color = "#cccccc"; bgcolor = "#ffffff";
-      accountpane [label = "Account pane\nrepository list"];
-      repopane    [label = "Repository pane\nprofile · settings · … · prompt"];
-    }
-
     subgraph cluster_prompt {
       label = "exploration pane  (ui/components/exploration-pane.js)\na peer of the view editors, in the same column";
       fontsize = 10; style = "rounded"; color = "#cccccc"; bgcolor = "#ffffff";
-      settings   [label = "Connection (collapsible)\nMCP endpoint (derived) · connect output\nLLM endpoint · key · workspace · model",
-                  shape = note, fillcolor = "#fdfdf5"];
-      llmcred    [label = "LLM CREDENTIAL\nprovider API key — a bearer token,\nand staying one by decision\nnever sent to dydra",
+      authstore  [label = "AuthStore\nservice token + configuration,\nin memory only",
+                  fillcolor = "#e8eef6", color = "#1f4e79"];
+      llmcred    [label = "LLM CREDENTIAL\nprovider API key — a bearer token,\nnever sent to dydra",
                   shape = note, fillcolor = "#fbe5d0", color = "#a2672a", fontsize = 9];
-      editor     [label = "Prompt · Run · Session", fillcolor = "#eef3ee"];
-      llmlog     [label = "Transcript · left\nthe model: indicator + request digest + prose\nshow/hide on the left margin",
+      editor     [label = "Prompt · Run · Dashboard · Session", fillcolor = "#eef3ee"];
+      llmlog     [label = "Transcript · left\nthe model: indicator, request digest, prose",
                   fillcolor = "#fdf8f2", color = "#a2672a"];
-      mcplog     [label = "Transcript · right\nthe service: indicator + arguments + payload\nshow/hide on the right margin",
+      mcplog     [label = "Transcript · right\nthe service: indicator, arguments, payload",
                   fillcolor = "#f4f8fc", color = "#1f4e79"];
-      suggested  [label = "Suggested query\nsparqlFrom(fenced block)"];
-      sessionlog [label = "Session log\nreplay of <account>/mcp", fillcolor = "#eef3ee"];
+      suggested  [label = "Suggested query\nsparqlFrom(fenced block) → Add as a view"];
     }
 
-    adapter [label = "Tool-call adapter\nlib/llm/tool-adapter.js\n— POLICY ENFORCEMENT POINT —\nALLOW_TOOLS = [survey]\ncarries one session handle",
+    adapter [label = "Tool-call adapter\nlib/llm/tool-adapter.js\n— POLICY ENFORCEMENT POINT —\nALLOW_TOOLS · the argument screen (lib/llm/grant.js)\ncarries one session handle",
              fillcolor = "#fff6e8", color = "#a2672a", penwidth = 2];
-    provider [label = "Provider adapter\nlib/llm/providers.js\nanthropic", shape = component,
+    provider [label = "Provider adapter\nlib/llm/providers.js — anthropic", shape = component,
               fillcolor = "#fff6e8", color = "#a2672a"];
 
-    subgraph cluster_view {
-      label = "view editing";
+    subgraph cluster_dash {
+      label = "dashboard pane  (ui/components/dashboard-pane.js)\nauthority granted once, not a query confirmed at the end";
       fontsize = 10; style = "rounded"; color = "#cccccc"; bgcolor = "#ffffff";
-      explorebtn[label = "Explore button\n(the former prompt tab, renamed;\nin the Views header, left of New)", fillcolor = "#eef3ee"];
-      router    [label = "Router\n/views/new?query=…", shape = note, fillcolor = "#fdfdf5"];
-      newdialog [label = "New-view dialog\nnames it — no PUT"];
-      viewlist  [label = "View list\nentries, saved or not"];
-      vieweditor[label = "View editor (new pane)\nbuffer = textarea.value", fillcolor = "#eef3ee"];
-      results   [label = "Query results pane\ntable · media type", fillcolor = "#eef3ee"];
+      gate0   [label = "Gate 0 — authority\nrepositories · read-only · call ceiling\nrow + byte budget · lifetime\ncharged per call, revocable mid-run",
+               shape = note, fillcolor = "#fdf8f2", color = "#a2672a"];
+      gate1   [label = "Gate 1 — the panel set\nevery query, every transform's source,\nevery sentence and what it was written from\nTHE LAST POINT BEFORE ANYTHING RUNS",
+               shape = note, fillcolor = "#fdf8f2", color = "#a2672a", penwidth = 2];
+      runner  [label = "Panel runner\nlib/dashboard/runner.js\nthe INTERFACE's own runs, with digests",
+               fillcolor = "#eef3ee"];
+      dframe  [label = "Dashboard frame\nlib/dashboard/frame.js\nsandbox=\"allow-scripts\" · default-src 'none'\nopaque origin · no credential · no network\nTHE MODEL'S HTML AND SCRIPT RUN HERE",
+               shape = component, fillcolor = "#f2efe6", color = "#8a5a1a", penwidth = 2];
+      gate2   [label = "Gate 2 — disposition\nkeep the panels as views · save the page · discard",
+               shape = note, fillcolor = "#fdf8f2", color = "#a2672a"];
+      archive [label = "Archive\nlib/dashboard/archive.js\nreopen: no model, no gate"];
     }
   }
 
@@ -103,11 +107,10 @@ digraph prompt_pane {
     subgraph cluster_services {
       label = "endpoints";
       fontsize = 10; style = "rounded"; color = "#9fb8d0"; bgcolor = "#ffffff";
-      authsvc  [label = "Account configuration\nGET /system/accounts/{a}/configuration", shape = component];
-      mcpsvc   [label = "MCP endpoint\nPOST /{a}/{r}/mcp\ntools/list · resources/read · tools/call\n401 ⇒ WWW-Authenticate: Bearer", shape = component];
+      mcpsvc   [label = "MCP endpoint\nPOST /{a}/{r}/mcp\ntools/list · resources/read · tools/call", shape = component];
       sparqlsvc[label = "SPARQL processor\nPOST /{a}/{r}/sparql", shape = component];
       viewsvc  [label = "View catalog\nGET/PUT/DELETE\n/system/accounts/{a}/repositories/{r}/views/{v}", shape = component];
-      logsvc   [label = "Session store query\nPOST /{a}/mcp/sparql", shape = component];
+      logsvc   [label = "Session + transcript store\nPOST /{a}/mcp/sparql", shape = component];
     }
 
     subgraph cluster_server {
@@ -121,8 +124,7 @@ digraph prompt_pane {
       label = "stores";
       fontsize = 10; style = "rounded"; color = "#9fb8d0"; bgcolor = "#f6f6f6";
       quads   [label = "Repository quads\n{a}/{r}", shape = component];
-      mcprepo [label = "<account>/mcp\nexploration graph per session\nrevisioned", shape = component];
-      terms   [label = "Term dictionary + segment\nsha1 → id, id → record", shape = component];
+      mcprepo [label = "<account>/mcp\nexploration graph (the service's)\ntranscript graph (the browser's)\nmcp:Dashboard per run\nrevisioned", shape = component];
       catalog [label = "View catalog storage", shape = component];
     }
   }
@@ -134,63 +136,67 @@ digraph prompt_pane {
     llmsvc   [label = "Anthropic Messages API\nPOST /v1/messages\nx-api-key · anthropic-version\nanthropic-workspace-id", shape = component];
   }
 
-  /* ─────────────────────────── 1–5  authentication and panes ─────────────────────────── */
-  svccred     -> login       [label = "0  typed once", style = dotted, color = "#1f4e79"];
-  login       -> authsvc     [label = "1  Basic or Bearer", color = "#1f4e79"];
-  authsvc     -> authstore   [label = "2  accessToken + configuration", color = "#1f4e79"];
-  authstore   -> accountpane [label = "3  open account"];
-  accountpane -> repopane    [label = "4  open repository"];
-  repopane    -> explorebtn  [label = "5a  Views panel header,\nright-aligned with New"];
-  explorebtn  -> editor      [label = "5b  Explore → a new pane in\n.view-editors-container"];
-  settings    -> adapter     [label = "6a  endpoints, model", style = dashed];
-  llmcred     -> adapter     [label = "6b  provider key", style = dashed, color = "#a2672a"];
-  authstore   -> adapter     [label = "6c  service token\nfor every dydra call",
-                              style = dashed, color = "#1f4e79"];
+  /* ═══════════════════════════ RUN ═══════════════════════════ */
 
-  /* ─────────────────────────── 7–11  the run begins ─────────────────────────── */
-  editor   -> adapter [label = "7  Execute (target = LLM)"];
-  editor   -> mcpsvc  [label = "7b  connect on open\nserver/discover + survey op=connect",
-                       color = "#1f4e79", style = dashed];
-  adapter  -> mcpsvc  [label = "8  tools/list", color = "#1f4e79"];
-  mcpsvc   -> adapter [label = "9  15 tools → survey kept, 14 withheld\n(withheld in the CLIENT — see note)", color = "#1f4e79"];
-  adapter  -> mcpsvc  [label = "10  resources/read\nscore://operations, score://grammar\n(uri also in Mcp-Name)", color = "#1f4e79"];
-  mcpsvc   -> adapter [label = "11  the server's own documentation\n→ system prompt", color = "#1f4e79"];
+  llmcred   -> adapter [label = "R0a  provider key", style = dashed, color = "#a2672a"];
+  authstore -> adapter [label = "R0b  service token,\nfor every dydra call", style = dashed, color = "#1f4e79"];
 
-  /* ─────────────────────────── 12–19  the tool loop ─────────────────────────── */
-  adapter  -> provider [label = "12  request shape"];
-  provider -> llmsvc   [label = "13  POST messages + tools", color = "#a2672a"];
-  llmsvc   -> adapter  [label = "14  text + tool_use blocks\n— a REQUEST, not an action —", color = "#a2672a"];
-  adapter  -> mcplog   [label = "15a  relayed call, shown"];
-  adapter  -> llmlog   [label = "15b  turn + trace"];
-  adapter  -> mcpsvc   [label = "16  tools/call survey\n{op, body, session}\nmade by the BROWSER,\nunder the USER's credential", color = "#1f4e79", penwidth = 2];
-  mcpsvc   -> orchestrator [label = "17  resolve session, run operation", color = "#1f4e79"];
-  orchestrator -> quads    [label = "18a  SPARQL over the repository", color = "#1f4e79"];
-  orchestrator -> persistence [label = "18b  record the node", color = "#1f4e79"];
-  persistence  -> mcprepo  [label = "18c  exploration graph, version+1", color = "#1f4e79"];
-  persistence  -> terms    [label = "18d  intern novel terms", style = dashed, color = "#1f4e79"];
-  mcpsvc   -> adapter  [label = "19  payload → tool_result\n(loop to 13 while stop_reason = tool_use)", color = "#1f4e79"];
-  adapter  -> llmsvc   [label = "19e  EGRESS: the payload crosses\nout of the service domain",
+  editor   -> adapter [label = "R1  Run  (⌘↵)"];
+
+  // Call and reply on one arrow: four separate edges between these two put
+  // four labels in one band and the band is what became unreadable.
+  adapter  -> mcpsvc  [label = "R2  tools/list · resources/read ⟶\n⟵ ALLOW_TOOLS keeps one, the rest\nwithheld IN THE CLIENT;\nscore:// docs → system prompt",
+                       color = "#1f4e79", dir = both];
+
+  adapter  -> provider [label = "R3  request shape", minlen = 2];
+  provider -> llmsvc   [label = "R4  POST messages + tools", color = "#a2672a"];
+  llmsvc   -> adapter  [label = "R5  text + tool_use\n— a REQUEST, not an action —", color = "#a2672a"];
+  // minlen 2 so this label does not land on the same rank as R2's and the
+  // two do not share one strip of canvas.
+  adapter  -> mcpsvc   [label = "R6  tools/call {op, body, session} ⟶\nby the BROWSER, under the USER's credential,\nafter the argument screen\n⟵ payload → tool_result\n(loop to R4 while stop_reason = tool_use)",
+                        color = "#1f4e79", penwidth = 2, dir = both, minlen = 2];
+  adapter  -> llmsvc   [label = "R6e  EGRESS: the payload leaves\nthe service domain",
                         color = "#a2672a", style = bold, constraint = false];
 
-  /* ─────────────────────────── 20–26  the query becomes a view ─────────────────────────── */
-  adapter    -> suggested  [label = "20  final text → fenced query"];
-  suggested  -> router     [label = "21  Add as a view"];
-  router     -> newdialog  [label = "22  seedQuery"];
-  newdialog  -> viewlist   [label = "23a  list entry — local, unsaved"];
-  newdialog  -> vieweditor [label = "23b  open a NEW pane, buffer seeded"];
-  viewlist   -> vieweditor [label = "23c  reopen later", style = dashed];
-  vieweditor -> sparqlsvc  [label = "24  run the buffer", color = "#1f4e79"];
-  sparqlsvc  -> quads      [label = "25a  reads", color = "#1f4e79"];
-  sparqlsvc  -> results    [label = "25b  result set", color = "#1f4e79"];
-  vieweditor -> viewsvc    [label = "26  Save — PUT, a separate act", style = dashed, color = "#1f4e79"];
-  viewsvc    -> catalog    [label = "26a  stored", style = dashed, color = "#1f4e79"];
-  viewsvc    -> vieweditor [label = "26b  GET on reopen", style = dashed, color = "#1f4e79"];
+  mcpsvc   -> orchestrator [label = "R6a  resolve session, run it", color = "#1f4e79"];
+  orchestrator -> quads    [label = "R6b  reads", color = "#1f4e79"];
+  orchestrator -> persistence [label = "R6c  record the node", color = "#1f4e79"];
+  persistence  -> mcprepo  [label = "R6d  exploration graph, version+1\n(re-posted whole: why R8 writes elsewhere)",
+                            color = "#1f4e79", minlen = 2];
 
-  /* ─────────────────────────── the log, read back ─────────────────────────── */
-  editor      -> sessionlog [label = "L1  Session, beside Run"];
-  sessionlog  -> logsvc     [label = "L2  list sessions / read one", color = "#1f4e79"];
-  logsvc      -> mcprepo    [label = "L3  SPARQL over the graphs", color = "#1f4e79"];
-  logsvc      -> sessionlog [label = "L4  explorations, nodes, operations", color = "#1f4e79"];
+  adapter  -> llmlog    [label = "R7a  turn + trace"];
+  adapter  -> mcplog    [label = "R7b  relayed call"];
+  adapter  -> suggested [label = "R7c  final text → fenced query", minlen = 2];
+  editor   -> logsvc    [label = "R8  transcript: prompt, primer, prose,\nevery payload — INSERT DATA into\n<exploration>/transcript",
+                         color = "#1f4e79", style = bold];
+  logsvc   -> mcprepo   [label = "R8a  beside the service's own record", color = "#1f4e79"];
+
+  /* ═══════════════════════════ DASHBOARD ═══════════════════════════ */
+
+  editor -> gate0 [label = "D0  Dashboard — its own pane,\nseeded with what was typed"];
+  gate0  -> adapter [label = "D1  the grant\n(charged per call, revocable mid-run)",
+                     color = "#a2672a", penwidth = 2];
+  adapter -> gate1 [label = "D2  Phase 1 explores inside the grant —\nthe same loop, R3–R6, no further dialogs.\nThe last turn carries a ```dashboard block"];
+  gate1 -> runner  [label = "D3  validated, and the user agreed.\nA transform that does not compile\nis refused HERE"];
+  runner -> viewsvc   [label = "D4  optional: PUT the panels as temp views\n(swept on discard)",
+                       style = dashed, color = "#1f4e79"];
+  runner -> sparqlsvc [label = "D5  Phase 2: run each panel,\nunder the USER's token (D-I)", color = "#1f4e79", penwidth = 2];
+  sparqlsvc -> quads  [taillabel = "D6  reads", labeldistance = 4.5, labelangle = 18,
+                       color = "#1f4e79"];
+  sparqlsvc -> runner [label = "D7  result + digest, per panel", color = "#1f4e79"];
+  runner -> dframe    [label = "D8  Phase 3: mount the page,\nthen POST the results in.\nIt BINDS; it does not embed"];
+  dframe -> dframe    [label = "D9  transforms (new Function) over the inputs;\nprose marked stale against the digests it\nwas written from; height reported back",
+                       color = "#8a5a1a"];
+  runner -> dframe    [label = "D10  Refresh = run again, post again:\nthe page holds no data",
+                       style = dashed, constraint = false];
+  dframe -> gate2     [label = "D11  the page, as the user sees it"];
+  gate2  -> viewsvc   [label = "D12  Keep — PUT each panel as a view", style = dashed, color = "#1f4e79"];
+  viewsvc -> catalog  [label = "D12a  stored", style = dashed, color = "#1f4e79"];
+  gate2  -> logsvc    [label = "D13  record: mcp:Dashboard —\nthe page, every query and digest,\nevery transform's source, every\nassertion and what it was written from",
+                       color = "#1f4e79", style = bold, minlen = 3];
+  logsvc -> archive   [label = "D14  reopen: straight to D5. No model,\nno gate — the queries were authorised\nwhen they were written",
+                       color = "#1f4e79", style = dashed];
+  archive -> runner   [label = "D14a  live again, not a snapshot", style = dashed];
 
   /* ─────────────────────────── what the boundaries mean ─────────────────────────── */
   subgraph cluster_legend {
@@ -206,25 +212,27 @@ digraph prompt_pane {
            <td align="left">the provider credential.  Reaches the Messages API<br align="left"/>
                and nothing else.</td></tr>
        <tr><td align="left"><b>the model's reach</b></td>
-           <td align="left">= the user's authority ∩ ALLOW_TOOLS.  The model<br align="left"/>
-               has no credential and no route to the endpoint; it asks,<br align="left"/>
-               and edge 16 is the browser answering on its behalf.</td></tr>
+           <td align="left">= the user's authority ∩ ALLOW_TOOLS ∩ the grant.  The<br align="left"/>
+               model has no credential and no route to the endpoint;<br align="left"/>
+               it asks, and R6 is the browser answering on its behalf.</td></tr>
+       <tr><td align="left"><b>the model's code</b></td>
+           <td align="left">runs only in the dashboard frame: opaque origin, no<br align="left"/>
+               credential, no network.  `script-src' there is permissive<br align="left"/>
+               because there is nothing in the frame worth stealing and<br align="left"/>
+               no way to send it anywhere.</td></tr>
        <tr><td align="left"><b>where it is weak</b></td>
-           <td align="left">the allow-list of edge 9 is <i>client-side</i>, and the<br align="left"/>
-               bearer token of edge 6c is permanent, unscoped and<br align="left"/>
-               account-wide.  Both are what OAuth scopes would move<br align="left"/>
-               to the server — on the blue boundary only; the orange<br align="left"/>
-               one keeps its bearer token.  See<br align="left"/>
+           <td align="left">the allow-list of R2 is <i>client-side</i>, and the bearer<br align="left"/>
+               token of R0b is permanent, unscoped and account-wide.<br align="left"/>
+               Both are what OAuth scopes would move to the server —<br align="left"/>
+               on the blue boundary only.  See<br align="left"/>
                mcp-oauth-authorization-plan.md.</td></tr>
        <tr><td align="left"><b>egress</b></td>
-           <td align="left">edge 19e: whatever the model surveys is sent to the<br align="left"/>
+           <td align="left">R6e: whatever the model surveys is sent to the<br align="left"/>
                provider.  Repository read authority is not a bound on<br align="left"/>
                where the content then goes.</td></tr>
       </table>>];
   }
 
   /* keep the reading order top to bottom */
-  { rank = same; login; authsvc; }
-  { rank = same; adapter; provider; }
-  { rank = same; quads; mcprepo; terms; catalog; }
+  { rank = same; quads; mcprepo; catalog; }
 }

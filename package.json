@@ -8,9 +8,20 @@
     "test:router": "node tests/router-query.test.mjs",
     "clean:test-repos": "node tests/clean-test-repos.mjs",
     "test:adapter": "node tests/tool-adapter.test.mjs",
-    "test:unit": "npm run test:router && npm run test:adapter && npm run test:log && npm run test:format",
+    "test:unit": "npm run test:router && npm run test:adapter && npm run test:log && npm run test:format && npm run test:record && npm run test:names && npm run test:dashboard && npm run test:figure && npm run test:wasm",
     "test:log": "node tests/session-log.test.mjs",
     "test:format": "node tests/transcript.test.mjs",
-    "test:pane": "node tests/exploration-pane.browser.mjs"
+    "test:pane": "node tests/exploration-pane.browser.mjs",
+    "test:record": "node tests/transcript-store.test.mjs",
+    "test:names": "node tests/name-policy.test.mjs",
+    "test:name-ui": "node tests/name-input.browser.mjs",
+    "test:browser": "npm run test:pane && npm run test:name-ui && npm run test:editor-ui && npm run test:dashboard-ui && npm run test:figure-ui && npm run test:wasm-ui",
+    "test:editor-ui": "node tests/view-editor-layout.browser.mjs",
+    "test:dashboard": "node tests/dashboard.test.mjs",
+    "test:dashboard-ui": "node tests/dashboard-frame.browser.mjs",
+    "test:figure": "node tests/figure.test.mjs",
+    "test:wasm": "node tests/wasm-graphviz.test.mjs",
+    "test:figure-ui": "node tests/figure-frame.browser.mjs",
+    "test:wasm-ui": "node tests/wasm-graphviz.browser.mjs"
   }
 }

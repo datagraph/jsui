@@ -1,0 +1,6 @@
+# Reserved view names, from the rails service
+# (config/reserved_names/views.txt).  A view is addressed under its repository,
+# where these segments already mean something else.  One per line; '#'
+# comments; case-insensitive.
+query
+sparql

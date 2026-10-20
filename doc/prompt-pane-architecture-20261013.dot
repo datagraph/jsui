@@ -1,0 +1,234 @@
+/*
+ * jsui prompt pane — from authentication to a view in a new pane.
+ *
+ * Edge labels are numbered in execution order.  Where the order branches the
+ * number repeats with a letter, and the tool loop (12–19) repeats until the
+ * model stops asking for tools.
+ *
+ * Two credentials govern this picture and they are deliberately drawn apart:
+ *
+ *   BLUE   the service credential.  Issued by dydra, held by AuthStore, and
+ *          presented on every request to a dydra resource.  Everything inside
+ *          "service authority" is reachable only with it, and what it reaches
+ *          is settled per resource by http:authorize-request and again when
+ *          the transaction is created.
+ *
+ *   ORANGE the LLM credential.  Issued by the model provider, held by the
+ *          prompt pane's settings row, and presented only to the provider.
+ *          It grants nothing in the dydra domain.  It is a bearer token and
+ *          remains one: OAuth is being added to the service credential only.
+ *
+ * The model holds neither.  It cannot address the MCP endpoint: it emits
+ * tool_use blocks, which are requests *to the browser*, and the adapter
+ * decides whether to honour each one and then makes the call itself under the
+ * user's service credential.  The adapter is therefore the one place where a
+ * datum from the LLM domain becomes an action in the service domain, and edge
+ * 19e is the one place where repository content leaves it.
+ *
+ *   dot -Tsvg prompt-pane-architecture.dot -o prompt-pane-architecture.svg
+ *   dot -Tpdf prompt-pane-architecture.dot -o prompt-pane-architecture.pdf
+ */
+digraph prompt_pane {
+  rankdir = TB;
+  compound = true;
+  newrank = true;
+  fontname = "Helvetica";
+  node  [fontname = "Helvetica", fontsize = 10, shape = box, style = "rounded,filled",
+         fillcolor = white, color = "#555555", margin = "0.12,0.07"];
+  edge  [fontname = "Helvetica", fontsize = 9, color = "#555555", arrowsize = 0.7];
+
+  /* ─────────────────────────── the browser ─────────────────────────── */
+  subgraph cluster_browser {
+    label = "browser — jsui   (holds both credentials, keeps them apart)";
+    fontsize = 11;
+    style = "rounded";
+    color = "#999999";
+    bgcolor = "#fbfbf9";
+
+    subgraph cluster_auth {
+      label = "authentication";
+      fontsize = 10; style = "rounded"; color = "#cccccc"; bgcolor = "#ffffff";
+      login      [label = "Login form\nhost · account · secret", fillcolor = "#eef3ee"];
+      authstore  [label = "AuthStore\ntoken + config, in memory only",
+                  fillcolor = "#e8eef6", color = "#1f4e79"];
+      svccred    [label = "SERVICE CREDENTIAL\npassword · bearer token\n(· OAuth — proposed)",
+                  shape = note, fillcolor = "#dce6f1", color = "#1f4e79", fontsize = 9];
+    }
+
+    subgraph cluster_panes {
+      label = "panes";
+      fontsize = 10; style = "rounded"; color = "#cccccc"; bgcolor = "#ffffff";
+      accountpane [label = "Account pane\nrepository list"];
+      repopane    [label = "Repository pane\nprofile · settings · … · prompt"];
+    }
+
+    subgraph cluster_prompt {
+      label = "exploration pane  (ui/components/exploration-pane.js)\na peer of the view editors, in the same column";
+      fontsize = 10; style = "rounded"; color = "#cccccc"; bgcolor = "#ffffff";
+      settings   [label = "Connection (collapsible)\nMCP endpoint (derived) · connect output\nLLM endpoint · key · workspace · model",
+                  shape = note, fillcolor = "#fdfdf5"];
+      llmcred    [label = "LLM CREDENTIAL\nprovider API key — a bearer token,\nand staying one by decision\nnever sent to dydra",
+                  shape = note, fillcolor = "#fbe5d0", color = "#a2672a", fontsize = 9];
+      editor     [label = "Prompt · Run · Session", fillcolor = "#eef3ee"];
+      llmlog     [label = "Transcript · left\nthe model: indicator + request digest + prose\nshow/hide on the left margin",
+                  fillcolor = "#fdf8f2", color = "#a2672a"];
+      mcplog     [label = "Transcript · right\nthe service: indicator + arguments + payload\nshow/hide on the right margin",
+                  fillcolor = "#f4f8fc", color = "#1f4e79"];
+      suggested  [label = "Suggested query\nsparqlFrom(fenced block)"];
+      sessionlog [label = "Session log\nreplay of <account>/mcp", fillcolor = "#eef3ee"];
+    }
+
+    adapter [label = "Tool-call adapter\nlib/llm/tool-adapter.js\n— POLICY ENFORCEMENT POINT —\nALLOW_TOOLS = [survey]\ncarries one session handle",
+             fillcolor = "#fff6e8", color = "#a2672a", penwidth = 2];
+    provider [label = "Provider adapter\nlib/llm/providers.js\nanthropic", shape = component,
+              fillcolor = "#fff6e8", color = "#a2672a"];
+
+    subgraph cluster_view {
+      label = "view editing";
+      fontsize = 10; style = "rounded"; color = "#cccccc"; bgcolor = "#ffffff";
+      explorebtn[label = "Explore button\n(the former prompt tab, renamed;\nin the Views header, left of New)", fillcolor = "#eef3ee"];
+      router    [label = "Router\n/views/new?query=…", shape = note, fillcolor = "#fdfdf5"];
+      newdialog [label = "New-view dialog\nnames it — no PUT"];
+      viewlist  [label = "View list\nentries, saved or not"];
+      vieweditor[label = "View editor (new pane)\nbuffer = textarea.value", fillcolor = "#eef3ee"];
+      results   [label = "Query results pane\ntable · media type", fillcolor = "#eef3ee"];
+    }
+  }
+
+  /* ───────────────── service authority — the dydra credential ───────────────── */
+  subgraph cluster_service_domain {
+    label = "SERVICE AUTHORITY   — reachable only with the dydra credential —\nper-resource http:authorize-request, re-checked when the transaction is created";
+    fontsize = 11; style = "rounded"; color = "#1f4e79"; penwidth = 2; bgcolor = "#f3f7fb";
+
+    subgraph cluster_services {
+      label = "endpoints";
+      fontsize = 10; style = "rounded"; color = "#9fb8d0"; bgcolor = "#ffffff";
+      authsvc  [label = "Account configuration\nGET /system/accounts/{a}/configuration", shape = component];
+      mcpsvc   [label = "MCP endpoint\nPOST /{a}/{r}/mcp\ntools/list · resources/read · tools/call\n401 ⇒ WWW-Authenticate: Bearer", shape = component];
+      sparqlsvc[label = "SPARQL processor\nPOST /{a}/{r}/sparql", shape = component];
+      viewsvc  [label = "View catalog\nGET/PUT/DELETE\n/system/accounts/{a}/repositories/{r}/views/{v}", shape = component];
+      logsvc   [label = "Session store query\nPOST /{a}/mcp/sparql", shape = component];
+    }
+
+    subgraph cluster_server {
+      label = "spocq";
+      fontsize = 10; style = "rounded"; color = "#9fb8d0"; bgcolor = "#ffffff";
+      orchestrator [label = "orchestrator\nscore operations\ncatalog · profile · select · materialize"];
+      persistence  [label = "persist-exploration\ncompare-and-set on version"];
+    }
+
+    subgraph cluster_stores {
+      label = "stores";
+      fontsize = 10; style = "rounded"; color = "#9fb8d0"; bgcolor = "#f6f6f6";
+      quads   [label = "Repository quads\n{a}/{r}", shape = component];
+      mcprepo [label = "<account>/mcp\nexploration graph per session (the service's)\ntranscript graph beside it (the browser's)\nrevisioned", shape = component];
+      terms   [label = "Term dictionary + segment\nsha1 → id, id → record", shape = component];
+      catalog [label = "View catalog storage", shape = component];
+    }
+  }
+
+  /* ───────────────── llm authority — the provider credential ───────────────── */
+  subgraph cluster_llm_domain {
+    label = "LLM AUTHORITY   — reachable only with the provider credential —\nno dydra authority whatever";
+    fontsize = 11; style = "rounded"; color = "#a2672a"; penwidth = 2; bgcolor = "#fdf6ee";
+    llmsvc   [label = "Anthropic Messages API\nPOST /v1/messages\nx-api-key · anthropic-version\nanthropic-workspace-id", shape = component];
+  }
+
+  /* ─────────────────────────── 1–5  authentication and panes ─────────────────────────── */
+  svccred     -> login       [label = "0  typed once", style = dotted, color = "#1f4e79"];
+  login       -> authsvc     [label = "1  Basic or Bearer", color = "#1f4e79"];
+  authsvc     -> authstore   [label = "2  accessToken + configuration", color = "#1f4e79"];
+  authstore   -> accountpane [label = "3  open account"];
+  accountpane -> repopane    [label = "4  open repository"];
+  repopane    -> explorebtn  [label = "5a  Views panel header,\nright-aligned with New"];
+  explorebtn  -> editor      [label = "5b  Explore → a new pane in\n.view-editors-container"];
+  settings    -> adapter     [label = "6a  endpoints, model", style = dashed];
+  llmcred     -> adapter     [label = "6b  provider key", style = dashed, color = "#a2672a"];
+  authstore   -> adapter     [label = "6c  service token\nfor every dydra call",
+                              style = dashed, color = "#1f4e79"];
+
+  /* ─────────────────────────── 7–11  the run begins ─────────────────────────── */
+  editor   -> adapter [label = "7  Execute (target = LLM)"];
+  editor   -> mcpsvc  [label = "7b  connect on open\nserver/discover + survey op=connect",
+                       color = "#1f4e79", style = dashed];
+  adapter  -> mcpsvc  [label = "8  tools/list", color = "#1f4e79"];
+  mcpsvc   -> adapter [label = "9  15 tools → survey kept, 14 withheld\n(withheld in the CLIENT — see note)", color = "#1f4e79"];
+  adapter  -> mcpsvc  [label = "10  resources/read\nscore://operations, score://grammar\n(uri also in Mcp-Name)", color = "#1f4e79"];
+  mcpsvc   -> adapter [label = "11  the server's own documentation\n→ system prompt", color = "#1f4e79"];
+
+  /* ─────────────────────────── 12–19  the tool loop ─────────────────────────── */
+  adapter  -> provider [label = "12  request shape"];
+  provider -> llmsvc   [label = "13  POST messages + tools", color = "#a2672a"];
+  llmsvc   -> adapter  [label = "14  text + tool_use blocks\n— a REQUEST, not an action —", color = "#a2672a"];
+  adapter  -> mcplog   [label = "15a  relayed call, shown"];
+  // The record of content, written from the only place the whole exchange
+  // exists.  The service never sees the model's half; the provider never sees
+  // the store's.
+  adapter  -> mcprepo  [label = "19f  transcript: prompt, primer, prose,\nand every payload — SPARQL INSERT DATA\ninto <exploration>/transcript", color = "#1f4e79", style = bold];
+  adapter  -> llmlog   [label = "15b  turn + trace"];
+  adapter  -> mcpsvc   [label = "16  tools/call survey\n{op, body, session}\nmade by the BROWSER,\nunder the USER's credential", color = "#1f4e79", penwidth = 2];
+  mcpsvc   -> orchestrator [label = "17  resolve session, run operation", color = "#1f4e79"];
+  orchestrator -> quads    [label = "18a  SPARQL over the repository", color = "#1f4e79"];
+  orchestrator -> persistence [label = "18b  record the node", color = "#1f4e79"];
+  persistence  -> mcprepo  [label = "18c  exploration graph, version+1\n(deleted and re-posted whole,\nwhich is why 19f writes elsewhere)", color = "#1f4e79"];
+  persistence  -> terms    [label = "18d  intern novel terms", style = dashed, color = "#1f4e79"];
+  mcpsvc   -> adapter  [label = "19  payload → tool_result\n(loop to 13 while stop_reason = tool_use)", color = "#1f4e79"];
+  adapter  -> llmsvc   [label = "19e  EGRESS: the payload crosses\nout of the service domain",
+                        color = "#a2672a", style = bold, constraint = false];
+
+  /* ─────────────────────────── 20–26  the query becomes a view ─────────────────────────── */
+  adapter    -> suggested  [label = "20  final text → fenced query"];
+  suggested  -> router     [label = "21  Add as a view"];
+  router     -> newdialog  [label = "22  seedQuery"];
+  newdialog  -> viewlist   [label = "23a  list entry — local, unsaved"];
+  newdialog  -> vieweditor [label = "23b  open a NEW pane, buffer seeded"];
+  viewlist   -> vieweditor [label = "23c  reopen later", style = dashed];
+  vieweditor -> sparqlsvc  [label = "24  run the buffer", color = "#1f4e79"];
+  sparqlsvc  -> quads      [label = "25a  reads", color = "#1f4e79"];
+  sparqlsvc  -> results    [label = "25b  result set", color = "#1f4e79"];
+  vieweditor -> viewsvc    [label = "26  Save — PUT, a separate act", style = dashed, color = "#1f4e79"];
+  viewsvc    -> catalog    [label = "26a  stored", style = dashed, color = "#1f4e79"];
+  viewsvc    -> vieweditor [label = "26b  GET on reopen", style = dashed, color = "#1f4e79"];
+
+  /* ─────────────────────────── the log, read back ─────────────────────────── */
+  editor      -> sessionlog [label = "L1  Session, beside Run"];
+  sessionlog  -> logsvc     [label = "L2  list sessions / read one", color = "#1f4e79"];
+  logsvc      -> mcprepo    [label = "L3  SPARQL over the graphs", color = "#1f4e79"];
+  logsvc      -> sessionlog [label = "L4  explorations, nodes, operations", color = "#1f4e79"];
+
+  /* ─────────────────────────── what the boundaries mean ─────────────────────────── */
+  subgraph cluster_legend {
+    label = "reading the boundaries";
+    fontsize = 11; style = "rounded"; color = "#999999"; bgcolor = "#ffffff";
+    legend [shape = plaintext, style = "", fillcolor = "none", fontsize = 9, label =
+      <<table border="0" cellborder="0" cellspacing="3" cellpadding="2">
+       <tr><td align="left"><font color="#1f4e79"><b>━━ service authority</b></font></td>
+           <td align="left">the dydra credential.  Authenticated per request<br align="left"/>
+               (password / bearer / session / location), then authorized<br align="left"/>
+               per resource, then again at transaction creation.</td></tr>
+       <tr><td align="left"><font color="#a2672a"><b>━━ llm authority</b></font></td>
+           <td align="left">the provider credential.  Reaches the Messages API<br align="left"/>
+               and nothing else.</td></tr>
+       <tr><td align="left"><b>the model's reach</b></td>
+           <td align="left">= the user's authority ∩ ALLOW_TOOLS.  The model<br align="left"/>
+               has no credential and no route to the endpoint; it asks,<br align="left"/>
+               and edge 16 is the browser answering on its behalf.</td></tr>
+       <tr><td align="left"><b>where it is weak</b></td>
+           <td align="left">the allow-list of edge 9 is <i>client-side</i>, and the<br align="left"/>
+               bearer token of edge 6c is permanent, unscoped and<br align="left"/>
+               account-wide.  Both are what OAuth scopes would move<br align="left"/>
+               to the server — on the blue boundary only; the orange<br align="left"/>
+               one keeps its bearer token.  See<br align="left"/>
+               mcp-oauth-authorization-plan.md.</td></tr>
+       <tr><td align="left"><b>egress</b></td>
+           <td align="left">edge 19e: whatever the model surveys is sent to the<br align="left"/>
+               provider.  Repository read authority is not a bound on<br align="left"/>
+               where the content then goes.</td></tr>
+      </table>>];
+  }
+
+  /* keep the reading order top to bottom */
+  { rank = same; login; authsvc; }
+  { rank = same; adapter; provider; }
+  { rank = same; quads; mcprepo; terms; catalog; }
+}
