@@ -148,13 +148,16 @@ const list = (doc, items, cls = "fig-list") =>
  */
 export function openFigureGate(container, {
   doc = null, host, account, repository, state,
-  prompt = "", text = "", query = null, session = null,
+  prompt = "", text = "", query = null, session = null, ran = [],
   onStatus = () => {}, onDone = () => {},
 } = {}) {
   const d = doc || container.ownerDocument || document;
   ensureStyle(d);
 
-  const proposal = validateProposal({ query: query || sparqlFrom(text) || "", text });
+  // `ran' is every query this exploration actually sent.  The proposal's
+  // query was typed again by the model and may not be one of them; see
+  // `lib/figure/provenance.js' for what that costs and how it is detected.
+  let proposal = validateProposal({ query: query || sparqlFrom(text) || "", text, ran });
   const run = runId();
   const started = new Date();
 
@@ -176,7 +179,12 @@ export function openFigureGate(container, {
   // What the run accumulates, for the record at the end.
   const events = [];
   const note = (e) => { events.push({ at: new Date().toISOString(), ...e }); return e; };
-  let temp = null;             // the temporary view's name, once written
+  let temp = null;             // the temporary view the CURRENT run went through
+  // Every temporary entry this gate wrote, which is not the same list: a run
+  // that falls back to the direct route stops USING the entry but has not
+  // stopped having written one, and a sweep that followed `temp' would leave
+  // it behind in the catalogue for nobody to find.
+  let written = null;
   let promoted = null;         // the name it was kept under
   let phase2 = null;           // the result document and its shape
   let drawn = null;            // {kind, text, caption, complete}
@@ -206,6 +214,30 @@ export function openFigureGate(container, {
 
     const warn = list(d, proposal.warnings);
     if (warn) { warn.dataset.testid = "figure-warnings"; body.appendChild(warn); }
+
+    // The query that ran, where it is not this one.  Shown rather than
+    // described, and offered rather than substituted: what the user
+    // authorises at Gate 1 has to be what they are looking at, so the swap is
+    // a button that redraws the gate, never something that happens to the
+    // text between reading it and pressing Run.
+    if (proposal.divergence?.kind === "dataset") {
+      const other = proposal.divergence.match;
+      const alt = el(d, "details", { open: "" }, [
+        el(d, "summary", { text: "the query that ran during this exploration" }),
+        pre(d, other.query, "sparql"),
+      ]);
+      alt.dataset.testid = "figure-ran-query";
+      body.appendChild(alt);
+      body.appendChild(el(d, "div", { class: "fig-actions" }, [
+        el(d, "button", { type: "button", testid: "figure-use-ran",
+          text: "Use the query that ran",
+          onclick: () => {
+            note({ type: "use-ran", from: proposal.query, to: other.query });
+            proposal = validateProposal({ query: other.query, text, ran });
+            gate1();
+          } }),
+      ]));
+    }
 
     const grid = el(d, "div", { class: "fig-grid" });
     const accept = el(d, "select", { class: "fig-accept", testid: "figure-accept" },
@@ -267,7 +299,7 @@ export function openFigureGate(container, {
       status.textContent = `writing ${name}…`;
       const put = await putView({ host, account, repository, name, query: q,
                                   token: state.token });
-      if (put.ok) { temp = name; note({ type: "temp-view", name, ok: true }); }
+      if (put.ok) { temp = name; written = name; note({ type: "temp-view", name, ok: true }); }
       else {
         // Not fatal: the direct route runs the same text and writes nothing,
         // so a catalogue that refuses the entry costs provenance, not the run.
@@ -289,14 +321,52 @@ export function openFigureGate(container, {
 
     if (!result.ok) {
       status.remove();
-      stage("Phase 2 failed", `HTTP ${result.status || 0}`);
+      stage(result.mismatch ? "Phase 2 — the response does not answer the query"
+                            : "Phase 2 failed",
+            result.mismatch ? `HTTP ${result.status} via ${result.via}`
+                            : `HTTP ${result.status || 0}`);
       body.appendChild(el(d, "div", { class: "fig-err", testid: "figure-run-error",
                                       text: result.error || "the query did not run" }));
-      body.appendChild(el(d, "div", { class: "fig-actions" }, [
-        el(d, "button", { type: "button", text: "Back", onclick: gate1 }),
-        el(d, "button", { type: "button", text: "Close", onclick: () => api.destroy() }),
-      ]));
-      onStatus(`the query failed · ${result.error || result.status}`);
+
+      // A mismatch is the one failure where the body is the evidence, so it
+      // is shown rather than described: the user has the query above it and
+      // can see for themselves what answered it.  Nothing is drawn from it,
+      // and nothing is sent to the model -- a document that does not answer
+      // the query cannot produce a figure of anything, and asking for one
+      // invites a picture of whatever it does contain.
+      if (result.mismatch) {
+        body.appendChild(el(d, "div", { class: "fig-note", testid: "figure-mismatch-note",
+          text: temp
+            ? `It ran by name, as ${temp}. The direct route posts the same query text `
+            + `to the SPARQL endpoint and writes nothing; if that answers properly, the `
+            + `catalogue entry is what is wrong, not the query.`
+            : `It ran directly against the SPARQL endpoint, so the query text above is `
+            + `exactly what was sent.` }));
+        const seen = el(d, "details", { open: "" }, [
+          el(d, "summary", { text: "what came back" }),
+          pre(d, (result.text || "").slice(0, 4000)),
+        ]);
+        seen.dataset.testid = "figure-mismatch-body";
+        body.appendChild(seen);
+      }
+
+      const actions = [];
+      if (result.mismatch && temp) {
+        actions.push(el(d, "button", { type: "button", class: "fig-primary",
+          testid: "figure-run-direct", text: "Run it directly instead",
+          onclick: () => {
+            temp = null;            // `written' still holds it, so it is still swept
+            note({ type: "retry-direct", after: "mismatch" });
+            phase2run({ query: q, accept, capped, viaCatalog: false });
+          } }));
+      }
+      actions.push(el(d, "button", { type: "button", text: "Back", onclick: gate1 }));
+      actions.push(el(d, "button", { type: "button", text: "Close",
+                                     onclick: () => api.destroy() }));
+      body.appendChild(el(d, "div", { class: "fig-actions" }, actions));
+      onStatus(result.mismatch
+        ? "the response does not answer the query"
+        : `the query failed · ${result.error || result.status}`);
       return;
     }
 
@@ -467,7 +537,7 @@ export function openFigureGate(container, {
     if (name) {
       const res = await promoteView({ host, account, repository, token: state.token,
                                       from: temp, to: name, query: phase2.query });
-      if (res.ok) { promoted = name; temp = null; }
+      if (res.ok) { promoted = name; temp = null; written = null; }
       else {
         body.appendChild(el(d, "div", { class: "fig-err", testid: "figure-keep-error",
           text: `the view was not written: ${res.put.error}` }));
@@ -547,12 +617,13 @@ export function openFigureGate(container, {
       // did not want enough to keep.  It is worth as much in the record as
       // an explicit discard.
       if (drawn && recordedAs === null) { disposition = "abandoned"; await record(); }
-      if (temp) {
+      if (written || temp) {
         // Only the name this gate wrote, and only while it is still
         // temporary: a sweep that could reach a promoted view would be a
         // worse failure than a stale entry left behind.
-        await deleteView({ host, account, repository, name: temp, token: state.token });
-        temp = null;
+        await deleteView({ host, account, repository, name: written || temp,
+                           token: state.token });
+        temp = null; written = null;
       }
       if (mounted) mounted.destroy();
       wrap.remove();

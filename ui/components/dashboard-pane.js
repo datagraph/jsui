@@ -35,11 +35,20 @@
 import { paneState } from "./mcp-pane-state.js";
 import { createToolAdapter, DASHBOARD_TOOLS, DEFAULT_SYSTEM } from "../../lib/llm/tool-adapter.js";
 import { createGrant, DEFAULT_GRANT } from "../../lib/llm/grant.js";
-import { dashboardSystem } from "../../lib/llm/dashboard-prompt.js";
+import { dashboardSystem, revisionSystem } from "../../lib/llm/dashboard-prompt.js";
 import {
-  validateDashboard, withInputDigests, staleAssertions, dashboardRecord,
+  withInputDigests, staleAssertions, dashboardRecord,
 } from "../../lib/dashboard/spec.js";
 import { mountDashboard } from "../../lib/dashboard/frame.js";
+import {
+  validateApplication, applicationFrom, mintId, specOf,
+} from "../../lib/app/document.js";
+import { applyPatch, patchFrom, panelDiff, classify } from "../../lib/app/patch.js";
+import { defaultValues, bindParameters } from "../../lib/app/parameters.js";
+import { createRepairLoop, groupFailures, repairPrompt } from "../../lib/app/repair.js";
+import {
+  createInteractionBudget, budgetForPage, DEFAULT_INTERACTION,
+} from "../../lib/app/interaction.js";
 import { runPanels, payloadsFor, totals } from "../../lib/dashboard/runner.js";
 import { putPanelSet, promoteView, sweep, runId, tempName } from "../../lib/dashboard/catalog.js";
 import { listDashboards, readDashboard } from "../../lib/dashboard/archive.js";
@@ -50,6 +59,10 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
 
 const slug = (s) => String(s || "").replace(/[^a-z0-9_-]/gi, "-");
 const kib = (n) => `${Math.round((Number(n) || 0) / 1024)} KiB`;
+
+/** The parameter values hiding in a restored state map, and nothing else. */
+const pick = (state, parameters = []) => Object.fromEntries(
+  parameters.filter((p) => state && state[p.name] != null).map((p) => [p.name, state[p.name]]));
 
 /* ─────────────────────────── styling ─────────────────────────── */
 
@@ -105,6 +118,9 @@ const STYLE = `
   overflow: hidden; margin-top: 3px; }
 .dashboard-pane .dsh-bar > i { display: block; height: 100%; background: #6a9ad0; }
 .dashboard-pane .dsh-bar.over > i { background: #c76b6b; }
+.dashboard-pane .dsh-interaction { border: 1px solid #eef1f4; border-radius: 3px;
+  padding: 5px 8px 6px; margin: 6px 0 8px; background: #fbfcfd; }
+.dashboard-pane .dsh-interaction .dsh-actions { margin-top: 5px; }
 
 .dashboard-pane .dsh-panel { border: 1px solid #eef1f4; border-radius: 3px;
   margin-bottom: 6px; }
@@ -117,6 +133,9 @@ const STYLE = `
 .dashboard-pane .dsh-kind-bound    { background: #e9f1f8; color: #1f4e79; }
 .dashboard-pane .dsh-kind-derived  { background: #eaf2ea; color: #2d662d; }
 .dashboard-pane .dsh-kind-asserted { background: #fdf3e0; color: #8a5a1a; }
+.dashboard-pane .dsh-kind-param    { background: #f0eaf6; color: #5a3d7a; }
+.dashboard-pane pre.dsh-was { background: #fdf3f3; color: #7a5252;
+  text-decoration: line-through; text-decoration-color: #d8b4b4; }
 .dashboard-pane pre.dsh-pre { margin: 0; padding: 6px 8px; background: #fbfcfd;
   font-family: ui-monospace, Menlo, monospace; font-size: 11px; line-height: 1.45;
   white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; }
@@ -181,7 +200,7 @@ function proseOf(text) {
 
 /** An answer block begun and never closed: the mark of a turn cut off. */
 function openFence(text) {
-  return /```(?:dashboard|json)\s*\n(?![\s\S]*```)/i.test(String(text || ""));
+  return /```(?:dashboard|application|patch|json)\s*\n(?![\s\S]*```)/i.test(String(text || ""));
 }
 
 function stage(doc, title, sub, { gate = false } = {}) {
@@ -235,13 +254,30 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
 
   let grant = null;
   let adapterResult = null;
-  let validated = null;         // {ok, spec, errors, warnings}
+  let validated = null;         // {ok, document, errors, warnings, size}
   let results = null;           // {panel: {ok, text, digest, …}}
   let mounted = null;           // the frame handle
   let run = null;               // the catalogue run id
   let tempNames = [];           // what was written, for the sweep
   let viaCatalog = false;
   let aborter = null;
+
+  // The document, its history, and what the page has become since it loaded.
+  // `appDoc' is the authority (§6.2.1): the frame holds a copy it may have
+  // patched in place, and these are what a rebuild or a reopen is built from.
+  let appDoc = null;            // the normalised application document
+  let patches = [];             // the operations that produced this revision
+  let parameterValues = {};     // what the page has chosen (D-X)
+  let appState = {};            // the bounded slice of §10.3
+  let frameErrors = [];         // what the page has reported since the last fill
+  let repair = null;            // the bounded loop of §11
+  // What the PAGE may spend, as against what the MODEL may (§15 q.3).  Every
+  // run it covers is a query the user authorised at Gate 1; it bounds how
+  // often, not what.
+  let interaction = null;
+  let revising = false;
+  let lastPrompt = "";
+  let startedAt = null;
 
   const teardown = () => {
     try { mounted?.destroy(); } catch { /* already gone */ }
@@ -289,6 +325,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   const fRows = field("rows", "rows", DEFAULT_GRANT.maxRows);
   const fBytes = field("KiB", "bytes", Math.round(DEFAULT_GRANT.maxBytes / 1024));
   const fRepos = field("repositories", "repos", repoKey, "text");
+  const fRuns = field("page runs", "runs", DEFAULT_INTERACTION.maxRuns);
   const readOnly = el(doc, "input", { type: "checkbox", checked: true,
                                       dataset: { testid: "dashboard-grant-readonly" } });
   const catalogBox = el(doc, "input", { type: "checkbox",
@@ -299,6 +336,14 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     fQueries.label, fQueries.input,
     fRows.label, fRows.input,
     fBytes.label, fBytes.input,
+    // Set here because this is where the user decides what a run may cost --
+    // but it is NOT the model's authority, and the note says so.  The model
+    // never makes these calls; a control on the finished page does, against
+    // a query this gate's successor will have shown them.
+    fRuns.label, el(doc, "span", {}, [fRuns.input,
+      el(doc, "span", { class: "dsh-note",
+        text: " how many times the finished page may re-run a panel by itself "
+            + "(a selector, a refresh). Renewable while you read it; not the model's to spend" })]),
     el(doc, "label", { text: "read-only" }),
     el(doc, "span", {}, [readOnly,
       el(doc, "span", { class: "dsh-note",
@@ -340,21 +385,38 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
             + accountName + ">/mcp as soon as its page exists" }));
       return;
     }
-    archive._body.replaceChildren(...listed.dashboards.map((d) => {
+    // Grouped by document, newest revision first (§10.2): a page revised four
+    // times is four records, and a list that showed all four would get longer
+    // the more a user worked on one thing.
+    archive._body.replaceChildren(...(listed.applications || []).map((g) => {
+      const d = g.latest;
       const openBtn = el(doc, "button", { type: "button", text: "Open",
                                           dataset: { testid: "dashboard-open-saved" },
                                           onclick: () => openStored(d) });
-      return el(doc, "div", { class: "dsh-actions" }, [
+      const row = el(doc, "div", { class: "dsh-actions" }, [
         openBtn,
         el(doc, "b", { text: d.title }),
         el(doc, "span", { class: "dsh-note",
           text: `${d.recorded || ""} ${d.repository || ""} ${d.disposition || ""}`.trim() }),
       ]);
+      if (g.count > 1) {
+        row.appendChild(el(doc, "span", { class: "dsh-note",
+          dataset: { testid: "dashboard-revisions" },
+          text: `revision ${d.revision} of ${g.count}` }));
+        // Earlier revisions are reachable, and continuing from one FORKS
+        // rather than rewriting history: the later revisions really happened.
+        for (const older of g.revisions.slice(1)) {
+          row.appendChild(el(doc, "button", { type: "button", text: `r${older.revision}`,
+                                              title: `open revision ${older.revision}`,
+                                              onclick: () => openStored(older, { fork: true }) }));
+        }
+      }
+      return row;
     }));
   });
 
   /** Reopen one: read it, run its panels now, and mark what no longer holds. */
-  async function openStored(entry) {
+  async function openStored(entry, options = {}) {
     archive._body.prepend(el(doc, "div", { class: "dsh-note",
                                            text: `opening ${entry.title}…` }));
     const stored = await readDashboard({ host, account: accountName, token: st.token,
@@ -365,7 +427,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
                         : `could not read it: ${stored.error}` }));
       return;
     }
-    const v = validateDashboard(stored.spec);
+    const v = validateApplication(stored.document || stored.spec);
     if (!v.ok) {
       archive._body.prepend(el(doc, "div", { class: "dsh-err",
         text: `the saved page no longer validates: ${v.errors.join("; ")}` }));
@@ -373,11 +435,26 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     }
     // The digests the record holds are what the prose was written against;
     // validation rebuilds the assertions, so they are put back (D-T).
-    v.spec.assertions = v.spec.assertions.map((a) => ({
+    v.document.assertions = v.document.assertions.map((a) => ({
       ...a,
       inputDigests: (stored.spec.assertions.find((x) => x.id === a.id) || {}).inputDigests || {},
     }));
     validated = v;
+    appDoc = v.document;
+    // Opening an EARLIER revision forks: a new identity, starting at
+    // revision 1, because continuing from r2 of a page that reached r4 is a
+    // different page from here on and rewriting r3 and r4 would be a lie
+    // about what happened (§10.2).
+    if (options.fork || !appDoc.id) {
+      appDoc = { ...appDoc, id: mintId(), revision: 1,
+                 revisionOf: entry.application ? `${entry.application}#${entry.revision}` : null };
+    }
+    // §10.3: reopening puts the reader back where they were.
+    appState = { ...(appDoc.state || {}) };
+    parameterValues = { ...defaultValues(appDoc.parameters), ...pick(appState, appDoc.parameters) };
+    patches = [];
+    repair = createRepairLoop();
+    interaction = interaction || createInteractionBudget({}, { onChange: () => paintInteraction() });
     viaCatalog = false;          // run the recorded query text; the temporary views are long gone
     run = runId();
     results = null;
@@ -386,10 +463,13 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     stagePage.hidden = false;
     const progress = el(doc, "div", { class: "dsh-log", dataset: { testid: "dashboard-progress" } });
     const holder = el(doc, "div", { dataset: { testid: "dashboard-frame-holder" } });
-    stagePage._body.replaceChildren(progress, holder);
+    const meter = el(doc, "div", { class: "dsh-interaction",
+                                   dataset: { testid: "dashboard-interaction" } });
+    stagePage._body.replaceChildren(progress, meter, holder);
     results = await runPanels({
       host, account: accountName, repository: repositoryName, token: st.token,
-      panels: v.spec.panels,
+      panels: appDoc.panels,
+      values: parameterValues, parameters: appDoc.parameters,
       onEvent: (e) => {
         if (e.type === "panel-done") {
           progress.appendChild(el(doc, "div", { class: e.ok ? "" : "dsh-err",
@@ -397,11 +477,23 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
         }
       },
     });
-    const stale = staleAssertions(v.spec, results);
+    const stale = staleAssertions(appDoc, results);
     try { mounted?.destroy(); } catch { /* first mount */ }
-    mounted = mountDashboard(holder, v.spec, { onRefresh: () => refresh(),
-                                               onEvent: () => {}, doc });
-    mounted.post({ results: payloadsFor(v.spec, results), stale });
+    frameErrors = [];
+    mounted = mountDashboard(holder, appDoc, {
+      onRefresh: () => refresh({ fromPage: true }),
+      onRun: (request) => runOnePanel(request),
+      onState: ({ key, value }) => rememberState(key, value),
+      onLayout: (request) => layoutGraph(request),
+      onPropose: ({ what, detail }) => presentProposalFromPage(what, detail),
+      onEvent: (e) => { if (e.type === "error") frameErrors.push(e); },
+      doc,
+    });
+    mounted.post({ results: payloadsFor(appDoc, results), stale,
+                   parameters: parameterValues, state: appState,
+                   budget: budgetForPage(interaction) });
+    paintInteraction();
+    stageRevise.hidden = false;
     progress.appendChild(el(doc, "div", { class: stale.length ? "dsh-warn" : "dsh-note",
       text: stale.length
         ? `${stale.length} passage(s) were written against data that has since changed; `
@@ -486,6 +578,38 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   stagePage.hidden = true;
   body.appendChild(stagePage);
 
+  /* ── the revise affordance: the second prompt, against the page ── */
+
+  // U-32.  Until this existed, a second prompt could only produce a second
+  // page: the model was handed the transcript and asked again, and whatever
+  // the user liked about the first page had to survive being described rather
+  // than being kept.  §3.1 called that the gap that makes the feature feel
+  // absent, and this box is what closes it.
+  const stageRevise = stage(doc, "Revise", "changes the page; does not replace it");
+  stageRevise.hidden = true;
+  body.appendChild(stageRevise);
+
+  const revisePrompt = el(doc, "div", {
+    class: "dsh-prompt", contenteditable: "true",
+    dataset: { testid: "dashboard-revise-prompt" },
+    "data-placeholder": "What should change?",
+  });
+  const reviseBtn = el(doc, "button", { type: "button", class: "dsh-primary",
+                                        dataset: { testid: "dashboard-revise" },
+                                        text: "Revise" });
+  const reviseStatus = el(doc, "span", { class: "dsh-note",
+                                         dataset: { testid: "dashboard-revise-status" } });
+  stageRevise._body.append(
+    revisePrompt,
+    el(doc, "div", { class: "dsh-actions" }, [reviseBtn, reviseStatus]),
+  );
+
+  /* ── the patch gate: whichever gate the change earns (D-W) ── */
+
+  const gatePatch = stage(doc, "The change", "", { gate: true });
+  gatePatch.hidden = true;
+  body.appendChild(gatePatch);
+
   /* ── Gate 2: disposition ── */
 
   const gate2 = stage(doc, "Gate 2 — disposition", "", { gate: true });
@@ -509,6 +633,10 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     grantStatus.textContent = "running…";
     viaCatalog = catalogBox.checked;
     run = runId();
+
+    interaction = createInteractionBudget(
+      { maxRuns: Math.max(0, Number(fRuns.input.value) || DEFAULT_INTERACTION.maxRuns) },
+      { onChange: () => paintInteraction() });
 
     grant = createGrant({
       repositories: String(fRepos.input.value || repoKey).split(/[,\s]+/).filter(Boolean),
@@ -553,6 +681,16 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       }
     };
 
+    // §13.9: the prompt is a budget too, spent on every request whether or not
+    // the page turns out to want what it carries -- and spent out of the same
+    // turn that has to carry the whole page.  Measured here rather than
+    // guessed at.
+    const system = dashboardSystem(DEFAULT_SYSTEM, { grant, digesting: true,
+                                                     answerTokens: ANSWER_TOKENS,
+                                                     request: text });
+    log(`prompt: ${Math.round(system.length / 1024)} KiB `
+      + `(~${Math.ceil(system.length / 4)} tokens), answer ceiling ${ANSWER_TOKENS}`);
+
     try {
       const adapter = createToolAdapter({
         provider: st.llmProvider, endpoint: st.llmEndpoint, apiKey: st.llmKey,
@@ -565,8 +703,10 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
         digestOver: 4000,
         maxTokens: ANSWER_TOKENS,
         maxIterations: 16,
-        system: dashboardSystem(DEFAULT_SYSTEM, { grant, digesting: true,
-                                                  answerTokens: ANSWER_TOKENS }),
+        // The catalog is subsetted by what was asked for (§8.5): it costs
+        // prompt tokens on every request, and they come out of the same turn
+        // that has to carry the whole page.
+        system: system,
         onEvent,
       });
       adapterResult = await adapter.run(text);
@@ -643,8 +783,17 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       return;
     }
 
-    validated = validateDashboard(adapterResult.dashboard);
-    const { spec, errors, warnings } = validated;
+    validated = validateApplication(adapterResult.dashboard);
+    appDoc = validated.document;
+    // Identity is minted here, before the first revision is recorded, because
+    // the record is written after the page is mounted and the revision has to
+    // already have something to be a revision OF (§10.1).
+    if (!appDoc.id) appDoc = { ...appDoc, id: mintId() };
+    parameterValues = defaultValues(appDoc.parameters);
+    appState = { ...(appDoc.state || {}) };
+    patches = [];
+    const spec = appDoc;
+    const { errors, warnings } = validated;
 
     for (const e of errors) {
       gate1._body.appendChild(el(doc, "div", { class: "dsh-err", text: `error: ${e}` }));
@@ -675,6 +824,29 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       box.appendChild(el(doc, "pre", { class: "dsh-pre", text: t.body }));
       gate1._body.appendChild(box);
     }
+    for (const x of spec.parameters) {
+      const box = el(doc, "div", { class: "dsh-panel" });
+      box.appendChild(el(doc, "header", {}, [
+        el(doc, "span", { class: "dsh-kind dsh-kind-param", text: "parameter" }),
+        el(doc, "b", { text: x.name }),
+        el(doc, "span", { class: "dsh-note",
+          text: `${x.kind}${x.datatype ? ` ${x.datatype}` : ""} · `
+              + `used by ${spec.panels.filter((p) => p.parameters.includes(x.name))
+                               .map((p) => p.name).join(", ") || "nothing"}` }),
+      ]));
+      // What the control will admit, shown at the gate: this is the whole of
+      // what the page may vary, and it is the one thing on this screen the
+      // user is authorising to change after they have left it.
+      box.appendChild(el(doc, "pre", { class: "dsh-pre",
+        text: x.domain
+          ? (Array.isArray(x.domain.values)
+              ? `one of: ${x.domain.values.join(", ")}`
+              : (x.domain.from
+                  ? `any value \`${x.domain.from}'.${x.domain.column || "(first column)"} returns`
+                  : `between ${x.domain.min ?? "−∞"} and ${x.domain.max ?? "∞"}`))
+          : "any value — no domain declared" }));
+      gate1._body.appendChild(box);
+    }
     for (const a of spec.assertions) {
       const box = el(doc, "div", { class: "dsh-panel" });
       box.appendChild(el(doc, "header", {}, [
@@ -688,11 +860,25 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       gate1._body.appendChild(box);
     }
 
+    // §13.9: what the page will weigh, which the model cannot measure and the
+    // user pays for when they save or mail it.
+    gate1._body.appendChild(sizeReport(validated.size));
+
     const runBtn = el(doc, "button", {
       type: "button", class: "dsh-primary", dataset: { testid: "dashboard-run-panels" },
       text: `Run ${spec.panels.length} ${spec.panels.length === 1 ? "panel" : "panels"}`,
     });
     runBtn.disabled = !validated.ok;
+    // A disabled primary button with the panels laid out above it reads as a
+    // broken gate rather than a refused document: the errors are at the top of
+    // a long screen and the button is at the bottom.  Say it where it is.
+    if (!validated.ok) {
+      gate1._body.appendChild(el(doc, "p", { class: "dsh-err",
+        dataset: { testid: "dsh-refused" },
+        text: `Nothing will run: ${errors.length} error(s) above. The panels are shown `
+            + `so you can see what was proposed, but the page was refused and the `
+            + `queries have not been sent. Ask again in the exploration pane.` }));
+    }
     const discard = el(doc, "button", { type: "button", text: "Discard",
                                         dataset: { testid: "dashboard-discard" },
                                         onclick: () => { gate1.hidden = true; } });
@@ -708,12 +894,74 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
 
   /* ─────────────── Phase 2 and 3 ─────────────── */
 
+  /**
+   * The interaction meter (§15 q.3).
+   *
+   * It lives beside the page rather than beside the grant, because what it
+   * measures is the page's behaviour and not the model's -- and because the
+   * moment it matters is the moment a reader turns a selector and wonders
+   * what that cost.  It is drawn even at zero, so that the first run moves
+   * something the user has already seen rather than making a meter appear.
+   */
+  function paintInteraction() {
+    if (!interaction) return;
+    const holder = stagePage._body.querySelector('[data-testid="dashboard-interaction"]');
+    if (!holder) return;
+    const s = interaction.state();
+    const used = Math.min(1, s.limits.maxRuns ? s.spent.runs / s.limits.maxRuns : 1);
+    const bar = el(doc, "div", { class: `dsh-bar${s.remaining.runs ? "" : " over"}` },
+                   [el(doc, "i", { style: `width:${Math.round(used * 100)}%` })]);
+    const renew = el(doc, "button", {
+      type: "button", dataset: { testid: "dashboard-interaction-renew" },
+      text: `Allow ${interaction.limits.renewal} more`,
+      onclick: () => {
+        interaction.renew();
+        log(`interaction budget renewed: ${interaction.summary()}`);
+        // The page is told at once, so a control that greyed itself out
+        // comes back without the reader having to touch it twice.
+        mounted?.budget(budgetForPage(interaction));
+      },
+    });
+    holder.replaceChildren(
+      el(doc, "div", { class: "dsh-meter" }, [
+        el(doc, "span", { dataset: { testid: "dashboard-interaction-meter" },
+                          text: `page: ${interaction.summary()}` }),
+      ]),
+      bar,
+      el(doc, "div", { class: "dsh-actions" }, [
+        renew,
+        el(doc, "span", { class: "dsh-note",
+          text: s.remaining.runs
+            ? "what the page may re-run by itself — the queries are the ones you approved"
+            : "the page has stopped asking; nothing is lost, and the queries are "
+            + "the ones you approved" }),
+      ]),
+    );
+  }
+
+  /** The page's inlined weight, broken out the way the model can act on it. */
+  function sizeReport(size) {
+    if (!size) return el(doc, "span", {});
+    const line = `${kib(size.total)} inlined — markup ${kib(size.html)}, `
+      + `styles ${kib(size.styles)}, script ${kib(size.script)}, `
+      + `components ${kib(size.components)}`;
+    const detail = Object.entries(size.perComponent || {})
+      .filter(([, n]) => n > 0)
+      .map(([name, n]) => `${name} ${kib(n)}`).join(" · ");
+    return el(doc, "div", { class: "dsh-note", dataset: { testid: "dashboard-size" },
+                            text: detail ? `${line} (${detail})` : line });
+  }
+
   async function executePanels(promptText, started) {
-    const spec = validated.spec;
+    lastPrompt = promptText;
+    startedAt = started;
+    const spec = appDoc;
     stagePage.hidden = false;
     const progress = el(doc, "div", { class: "dsh-log", dataset: { testid: "dashboard-progress" } });
     const holder = el(doc, "div", { dataset: { testid: "dashboard-frame-holder" } });
-    stagePage._body.replaceChildren(progress, holder);
+    const meter = el(doc, "div", { class: "dsh-interaction",
+                                   dataset: { testid: "dashboard-interaction" } });
+    stagePage._body.replaceChildren(progress, meter, holder);
     aborter = typeof AbortController !== "undefined" ? new AbortController() : null;
 
     if (viaCatalog) {
@@ -734,6 +982,11 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     results = await runPanels({
       host, account: accountName, repository: repositoryName, token: st.token,
       panels: spec.panels, run, viaCatalog,
+      // The declared defaults, bound as terms (D-X).  A page whose first
+      // render used no parameter at all would show the reader something no
+      // control of theirs produced, and then change under them on the first
+      // selection.
+      values: parameterValues, parameters: spec.parameters,
       signal: aborter?.signal,
       onEvent: (e) => {
         if (e.type === "panel-start") {
@@ -756,45 +1009,541 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
 
     // D-T: the sentences the model wrote are stamped with the digests of what
     // it wrote them from, here, at the moment the data is in hand.
-    validated.spec = withInputDigests(spec, results);
+    appDoc = withInputDigests(spec, results);
     mountPage(promptText, started);
   }
 
   function mountPage(promptText, started) {
-    const spec = validated.spec;
+    const spec = appDoc;
     const holder = stagePage._body.querySelector('[data-testid="dashboard-frame-holder"]');
     try { mounted?.destroy(); } catch { /* first mount */ }
+    repair = repair || createRepairLoop();
+    frameErrors = [];
     mounted = mountDashboard(holder, spec, {
-      onRefresh: () => refresh(),
+      onRefresh: () => refresh({ fromPage: true }),
+      onRun: (request) => runOnePanel(request),
+      onState: ({ key, value }) => rememberState(key, value),
+      onLayout: (request) => layoutGraph(request),
+      onPropose: ({ what, detail }) => presentProposalFromPage(what, detail),
       onEvent: (e) => {
-        if (e.type === "error") {
-          stagePage._body.appendChild(el(doc, "div", { class: "dsh-err",
-            text: `the page reported an error in ${e.where}: ${e.error}` }));
-        }
+        if (e.type !== "error") return;
+        frameErrors.push(e);
+        stagePage._body.appendChild(el(doc, "div", { class: "dsh-err",
+          dataset: { testid: "dashboard-page-error" },
+          text: `the page reported an error in ${e.where}: ${e.error}` }));
+        // Debounced, because the frame reports one error per failing region
+        // per fill and a page whose data arrives twice reports twice: the
+        // loop should see one set of faults, not two.
+        clearTimeout(repairTimer);
+        repairTimer = setTimeout(() => attemptRepair(), 400);
       },
       doc,
     });
-    mounted.post({ results: payloadsFor(spec, results), stale: [] });
+    mounted.post({ results: payloadsFor(spec, results), stale: [],
+                   parameters: parameterValues, state: appState,
+                   budget: budgetForPage(interaction) });
+    paintInteraction();
+    stageRevise.hidden = false;
     presentDisposition(promptText, started);
   }
 
-  async function refresh() {
-    if (!validated?.spec) return;
-    const spec = validated.spec;
+  let repairTimer = null;
+
+  /**
+   * Run the whole set again.
+   *
+   * `fromPage' is the distinction the budget turns on: the Refresh button in
+   * Gate 2 is the user pressing a button, and the user does not spend the
+   * page's allowance; `dashboard.refresh()' is the page asking, and it costs
+   * one run per panel -- otherwise the cheapest thing a page can ask for and
+   * the most expensive would cost the same, and a page refreshing in a loop
+   * would never reach the meter.
+   */
+  async function refresh({ fromPage = false } = {}) {
+    if (!appDoc) return;
+    const spec = appDoc;
+    if (fromPage && interaction) {
+      const allowed = interaction.check({ runs: spec.panels.length, panel: "(refresh)" });
+      if (!allowed.ok) {
+        mounted?.refuse({ request: { refresh: true }, reason: allowed.reason,
+                          budget: budgetForPage(interaction) });
+        log(`  ✗ refresh: ${allowed.reason}`, "dsh-warn");
+        return;
+      }
+    }
     const fresh = await runPanels({
       host, account: accountName, repository: repositoryName, token: st.token,
       panels: spec.panels, run, viaCatalog,
+      values: parameterValues, parameters: spec.parameters,
     });
     results = fresh;
+    if (fromPage && interaction) {
+      for (const r of Object.values(fresh)) {
+        interaction.chargeResult({ rows: r.rows, bytes: r.bytes });
+      }
+    }
     // The page updates; the prose does not, and the difference is marked
     // rather than hidden (D-T).  A sentence written against data that has
     // moved is not deleted -- the user may still want it -- it is flagged.
     const stale = staleAssertions(spec, fresh);
-    mounted?.post({ results: payloadsFor(spec, fresh), stale });
+    mounted?.post({ results: payloadsFor(spec, fresh), stale,
+                    budget: budgetForPage(interaction) });
     if (stale.length) {
       stagePage._body.appendChild(el(doc, "div", { class: "dsh-warn",
         text: `${stale.length} passage(s) were written against data that has since changed; `
             + `they are marked in the page.` }));
+    }
+  }
+
+
+  /* ─────────────── what the page may ask for ─────────────── */
+
+  /**
+   * One panel, re-run with values the page chose (D-X, U-34).
+   *
+   * The whole of a page's influence over what runs passes through here, and
+   * three things make that safe rather than merely narrow: the panel must be
+   * one the document declares, the values are checked against declared
+   * domains before anything is fetched, and the query text is the one the
+   * user authorised with a VALUES clause after it.  A refusal goes back to
+   * the page with its reason, because a control that appears to hang is
+   * worse than one that says no.
+   */
+  async function runOnePanel({ id, panel, parameters }) {
+    if (!appDoc || !mounted) return;
+    const target = appDoc.panels.find((p) => p.name === panel);
+    if (!target) {
+      mounted.refuse({ id, request: { panel }, reason: `\`${panel}' is not a panel of this page` });
+      return;
+    }
+    const values = { ...parameterValues, ...(parameters || {}) };
+
+    // The domain is checked here, before the budget is, because this check
+    // is free and local: a value outside its declared domain never reaches
+    // the store, so it must not cost the page a run.  The grant charges
+    // before a call because it cannot know what the call will do; here we
+    // can, and charging for a request we already know will not be made would
+    // make the meter a tally of the reader's typing.
+    const binding = bindParameters(target, values,
+                                   { parameters: appDoc.parameters, results });
+    if (!binding.ok) {
+      const why = binding.refusals.map((r) => `${r.name}: ${r.reason}`).join("; ");
+      mounted.refuse({ id, request: { panel, parameters }, reason: why,
+                       budget: budgetForPage(interaction) });
+      log(`  ✗ ${panel}: ${why}`, "dsh-warn");
+      return;
+    }
+
+    // §15 q.3.  The page is not asking for authority -- the query is the one
+    // authorised at Gate 1 -- it is asking to spend the user's store time
+    // again, and that is what the meter is for.  Charged before the call,
+    // like the grant: a refusal after the store has been read is a complaint,
+    // not a limit.
+    const allowed = interaction
+      ? interaction.check({ panel, parameters })
+      : { ok: true };
+    if (!allowed.ok) {
+      mounted.refuse({ id, request: { panel, parameters }, reason: allowed.reason,
+                       budget: budgetForPage(interaction) });
+      log(`  ✗ ${panel}: ${allowed.reason}`, "dsh-warn");
+      return;
+    }
+    log(`page asked to re-run ${panel}`
+      + (Object.keys(parameters || {}).length
+          ? ` with ${Object.entries(parameters).map(([k, v]) => `${k}=${v}`).join(", ")}` : ""));
+    const fresh = await runPanels({
+      host, account: accountName, repository: repositoryName, token: st.token,
+      panels: [target], run, viaCatalog: false,
+      values, parameters: appDoc.parameters, have: results,
+    });
+    const r = fresh[panel];
+    if (!r?.ok) {
+      mounted.refuse({ id, request: { panel, parameters },
+                       reason: r?.error || "the panel did not run",
+                       budget: budgetForPage(interaction) });
+      log(`  ✗ ${panel}: ${r?.error || "did not run"}`, "dsh-warn");
+      return;
+    }
+    results = fresh;
+    parameterValues = values;
+    interaction?.chargeResult({ rows: r.rows, bytes: r.bytes });
+    const stale = staleAssertions(appDoc, results);
+    mounted.post({ id, partial: true, results: payloadsFor(appDoc, { [panel]: r }),
+                   stale, parameters: values, budget: budgetForPage(interaction) });
+    log(`  ← ${panel}: ${r.rows} rows in ${r.ms} ms`);
+  }
+
+  /**
+   * A bounded slice of what the page has become (§10.3).
+   *
+   * Which view is open and which parameters were chosen: enough that
+   * reopening puts the reader back where they were, and not enough to become
+   * a database.  It is written into the document, so it is recorded with it
+   * and comes back on reopen.
+   */
+  function rememberState(key, value) {
+    appState = { ...appState, [String(key)]: value };
+    const text = JSON.stringify(appState);
+    if (text.length > 8 * 1024) {
+      delete appState[String(key)];
+      mounted?.refuse({ request: { state: key },
+                        reason: "state is limited to 8 KiB: it holds which view is open and "
+                              + "which parameters were chosen. A page that wants more than "
+                              + "that wants a repository, and it has one" });
+      return;
+    }
+    if (appDoc) appDoc = { ...appDoc, state: appState };
+  }
+
+  /**
+   * A graph, laid out (§8.4, U-42).
+   *
+   * The component emits DOT; the engine runs here, in the scripted
+   * network-less frame beside the display frame, and the SVG goes back in
+   * like any other result.  One graph vocabulary across this path and the
+   * figure path, rather than two.  Loaded on demand: the engine is 800 KiB
+   * and most pages never draw a graph.
+   */
+  async function layoutGraph({ dot, engine }) {
+    try {
+      const { layoutDot } = await import("../../lib/wasm/graphviz.js");
+      const out = await layoutDot(dot, { engine, doc });
+      if (!out.ok) log(`graph layout failed: ${out.error}`, "dsh-warn");
+      return out;
+    } catch (e) {
+      return { ok: false, error: `the layout engine could not be loaded: ${String(e)}` };
+    }
+  }
+
+  /**
+   * Something the page asked for and may not do (D-Z).
+   *
+   * It surfaces here as a sentence and a prefilled revise box — never as an
+   * action.  A page that could widen its own authority by asking politely
+   * would make every other restriction in this file decorative.
+   */
+  function presentProposalFromPage(what, detail) {
+    stageRevise.hidden = false;
+    const text = typeof detail === "string" ? detail
+      : (detail && detail.question) || JSON.stringify(detail || {});
+    stageRevise._body.insertBefore(el(doc, "div", { class: "dsh-warn",
+      dataset: { testid: "dashboard-proposal" },
+      text: `The page proposes ${what}: ${text}. Nothing has been done; ask for it below `
+          + `if you want it.` }), stageRevise._body.firstChild);
+    revisePrompt.textContent = text;
+  }
+
+  /* ─────────────── the second prompt ─────────────── */
+
+  /**
+   * Revise: the model is given the page, not the transcript.
+   *
+   * The document's SHAPE goes — names, queries, slot ids, no transform
+   * bodies — because the bodies are what make a document too large to send
+   * and the shape is what a patch needs to address correctly (§15, q.2).
+   */
+  async function startRevision(text) {
+    const ask = String(text ?? revisePrompt.innerText ?? "").trim();
+    if (revising || !appDoc) return null;
+    if (!ask) { reviseStatus.textContent = "nothing to change"; return null; }
+    if (!st.llmKey) {
+      reviseStatus.textContent = "set a provider key in the exploration pane's Connection";
+      return null;
+    }
+    revising = true;
+    reviseBtn.disabled = true;
+    reviseStatus.textContent = "asking…";
+    // §13.9: the prompt is a budget too, spent on every request whether or not
+    // the page turns out to want what it carries -- and spent out of the same
+    // turn that has to carry the whole page.  Measured here rather than
+    // guessed at.
+    const system = dashboardSystem(DEFAULT_SYSTEM, { grant, digesting: true,
+                                                     answerTokens: ANSWER_TOKENS,
+                                                     request: text });
+    log(`prompt: ${Math.round(system.length / 1024)} KiB `
+      + `(~${Math.ceil(system.length / 4)} tokens), answer ceiling ${ANSWER_TOKENS}`);
+
+    try {
+      const adapter = createToolAdapter({
+        provider: st.llmProvider, endpoint: st.llmEndpoint, apiKey: st.llmKey,
+        workspaceId: st.llmWorkspace, model: st.llmModel,
+        mcp: st.mcpEndpoint ? { endpoint: st.mcpEndpoint, token: st.token } : null,
+        allowTools: DASHBOARD_TOOLS,
+        grant,
+        digestOver: 4000,
+        maxTokens: ANSWER_TOKENS,
+        maxIterations: 8,
+        system: revisionSystem(DEFAULT_SYSTEM, { grant, document: appDoc,
+                                                 answerTokens: ANSWER_TOKENS, request: ask }),
+        onEvent: (e) => { if (e.type === "refused") log(`  ✗ refused: ${e.reason}`, "dsh-warn"); },
+      });
+      const out = await adapter.run(ask);
+      st.session = out.session || st.session;
+      reviseStatus.textContent = out.ok ? "answered" : `failed · ${out.error}`;
+      return receiveRevision(out, ask);
+    } catch (e) {
+      reviseStatus.textContent = String(e);
+      return null;
+    } finally {
+      revising = false;
+      reviseBtn.disabled = false;
+    }
+  }
+
+  reviseBtn.addEventListener("click", () => startRevision());
+
+  /**
+   * What came back: a patch, or a whole document, or neither.
+   *
+   * A model that answers a revision with a whole page has not done anything
+   * wrong — it is what the first turn asks for — so the page is diffed
+   * against the one on the screen and treated as the patch it amounts to.
+   * Refusing it over its shape would throw away a turn for a formality.
+   */
+  function receiveRevision(out, ask) {
+    const ops = patchFrom(out?.finalText);
+    if (ops) return presentPatch(ops, { ask });
+    const whole = applicationFrom(out?.finalText);
+    if (whole) {
+      const checked = validateApplication({ ...whole, id: appDoc.id, revision: appDoc.revision });
+      if (!checked.ok) return refusePatch(checked.errors, ask);
+      const after = { ...checked.document, revision: (appDoc.revision || 1) + 1,
+                      revisionOf: `${appDoc.id}#${appDoc.revision || 1}` };
+      return presentChange({ ok: true, document: after, warnings: checked.warnings,
+                             classification: classify(appDoc, checked.document, []),
+                             size: checked.size }, null, ask);
+    }
+    const cut = Boolean(out?.truncated) || openFence(out?.lastTurn?.text);
+    return refusePatch([cut
+      ? `The answer ran out of room at the ${ANSWER_TOKENS}-token ceiling with the block `
+        + `still open, so there is nothing to apply. Ask for a smaller change.`
+      : "The answer carried no patch block, so nothing has been changed."], ask);
+  }
+
+  /** Apply a patch to a copy, validate the result, and present what it is. */
+  function presentPatch(ops, { ask = "" } = {}) {
+    const applied = applyPatch(appDoc, ops);
+    if (!applied.ok) return refusePatch(applied.errors, ask, ops);
+    return presentChange(applied, ops, ask);
+  }
+
+  function refusePatch(errors, ask, ops = null) {
+    gatePatch.hidden = false;
+    gatePatch._body.replaceChildren();
+    gatePatch._sub.textContent = "refused";
+    gatePatch._body.appendChild(el(doc, "div", { class: "dsh-err",
+      dataset: { testid: "dashboard-patch-refused" },
+      text: "The change was refused whole — nothing was half-applied:" }));
+    for (const e of errors) {
+      gatePatch._body.appendChild(el(doc, "div", { class: "dsh-err", text: `error: ${e}` }));
+    }
+    if (ops) {
+      gatePatch._body.appendChild(el(doc, "pre", { class: "dsh-pre",
+        text: JSON.stringify(ops, null, 2).slice(0, 2000) }));
+    }
+    return { ok: false, errors, ask };
+  }
+
+  /**
+   * The change, and the gate it earned (D-W).
+   *
+   * Which gate is not a judgement about this patch; it is read off a
+   * comparison of the normalised document before and after.  A patch
+   * described as a colour change and performing a query change gets Gate 1,
+   * which is the whole point of computing the class rather than believing it.
+   */
+  function presentChange(applied, ops, ask) {
+    const c = applied.classification;
+    gatePatch.hidden = false;
+    gatePatch._body.replaceChildren();
+    gatePatch._sub.textContent = {
+      presentational: "presentational — nothing re-runs, nothing is re-asked",
+      computational: "computational — the bodies are checked, nothing asks the store",
+      data: "data — this changes what runs against the store",
+      authority: "authority — this needs a new grant",
+    }[c.class] || c.class;
+    gatePatch.dataset.patchClass = c.class;
+
+    gatePatch._body.appendChild(el(doc, "div", { class: "dsh-note",
+      dataset: { testid: "dashboard-patch-class" },
+      text: `${c.class} · ${c.reasons.map((r) => r.why).join("; ") || "no change"}` }));
+    for (const w of applied.warnings || []) {
+      gatePatch._body.appendChild(el(doc, "div", { class: "dsh-warn", text: `note: ${w}` }));
+    }
+
+    if (c.class === "data" || c.class === "authority") {
+      // The per-panel diff: the same question Gate 1 always asks, about a
+      // smaller thing.  Showing the whole document again would bury the two
+      // lines that changed in the thirty that did not.
+      for (const d of panelDiff(appDoc, applied.document)) {
+        if (d.change === "unchanged") continue;
+        const box = el(doc, "div", { class: "dsh-panel",
+                                     dataset: { testid: `dashboard-diff-${d.name}` } });
+        box.appendChild(el(doc, "header", {}, [
+          el(doc, "span", { class: `dsh-kind dsh-kind-${d.change === "removed" ? "asserted" : "bound"}`,
+                            text: d.change }),
+          el(doc, "b", { text: d.name }),
+        ]));
+        if (d.before) box.appendChild(el(doc, "pre", { class: "dsh-pre dsh-was", text: d.before.query }));
+        if (d.after) box.appendChild(el(doc, "pre", { class: "dsh-pre", text: d.after.query }));
+        gatePatch._body.appendChild(box);
+      }
+      const keeping = c.unchanged.filter((n) => !c.rerun.includes(n));
+      if (keeping.length) {
+        gatePatch._body.appendChild(el(doc, "div", { class: "dsh-note",
+          text: `${keeping.join(", ")} ${keeping.length === 1 ? "is" : "are"} unchanged and will `
+              + `not run again.` }));
+      }
+    }
+    gatePatch._body.appendChild(sizeReport(applied.size));
+
+    if (c.class === "authority") {
+      gatePatch._body.appendChild(el(doc, "div", { class: "dsh-err",
+        text: "A patch cannot widen a grant. Close this page and start again with the "
+            + "authority you want to give." }));
+      return { ok: false, classification: c };
+    }
+
+    // Presentational changes are applied without a gate, which is the point
+    // of classifying at all: a change of colour that asked permission would
+    // teach the user to stop reading the ones that matter.
+    if (c.class === "presentational") {
+      applyRevision(applied, ops, ask);
+      return { ok: true, classification: c, applied: "immediately" };
+    }
+
+    const accept = el(doc, "button", {
+      type: "button", class: "dsh-primary", dataset: { testid: "dashboard-patch-accept" },
+      text: c.rerun.length
+        ? `Run ${c.rerun.length} ${c.rerun.length === 1 ? "panel" : "panels"} and apply`
+        : "Apply",
+      onclick: () => applyRevision(applied, ops, ask),
+    });
+    const reject = el(doc, "button", {
+      type: "button", text: "Discard", dataset: { testid: "dashboard-patch-discard" },
+      onclick: () => { gatePatch.hidden = true; },
+    });
+    gatePatch._body.appendChild(el(doc, "div", { class: "dsh-actions" }, [accept, reject]));
+    return { ok: true, classification: c, applied: "waiting" };
+  }
+
+  /**
+   * Accepted: run only what changed, then change the page in place if the
+   * runtime can (§6.2.1).
+   *
+   * Rebuilding would throw away scroll position, the open tab, a selection
+   * and the parameter the reader just chose — which would make the cheap
+   * change feel worse than the expensive one.
+   */
+  async function applyRevision(applied, ops, ask) {
+    const c = applied.classification;
+    gatePatch.hidden = true;
+    const next = applied.document;
+    if (c.rerun.length) {
+      const progress = el(doc, "div", { class: "dsh-log",
+                                        dataset: { testid: "dashboard-patch-progress" } });
+      stagePage._body.appendChild(progress);
+      results = await runPanels({
+        host, account: accountName, repository: repositoryName, token: st.token,
+        panels: next.panels.filter((p) => c.rerun.includes(p.name)), run, viaCatalog: false,
+        values: parameterValues, parameters: next.parameters, have: results,
+        onEvent: (e) => {
+          if (e.type === "panel-done") {
+            progress.appendChild(el(doc, "div", { class: e.ok ? "" : "dsh-err",
+              text: e.ok ? `${e.name}: ${e.rows} rows in ${e.ms} ms` : `${e.name}: ${e.error}` }));
+          }
+        },
+      });
+      for (const name of c.dropped) delete results[name];
+    }
+    appDoc = withInputDigests({ ...next, state: appState }, results);
+    patches = patches.concat(ops || []);
+    frameErrors = [];
+    // The markup and the data go together.  Applying the markup first and
+    // posting the data a moment later would fill once with a transform's
+    // inputs missing, and that momentary failure is indistinguishable from
+    // a real one -- it would reach the pane as an error and start a repair
+    // for a page that is about to be correct.
+    const how = await mounted.update(appDoc, {
+      ops: c.rebuild ? null : ops,
+      post: { results: payloadsFor(appDoc, results),
+              stale: staleAssertions(appDoc, results),
+              parameters: parameterValues, state: appState,
+              budget: budgetForPage(interaction) },
+    });
+    if (how.applied === "rebuild" && !c.rebuild) {
+      log("the page could not apply that in place and was rebuilt", "dsh-warn");
+    }
+    reviseStatus.textContent = `revision ${appDoc.revision} · ${c.class} · `
+      + `${how.applied === "in-place" ? "applied in place" : "rebuilt"}`;
+    revisePrompt.textContent = "";
+    recorded = false;
+    record(ask || lastPrompt, startedAt || new Date(), "revised");
+    return how;
+  }
+
+  /* ─────────────── repair (§11) ─────────────── */
+
+  /**
+   * A page that broke, and at most two attempts at fixing it.
+   *
+   * Everything here existed except the wiring: the frame already marked the
+   * failing region and posted the error out, and the error was already shown
+   * under the page — where the user read it and retyped their prompt.  That
+   * last step is what this replaces.
+   */
+  async function attemptRepair() {
+    if (!appDoc || !mounted || !st.llmKey) return;
+    const failures = groupFailures(frameErrors);
+    if (!repair?.mayAttempt(failures)) {
+      if (failures.length && repair?.summary()?.exhausted) {
+        stagePage._body.appendChild(el(doc, "div", { class: "dsh-warn",
+          dataset: { testid: "dashboard-repair-exhausted" },
+          text: `Two attempts did not fix this; both are above. An automatic loop that `
+              + `cannot converge has to stop where you can see it.` }));
+      }
+      return;
+    }
+    const attempt = repair.count + 1;
+    const { prompt } = repairPrompt(appDoc, failures, { attempt });
+    stagePage._body.appendChild(el(doc, "div", { class: "dsh-note",
+      dataset: { testid: "dashboard-repair" },
+      text: `Repair attempt ${attempt} of 2: ${failures.map((f) => f.where).join(", ")}` }));
+    const before = failures;
+    frameErrors = [];
+    const out = await startRepairTurn(prompt);
+    const ops = patchFrom(out?.finalText);
+    if (!ops) {
+      repair.record({ failures: before, outcome: "no-patch" });
+      stagePage._body.appendChild(el(doc, "div", { class: "dsh-warn",
+        text: "The repair turn produced no patch." }));
+      return;
+    }
+    const applied = applyPatch(appDoc, ops);
+    if (!applied.ok) {
+      repair.record({ failures: before, patch: ops, outcome: "invalid", errors: applied.errors });
+      refusePatch(applied.errors, "repair", ops);
+      return;
+    }
+    repair.record({ failures: before, patch: ops, outcome: "attempted" });
+    // A repair is a patch like any other: one that changes a query stops at
+    // Gate 1.  A bug is not authority.
+    presentChange(applied, ops, "repair");
+  }
+
+  async function startRepairTurn(prompt) {
+    try {
+      const adapter = createToolAdapter({
+        provider: st.llmProvider, endpoint: st.llmEndpoint, apiKey: st.llmKey,
+        workspaceId: st.llmWorkspace, model: st.llmModel,
+        allowTools: [], grant, maxTokens: ANSWER_TOKENS, maxIterations: 2,
+        system: revisionSystem(DEFAULT_SYSTEM, { grant, document: appDoc,
+                                                 answerTokens: ANSWER_TOKENS }),
+      });
+      return await adapter.run(prompt);
+    } catch (e) {
+      log(`repair failed: ${String(e)}`, "dsh-err");
+      return null;
     }
   }
 
@@ -823,10 +1572,10 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     gate2._body.appendChild(outcome);
 
     keep.addEventListener("click", async () => {
-      const base = (nameInput.value || "").trim() || validated.spec.title.toLowerCase()
+      const base = (nameInput.value || "").trim() || appDoc.title.toLowerCase()
         .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "dashboard";
       const kept = [];
-      for (const p of validated.spec.panels) {
+      for (const p of appDoc.panels) {
         const to = `${base}-${p.name}`;
         const res = await promoteView({
           host, account: accountName, repository: repositoryName, token: st.token,
@@ -840,10 +1589,16 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     });
 
     save.addEventListener("click", () => {
-      const html = mounted.page(payloadsFor(validated.spec, results));
+      // The combination the page is showing is recorded with it, so a
+      // control in the saved copy can replay what it holds and say plainly
+      // that it holds nothing else (§7.4).
+      const replay = Object.keys(parameterValues).length
+        ? { [JSON.stringify([null, parameterValues])]: payloadsFor(appDoc, results) } : null;
+      const html = mounted.page(payloadsFor(appDoc, results),
+                                { replay, parameters: parameterValues });
       const blob = new Blob([html], { type: "text/html" });
       const url = URL.createObjectURL(blob);
-      const a = el(doc, "a", { href: url, download: `${slug(validated.spec.title)}.html` });
+      const a = el(doc, "a", { href: url, download: `${slug(appDoc.title)}.html` });
       doc.body.appendChild(a);
       a.click();
       a.remove();
@@ -871,11 +1626,14 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   async function record(promptText, started, disposition) {
     if (recorded && disposition === "pending") return;
     recorded = true;
+    if (!appDoc) return;
     const dash = {
-      ...dashboardRecord(validated.spec, results, { grant, prompt: promptText }),
+      ...dashboardRecord({ ...appDoc, state: appState }, results,
+                         { grant, prompt: promptText, patches,
+                           interaction: interaction?.state() || null }),
       disposition,
       via: viaCatalog ? "catalog" : "direct",
-      panels: dashboardRecord(validated.spec, results, { grant }).panels.map((p) => ({
+      panels: dashboardRecord(appDoc, results, { grant }).panels.map((p) => ({
         ...p, view: viaCatalog ? tempName(run, p.name) : null,
       })),
     };
@@ -889,9 +1647,14 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
                 : `not recorded: ${kept.error}`, kept.ok ? "" : "dsh-warn");
   }
 
-  const api = { wrapper, state: st, start: startRun, refresh,
+  const api = { wrapper, state: st, start: startRun, refresh, revise: startRevision,
                 get grant() { return grant; },
-                get spec() { return validated?.spec || null; },
+                get spec() { return appDoc ? specOf(appDoc) : null; },
+                get document() { return appDoc; },
+                get parameters() { return { ...parameterValues }; },
+                get patches() { return patches.slice(); },
+                get repair() { return repair?.summary() || null; },
+                get interaction() { return interaction; },
                 get results() { return results; } };
   wrapper._dashboardApi = api;
   promptEl.focus();

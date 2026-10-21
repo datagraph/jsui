@@ -374,9 +374,15 @@ section("Phase 2: the interface runs the panels, under its own token");
   const fetchImpl = async (url, init) => {
     seen.push({ url, method: init.method, accept: init.headers.Accept,
                 auth: init.headers.Authorization, body: init.body });
+    // Answers in the columns the query actually selects.  A stub that
+    // replied `?a ?b\' to everything passed for a long time and should not
+    // have: a document whose columns are not the query\'s is now a failed
+    // run (`resultFault\'), which is the whole point of the check.
+    const cols = (init.body.match(/SELECT\s+([^W]*?)\s*WHERE/i)[1].match(/\?\w+/g) || [])
+      .join("\t");
     return { ok: true, status: 200,
              headers: { get: () => "text/tab-separated-values" },
-             text: async () => "?a\t?b\n1\tx\n2\ty\n" };
+             text: async () => `${cols}\n1\tx\n2\ty\n` };
   };
   const spec = validateDashboard(PROPOSAL).spec;
   const results = await runPanels({
@@ -396,7 +402,8 @@ section("Phase 2: the interface runs the panels, under its own token");
 
   const payload = payloadsFor(spec, results);
   ok(Object.keys(payload).length === 2, "panels the page uses are posted into it");
-  ok(payload.sales.text.includes("?a"), "with the document the interface fetched");
+  ok(payload.sales.text.includes("?r") && payload.sales.text.includes("?v"),
+     "with the document the interface fetched, in the columns the panel asked for");
 
   const unused = payloadsFor({ panels: [{ name: "sales" }], html: "<p>nothing</p>", transforms: [] },
                              results);

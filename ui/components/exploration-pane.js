@@ -28,6 +28,7 @@ import { connect as mcpConnect, sparqlFrom } from "../../lib/mcp/mcp-client.js";
 import { createToolAdapter, FIGURE_TOOLS, DEFAULT_SYSTEM } from "../../lib/llm/tool-adapter.js";
 import { figureSystem } from "../../lib/llm/figure-prompt.js";
 import { openFigureGate } from "./figure-gate.js";
+import { queriesRan } from "../../lib/figure/provenance.js";
 import { renderSessionLog } from "./session-log.js";
 import { recordRun } from "../../lib/mcp/transcript-store.js";
 import { paneState } from "./mcp-pane-state.js";
@@ -282,6 +283,14 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
   const auth = app?.state?.getAuthContext?.(accountName) || {};
   const host = auth.host || window.location.origin;
   const st = paneState(accountName, repositoryName, host);
+
+  // Every query this exploration actually sent, across all of its runs.  The
+  // figure gate compares its proposal against these: the query in a turn's
+  // prose was typed again, and a retyped query can lose its `FROM' clause
+  // without losing anything a reader would notice.  Kept here rather than on
+  // the entry, because the exploration is the unit -- a query sent in the
+  // first run is still what ran when a gate opens under the third.
+  const ran = [];
   st.token = auth.token || st.token || null;
 
   const wrapper = doc.createElement("div");
@@ -330,7 +339,7 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
         <button type="button" class="exp-run" data-testid="exploration-run">Run</button>
         <button type="button" class="exp-session" data-testid="exploration-session">Session</button>
         <button type="button" class="exp-dashboard" data-testid="exploration-dashboard"
-                title="Ask for a whole page rather than one query">Dashboard</button>
+                title="Compose a page from several queries">Compose</button>
         <label class="exp-mode" title="Ask for a figure drawn from the result, in three steps:
 explore, propose a query, then draw from what the interface fetched">
           <input type="checkbox" class="exp-figure-mode"
@@ -452,6 +461,7 @@ explore, propose a query, then draw from what the interface fetched">
           doc, host, account: accountName, repository: repositoryName, state: st,
           prompt: entry.promptText || st.lastPrompt || "",
           text: entry.response || "", query: entry.sparql, session: st.session,
+          ran: ran.slice(),
           onStatus: setStatus,
           onDone: ({ figure, recorded }) => {
             add({ kind: "note", title: `figure · ${figure.disposition || "drawn"}`,
@@ -644,6 +654,7 @@ explore, propose a query, then draw from what the interface fetched">
             raw: [{ label: "the JSON-RPC request", text: e.request }],
             sparql: sparqlFrom(e.text || ""),
           });
+          ran.push(...queriesRan([e]));
           break;
 
         case "session":

@@ -31,10 +31,43 @@
  *          exploration pane's settings, and presented only to the provider.
  *          It grants nothing in the dydra domain.
  *
- * Two edges are worth finding before the rest: R6e, where repository content
- * leaves the service domain for the provider, and D9, where code the model
- * wrote is executed — in a frame with no origin, no credential and no
- * network, which is the whole reason it may be executed at all.
+ * Three edges are worth finding before the rest: R6e, where repository content
+ * leaves the service domain for the provider; D9, where code the model wrote
+ * is executed — in a frame with no origin, no credential and no network,
+ * which is the whole reason it may be executed at all; and D17, where a
+ * follow-up prompt is CLASSIFIED, because that is what decides whether it
+ * costs the user another authorisation or nothing at all.
+ *
+ * The revise loop (D15–D21) is the second half of the dashboard flow and it
+ * is drawn deliberately as a loop back into the same gates: a patch is not a
+ * lighter kind of proposal with a lighter kind of review, it is the same
+ * review entered at whichever point the change actually earns.  The classes
+ * and what each costs:
+ *
+ *   presentational  markup, styles, captions, `uses'   no gate; applied in
+ *                                                      the frame in place, so
+ *                                                      scroll, tab, selection
+ *                                                      and chart state survive
+ *   computational   transforms, assertions             the bodies are checked
+ *                                                      and the diff is shown
+ *   data            a query, `accept', a parameter's   Gate 1 again, with a
+ *                   domain, a new panel                per-panel diff; only new
+ *                                                      and changed panels run
+ *   authority       a repository, a budget, writing    Gate 0 — which a patch
+ *                                                      cannot ask for
+ *
+ * The class is computed by comparing the normalised document before and
+ * after, never read from the operation names: a patch described as a colour
+ * change and performing a query change is a query change.
+ *
+ * D20 carries the one budget that is not the grant's.  The grant screens the
+ * MODEL; the interaction budget bounds how often the finished PAGE may
+ * re-run a panel by itself.  They are not the same question: the queries a
+ * control re-runs are the ones already authorised at D18/Gate 1, so nothing
+ * it does widens authority — what it spends is store time, and a meter
+ * beside the page is what makes that visible.  It is renewable without a
+ * gate, because a consent dialog in front of a query approved ten seconds
+ * ago is the failure Gate 0 was designed to avoid.
  *
  *   dot -Tsvg prompt-pane-architecture.dot -o prompt-pane-architecture.svg
  *   dot -Tpdf prompt-pane-architecture.dot -o prompt-pane-architecture.pdf
@@ -95,7 +128,11 @@ digraph prompt_pane {
                shape = component, fillcolor = "#f2efe6", color = "#8a5a1a", penwidth = 2];
       gate2   [label = "Gate 2 — disposition\nkeep the panels as views · save the page · discard",
                shape = note, fillcolor = "#fdf8f2", color = "#a2672a"];
-      archive [label = "Archive\nlib/dashboard/archive.js\nreopen: no model, no gate"];
+      archive [label = "Archive\nlib/dashboard/archive.js\nreopen: no model, no gate\ngrouped by document, newest revision"];
+      revise  [label = "Revise — the second prompt\nagainst the page, not the transcript",
+               fillcolor = "#eef3ee"];
+      patchcls[label = "The change, classified\nlib/app/patch.js — from the normalised\ndocument BEFORE and AFTER, never from\nthe operation names\npresentational · computational · data · authority",
+               shape = note, fillcolor = "#fdf8f2", color = "#a2672a", penwidth = 2];
     }
   }
 
@@ -197,6 +234,24 @@ digraph prompt_pane {
   logsvc -> archive   [label = "D14  reopen: straight to D5. No model,\nno gate — the queries were authorised\nwhen they were written",
                        color = "#1f4e79", style = dashed];
   archive -> runner   [label = "D14a  live again, not a snapshot", style = dashed];
+
+  /* ──────────────── DASHBOARD, continued: the page is revised ──────────────── */
+
+  dframe -> revise  [label = "D15  ask for a change to the page\n— or D21: a region threw, and at most two\nautomatic repairs are attempted from here",
+                     constraint = false];
+  revise -> adapter [label = "D16  the document's SHAPE + the prompt.\nThe answer is a ```patch block",
+                     constraint = false, minlen = 2];
+  adapter -> patchcls [label = "D17  apply to a COPY, validate the RESULT,\nthen classify", penwidth = 2];
+  // The label is a taillabel so that it hangs off the classifier rather than
+  // landing in the gap between two adjacent nodes, which is where an ordinary
+  // edge label goes and where there is no room for one.
+  patchcls -> gate1   [taillabel = "D18  data —\nGate 1 again,\nper-panel diff",
+                       labeldistance = 5.5, labelangle = -22,
+                       color = "#a2672a", penwidth = 2, constraint = false];
+  patchcls -> dframe  [label = "D19  presentational — applied to the DOM:\nno gate, no store, no reload",
+                       color = "#8a5a1a", penwidth = 2, constraint = false, minlen = 2];
+  dframe -> runner    [label = "D20  re-run ONE declared panel; the value is\nbound by a VALUES clause AFTER the\nauthorised query — never query text.\nCharged against the INTERACTION BUDGET,\nwhich bounds how often, not what",
+                       color = "#1f4e79", style = bold, constraint = false];
 
   /* ─────────────────────────── what the boundaries mean ─────────────────────────── */
   subgraph cluster_legend {
