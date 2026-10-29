@@ -1,0 +1,303 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - generic [ref=e5]:
+    - link "Dydra" [ref=e6] [cursor=pointer]:
+      - /url: /login
+    - list [ref=e8]:
+      - listitem [ref=e9]:
+        - link "Logout" [ref=e10] [cursor=pointer]:
+          - /url: "#"
+      - listitem [ref=e11]:
+        - link "Admin" [ref=e12] [cursor=pointer]:
+          - /url: /ui/admin
+      - listitem [ref=e13]:
+        - link "About" [ref=e14] [cursor=pointer]:
+          - /url: https://dydra.com/about
+      - listitem [ref=e15]:
+        - link "Docs" [ref=e16] [cursor=pointer]:
+          - /url: http://docs.dydra.com/
+      - listitem [ref=e17]:
+        - link "Blog" [ref=e18] [cursor=pointer]:
+          - /url: http://blog.dydra.com/
+  - list [ref=e21]:
+    - listitem [ref=e22]:
+      - link "Login" [ref=e23] [cursor=pointer]:
+        - /url: "#tab-login"
+        - generic [ref=e24]: Login
+    - listitem [ref=e25]:
+      - link "playwright" [ref=e26] [cursor=pointer]:
+        - /url: "#tab-account-playwright"
+        - generic [ref=e27]: playwright
+    - listitem [ref=e31]:
+      - link "playwright test" [ref=e32] [cursor=pointer]:
+        - /url: "#tab-repository-playwright-test"
+        - generic [ref=e33]:
+          - text: playwright
+          - text: test
+  - generic [ref=e37]:
+    - text: ⚠
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - heading "Views Explore New" [level=2] [ref=e45]:
+              - text: Views
+              - generic [ref=e46]:
+                - button "Explore" [ref=e47] [cursor=pointer]
+                - button "New" [ref=e48] [cursor=pointer]
+            - generic [ref=e49]:
+              - generic [ref=e50]:
+                - link "run-view-1793061348519" [ref=e51] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e52]:
+                  - link "playwright" [ref=e54] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e55] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e56]
+                  - button "Open in window" [ref=e57] [cursor=pointer]:
+                    - img "Open in window" [ref=e58]
+                  - button "Delete" [ref=e59] [cursor=pointer]:
+                    - img "Delete" [ref=e60]
+              - generic [ref=e61]:
+                - link "sparql-csv-1793061239638" [ref=e62] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e63]:
+                  - link "playwright" [ref=e65] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e66] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e67]
+                  - button "Open in window" [ref=e68] [cursor=pointer]:
+                    - img "Open in window" [ref=e69]
+                  - button "Delete" [ref=e70] [cursor=pointer]:
+                    - img "Delete" [ref=e71]
+              - generic [ref=e72]:
+                - link "sparql-csv-1793071322214" [ref=e73] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e74]:
+                  - link "playwright" [ref=e76] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e77] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e78]
+                  - button "Open in window" [ref=e79] [cursor=pointer]:
+                    - img "Open in window" [ref=e80]
+                  - button "Delete" [ref=e81] [cursor=pointer]:
+                    - img "Delete" [ref=e82]
+              - generic [ref=e83]:
+                - link "sparql-json-1793061233913" [ref=e84] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e85]:
+                  - link "playwright" [ref=e87] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e88] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e89]
+                  - button "Open in window" [ref=e90] [cursor=pointer]:
+                    - img "Open in window" [ref=e91]
+                  - button "Delete" [ref=e92] [cursor=pointer]:
+                    - img "Delete" [ref=e93]
+              - generic [ref=e94]:
+                - link "sparql-json-1793071315474" [ref=e95] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e96]:
+                  - link "playwright" [ref=e98] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e99] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e100]
+                  - button "Open in window" [ref=e101] [cursor=pointer]:
+                    - img "Open in window" [ref=e102]
+                  - button "Delete" [ref=e103] [cursor=pointer]:
+                    - img "Delete" [ref=e104]
+              - generic [ref=e105]:
+                - link "sparql-kbd-1793061256756" [ref=e106] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e107]:
+                  - link "playwright" [ref=e109] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e110] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e111]
+                  - button "Open in window" [ref=e112] [cursor=pointer]:
+                    - img "Open in window" [ref=e113]
+                  - button "Delete" [ref=e114] [cursor=pointer]:
+                    - img "Delete" [ref=e115]
+              - generic [ref=e116]:
+                - link "sparql-run-1793061227484" [ref=e117] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e118]:
+                  - link "playwright" [ref=e120] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e121] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e122]
+                  - button "Open in window" [ref=e123] [cursor=pointer]:
+                    - img "Open in window" [ref=e124]
+                  - button "Delete" [ref=e125] [cursor=pointer]:
+                    - img "Delete" [ref=e126]
+              - generic [ref=e127]:
+                - link "sparql-run-1793071306901" [ref=e128] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e129]:
+                  - link "playwright" [ref=e131] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e132] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e133]
+                  - button "Open in window" [ref=e134] [cursor=pointer]:
+                    - img "Open in window" [ref=e135]
+                  - button "Delete" [ref=e136] [cursor=pointer]:
+                    - img "Delete" [ref=e137]
+              - generic [ref=e138]:
+                - link "sparql-time-1793061251117" [ref=e139] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e140]:
+                  - link "playwright" [ref=e142] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e143] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e144]
+                  - button "Open in window" [ref=e145] [cursor=pointer]:
+                    - img "Open in window" [ref=e146]
+                  - button "Delete" [ref=e147] [cursor=pointer]:
+                    - img "Delete" [ref=e148]
+              - generic [ref=e149]:
+                - link "sparql-xml-1793061245236" [ref=e150] [cursor=pointer]:
+                  - /url: "#"
+                - generic [ref=e151]:
+                  - link "playwright" [ref=e153] [cursor=pointer]:
+                    - /url: /ui/account/playwright
+                  - button "Edit Pane" [ref=e154] [cursor=pointer]:
+                    - img "Edit Pane" [ref=e155]
+                  - button "Open in window" [ref=e156] [cursor=pointer]:
+                    - img "Open in window" [ref=e157]
+                  - button "Delete" [ref=e158] [cursor=pointer]:
+                    - img "Delete" [ref=e159]
+          - generic [ref=e160]:
+            - generic [ref=e161]:
+              - heading "Editors" [level=2] [ref=e163]
+              - generic [ref=e164]:
+                - button "Import" [ref=e165] [cursor=pointer]
+                - button "Export" [ref=e166] [cursor=pointer]
+                - button "Clear" [ref=e167] [cursor=pointer]
+            - generic [ref=e170]:
+              - generic [ref=e171]:
+                - button "Show/Hide SPARQL editor" [ref=e172] [cursor=pointer]:
+                  - img [ref=e173]
+                - generic [ref=e175] [cursor=pointer]: /playwright/test/sparql-csv-1793071322214
+                - generic [ref=e176]:
+                  - button "LOG" [ref=e177] [cursor=pointer]
+                  - combobox "Select response media type" [ref=e178] [cursor=pointer]:
+                    - option "JSON"
+                    - option "XML"
+                    - option "SVG"
+                    - option "HTML"
+                    - option "───────────────" [disabled]
+                    - option "CSV" [selected]
+                    - option "TSV"
+                    - option "Turtle"
+                    - option "N-Triples"
+                    - option "RDF/XML"
+                    - option "JSON-LD"
+                    - option "───────────────" [disabled]
+                    - option "SSE"
+                  - button "Query settings" [ref=e179] [cursor=pointer]:
+                    - img [ref=e180]
+                  - button "Execute SPARQL query" [ref=e183] [cursor=pointer]:
+                    - img [ref=e184]
+                  - button "Save query to view" [ref=e188] [cursor=pointer]
+                  - button "Reset to original query" [ref=e189] [cursor=pointer]:
+                    - img [ref=e190]
+                  - button "Close view dialog" [ref=e192] [cursor=pointer]:
+                    - img [ref=e193]
+              - generic [ref=e196]:
+                - generic [ref=e197]: "args:"
+                - textbox "URL query arguments (space-separated name=value pairs)" [ref=e198]:
+                  - /placeholder: name=value name2=value2
+              - textbox "Enter your SPARQL query here..." [ref=e200]: "SELECT * WHERE { ?s ?p ?o } LIMIT 10"
+              - generic [ref=e204]: "<div style=\"font-family: monospace; font-size:12px; white-space:pre-wrap; background:#f8f9fa; padding:12px; border-radius:4px; border:1px solid #e9ecef;\">s,p,o </div>"
+              - generic [ref=e205]:
+                - generic [ref=e206]:
+                  - generic [ref=e207]: Event Log
+                  - button "Clear" [ref=e208] [cursor=pointer]
+                - generic [ref=e209]:
+                  - generic [ref=e210]: "[4:22:06 AM] Query saved successfully!"
+                  - generic [ref=e211]: "[4:22:06 AM] === EXECUTE QUERY START ==="
+                  - generic [ref=e212]: "[4:22:06 AM] isExecuting: false"
+                  - generic [ref=e213]: "[4:22:06 AM] Query length: 36"
+                  - generic [ref=e214]: "[4:22:06 AM] Query preview: SELECT * WHERE { ?s ?p ?o } LIMIT 10"
+                  - generic [ref=e215]: "[4:22:06 AM] Execution started at: 1793071326594"
+                  - generic [ref=e216]: "[4:22:06 AM] Extracted account/repo: null, null"
+                  - generic [ref=e217]: "[4:22:06 AM] SPARQL endpoint: http://localhost:8099/playwright/test/sparql"
+                  - generic [ref=e218]: "[4:22:06 AM] Executing query against endpoint: http://localhost:8099/playwright/test/sparql"
+        - generic [ref=e219]:
+          - heading "Readme" [level=2] [ref=e220]
+          - paragraph [ref=e222]: A description has not been added for this repository yet.
+      - generic [ref=e223]:
+        - generic [ref=e224]:
+          - button "Profile" [ref=e225] [cursor=pointer]:
+            - img "Profile" [ref=e226]
+          - button "Configuration" [ref=e227] [cursor=pointer]:
+            - img "Configuration" [ref=e228]
+          - button "Permissible IPs" [disabled] [ref=e229]:
+            - img "Permissible IPs" [ref=e230]
+          - button "Prefixes" [ref=e231] [cursor=pointer]:
+            - img "Prefixes" [ref=e232]
+          - button "Collaboration" [ref=e233] [cursor=pointer]:
+            - img "Collaboration" [ref=e234]
+          - button "Logs" [ref=e235] [cursor=pointer]:
+            - img "Logs" [ref=e236]
+        - generic [ref=e237]:
+          - generic [ref=e238]:
+            - generic [ref=e239]: "Repository Name:"
+            - generic [ref=e240]: test
+          - generic [ref=e241]:
+            - generic [ref=e242]: "Homepage:"
+            - generic [ref=e243]: "-"
+          - generic [ref=e244]:
+            - generic [ref=e245]: "Summary:"
+            - generic [ref=e246]: "-"
+          - generic [ref=e247]:
+            - generic [ref=e248]: "Description:"
+            - generic [ref=e249]: "-"
+          - generic [ref=e250]:
+            - generic [ref=e251]: "Privacy setting:"
+            - combobox [ref=e252]:
+              - option "Private" [selected]
+              - option "Read By IP"
+              - option "Read By Authenticated User"
+              - option "Read By Authenticated User Or IP"
+              - option "Public"
+  - generic [ref=e254]:
+    - paragraph [ref=e255]:
+      - text: A product of
+      - link "Datagraph, GmbH" [ref=e256] [cursor=pointer]:
+        - /url: http://datagraph.org/
+      - text: •
+      - link "About" [ref=e258] [cursor=pointer]:
+        - /url: https://dydra.com/about
+      - text: •
+      - link "Docs" [ref=e260] [cursor=pointer]:
+        - /url: http://docs.dydra.com/
+      - text: •
+      - link "Blog" [ref=e262] [cursor=pointer]:
+        - /url: http://blog.dydra.com/
+      - generic [ref=e263]:
+        - text: •
+        - link "Signup" [ref=e265] [cursor=pointer]:
+          - /url: /signup
+        - text: •
+        - link "Admin" [ref=e267] [cursor=pointer]:
+          - /url: /ui/admin
+      - text: •
+      - link "Legal" [ref=e269] [cursor=pointer]:
+        - /url: https://dydra.com/legal
+    - paragraph [ref=e270]:
+      - link "Support" [ref=e271] [cursor=pointer]:
+        - /url: https://github.com/dydra/support/blob/master/README.rst#readme
+      - text: •
+      - link "GitHub" [ref=e272] [cursor=pointer]:
+        - /url: https://github.com/dydra
+      - text: •
+      - link "Twitter" [ref=e273] [cursor=pointer]:
+        - /url: http://twitter.com/dydradata
+      - text: •
+      - link "RSS" [ref=e274] [cursor=pointer]:
+        - /url: http://feeds.feedburner.com/dydra
+  - generic [ref=e276]: /ui/account/playwright
+```

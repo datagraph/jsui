@@ -1,0 +1,162 @@
+module : jsui/tests/dashboard.test.mjs
+run    : cd jsui && npm run test:dashboard
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:31Z
+----------------------------------------------------------------------
+
+D-O: the grant is charged, not consulted
+  ok   a read is allowed
+  ok   and the call is charged before it is made, not after
+  ok   a write notation is refused under a read-only grant
+  ok   a refused call costs nothing
+  ok   and so is a read notation carrying a body that writes -- the argument is screened, not the name
+  ok   a tool outside the grant is refused
+  ok   the second of two calls is allowed
+  ok   the third is not
+  ok   a repository outside the grant is refused
+  ok   every charge and every refusal is announced, so a meter can be live
+
+D-O: revocable mid-run, and widenable a notch at a time
+  ok   a revoked grant refuses the next call
+  ok   spent
+  ok   and runs again once widened, without restarting
+  ok   widening cannot narrow: taking authority away is revocation, and says so
+
+the operative keyword decides what a body does
+  ok   a query mentioning delete in a literal is still a SELECT
+  ok   a write behind a prologue and a comment is still a write
+  ok   an endpoint names its repository
+
+D-Q: the shape is the default, not the ceiling
+  ok   a table is read as a table
+  ok   the ? is stripped from a SPARQL TSV header
+  ok   a numeric column carries its range
+  ok   the lexical form decides the type: 7.50 is a decimal, not an integer
+  ok   cardinality is counted, which is what picks a chart
+  ok   and a head sample is carried
+  ok   the digest is a fraction of the document
+  ok   and every digest says how to get the whole thing
+  ok   an ASK is a boolean
+  ok   a graph is a graph, with its predicates counted
+
+D-T: the digest is stable, and changes when the data does
+  ok   the same text always digests the same
+  ok   a changed byte changes it
+  ok   length is mixed in, so truncation is not a near miss
+  ok   128 bits, as hex
+
+D-P: three kinds of region, each declaring itself
+  ok   the proposal is read out of the fenced block
+  ok   a well-formed proposal validates
+  ok   and the page's slots are found by kind
+  ok   an assertion citing no panel is marked as outside knowledge, not hidden
+  ok   one citing a panel says what it was written from
+
+a `#' in a namespace is not a comment
+  ok   the form is read through a hash-terminated namespace
+  ok   and through rdf:, which every query in the world declares
+  ok   a real comment is still a comment
+  ok   and a hash inside a literal is neither
+  ok   a DELETE behind a hash-terminated prefix is a DELETE
+  ok   so the read-only screen refuses it, which it did not before
+  ok   and the page the live run proposed validates, which it did not before
+  ok   with its panels and its transform intact
+
+one fault is reported once
+  ok   the proposal is still refused
+  ok   by the one error that says why, not by its five consequences
+  ok   and `no panels' is not said of a page that proposed one
+  ok   a cycle is still a cycle
+
+a transform that does not compile is a Gate 1 error, not a page that fails
+  ok   a body that cannot be parsed stops the page
+  ok   and is named as the transform it is, before anything is mounted
+  ok   with the parser's own message, which the frame's stack omits: "transform `census' does not compile: Unexpected token ';'"
+  ok   once -- the slot that shows it is not a second fault
+  ok   a body that parses is left alone
+  ok   the check parses the body and does not execute it
+
+D-P: what the contract refuses
+  ok   a broken proposal does not validate
+  ok   a panel that writes is refused
+  ok   a slot naming nothing is refused
+  ok   and so is a derived slot with no function
+  ok   declaration order is dependency order, so a cycle cannot be written
+  ok   a page the policy will trim is still a valid page
+  ok   but Gate 1 is told what will be blocked, rather than leaving a blank panel to explain itself
+
+D-T: an assertion carries the digest of what it was written from
+  ok   the digest is stamped on
+  ok   unchanged data leaves the prose alone
+  ok   and when the data moves, the sentence written against it is named
+  ok   a passage citing nothing cannot go stale, because it never claimed a number
+
+D-R: scripts on, origin off
+  ok   the sandbox allows scripts
+  ok   and NOT same-origin -- the one combination that must never appear, because a frame holding both can remove its own sandbox
+  ok   the page cannot open a connection
+  ok   and loads nothing from the network
+  ok   images must be inline
+  ok   the policy travels in the document
+  ok   the runtime is inlined -- the frame loads no second file
+  ok   D-S: the artifact says it is model-produced, not only the transcript
+  ok   and carries the provenance marking the page cannot opt out of
+
+Phase 2: the interface runs the panels, under its own token
+  ok   every panel is run
+  ok   under the user's own token -- the model executed nothing
+  ok   directly, when the catalogue route was not chosen
+  ok   and each result is digested as it lands, which is what makes staleness detectable
+  ok   totals are what the meter reads
+  ok   panels the page uses are posted into it
+  ok   with the document the interface fetched, in the columns the panel asked for
+  ok   and a panel the page never binds is not posted in at all
+
+Phase 2: the catalogue route writes views named for the run
+  ok   one view per panel
+  ok   each named for the run, so a sweep can find this run's and leave another's
+  ok   the name is predictable
+  ok   and the sweep refuses to delete anything it did not write
+  ok   which it tells apart by name
+  ok   a token is bearer-prefixed once, however the caller holds it
+
+the adapter relays under the grant, and serves full documents itself
+  ok   a dashboard run offers query as well as survey
+  ok   and still not the deprecated write
+  ok   with the local tool, because a digest without a way to ask past it is a cap
+  ok   a large payload is digested and labelled
+  ok   the model is shown a fraction of it
+  ok   and result_full answers with the whole document, from what was relayed
+  ok   without asking the store again, which could answer from data that has moved
+  ok   the write is refused by the grant, not sent
+  ok   and the model is told why, so it can adapt rather than retry blindly
+  ok   the run's product is a dashboard proposal
+  ok   one call charged: the refused write never left, and reading a document already in hand is not another call against the store
+  ok   though result_full is charged its bytes -- the budget is about what reaches the model, not about what the store did
+  ok   the full payloads come back with the run, for the record
+
+D-S: the record answers what the page was drawn from
+  ok   the record carries the page and its panels
+  ok   the transform SOURCE, because a derived number is only checkable against it
+  ok   and each assertion's provenance
+  ok   all four go into <account>/mcp as RDF
+  ok   with the digest of what each panel returned
+  ok   and what each sentence was written against, which is what makes D-T checkable later
+  ok   and what the user did with it
+
+U-24: a dashboard can be read back out of the record and reopened
+  ok   the dashboards an account has made are listed from <account>/mcp
+  ok   and one can be read back whole
+  ok   the page is kept, not only its digest
+  ok   with the query behind each panel, so reopening RUNS rather than replays
+  ok   and the digest each sentence was written against
+  ok   so a page reopened after the data moved marks its own prose on the way up
+
+the prompt states the contract the parser enforces
+  ok   the three kinds of region are named
+  ok   with the order to prefer them in
+  ok   the way past a digest is stated
+  ok   and the grant is described, so a refusal is not a surprise
+  ok   as are the frame's rules, which the model could not otherwise discover
+
+119 passed, 0 failed

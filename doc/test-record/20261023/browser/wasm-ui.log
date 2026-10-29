@@ -1,0 +1,100 @@
+module : jsui/tests/wasm-graphviz.browser.mjs
+run    : cd jsui && npm run test:wasm-ui
+needs  : node + playwright's chromium; the script starts its own http
+         server over the working copy — fixtures, no host, no credentials
+date   : 2026-10-23T12:30:53Z
+----------------------------------------------------------------------
+
+a graph is laid out in the page — firefox
+  ok   the engine ran and answered
+  ok   and it is graphviz that answered — version 16.1.0
+  ok   which says its own version, so a drawing can be attributed to a build
+  ok   what comes back is a fragment that scales, not a page-sized file
+  ok   with the nodes and edges of the graph that was sent, and no others
+
+the engine frame is contained — firefox
+  ok   the engine runs in a frame of its own, started on first use
+  ok   given script and nothing else — not same-origin
+  ok   so its document is opaque to the page that started it, and the page's to it
+  ok   and it carries its own policy, which is what denies it the network
+  ok   it draws nothing: it is a worker that happens to be a frame
+
+the engine is a choice, and the choice shows — firefox
+  ok   the same graph can be laid out by neato
+  ok   and comes out a different shape — dot 0.00 0.00 242.00 99.00, neato 0.00 0.00 134.00 106.00
+  ok   an engine that does not exist falls back to dot rather than failing the figure
+
+a graph that will not parse — firefox
+  ok   comes back as a failure
+  ok   with what the engine said: "syntax error in line 1"
+  ok   and the engine is still usable afterwards — one bad graph is not a dead page
+
+the panel shows both, and the frame still runs nothing — firefox
+  ok   mounting a DOT figure lays it out first
+  ok   the drawing is shown in the frame that runs nothing
+  ok   whose sandbox is still empty: the engine was added beside D-M, not inside it
+  ok   the page it holds is the drawing
+  ok   and carries the DOT source with it, in a <details> that needs no script
+  ok   and says so: the geometry is the engine's work, not the model's
+  ok   the pane offers the two as tabs, which it can because it has script
+  ok   the drawing is what you see first
+  ok   the source is there but behind its tab
+  ok   clicking it shows the graph as the model wrote it
+  ok   and puts the drawing away
+  ok   and back again
+  ok   choosing another engine re-lays out the same source
+  ok   and the drawing changes without asking the model for anything
+
+a figure the engine cannot draw — firefox
+  ok   the mount reports the failure to its caller
+  ok   and the source is shown instead, which is what there is to show
+  ok   with the reason, so a wall of text is not left unexplained
+  ok   and no tabs: there is only one thing to look at
+
+a graph is laid out in the page — chromium
+  ok   the engine ran and answered
+  ok   and it is graphviz that answered — version 16.1.0
+  ok   which says its own version, so a drawing can be attributed to a build
+  ok   what comes back is a fragment that scales, not a page-sized file
+  ok   with the nodes and edges of the graph that was sent, and no others
+
+the engine frame is contained — chromium
+  ok   the engine runs in a frame of its own, started on first use
+  ok   given script and nothing else — not same-origin
+  ok   so its document is opaque to the page that started it, and the page's to it
+  ok   and it carries its own policy, which is what denies it the network
+  ok   it draws nothing: it is a worker that happens to be a frame
+
+the engine is a choice, and the choice shows — chromium
+  ok   the same graph can be laid out by neato
+  ok   and comes out a different shape — dot 0.00 0.00 242.00 99.00, neato 0.00 0.00 134.00 106.00
+  ok   an engine that does not exist falls back to dot rather than failing the figure
+
+a graph that will not parse — chromium
+  ok   comes back as a failure
+  ok   with what the engine said: "syntax error in line 1"
+  ok   and the engine is still usable afterwards — one bad graph is not a dead page
+
+the panel shows both, and the frame still runs nothing — chromium
+  ok   mounting a DOT figure lays it out first
+  ok   the drawing is shown in the frame that runs nothing
+  ok   whose sandbox is still empty: the engine was added beside D-M, not inside it
+  ok   the page it holds is the drawing
+  ok   and carries the DOT source with it, in a <details> that needs no script
+  ok   and says so: the geometry is the engine's work, not the model's
+  ok   the pane offers the two as tabs, which it can because it has script
+  ok   the drawing is what you see first
+  ok   the source is there but behind its tab
+  ok   clicking it shows the graph as the model wrote it
+  ok   and puts the drawing away
+  ok   and back again
+  ok   choosing another engine re-lays out the same source
+  ok   and the drawing changes without asking the model for anything
+
+a figure the engine cannot draw — chromium
+  ok   the mount reports the failure to its caller
+  ok   and the source is shown instead, which is what there is to show
+  ok   with the reason, so a wall of text is not left unexplained
+  ok   and no tabs: there is only one thing to look at
+
+68 passed, 0 failed

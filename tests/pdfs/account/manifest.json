@@ -1,1 +1,46 @@
-[]
+[
+  {
+    "requirement": "REQ-2.1.1",
+    "title": "Display Account Information",
+    "section": "account",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Account information fields displayed",
+    "filename": "req-2-1-1-display-account-information-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:12.687Z"
+  },
+  {
+    "requirement": "REQ-2.1.1",
+    "title": "Display Account Information",
+    "section": "account",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account pane with account information",
+    "filename": "req-2-1-1-display-account-information-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:12.348Z"
+  },
+  {
+    "requirement": "REQ-2.2.4",
+    "title": "Display Authentication Token",
+    "section": "account",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Authentication token displayed",
+    "filename": "req-2-2-4-display-authentication-token-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:19.268Z"
+  },
+  {
+    "requirement": "REQ-2.2.4",
+    "title": "Display Authentication Token",
+    "section": "account",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account pane before showing the token",
+    "filename": "req-2-2-4-display-authentication-token-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:17.900Z"
+  }
+]

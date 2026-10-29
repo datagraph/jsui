@@ -1,0 +1,95 @@
+module : jsui/tests/result-shape.test.mjs
+run    : cd jsui && npm run test:shape
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:32Z
+----------------------------------------------------------------------
+
+the whole projection list, not the half of it that has parentheses
+  ok   a mixed list reads as both: ?type AND the aliased count
+  ok   a nested call does not end the item early — COUNT(DISTINCT ?s) is one expression
+  ok   PREFIX declarations are stepped over, which nearly every real query has
+  ok   and so are comments
+
+and null wherever it cannot tell, because a wrong list refuses sound work
+  ok   SELECT *
+  ok   an expression with no alias: the column has a value but no name to match on
+  ok   a query that projects nothing
+  ok   nothing at all
+
+the live failure: a SELECT answered with a boolean
+  ok   refused
+  ok   saying what came instead
+  ok   and what it actually means — see the last section: the store encodes an empty result set this way, so the useful reading is 'no rows', not 'wrong shape'
+  ok   a boolean still digests to one row — which is exactly why the form has to be compared and a row count cannot stand in for it
+
+the same failure as it actually arrived: TSV
+  ok   it digests as a perfectly ordinary one-row table — nothing about it is malformed
+  ok   and is caught by its columns, which is the only thing about it that is wrong
+
+a table that is not this query's table
+  ok   a renamed column is a different result, and is named
+  ok   with both lists shown, since the user is about to decide which is wrong
+
+every other way the shapes can disagree
+  ok   an ASK answered with a table
+  ok   a CONSTRUCT answered with a boolean
+  ok   a score payload where a result should be — the survey answering instead of the store
+  ok   and a page, which is what a misrouted request returns with a 200
+
+what it must not refuse
+  ok   the right answer
+  ok   the right answer with no rows in it — no rows is a real answer to a real query
+  ok   an empty body, which is the same statement more tersely
+  ok   a SELECT * against any columns at all, because nothing was promised
+  ok   a projection it cannot read: unreadable is not wrong
+  ok   an ASK answered with a boolean
+  ok   a CONSTRUCT answered with statements
+  ok   and a form this does not judge is left alone rather than guessed at
+  ok   column ORDER is not a fault: the page binds by name
+
+runPanel refuses it as a failed run, and keeps the body
+  ok   not a result, though the status was 200
+  ok   and distinguishable from a store that refused or fell over
+  ok   the status it actually got is kept, not rewritten to an error
+  ok   with the reason in the panel's own error
+  ok   and the body kept — the whole value of catching it here is that the user can read the query and what answered it side by side
+
+a sound run is untouched
+  ok   one row, no complaint
+
+the queries that ran are read from what was relayed, not from the prose
+  ok   the call that carried SPARQL, and not the turn that merely wrote some
+  ok   with the tool and the outcome, since matching a call that errored is worth knowing too
+
+a query retyped without its dataset clause is caught
+  ok   recognised as the same query with its dataset clause changed
+  ok   and the graph it stopped reading is named
+  ok   with the call itself kept, so the gate can offer it
+  ok   the note says what it will do instead and why that is worse than an error
+  ok   the same query, whitespace aside, is just the same query
+  ok   — whitespace really aside
+
+and a different query is not
+  ok   a model proposing a better query than it explored with is the normal case, and warning about it would teach the user to click past this
+  ok   nothing relayed, nothing to say
+  ok   and no proposal, nothing to say
+
+reading a dataset clause
+  ok   an IRI
+  ok   a prefixed name, and FROM NAMED, which loses just as much
+  ok   and none at all
+  ok   the rest of the two queries is the same text, which is what makes the match safe
+
+Gate 1 warns, and keeps the proposal runnable
+  ok   the proposal is still valid — this is not an error, and refusing it would be wrong
+  ok   but the gate says the query is not the one that ran
+  ok   and carries the one that did, so the gate can offer it rather than describe it
+  ok   the query that ran draws no warning about itself
+  ok   and a gate opened with no history behaves exactly as it did before
+
+the refusal names the likely cause, not just the wrong shape
+  ok   a boolean where a SELECT was asked is an empty result set encoded badly — saying 'wrong shape' sends the reader hunting a routing fault
+  ok   so the next thing to check is named
+  ok   and when the query DOES name a graph, the advice is the other one
+
+58 passed, 0 failed

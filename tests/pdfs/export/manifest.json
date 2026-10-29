@@ -1,1 +1,57 @@
-[]
+[
+  {
+    "requirement": "REQ-3.5.1",
+    "title": "Export Repository Data",
+    "section": "export",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Export completed",
+    "filename": "req-3-5-1-export-repository-data-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:12.783Z"
+  },
+  {
+    "requirement": "REQ-3.5.1",
+    "title": "Export Repository Data",
+    "section": "export",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository before export",
+    "filename": "req-3-5-1-export-repository-data-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:11.548Z"
+  },
+  {
+    "requirement": "REQ-3.5.1",
+    "title": "Export Repository Data",
+    "section": "export",
+    "phase": "format",
+    "stepIndex": 0,
+    "description": "Export format set to application/n-triples",
+    "filename": "req-3-5-1-export-repository-data-format.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:11.843Z"
+  },
+  {
+    "requirement": "REQ-3.5.2",
+    "title": "Direct Download URL",
+    "section": "export",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Export downloaded",
+    "filename": "req-3-5-2-direct-download-url-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:14.118Z"
+  },
+  {
+    "requirement": "REQ-3.5.2",
+    "title": "Direct Download URL",
+    "section": "export",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository before a direct download",
+    "filename": "req-3-5-2-direct-download-url-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:13.059Z"
+  }
+]

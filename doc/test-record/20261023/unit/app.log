@@ -1,0 +1,365 @@
+module : jsui/tests/app-document.test.mjs, app-patch, app-parameters, app-repair, app-budget
+run    : cd jsui && npm run test:app
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:32Z
+----------------------------------------------------------------------
+
+D-U: today's spec is an application document with one view
+  ok   a spec with `html' lifts to one view named main
+  ok   and the lifted shape no longer carries the flat html
+  ok   which validates
+  ok   as a version-1 document at revision 1
+  ok   naming the toolbox version it was written against (§13.10)
+  ok   and projects back to exactly the html it came from
+  ok   with the panels and the title unchanged
+  ok   `validateDashboard' is that projection, not a second validator
+  ok   and hands the document out beside the spec, for the callers that patch it
+
+a document with views needs no html at all
+  ok   two views validate
+  ok   and keep their order, which is the order they were declared in
+  ok   a reader with no notion of views sees all of the page, in order
+  ok   and `viewsOf' gives a legacy spec the same one-view reading
+
+§5.3: a parameter whose domain names a panel that does not exist
+  ok   is refused, naming the panel
+
+§5.3: a parameter whose domain names a column the panel does not return
+  ok   is refused, and says what the panel does return
+  ok   and the same document with the right column is not
+  ok   a projection the text cannot read is `cannot tell', not an empty list
+  ok   DISTINCT does not hide the variables
+  ok   and an aliased expression is read by its alias
+
+§5.3: a panel that names a parameter not declared
+  ok   is refused
+
+§5.3: a declared parameter that binds nothing is a control that does nothing
+  ok   is refused: the user would turn the control and get the same rows back
+  ok   while a parameter no panel mentions at all is a warning, not an error
+
+§5.3: a view name that is not unique, and navigation to a view that is not there
+  ok   a repeated view name is refused
+  ok   and a link to a view that does not exist is refused at the gate, not discovered by clicking it
+  ok   a link to a view that does exist is not
+
+§5.3: `uses' is checked against the toolbox when there is one
+  ok   a component that is not in the toolbox is refused
+  ok   and the real toolbox is the default, so no caller can forget to check
+  ok   while the names the real toolbox does have pass
+  ok   a dependency the model did not name is added rather than refused
+  ok   and the addition is said out loud, because it is page bytes the model did not ask for
+  ok   a capability the host cannot supply is refused (§8.2)
+  ok   and with no catalog to check against, `uses' is carried through rather than refused
+
+§5.3: `uses' takes the element name too, because that is what the catalog shows
+  ok   the three names that were refused on a live page are accepted
+  ok   and normalised to the component name, so everything downstream reads one spelling
+  ok   without a warning: the model wrote what it was shown, and there is nothing to correct
+  ok   naming a component both ways is one component, not two
+  ok   an element that is in no toolbox is still refused — and reported as the model spelled it, so the error names a string that is findable in the answer
+
+§5.3: the page's size is measured, because the model cannot measure it
+  ok   a page over the budget is refused with the number
+  ok   broken down, because the breakdown is the line the model can act on
+  ok   and the measurement counts markup, styles, script and the components `uses' names
+
+§10.3: state is bounded
+  ok   a page that writes a megabyte of state is refused, and told why
+  ok   a few keys are kept
+
+a view whose regions carry no id can only be revised whole
+  ok   which is a warning at Gate 1, where the page can still be asked for again
+  ok   and the ids are read in document order
+
+D-W rests on two equal documents serialising identically
+  ok   key order in the model's answer does not reach the comparison
+  ok   because the canonical form sorts keys at every depth
+  ok   and an id is minted, time-ordered and distinct
+
+U-28: the record carries identity and history
+  ok   the id, the revision and what it was made from
+  ok   the components it inlined and the contract version they answer to
+  ok   with the toolbox's own shared helper added silently — not a choice the model made
+  ok   the views, and the whole page beside them for a reader that wants one string
+  ok   and the operations that produced this revision from the last
+  ok   a record written from a page with no identity carries none, rather than inventing one
+  ok   and still carries the page
+
+U-28: the archive groups revisions of one page into one entry
+  ok   four records, three things
+  ok   the newest revision stands for the group and says how many there are
+  ok   with the others reachable through it, newest first
+  ok   and the groups are ordered by when they were last touched
+  ok   a record written before revisions existed is its own group — it really is a page that happened once
+
+§13.10: a document names the toolbox version it was written against
+  ok   and one written against a version this build does not have is refused, not mounted subtly wrong
+  ok   while a document that names none is this version's
+
+the fenced block is read under either name
+  ok   ```dashboard, which is what every recorded run carries
+  ok   ```application, which is what a document with views is called in the prompt now
+  ok   and nothing at all from a block that is not JSON
+
+64 passed, 0 failed
+
+§6.1: `set-slot' addresses one element by id, in text, with no DOM
+  ok   a nested element of the same tag name does not end the outer one early
+  ok   and the scanner reads the tag name back
+  ok   an id that is not there is null, not a guess
+  ok   a void element ends at its own tag
+  ok   single quotes address the same element
+  ok   and an id written inside another attribute's value is not one
+  ok   replacing the inner element leaves the outer alone
+  ok   and replacing what is not there fails
+  ok   appending goes inside the element, before its close
+  ok   and with no id, at the end of the view
+
+§6.2: a patch is applied to a copy and the RESULT is validated
+  ok   a slot replacement validates
+  ok   and the new markup is in the view
+  ok   while the document it was applied to is untouched — the copy was the one that changed
+  ok   the revision is bumped and says what it was made from
+
+§6.2: a patch that does not validate is refused WHOLE
+  ok   the patch is refused
+  ok   for the fault the SECOND operation caused, which only the result could show
+  ok   and the title the first operation changed did not survive: half a patch is not applied
+
+an operation this version does not know is refused, not ignored
+  ok   because ignoring it would silently produce a page the prompt did not ask for
+  ok   and a patch that asks for authority is told it is a proposal for Gate 0
+
+operations that address something absent say so
+  ok   a slot id the view does not contain
+  ok   and removing the only view
+  ok   and removing a panel that is not there
+
+a document with two views makes `set-slot' name one
+  ok   because guessing which view a card is in is how the wrong card gets replaced
+  ok   and naming it works
+
+D-W: a change to a query is a data-class change and re-opens Gate 1
+  ok   classified data
+  ok   which is Gate 1
+  ok   and the panel re-runs
+  ok   with a reason the user can read
+
+D-W: a new panel is a data-class change; the others do not re-run
+  ok   a new panel is a data change
+  ok   only the new panel re-runs
+  ok   and the unchanged one is named as unchanged
+
+D-W: a change to a transform or an assertion is computational, not data
+  ok   the body compiles and the diff is shown; nothing asks the store anything new
+  ok   and no panel re-runs
+
+D-W: markup, styles and captions are presentational — no gate, no store
+  ok   classified presentational
+  ok   which opens no gate
+  ok   and runs nothing
+  ok   and can be applied in the frame in place, without reloading it (§6.2.1)
+
+D-W: a caption change on a panel does not become a data change
+  ok   `set-panel' is not what makes a change data-class; changing what it asks the store is
+  ok   and the query is carried through untouched
+
+D-W: three things force a rebuild although they re-run nothing
+  ok   a component that was not inlined is not in the frame to be used
+  ok   and a new page script has to be run
+  ok   and so does a view that did not exist
+
+D-W: the class is the strongest change in the patch, not the last one
+  ok   a patch that changes a query and a colour is a patch that changes a query
+
+D-W: the classification is computed, never declared by the model
+  ok   a patch described as presentational and performing a data change is a data change
+  ok   and the four classes each name a gate
+
+the patch block
+  ok   a fenced ```patch block of operations
+  ok   a single operation written without its brackets is accepted rather than losing the turn
+  ok   and a block that is not JSON is nothing
+  ok   as is no block at all
+
+§6.3: the three prompts, end to end
+  ok   prompt 1 produces revision 1
+  ok   prompt 2's patch applies and validates
+  ok   classified data — a query changed and a panel is new
+  ok   two panels of three re-run
+  ok   and `regions', unchanged, does not
+  ok   Gate 1 shows exactly that: one added, one diffed, one left alone
+  ok   revision 2
+  ok   prompt 3 is presentational
+  ok   no gate, no query, no round trip to the store
+  ok   and no reload: this is the case that makes interactive design feel like design
+  ok   revision 3, made from revision 2
+
+60 passed, 0 failed
+
+D-X: a value becomes a term, through one encoder
+  ok   a plain literal is a plain literal
+  ok   and so is an xsd:string — the same term, with one less thing to get wrong
+  ok   a typed literal carries its datatype as a FULL IRI
+  ok   including the ones with no shorthand
+  ok   a language tag is written as one
+  ok   and an IRI parameter is written in angle brackets
+  ok   a known prefix expands
+  ok   a full IRI passes through
+  ok   and an unknown prefix does not, because the appended clause has no prologue to declare it
+  ok   so a value with that datatype is refused rather than written with a prefix nothing binds
+
+the encoder refuses what it cannot write, rather than escaping it
+  ok   a quote and a backslash are escaped
+  ok   so a quote in a value cannot end the literal early
+  ok   nor can a newline
+  ok   a control character is refused — no legitimate value needs one
+  ok   a relative IRI is refused
+  ok   and so is one with a space, because a value that needs escaping to sit in an IRI is not one
+  ok   or one that would close the brackets early
+  ok   a lexical form that is not of its datatype is refused
+  ok   and a parameter takes one value, not an object
+  ok   nor nothing at all
+
+a value outside its declared domain is refused, with a reason
+  ok   a value in the enumeration
+  ok   and one outside it, named, with what was admitted
+  ok   a number inside the range
+  ok   below it
+  ok   and above it
+  ok   the values of a `from' domain are read off what the panel returned
+  ok   a value the store returned is admitted
+  ok   and one it did not is refused — the enumeration is the data's, not the model's
+  ok   a domain whose panel has not run yet admits the value: the page cannot have offered one it never had
+
+D-X: the authorised text is appended to, never edited
+  ok   the binding succeeds
+  ok   and the query that runs BEGINS with the query that was authorised, byte for byte
+  ok   with exactly one VALUES clause after it, on its own line
+  ok   the value appears nowhere inside the authorised text — nothing was interpolated
+  ok   and what was bound is reported
+  ok   a panel that declares no parameters gets its text back identical, not merely equivalent
+  ok   and a parameter with no value and no default leaves the query's own variable free
+  ok   a default is used when nothing is supplied
+  ok   and the defaults a page starts with are the declared ones
+
+the clause survives a query that ends in a comment
+  ok   because a `#' runs to the end of its own line and would otherwise swallow the binding
+
+one refused value stops the whole binding
+  ok   the refusal names the parameter and the reason
+  ok   and nothing is bound: half a binding is a query the user never saw, returning the wrong rows
+
+U-34: the runner binds, and refuses before it fetches
+  ok   a value in the domain runs
+  ok   and the result says what it was run with
+  ok   a value outside it is refused with a reason
+  ok   and nothing was fetched: the refusal happens before the store is touched
+
+U-31: only the panels that changed are run
+  ok   two of three panels are run
+  ok   and the one that was not keeps the result it already had
+
+47 passed, 0 failed
+
+§11: a fault names a region, and the region names its source
+  ok   the frame's own label is read back
+  ok   and a fault with no region is a page fault
+  ok   a transform fault carries the transform's body
+  ok   labelled with what it reads, so the model knows what it has
+  ok   a bound fault carries the panel's query
+  ok   an assertion fault carries the sentence
+  ok   and a page fault carries the model's own script
+  ok   a fault naming something the document does not contain is null — the frame and the document have come apart, and the answer is a rebuild rather than a repair
+
+§2.5: the repair turn carries the failing region and NOT the document
+  ok   one region's source went
+  ok   which is in the prompt
+  ok   and the panel query, which did not fail, is not
+  ok   nor the assertion
+  ok   the answer asked for is a patch
+  ok   the smallest one that fixes it — not a re-emission of the parts that work
+  ok   and a model that cannot tell is told to say so: a wrong patch costs the attempt
+  ok   a second attempt says which attempt it is, because that changes what is worth trying
+
+D-AA: two attempts, and then it stops where a human can see it
+  ok   two is the bound
+  ok   the first attempt is allowed
+  ok   and the second
+  ok   and then no more: an automatic loop that cannot converge must stop where it can be seen
+  ok   with both attempts in the summary the pane shows and the record keeps
+  ok   and the region that would not come right
+
+a patch that changed nothing stops the loop one attempt early
+  ok   trying again with the same input and the same fault is the definition of not converging
+  ok   while a different fault is a different question, and is still worth one attempt
+  ok   and with nothing broken there is nothing to attempt
+
+the same fault reported twice is one fault
+  ok   two regions, not three errors
+  ok   with the repetition counted — a page whose data arrives twice reports twice
+  ok   and nothing that is not an error
+
+D-AA: a repair that changes a query stops at Gate 1 like any other patch
+  ok   the fact that something is broken is not a reason to run a query the user has not seen
+  ok   while the ordinary repair — a transform that threw — asks for no authority
+
+30 passed, 0 failed
+
+§15 q.3: a page's runs are charged before the call, like the grant's
+  ok   the first run is allowed
+  ok   and charged before it is made, not after
+  ok   with the meter told at once, so it moves while the page runs
+  ok   the second
+  ok   and the third is refused
+  ok   without being charged — a refusal does not cost a run
+  ok   the budget is spent
+
+the refusal is worded for a reader, not for a log
+  ok   it says nothing is wrong first, because a reader who thinks they broke something stops
+  ok   it says the queries are the ones they approved — this is a meter, not a consent question
+  ok   and it says what to do
+  ok   naming the number that was spent
+
+rows and bytes are charged after, because they are not knowable before
+  ok   what it actually cost
+  ok   and a page over the row budget is stopped at the next request, not retrospectively
+  ok   the two runs that did happen are still the two that happened
+
+a refresh costs one run per panel
+  ok   a three-panel refresh is allowed
+  ok   and charged three
+  ok   so a second one is refused: otherwise the cheapest thing a page can ask for and the most expensive would cost the same
+
+renewal asks nobody anything — and is counted, because the count is the signal
+  ok   spent
+  ok   one press adds the renewal amount
+  ok   and the page can ask again
+  ok   the renewal is counted
+  ok   three renewals means a page whose shape is wrong, which a larger number would hide
+  ok   and the ceilings are additive
+
+renewal is upward only
+  ok   a button the user reads as giving more must never quietly give less
+  ok   and a renewal that changed nothing is not counted as one
+
+what the page is told
+  ok   the counts, so a control can be honest about being spent
+  ok   and whether it is
+  ok   and nothing else: a page that could renew its own budget would make the button a decoration
+  ok   and a page with no budget behind it is told nothing
+
+the grant screens the model; the budget bounds the page
+  ok   a model's call does not spend the page's allowance
+  ok   and a page's run does not spend the model's — a reader turning a selector must not exhaust an exploration
+  ok   a grant is revoked and widened; a budget is renewed. They are not the same verb
+
+the record keeps what the page cost, beside what the model was given
+  ok   what it spent and how often it was renewed
+  ok   and what it was allowed by the end
+  ok   written as one literal: nothing queries inside a meter reading
+  ok   with the renewal count in it
+  ok   a page nobody interacted with records no meter, rather than a meter reading zero
+
+37 passed, 0 failed

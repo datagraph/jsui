@@ -1,0 +1,434 @@
+═══ MCP test suite ══════════════════════════════════════════════
+
+── 01-import ────────────────────────────────────────────────────
+  Clearing /test/test
+  { "head": {}, "boolean": true  }
+  
+  Importing /Users/Shared/Development/Source/Library/org/datagraph/spocq/gensrc/mcp/test/data/dataset.nq
+    → https://nl4.dydra.com/test/test/service
+  
+  <urn:uuid:F9762F5A-D1B4-11F1-9608-3BCB8CEB8DDD> <http://www.w3.org/ns/activitystreams#id> <urn:uuid:F9762F5A-D1B4-11F1-9608-3BCB8CEB8DDD>  ;
+      <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/activitystreams#Update>  ;
+      <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2011/http-methods#POST>  ;
+      <http://www.w3.org/ns/prov#startedAtTime> "2026-10-27T03:17:43Z"^^<http://www.w3.org/2001/XMLSchema#dateTime>  ;
+      <http://www.w3.org/ns/prov#endedAtTime> "2026-10-27T03:17:43.931176Z"^^<http://www.w3.org/2001/XMLSchema#dateTime>  ;
+      <http://www.w3.org/ns/activitystreams#actor> <http://dydra.com/users/test>  ;
+      <http://www.w3.org/ns/activitystreams#object> <http://dydra.com/test/test?revision=1774E2AE-861B-FF41-95B5-A78E1D81E5DC> .
+  Import complete.
+  PASS  01-import
+
+── 02-initialize ────────────�
+  ── initialize handshake (legacy era, protocol 2025-11-25) ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 0, "result": {"resultType": "complete", "protocolVersion": "2025-11-25", "capabilities": {"tools": {"listChanged": false}, "resources": {"listChanged": false, "subscribe": false}, "prompts": {"listChanged": false}, "extensions": {"org.datagraph.spocq/notation": {"requestMediaTypes": ["application/sparql-query", "application/sparql-update", "application/score", "application/graphql"]}}}, "serverInfo": {"name": "spocq-mcp", "version": "2.0.0"}, "_meta": {"io.modelcontextprotocol/serverInfo": {"name": "spocq-mcp", "version": "2.0.0"}}}}
+  
+      ✓ initialize returns result
+      ✓ result["protocolVersion"] == "2025-11-25"
+      ✓ serverInfo.name == spocq-mcp
+      ✓ ping is answered in the legacy era
+  
+    4/4 checks passed
+  PASS  02-initialize
+
+── 03-tools-list ────────────�
+  ── tools/list — the two-tool surface plus the deprecated ali... ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "tools": [{"name": "query", "description": "Run one query against the RDF repository. The mimeType argument names the notation of `text' and determines the notation of the result, which is reported as the mimeType of the result's embed...
+  
+      ✓ tools/list returns result
+      ✓ result.resultType == "complete"
+      ✓ result._meta carries serverInfo
+      ✓ result carries ttlMs and cacheScope=private
+      ✓ tool 'query' present
+      ✓ tool 'survey' present
+      ✓ tool 'graphql_query' present
+      ✓ tool 'graphql_mutate' present
+      ✓ tool 'sparql_select' present
+      ✓ tool 'sparql_update' present
+      ✓ tool 'sparql_describe' present
+      ✓ tool 'list_graphs' present
+      ✓ tool 'orch_survey' present
+      ✓ tool 'orch_select' present
+      ✓ tools list has 15 entries
+      ✓ tool 'score_save' absent
+      ✓ tool 'score_load' absent
+      ✓ all tools have inputSchema
+      ✓ tool order is deterministic across requests
+      ✓ tool 'score' absent
+      ✓ the former name 'score' still reaches the survey tool
+  
+    21/21 checks passed
+  PASS  03-tools-list
+
+── 04-resources-list ───────────
+  ── resources/list ───────────────────────────────────────────────
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "resources": [{"uri": "rdf://vocabulary", "name": "RDF Vocabulary", "description": "RDF classes, properties, domain/range, and datatypes in Turtle. Read this before writing SPARQL queries \u2014 it provides the IRIs and namespace prefixes needed for correct triple patterns.", "mimeType": "text/turtle"}, {"uri": "rdf://graphs", "name": "Named Graphs", "description": "JSON array of named graph URIs present in the repository.", "mimeType": "application/json"}, {"uri": "rdf://types", "name": "RDF Types", "description": "JSON array of RDF class URIs present in the repository.", "mimeType": "application/json"}, {"uri": "score://grammar", "name": "Score Grammar", "description": "The score notation: grammar, shape operators, and worked examples. Read this before writing a score expression.", "mimeType": "text/plain"}, {"uri": "score://operations", "name": "Score Operations", "description": "The operations of the survey tool: name, purpose, and an example body for each.", "mimeType": "application/score"}], "ttlMs": 300000, "cacheScope": "private", "_meta": {"io.modelcontextprotocol/serverInfo": {"name": "spocq-mcp", "version": "2.0.0"}}}}
+  
+      ✓ resources/list returns result
+      ✓ resources list has 5 entries
+      ✓ result.resultType == "complete"
+      ✓ result carries ttlMs and cacheScope=private
+      ✓ resource 'rdf://vocabulary' listed
+      ✓ resource 'rdf://graphs' listed
+      ✓ resource 'rdf://types' listed
+      ✓ resource 'score://grammar' listed
+      ✓ resource 'score://operations' listed
+      ✓ all resources have mimeType
+  
+    10/10 checks passed
+  PASS  04-resources-list
+
+── 05-graphql-query-persons ────────�
+  ── graphql_query (deprecated alias): { person { Name Email A... ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "resource", "resource": {"uri": "rdf://test/test/result/C18368D0-9A2E-4DFD-BF56-0F2F261103A4", "mimeType": "application/graphql-response+json", "text": "{\"data\":{\"person\":[{\"Name\":\"Alice Smith\",\"Email\":\"...
+  
+      ✓ graphql_query returns result
+      ✓ result is not an error
+      ✓ response mimeType == application/graphql-response+json
+      ✓ Result content contains: Alice Smith
+      ✓ Result content contains: Bob Jones
+      ✓ Result content contains: Carol White
+      ✓ response document has data.person as an array
+  
+    7/7 checks passed
+  PASS  05-graphql-query-persons
+
+── 06-graphql-query-filter ─────────
+  ── graphql_query with a field filter ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "resource", "resource": {"uri": "rdf://test/test/result/B519EAA2-B183-40BA-870D-44E05EF9BBBA", "mimeType": "application/graphql-response+json", "text": "{\"data\":{\"person\":[{\"Name\":\"Alice Smith\",\"Email\":\"...
+  
+      ✓ graphql_query with filter returns result
+      ✓ result is not an error
+      ✓ Result content contains: Alice Smith
+      ✓ result does not contain: Bob Jones
+  
+    4/4 checks passed
+  PASS  06-graphql-query-filter
+
+── 07-sparql-select ───────────�
+  ── sparql_select (deprecated alias) → SPARQL Results JSON ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "resource", "resource": {"uri": "rdf://test/test/result/C316B580-27A6-4DF1-86AC-CE6C1548D962", "mimeType": "application/sparql-results+json", "text": "{ \"head\": { \"vars\": [ \"name\" ] },\n \"results\": {\n  \"b...
+  
+      ✓ sparql_select returns result
+      ✓ result is not an error
+      ✓ response mimeType == application/sparql-results+json
+      ✓ result is a SPARQL Results JSON document
+      ✓ Result content contains: Alice Smith
+  
+    5/5 checks passed
+  PASS  07-sparql-select
+
+── 08-sparql-describe ──────────�
+  ── sparql_describe (deprecated alias) → text/turtle ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "resource", "resource": {"uri": "rdf://test/test/result/25ABCFE1-0DBB-4C02-A1B5-C76134B5D532", "mimeType": "text/turtle", "text": "<http://example.org/data/alice> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <...
+  
+      ✓ sparql_describe returns result
+      ✓ result is not an error
+      ✓ response mimeType == text/turtle
+      ✓ Result content contains: http://example.org/data/alice
+  
+    4/4 checks passed
+  PASS  08-sparql-describe
+
+── 09-list-graphs ────────────
+  ── list_graphs (deprecated alias) → SPARQL Results JSON ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "resource", "resource": {"uri": "rdf://test/test/result/C18368D0-9A2E-4DFD-BF56-0F2F261103A4", "mimeType": "application/sparql-results+json", "text": "{ \"head\": { \"vars\": [ \"g\" ] },\n \"results\": {\n  \"bind...
+  
+      ✓ list_graphs returns result
+      ✓ result is not an error
+      ✓ response mimeType == application/sparql-results+json
+      ✓ Result content contains: http://test/test/schema
+  
+    4/4 checks passed
+  PASS  09-list-graphs
+
+── 10-resources-read-schema ────────�
+  ── resources/read: rdf://test/test/vocabulary ───────────────────
+     https://nl4.dydra.com/test/test/mcp
+  
+    response (truncated): {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "contents": [{"uri": "rdf://test/test/vocabulary", "mimeType": "text/turtle", "text": "# RDF vocabulary for test/test, derived from the data.\n# Read this before writing SPARQL or GraphQL.\n# The data is held in named graphs: select over the union with\n#   FROM <urn:dydra:all>\n# or name the graph.\n\n@prefix rdf:  <http://www.w3.or...
+  
+      ✓ resources/read vocabulary returns result
+      ✓ vocabulary mimeType is text/turtle
+      ✓ vocabulary includes rdfs:Class declarations
+      ✓ vocabulary includes rdf:Property declarations
+      ✓ vocabulary references Person class
+      ✓ vocabulary includes rdfs:domain
+      ✓ vocabulary includes rdfs:range
+      ✓ vocabulary declares @prefix
+  
+    8/8 checks passed
+  PASS  10-resources-read-schema
+
+── 11-resources-read-graphs ────────�
+  ── resources/read: rdf://graphs ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "contents": [{"uri": "rdf://graphs", "mimeType": "application/json", "text": "[\"http://test/test/schema\",\"http://test/test/data\"]"}], "ttlMs": 300000, "cacheScope": "private", "_meta": {"io.modelcontextprotocol/serverInfo": {"name"
+  
+      ✓ resources/read graphs returns result
+      ✓ response mimeType == application/json
+      ✓ result carries ttlMs and cacheScope=private
+      ✓ graphs text is a JSON array
+      ✓ the schema graph is listed
+      ✓ the data graph is listed
+  
+    6/6 checks passed
+  PASS  11-resources-read-graphs
+
+── 12-resources-read-types ─────────
+  ── resources/read: rdf://types ────────────────────────
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "contents": [{"uri": "rdf://types", "mimeType": "application/json", "text": "[\"http://www.w3.org/1999/02/22-rdf-syntax-ns#Property\",\"http://www.w3.org/2000/01/rdf-schema#Class\",\"http://example.org/schema/Person\",\"http://example.org/schema/Project\",\"http://example.org/schema/Department\"]"}], "ttlMs": 300000, "cacheScope": "private", "_meta": {"io.modelcontextprotocol/serverInfo": {"name": "spocq-mcp", "version": "2.0.0"}}}}
+  
+      ✓ resources/read types returns result
+      ✓ types mimeType is application/json
+      ✓ types text is a non-empty JSON array
+      ✓ types includes Person class
+      ✓ types includes Department class
+      ✓ types includes Project class
+  
+    6/6 checks passed
+  PASS  12-resources-read-types
+
+── 13-discover ─────────────
+  ── server/discover — the stateless era, with no handshake ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "supportedVersions": ["2026-07-28", "2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"], "capabilities": {"tools": {"listChanged": false}, "resources": {"listChanged": false, "subscribe": false}, "prompts": {"listChanged": false}, "extensions": {"org.datagraph.spocq/notation": {"requestMediaTypes": ["application/sparql-query", "a...
+  
+      ✓ server/discover returns result
+      ✓ result.resultType == "complete"
+      ✓ result._meta carries serverInfo
+      ✓ result carries ttlMs and cacheScope=private
+      ✓ supportedVersions includes 2026-07-28
+      ✓ supportedVersions includes the legacy 2025-11-25
+      ✓ capabilities declare tools, resources and prompts
+      ✓ the notation extension advertises the request media types
+      ✓ instructions teach the notation triad
+      ✓ tools/list works without any handshake
+  
+    10/10 checks passed
+  PASS  13-discover
+
+── 14-headers ─────────────�
+  ── request-header validation and version negotiation ──
+     https://nl4.dydra.com/test/test/mcp
+  
+      ✓ HTTP status == 200
+      ✓ well-formed request succeeds
+      ✓ HTTP status == 400
+      ✓ JSON-RPC error code == -32020
+      ✓ HTTP status == 400
+      ✓ JSON-RPC error code == -32020
+      ✓ HTTP status == 400
+      ✓ JSON-RPC error code == -32020
+      ✓ HTTP status == 400
+      ✓ JSON-RPC error code == -32020
+      ✓ HTTP status == 400
+      ✓ JSON-RPC error code == -32020
+      ✓ HTTP status == 404
+      ✓ JSON-RPC error code == -32601
+  
+    14/14 checks passed
+  PASS  14-headers
+
+── 15-tool-errors ────────────
+  ── tool execution errors are results with isError, not protoco... ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "text", "text": "SPARQL query failed: While processing, an error was signaled: Invalid message received :\nfailed to parse after 'this' at offset 18 on line 1.\nSELECT ?s WHERE { this is not sparql\n\nCheck the syn...
+  
+      ✓ invalid SPARQL is a result with isError:true
+      ✓ result.resultType == "complete"
+      ✓ unknown mimeType is a tool execution error
+      ✓ the error lists the accepted media types
+      ✓ absent mimeType is a tool execution error
+      ✓ an update sent as a query is a tool execution error
+      ✓ the error names the update media type
+      ✓ unknown score operation is a tool execution error
+      ✓ save is not exposed
+      ✓ save points at the graph store instead
+      ✓ load is not exposed
+      ✓ an unknown session handle is a tool execution error
+      ✓ the error says how to recover
+      ✓ JSON-RPC error code == -32602
+      ✓ JSON-RPC error code == -32602
+  
+    15/15 checks passed
+  PASS  15-tool-errors
+
+── 16-notation-sparql ──────────�
+  ── query in SPARQL — the response notation follows the query f... ──
+     https://nl4.dydra.com/test/test/mcp
+  
+      ✓ SELECT returns a result
+      ✓ result is not an error
+      ✓ response mimeType == application/sparql-results+json
+      ✓ _meta pairs application/sparql-query → application/sparql-results+json
+      ✓ Result content contains: Alice Smith
+      ✓ SELECT carries the structured twin
+      ✓ result is not an error
+      ✓ response mimeType == application/sparql-results+json
+      ✓ Result content contains: boolean
+      ✓ result is not an error
+      ✓ response mimeType == text/turtle
+      ✓ _meta pairs application/sparql-query → text/turtle
+      ✓ result is not an error
+      ✓ response mimeType == text/turtle
+      ✓ result is not an error
+      ✓ response mimeType == application/sparql-results+json
+      ✓ result is not an error
+      ✓ limit caps the returned rows
+      ✓ update runs
+      ✓ response mimeType == application/sparql-results+json
+      ✓ Result content contains: boolean
+  
+    21/21 checks passed
+  PASS  16-notation-sparql
+
+── 17-notation-graphql ──────────�
+  ── query in GraphQL — paired to application/graphql-response+j... ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "resource", "resource": {"uri": "rdf://test/test/result/227F7989-91D6-4E1D-9607-32334AD778CA", "mimeType": "application/graphql-response+json", "text": "{\"data\":{\"person\":[{\"Name\":\"Alice Smith\",\"Email\":\"...
+  
+      ✓ GraphQL query returns a result
+      ✓ result is not an error
+      ✓ response mimeType == application/graphql-response+json
+      ✓ _meta pairs application/graphql → application/graphql-response+json
+      ✓ Result content contains: Alice Smith
+      ✓ the response document has a data member
+      ✓ a GraphQL fault still returns a JSON-RPC result
+  
+    7/7 checks passed
+  PASS  17-notation-graphql
+
+── 18-notation-score ───────────
+  ── query in score — paired to application/score ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "resource", "resource": {"uri": "rdf://test/test/result/069345A4-1845-4499-A7ED-87CE99343DDD", "mimeType": "application/score", "text": "{\n  session: \"13755F32-D1B7-11F1-960A-3BCB8CEB8DDD\",\n  node: \"n1\",\n  count: 3,\n  results: [\n    {schema_name: \"Alice Smith\"},\n    {schema_name: \"Bob Jones\"},\n    ...
+  
+      ✓ score query returns a result
+      ✓ result is not an error
+      ✓ response mimeType == application/score
+      ✓ _meta pairs application/score → application/score
+      ✓ Result content contains: results
+      ✓ the handle of the session it opened is reported
+      ✓ malformed score is a tool execution error
+  
+    7/7 checks passed
+  PASS  18-notation-score
+
+── 19-score-session ───────────�
+  ── score — handle-based exploration state ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "resource", "resource": {"uri": "rdf://test/test/result/227F7989-91D6-4E1D-9607-32334AD778CA", "mimeType": "application/score", "text": "{\n  session: \"2C1636C4-D1B7-11F1-960A-3BCB8CEB8DDD\",\n  repository: \"test...
+  
+      ✓ connect returns a result
+      ✓ result is not an error
+      ✓ response mimeType == application/score
+      ✓ Result content contains: session
+      ✓ the retention policy names what ends the session
+      ✓ the retention policy states the cache lifetime
+      ✓ a session handle was minted: 2C1636C4-D1B7-11F1-960A-3BCB8CEB8DDD
+      ✓ survey runs against the handle
+      ✓ response mimeType == application/score
+      ✓ select runs against the handle
+      ✓ Result content contains: Alice Smith
+      ✓ history runs
+      ✓ the tree records the select
+      ✓ the session resource reads
+      ✓ disconnect runs
+      ✓ a released handle no longer resolves
+  
+    16/16 checks passed
+  PASS  19-score-session
+
+── 20-score-resolve ───────────�
+  ── score — bare names resolved against the vocabulary ──
+     https://nl4.dydra.com/test/test/mcp
+  
+    response: {"jsonrpc": "2.0", "id": 1, "result": {"resultType": "complete", "content": [{"type": "resource", "resource": {"uri": "rdf://test/test/result/6A876A76-2519-4DD0-9683-D134DB8A9646", "mimeType": "application/score", "text": "{\n  node: \"n1\",\n  count: 3,\n  results: [\n    {schema_name: \"Alice Smith\"},\n    {schema_name: \"Bob Jones\"},\n    {schema_name: \"Carol White\"}\n  ],\n  suggestions: [...
+  
+      ✓ a select written in bare names returns a result
+      ✓ the result reports what it resolved
+      ✓ Person resolved to a vocabulary term
+      ✓ strict turns an unresolved name into an error
+      ✓ the error names what it could not resolve
+  
+    5/5 checks passed
+  PASS  20-score-resolve
+
+── 21-score-materialize ──────────
+  ── score — materialize compiles to SPARQL that runs ──
+     https://nl4.dydra.com/test/test/mcp
+  
+      ✓ the shaped select runs
+      ✓ materialize runs
+      ✓ materialize emits SPARQL
+      ✓ the compiled SPARQL was recovered from the score result
+    compiled: SELECT ?SCHEMA_NAME\n FROM <urn:dydra:all> WHERE { ?S <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://example.org/schema/Person> .\n         ?S <http://example.org/schema/name> ?SCHEMA_NAME ...
+  
+    4/4 checks passed
+  PASS  21-score-materialize
+
+── 22-score-resources ──────────�
+  ── the score:// resources — grammar, operations, session ──
+     https://nl4.dydra.com/test/test/mcp
+  
+      ✓ the grammar resource reads
+      ✓ result carries ttlMs and cacheScope=private
+      ✓ the grammar documents @shape
+      ✓ the grammar documents bare names
+      ✓ the operations resource reads
+      ✓ the catalogue lists survey
+      ✓ the catalogue lists materialize
+      ✓ result does not contain: save
+      ✓ the operations catalogue is score
+      ✓ the long form still reads
+      ✓ and returns the same document
+      ✓ JSON-RPC error code == -32602
+  
+    12/12 checks passed
+  PASS  22-score-resources
+
+── 23-describe-depth ───────────
+  ── DESCRIBE: form and depth ──
+     https://nl4.dydra.com/test/test/mcp
+  
+      ✓ describe with form and depths runs
+      ✓ response mimeType == text/turtle
+      ✓ the description names its subject
+    asymmetric, subject depth 1: 404 bytes
+      ✓ describe reaching further runs
+    symmetric, subject depth 2, object depth 1: 514 bytes
+      ✓ reaching further does not return less
+      ✓ the request parameters are accepted on the MCP endpoint
+      ✓ response mimeType == text/turtle
+      ✓ an unknown describeForm is a tool execution error
+      ✓ the error names the forms it accepts
+      ✓ a negative depth is a tool execution error
+  
+    10/10 checks passed
+  PASS  23-describe-depth
+
+═══════════════════════════════════════════════════════════════════
+Results: 22 passed, 0 failed

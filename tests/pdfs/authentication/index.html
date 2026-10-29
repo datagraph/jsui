@@ -18,6 +18,88 @@
 </head>
 <body>
   <h1>Dydra JSUI - Requirements Documentation</h1>
-  <p>Generated: 2026-10-08T07:42:17.278Z</p>
+  <p>Generated: 2026-10-27T03:18:39.205Z</p>
+  <h2>Authentication</h2>
+  <div class="requirement">
+    <h3>REQ-1.1.1: Basic/Bearer Authentication</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-1-1-1-basic-bearer-authentication-after.pdf">req-1-1-1-basic-bearer-authentication-after.pdf</a>
+        <div class="description">Account open after authentication</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-1-1-1-basic-bearer-authentication-before.pdf">req-1-1-1-basic-bearer-authentication-before.pdf</a>
+        <div class="description">Login form before authentication</div>
+      </div>
+    </div>
+  </div>
+  <div class="requirement">
+    <h3>REQ-1.2.1: Session Persistence</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-1-2-1-session-persistence-after.pdf">req-1-2-1-session-persistence-after.pdf</a>
+        <div class="description">Account name remembered after reload</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-1-2-1-session-persistence-before.pdf">req-1-2-1-session-persistence-before.pdf</a>
+        <div class="description">Authenticated, before reload</div>
+      </div>
+    </div>
+  </div>
+  <div class="requirement">
+    <h3>REQ-1.2.2: Logout Functionality</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-1-2-2-logout-functionality-after.pdf">req-1-2-2-logout-functionality-after.pdf</a>
+        <div class="description">Logged out, login form shown</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-1-2-2-logout-functionality-before.pdf">req-1-2-2-logout-functionality-before.pdf</a>
+        <div class="description">Logged in, before logout</div>
+      </div>
+    </div>
+  </div>
+  <div class="requirement">
+    <h3>REQ-1.2.3: Auth-Based Navigation Links</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-1-2-3-auth-based-navigation-links-after.pdf">req-1-2-3-auth-based-navigation-links-after.pdf</a>
+        <div class="description">Navigation reflects the authenticated state</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-1-2-3-auth-based-navigation-links-before.pdf">req-1-2-3-auth-based-navigation-links-before.pdf</a>
+        <div class="description">Navigation when logged out</div>
+      </div>
+      <div class="capture">
+        <div class="phase">logged-in</div>
+        <a href="req-1-2-3-auth-based-navigation-links-logged-in.pdf">req-1-2-3-auth-based-navigation-links-logged-in.pdf</a>
+        <div class="description">Navigation when logged in</div>
+      </div>
+    </div>
+  </div>
+  <h2>Error</h2>
+  <div class="requirement">
+    <h3>REQ-9.1.1: Authentication Error Messages</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-9-1-1-authentication-error-messages-after.pdf">req-9-1-1-authentication-error-messages-after.pdf</a>
+        <div class="description">Rejected, still on the login form</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-9-1-1-authentication-error-messages-before.pdf">req-9-1-1-authentication-error-messages-before.pdf</a>
+        <div class="description">Login form before a failed attempt</div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

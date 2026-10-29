@@ -1,0 +1,27 @@
+module : jsui/tests/events-documented.spec.js
+run    : cd jsui && node tests/dev-server.mjs &
+         JSUI_ORIGIN=http://localhost:8099 CAPTURE_DOCS=true \
+           npx playwright test tests/events-documented.spec.js
+why    : re-run of the one test that failed in the full pass — the accounts
+         pane did not finish loading inside its 20s wait.
+date   : 2026-10-23T12:42:15Z
+----------------------------------------------------------------------
+
+Running 4 tests using 1 worker
+
+[DocCapture] REQ-2.5.1 before: req-2-5-1-account-history-tab-before.pdf
+[DocCapture] REQ-2.5.1 after: req-2-5-1-account-history-tab-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account-history/manifest.json (4 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/account-history/index.html
+  ✓  1 [chromium] › tests/events-documented.spec.js:268:7 › Lifecycle Events › events offered and fetched per account [REQ-2.5.1, REQ-2.5.2] (2.7s)
+[DocCapture] REQ-2.5.3 before: req-2-5-3-render-account-events-before.pdf
+  -  2 [chromium] › tests/events-documented.spec.js:279:7 › Lifecycle Events › event table columns and agent [REQ-2.5.3, REQ-3.8.3]
+  -  3 [chromium] › tests/events-documented.spec.js:290:7 › Lifecycle Events › event type names [REQ-3.8.1, REQ-3.8.7]
+[DocCapture] REQ-2.5.4 before: req-2-5-4-filter-account-events-before.pdf
+[DocCapture] REQ-2.5.4 after: req-2-5-4-filter-account-events-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account-history/manifest.json (4 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/account-history/index.html
+  ✓  4 [chromium] › tests/events-documented.spec.js:301:7 › Lifecycle Events › history filters [REQ-2.5.4] (2.4s)
+
+  2 skipped
+  2 passed (10.2s)

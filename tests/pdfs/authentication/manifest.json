@@ -1,1 +1,123 @@
-[]
+[
+  {
+    "requirement": "REQ-1.1.1",
+    "title": "Basic/Bearer Authentication",
+    "section": "authentication",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Account open after authentication",
+    "filename": "req-1-1-1-basic-bearer-authentication-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:20.649Z"
+  },
+  {
+    "requirement": "REQ-1.1.1",
+    "title": "Basic/Bearer Authentication",
+    "section": "authentication",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Login form before authentication",
+    "filename": "req-1-1-1-basic-bearer-authentication-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:17.171Z"
+  },
+  {
+    "requirement": "REQ-1.2.1",
+    "title": "Session Persistence",
+    "section": "authentication",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Account name remembered after reload",
+    "filename": "req-1-2-1-session-persistence-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:39.204Z"
+  },
+  {
+    "requirement": "REQ-1.2.1",
+    "title": "Session Persistence",
+    "section": "authentication",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Authenticated, before reload",
+    "filename": "req-1-2-1-session-persistence-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:36.286Z"
+  },
+  {
+    "requirement": "REQ-1.2.2",
+    "title": "Logout Functionality",
+    "section": "authentication",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Logged out, login form shown",
+    "filename": "req-1-2-2-logout-functionality-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:28.386Z"
+  },
+  {
+    "requirement": "REQ-1.2.2",
+    "title": "Logout Functionality",
+    "section": "authentication",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Logged in, before logout",
+    "filename": "req-1-2-2-logout-functionality-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:28.132Z"
+  },
+  {
+    "requirement": "REQ-1.2.3",
+    "title": "Auth-Based Navigation Links",
+    "section": "authentication",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Navigation reflects the authenticated state",
+    "filename": "req-1-2-3-auth-based-navigation-links-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:32.641Z"
+  },
+  {
+    "requirement": "REQ-1.2.3",
+    "title": "Auth-Based Navigation Links",
+    "section": "authentication",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Navigation when logged out",
+    "filename": "req-1-2-3-auth-based-navigation-links-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:28.797Z"
+  },
+  {
+    "requirement": "REQ-1.2.3",
+    "title": "Auth-Based Navigation Links",
+    "section": "authentication",
+    "phase": "logged-in",
+    "stepIndex": 0,
+    "description": "Navigation when logged in",
+    "filename": "req-1-2-3-auth-based-navigation-links-logged-in.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:32.317Z"
+  },
+  {
+    "requirement": "REQ-9.1.1",
+    "title": "Authentication Error Messages",
+    "section": "error",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Rejected, still on the login form",
+    "filename": "req-9-1-1-authentication-error-messages-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:24.375Z"
+  },
+  {
+    "requirement": "REQ-9.1.1",
+    "title": "Authentication Error Messages",
+    "section": "error",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Login form before a failed attempt",
+    "filename": "req-9-1-1-authentication-error-messages-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:21.064Z"
+  }
+]

@@ -1,0 +1,301 @@
+# Suite D — MCP endpoint, nl4
+# module:  spocq/gensrc/mcp/test/
+# command: cd spocq/gensrc/mcp/test
+#          export STORE_HOST=https://nl4.dydra.com MCP_PATH=/test/test/mcp MCP_INSECURE=1 STORE_ACCOUNT=test
+#          for s in 0[2-9]-*.sh [12][0-9]-*.sh; do bash $s; done
+# needs:   a store token; resolved from ~/.dydra/nl4.dydra.com.test.token
+# note:    01-import.sh SKIPPED — see the tail of this log
+# date:    2026-10-26T01:01:07Z
+
+── 02-initialize ───────────────────────────────────────────
+    ✓ initialize returns result
+    ✓ result["protocolVersion"] == "2025-11-25"
+    ✓ serverInfo.name == spocq-mcp
+    ✗ ping is answered in the legacy era
+        response: {"jsonrpc": "2.0", "id": 1, "error": {"code": -32002, "message": "No MCP session: send initialize (and Mcp-Session-Id) first"}}
+  3/4 checks passed
+  FAIL  02-initialize
+
+── 03-tools-list ───────────────────────────────────────────
+    ✓ tools/list returns result
+    ✓ result.resultType == "complete"
+    ✓ result._meta carries serverInfo
+    ✓ result carries ttlMs and cacheScope=private
+    ✓ tool 'query' present
+    ✓ tool 'survey' present
+    ✓ tool 'graphql_query' present
+    ✓ tool 'graphql_mutate' present
+    ✓ tool 'sparql_select' present
+    ✓ tool 'sparql_update' present
+    ✓ tool 'sparql_describe' present
+    ✓ tool 'list_graphs' present
+    ✓ tool 'orch_survey' present
+    ✓ tool 'orch_select' present
+    ✓ tools list has 15 entries
+    ✓ tool 'score_save' absent
+    ✓ tool 'score_load' absent
+    ✓ all tools have inputSchema
+    ✓ tool order is deterministic across requests
+    ✓ tool 'score' absent
+    ✓ the former name 'score' still reaches the survey tool
+  21/21 checks passed
+  PASS  03-tools-list
+
+── 04-resources-list ───────────────────────────────────────────
+    ✓ resources/list returns result
+    ✓ resources list has 5 entries
+    ✓ result.resultType == "complete"
+    ✓ result carries ttlMs and cacheScope=private
+    ✓ resource 'rdf://vocabulary' listed
+    ✓ resource 'rdf://graphs' listed
+    ✓ resource 'rdf://types' listed
+    ✓ resource 'score://grammar' listed
+    ✓ resource 'score://operations' listed
+    ✓ all resources have mimeType
+  10/10 checks passed
+  PASS  04-resources-list
+
+── 05-graphql-query-persons ───────────────────────────────────────────
+    ✓ graphql_query returns result
+    ✓ result is not an error
+    ✓ response mimeType == application/graphql-response+json
+    ✓ Result content contains: Alice Smith
+    ✓ Result content contains: Bob Jones
+    ✓ Result content contains: Carol White
+    ✓ response document has data.person as an array
+  7/7 checks passed
+  PASS  05-graphql-query-persons
+
+── 06-graphql-query-filter ───────────────────────────────────────────
+    ✓ graphql_query with filter returns result
+    ✓ result is not an error
+    ✓ Result content contains: Alice Smith
+    ✓ result does not contain: Bob Jones
+  4/4 checks passed
+  PASS  06-graphql-query-filter
+
+── 07-sparql-select ───────────────────────────────────────────
+    ✓ sparql_select returns result
+    ✓ result is not an error
+    ✓ response mimeType == application/sparql-results+json
+    ✓ result is a SPARQL Results JSON document
+    ✓ Result content contains: Alice Smith
+  5/5 checks passed
+  PASS  07-sparql-select
+
+── 08-sparql-describe ───────────────────────────────────────────
+    ✓ sparql_describe returns result
+    ✓ result is not an error
+    ✓ response mimeType == text/turtle
+    ✓ Result content contains: http://example.org/data/alice
+  4/4 checks passed
+  PASS  08-sparql-describe
+
+── 09-list-graphs ───────────────────────────────────────────
+    ✓ list_graphs returns result
+    ✓ result is not an error
+    ✓ response mimeType == application/sparql-results+json
+    ✓ Result content contains: http://test/test/schema
+  4/4 checks passed
+  PASS  09-list-graphs
+
+── 10-resources-read-schema ───────────────────────────────────────────
+    ✓ resources/read vocabulary returns result
+    ✓ vocabulary mimeType is text/turtle
+    ✓ vocabulary includes rdfs:Class declarations
+    ✓ vocabulary includes rdf:Property declarations
+    ✓ vocabulary references Person class
+    ✓ vocabulary includes rdfs:domain
+    ✓ vocabulary includes rdfs:range
+    ✓ vocabulary declares @prefix
+  8/8 checks passed
+  PASS  10-resources-read-schema
+
+── 11-resources-read-graphs ───────────────────────────────────────────
+    ✓ resources/read graphs returns result
+    ✓ response mimeType == application/json
+    ✓ result carries ttlMs and cacheScope=private
+    ✓ graphs text is a JSON array
+    ✓ the schema graph is listed
+    ✓ the data graph is listed
+  6/6 checks passed
+  PASS  11-resources-read-graphs
+
+── 12-resources-read-types ───────────────────────────────────────────
+    ✓ resources/read types returns result
+    ✓ types mimeType is application/json
+    ✓ types text is a non-empty JSON array
+    ✓ types includes Person class
+    ✓ types includes Department class
+    ✓ types includes Project class
+  6/6 checks passed
+  PASS  12-resources-read-types
+
+── 13-discover ───────────────────────────────────────────
+    ✓ server/discover returns result
+    ✓ result.resultType == "complete"
+    ✓ result._meta carries serverInfo
+    ✓ result carries ttlMs and cacheScope=private
+    ✓ supportedVersions includes 2026-07-28
+    ✓ supportedVersions includes the legacy 2025-11-25
+    ✓ capabilities declare tools, resources and prompts
+    ✓ the notation extension advertises the request media types
+    ✓ instructions teach the notation triad
+    ✓ tools/list works without any handshake
+  10/10 checks passed
+  PASS  13-discover
+
+── 14-headers ───────────────────────────────────────────
+    ✓ HTTP status == 200
+    ✓ well-formed request succeeds
+    ✓ HTTP status == 400
+    ✓ JSON-RPC error code == -32020
+    ✓ HTTP status == 400
+    ✓ JSON-RPC error code == -32020
+    ✓ HTTP status == 400
+    ✓ JSON-RPC error code == -32020
+    ✓ HTTP status == 400
+    ✓ JSON-RPC error code == -32020
+    ✓ HTTP status == 400
+    ✓ JSON-RPC error code == -32020
+    ✓ HTTP status == 404
+    ✓ JSON-RPC error code == -32601
+  14/14 checks passed
+  PASS  14-headers
+
+── 15-tool-errors ───────────────────────────────────────────
+    ✓ invalid SPARQL is a result with isError:true
+    ✓ result.resultType == "complete"
+    ✓ unknown mimeType is a tool execution error
+    ✓ the error lists the accepted media types
+    ✓ absent mimeType is a tool execution error
+    ✓ an update sent as a query is a tool execution error
+    ✓ the error names the update media type
+    ✓ unknown score operation is a tool execution error
+    ✓ save is not exposed
+    ✓ save points at the graph store instead
+    ✓ load is not exposed
+    ✓ an unknown session handle is a tool execution error
+    ✓ the error says how to recover
+    ✓ JSON-RPC error code == -32602
+    ✓ JSON-RPC error code == -32602
+  15/15 checks passed
+  PASS  15-tool-errors
+
+── 16-notation-sparql ───────────────────────────────────────────
+    ✓ SELECT returns a result
+    ✓ result is not an error
+    ✓ response mimeType == application/sparql-results+json
+    ✓ _meta pairs application/sparql-query → application/sparql-results+json
+    ✓ Result content contains: Alice Smith
+    ✓ SELECT carries the structured twin
+    ✓ result is not an error
+    ✓ response mimeType == application/sparql-results+json
+    ✓ Result content contains: boolean
+    ✓ result is not an error
+    ✓ response mimeType == text/turtle
+    ✓ _meta pairs application/sparql-query → text/turtle
+    ✓ result is not an error
+    ✓ response mimeType == text/turtle
+    ✓ result is not an error
+    ✓ response mimeType == application/sparql-results+json
+    ✓ result is not an error
+    ✓ limit caps the returned rows
+    ✓ update runs
+    ✓ response mimeType == application/sparql-results+json
+    ✓ Result content contains: boolean
+  21/21 checks passed
+  PASS  16-notation-sparql
+
+── 17-notation-graphql ───────────────────────────────────────────
+    ✓ GraphQL query returns a result
+    ✓ result is not an error
+    ✓ response mimeType == application/graphql-response+json
+    ✓ _meta pairs application/graphql → application/graphql-response+json
+    ✓ Result content contains: Alice Smith
+    ✓ the response document has a data member
+    ✓ a GraphQL fault still returns a JSON-RPC result
+  7/7 checks passed
+  PASS  17-notation-graphql
+
+── 18-notation-score ───────────────────────────────────────────
+    ✓ score query returns a result
+    ✓ result is not an error
+    ✓ response mimeType == application/score
+    ✓ _meta pairs application/score → application/score
+    ✓ Result content contains: results
+    ✓ the handle of the session it opened is reported
+    ✓ malformed score is a tool execution error
+  7/7 checks passed
+  PASS  18-notation-score
+
+── 19-score-session ───────────────────────────────────────────
+    ✓ connect returns a result
+    ✓ result is not an error
+    ✓ response mimeType == application/score
+    ✓ Result content contains: session
+    ✓ the retention policy names what ends the session
+    ✓ the retention policy states the cache lifetime
+    ✓ a session handle was minted: C57DA02C-D0D8-11F1-95F8-3BCB8CEB8DDD
+    ✗ survey runs against the handle
+    ✗ response mimeType == application/score
+    ✗ select runs against the handle
+    ✗ Result content contains: Alice Smith
+    ✗ history runs
+    ✗ the tree records the select
+    ✗ the session resource reads
+        response: {"jsonrpc": "2.0", "id": 1, "error": {"code": -32602, "message": "Unknown exploration session: C57DA02C-D0D8-11F1-95F8-3BCB8CEB8DDD. It may have expired; call survey with op=connect for a new handle."}}
+    ✗ disconnect runs
+    ✓ a released handle no longer resolves
+  8/16 checks passed
+  FAIL  19-score-session
+
+── 20-score-resolve ───────────────────────────────────────────
+    ✓ a select written in bare names returns a result
+    ✗ the result reports what it resolved
+    ✗ Person resolved to a vocabulary term
+    ✓ strict turns an unresolved name into an error
+    ✗ the error names what it could not resolve
+  2/5 checks passed
+  FAIL  20-score-resolve
+
+── 21-score-materialize ───────────────────────────────────────────
+    ✗ the shaped select runs
+    ✗ materialize runs
+    ✗ materialize emits SPARQL
+    ✗ the compiled SPARQL was recovered from the score result
+  0/4 checks passed
+  FAIL  21-score-materialize
+
+── 22-score-resources ───────────────────────────────────────────
+    ✓ the grammar resource reads
+    ✓ result carries ttlMs and cacheScope=private
+    ✓ the grammar documents @shape
+    ✓ the grammar documents bare names
+    ✓ the operations resource reads
+    ✓ the catalogue lists survey
+    ✓ the catalogue lists materialize
+    ✓ result does not contain: save
+    ✓ the operations catalogue is score
+    ✓ the long form still reads
+    ✓ and returns the same document
+    ✓ JSON-RPC error code == -32602
+  12/12 checks passed
+  PASS  22-score-resources
+
+── 23-describe-depth ───────────────────────────────────────────
+    ✓ describe with form and depths runs
+    ✓ response mimeType == text/turtle
+    ✓ the description names its subject
+    ✓ describe reaching further runs
+    ✓ reaching further does not return less
+    ✓ the request parameters are accepted on the MCP endpoint
+    ✓ response mimeType == text/turtle
+    ✓ an unknown describeForm is a tool execution error
+    ✓ the error names the forms it accepts
+    ✓ a negative depth is a tool execution error
+  10/10 checks passed
+  PASS  23-describe-depth
+
+═══════════════════════════════════════════════════
+scripts: 18 passed, 4 failed — 02-initialize 19-score-session 20-score-resolve 21-score-materialize

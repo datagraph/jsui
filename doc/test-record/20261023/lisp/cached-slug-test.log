@@ -1,0 +1,26 @@
+module : spocq/gensrc/test/cached-slug-test.lisp
+run    : cd spocq/gensrc && sbcl --script test/cached-slug-test.lisp
+needs  : a bare SBCL only. The two helpers are pure and are INLINED in
+         the test, so it needs no image and no host — keep it in step
+         with odbc/views.lisp when either is edited.
+date   : 2026-10-23T12:31:47Z
+----------------------------------------------------------------------
+== compute-cached-slug
+  ok   a plain name is its own slug
+  ok   a hyphenated name is unchanged
+  ok   spaces become hyphens
+  ok   surrounding space is trimmed, not hyphenated
+  ok   case is preserved -- a name lookup must still match
+  ok   an empty name has no slug
+  ok   and neither has NIL
+== ensure-sql-cached-slug
+  ok   an UNBOUND slot is filled -- the case the external CLI leaves behind
+  ok   a NULL slot is filled
+  ok   an empty-string slot is filled
+  ok   the :null clsql marker is filled
+  ok   an existing slug is NOT overwritten
+  ok   and keeps its value
+  ok   an empty name leaves the slot alone
+  ok   and does not bind it to NIL
+
+15 passed, 0 failed

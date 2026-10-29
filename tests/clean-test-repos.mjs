@@ -3,10 +3,11 @@
 // because .repo-delete-btn lives in the account pane, which is rendered twice
 // under one id.  Run: npm run clean:test-repos
 import { chromium } from '@playwright/test';
+import { credential } from './credentials.js';
 
 const ORIGIN = process.env.JSUI_ORIGIN || 'https://dydra.com';
-const USER = process.env.JSUI_USER || 'playwright';
-const PASSWORD = process.env.JSUI_PASSWORD || 'shakespear';
+const USER = credential('JSUI_USER', credential('JSUI_ACCOUNT', 'playwright'));
+const PASSWORD = credential('JSUI_PASSWORD');
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ ignoreHTTPSErrors: true });

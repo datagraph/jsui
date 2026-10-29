@@ -1,0 +1,756 @@
+
+Running 74 tests using 1 worker
+
+[DocCapture] REQ-2.1.1 before: req-2-1-1-display-account-information-before.pdf
+[DocCapture] REQ-2.1.1 after: req-2-1-1-display-account-information-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account/manifest.json (4 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/account/index.html
+  ✓   1 [chromium] › tests/account-documented.spec.js:48:7 › Account › display account information [REQ-2.1.1, REQ-2.1.2] (6.1s)
+  -   2 [chromium] › tests/account-documented.spec.js:83:7 › Account › edit account profile fields [REQ-2.2.1, REQ-2.2.3]
+[DocCapture] REQ-2.2.4 before: req-2-2-4-display-authentication-token-before.pdf
+[DocCapture] REQ-2.2.4 after: req-2-2-4-display-authentication-token-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account/manifest.json (4 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/account/index.html
+  ✓   3 [chromium] › tests/account-documented.spec.js:134:7 › Account › view authentication token [REQ-2.2.4] (6.5s)
+[DocCapture] REQ-2.4.1 before: req-2-4-1-account-listing-table-before.pdf
+[DocCapture] REQ-2.4.1 after: req-2-4-1-account-listing-table-after.pdf
+[DocCapture] REQ-2.4.2 before: req-2-4-2-account-entry-fields-before.pdf
+[DocCapture] REQ-2.4.2 after: req-2-4-2-account-entry-fields-after.pdf
+[DocCapture] Manifest written: tests/pdfs/admin-accounts/manifest.json (8 entries, 4 from this test)
+[DocCapture] Index written: tests/pdfs/admin-accounts/index.html
+  ✓   4 [chromium] › tests/accounts-pane-documented.spec.js:322:7 › Accounts Pane › account listing [REQ-2.4.1, REQ-2.4.2] (8.6s)
+[DocCapture] REQ-2.4.3 before: req-2-4-3-order-account-listing-before.pdf
+  -   5 [chromium] › tests/accounts-pane-documented.spec.js:334:7 › Accounts Pane › order the listing by any column [REQ-2.4.3]
+[DocCapture] REQ-2.4.4 before: req-2-4-4-account-listing-scoped-by-role-before.pdf
+[DocCapture] REQ-2.4.4 after: req-2-4-4-account-listing-scoped-by-role-after.pdf
+[DocCapture] REQ-2.6.1 before: req-2-6-1-delete-account-control-before.pdf
+[DocCapture] REQ-2.6.1 after: req-2-6-1-delete-account-control-after.pdf
+[DocCapture] Manifest written: tests/pdfs/admin-accounts/manifest.json (8 entries, 4 from this test)
+[DocCapture] Index written: tests/pdfs/admin-accounts/index.html
+  ✓   6 [chromium] › tests/accounts-pane-documented.spec.js:346:7 › Accounts Pane › listing scope and delete control [REQ-2.4.4, REQ-2.6.1] (2.6s)
+[DocCapture] REQ-A.1.1 before: req-a-1-1-admin-login-as-administrator-before.pdf
+[ManualImage] admin-login-form.png
+[DocCapture] REQ-A.1.1 form-filled: req-a-1-1-admin-login-as-administrator-form-filled.pdf
+[DocCapture] REQ-A.1.1 after: req-a-1-1-admin-login-as-administrator-after.pdf
+[ManualImage] admin-login-success.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓   7 [chromium] › tests/admin-documented.spec.js:528:7 › Admin Console › login as administrator [REQ-A.1.1] (2.1s)
+[DocCapture] REQ-A.1.3 before: req-a-1-3-admin-logout-before.pdf
+[DocCapture] REQ-A.1.3 after: req-a-1-3-admin-logout-after.pdf
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓   8 [chromium] › tests/admin-documented.spec.js:544:7 › Admin Console › logout [REQ-A.1.3] (2.1s)
+[DocCapture] REQ-A.2.1 before: req-a-2-1-dashboard-tab-navigation-before.pdf
+[ManualImage] admin-dashboard-overview.png
+[ManualImage] admin-dashboard-tabs.png
+[DocCapture] REQ-A.2.1 after: req-a-2-1-dashboard-tab-navigation-after.pdf
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓   9 [chromium] › tests/admin-documented.spec.js:555:7 › Admin Console › dashboard tab navigation [REQ-A.2.1] (4.8s)
+[DocCapture] REQ-A.2.2 before: req-a-2-2-location-bar-navigation-before.pdf
+[DocCapture] REQ-A.2.2 after: req-a-2-2-location-bar-navigation-after.pdf
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  10 [chromium] › tests/admin-documented.spec.js:567:7 › Admin Console › location bar navigation [REQ-A.2.2] (3.7s)
+[DocCapture] REQ-A.3.1 before: req-a-3-1-view-system-accounts-before.pdf
+[DocCapture] REQ-A.3.1 after: req-a-3-1-view-system-accounts-after.pdf
+[ManualImage] admin-accounts-list.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  11 [chromium] › tests/admin-documented.spec.js:579:7 › Admin Console › view system accounts [REQ-A.3.1] (2.3s)
+[DocCapture] REQ-A.3.2 before: req-a-3-2-account-details-dialog-before.pdf
+[DocCapture] REQ-A.3.2 after: req-a-3-2-account-details-dialog-after.pdf
+[ManualImage] admin-account-details-dialog.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  12 [chromium] › tests/admin-documented.spec.js:590:7 › Admin Console › account details dialog [REQ-A.3.2] (3.5s)
+  -  13 [chromium] › tests/admin-documented.spec.js:603:7 › Admin Console › create and delete account [REQ-A.3.3, REQ-A.3.4]
+[DocCapture] REQ-A.4.1 before: req-a-4-1-view-account-repositories-before.pdf
+[DocCapture] REQ-A.4.1 after: req-a-4-1-view-account-repositories-after.pdf
+[ManualImage] admin-repositories-list.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  14 [chromium] › tests/admin-documented.spec.js:628:7 › Admin Console › view repositories for selected account [REQ-A.4.1] (3.4s)
+  -  15 [chromium] › tests/admin-documented.spec.js:640:7 › Admin Console › create and delete repository [REQ-A.4.2, REQ-A.4.3]
+[DocCapture] REQ-A.5.1 before: req-a-5-1-view-invitations-before.pdf
+[DocCapture] REQ-A.5.1 after: req-a-5-1-view-invitations-after.pdf
+[ManualImage] admin-invitations-list.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  16 [chromium] › tests/admin-documented.spec.js:672:7 › Admin Console › view invitations [REQ-A.5.1] (3.0s)
+  -  17 [chromium] › tests/admin-documented.spec.js:683:7 › Admin Console › create and delete invitation [REQ-A.5.2, REQ-A.5.3]
+[DocCapture] REQ-A.6.1 before: req-a-6-1-query-history-table-before.pdf
+[DocCapture] REQ-A.6.1 after: req-a-6-1-query-history-table-after.pdf
+[ManualImage] admin-query-history-table.png
+[DocCapture] REQ-A.6.2 before: req-a-6-2-query-history-graph-before.pdf
+[DocCapture] REQ-A.6.2 after: req-a-6-2-query-history-graph-after.pdf
+[ManualImage] admin-query-history-graph.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 4 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  18 [chromium] › tests/admin-documented.spec.js:708:7 › Admin Console › query history table and graph [REQ-A.6.1, REQ-A.6.2] (6.1s)
+  -  19 [chromium] › tests/admin-documented.spec.js:734:7 › Admin Console › transaction history [REQ-A.6.3]
+  -  20 [chromium] › tests/admin-documented.spec.js:773:7 › Admin Console › import history table and graph [REQ-A.6.4, REQ-A.6.5]
+[DocCapture] REQ-1.1.1 before: req-1-1-1-basic-bearer-authentication-before.pdf
+[DocCapture] REQ-1.1.1 after: req-1-1-1-basic-bearer-authentication-after.pdf
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  21 [chromium] › tests/authentication-documented.spec.js:37:7 › Authentication › login with valid credentials [REQ-1.1.1, REQ-1.1.2] (4.0s)
+[DocCapture] REQ-9.1.1 before: req-9-1-1-authentication-error-messages-before.pdf
+[DocCapture] REQ-9.1.1 after: req-9-1-1-authentication-error-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  22 [chromium] › tests/authentication-documented.spec.js:59:7 › Authentication › login with invalid credentials [REQ-9.1.1] (3.7s)
+[DocCapture] REQ-1.2.2 before: req-1-2-2-logout-functionality-before.pdf
+[DocCapture] REQ-1.2.2 after: req-1-2-2-logout-functionality-after.pdf
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  23 [chromium] › tests/authentication-documented.spec.js:85:7 › Authentication › logout functionality [REQ-1.2.2] (3.8s)
+[DocCapture] REQ-1.2.3 before: req-1-2-3-auth-based-navigation-links-before.pdf
+[DocCapture] REQ-1.2.3 logged-in: req-1-2-3-auth-based-navigation-links-logged-in.pdf
+[DocCapture] REQ-1.2.3 after: req-1-2-3-auth-based-navigation-links-after.pdf
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  24 [chromium] › tests/authentication-documented.spec.js:103:7 › Authentication › navigation links based on auth status [REQ-1.2.3] (4.3s)
+[DocCapture] REQ-1.2.1 before: req-1-2-1-session-persistence-before.pdf
+[DocCapture] REQ-1.2.1 after: req-1-2-1-session-persistence-after.pdf
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  25 [chromium] › tests/authentication-documented.spec.js:126:7 › Authentication › session persistence of account name [REQ-1.2.1] (6.5s)
+[DocCapture] REQ-3.7.1 before: req-3-7-1-manage-collaborators-before.pdf
+[DocCapture] REQ-3.7.1 after: req-3-7-1-manage-collaborators-after.pdf
+[DocCapture] Manifest written: tests/pdfs/collaboration/manifest.json (14 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/collaboration/index.html
+  ✓  26 [chromium] › tests/collaboration-documented.spec.js:467:7 › Collaboration › read collaborators [REQ-3.7.1] (4.3s)
+  -  27 [chromium] › tests/collaboration-documented.spec.js:479:7 › Collaboration › add, modify and remove a collaborator [REQ-3.7.2, REQ-3.7.3, REQ-3.7.4, REQ-3.7.5]
+[DocCapture] REQ-3.7.6 before: req-3-7-6-unknown-collaborator-refused-before.pdf
+[DocCapture] REQ-3.7.6 after: req-3-7-6-unknown-collaborator-refused-after.pdf
+[DocCapture] Manifest written: tests/pdfs/collaboration/manifest.json (14 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/collaboration/index.html
+  ✓  28 [chromium] › tests/collaboration-documented.spec.js:517:7 › Collaboration › unknown account refused [REQ-3.7.6] (4.2s)
+[DocCapture] REQ-2.1.2 before: req-2-1-2-view-current-account-details-before.pdf
+[DocCapture] REQ-2.1.2 after: req-2-1-2-view-current-account-details-after.pdf
+[DocCapture] Manifest written: tests/pdfs/collaboration/manifest.json (14 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/collaboration/index.html
+  ✓  29 [chromium] › tests/collaboration-documented.spec.js:529:7 › Collaboration › collaborations an account reaches [REQ-2.1.2] (4.0s)
+[DocCapture] REQ-2.5.1 before: req-2-5-1-account-history-tab-before.pdf
+[DocCapture] REQ-2.5.1 after: req-2-5-1-account-history-tab-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account-history/manifest.json (4 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/account-history/index.html
+  ✓  30 [chromium] › tests/events-documented.spec.js:271:7 › Lifecycle Events › events offered and fetched per account [REQ-2.5.1, REQ-2.5.2] (1.9s)
+[DocCapture] REQ-2.5.3 before: req-2-5-3-render-account-events-before.pdf
+  -  31 [chromium] › tests/events-documented.spec.js:282:7 › Lifecycle Events › event table columns and agent [REQ-2.5.3, REQ-3.8.3]
+  -  32 [chromium] › tests/events-documented.spec.js:293:7 › Lifecycle Events › event type names [REQ-3.8.1, REQ-3.8.7]
+[DocCapture] REQ-2.5.4 before: req-2-5-4-filter-account-events-before.pdf
+[DocCapture] REQ-2.5.4 after: req-2-5-4-filter-account-events-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account-history/manifest.json (4 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/account-history/index.html
+  ✓  33 [chromium] › tests/events-documented.spec.js:304:7 › Lifecycle Events › history filters [REQ-2.5.4] (2.1s)
+[DocCapture] REQ-3.4.4 before: req-3-4-4-import-from-file-upload-before.pdf
+[DocCapture] REQ-3.4.4 file-selected: req-3-4-4-import-from-file-upload-file-selected.pdf
+  ✘  34 [chromium] › tests/import-export-documented.spec.js:238:7 › Import/Export › import Turtle file [REQ-3.4.4, REQ-3.4.7] (4.7s)
+[DocCapture] REQ-3.4.4 before: req-3-4-4-import-from-file-upload-before.pdf
+[DocCapture] REQ-3.4.4 file-selected: req-3-4-4-import-from-file-upload-file-selected.pdf
+  ✘  35 [chromium] › tests/import-export-documented.spec.js:256:7 › Import/Export › import N-Triples file [REQ-3.4.4, REQ-3.4.7] (4.5s)
+[DocCapture] REQ-3.4.4 before: req-3-4-4-import-from-file-upload-before.pdf
+[DocCapture] REQ-3.4.4 file-selected: req-3-4-4-import-from-file-upload-file-selected.pdf
+  ✘  36 [chromium] › tests/import-export-documented.spec.js:279:7 › Import/Export › import N-Quads file [REQ-3.4.4, REQ-3.4.7] (4.6s)
+[DocCapture] REQ-3.4.3 before: req-3-4-3-import-from-url-before.pdf
+[DocCapture] REQ-3.4.3 url-entered: req-3-4-3-import-from-url-url-entered.pdf
+[DocCapture] REQ-3.4.3 after: req-3-4-3-import-from-url-after.pdf
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json (11 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓  37 [chromium] › tests/import-export-documented.spec.js:296:7 › Import/Export › import from URL [REQ-3.4.3] (35.6s)
+[DocCapture] REQ-3.4.6 before: req-3-4-6-import-progress-display-before.pdf
+  ✘  38 [chromium] › tests/import-export-documented.spec.js:306:7 › Import/Export › import progress display [REQ-3.4.6] (4.6s)
+[DocCapture] REQ-3.5.1 before: req-3-5-1-export-repository-data-before.pdf
+[DocCapture] REQ-3.5.1 format: req-3-5-1-export-repository-data-format.pdf
+[DocCapture] REQ-3.5.1 after: req-3-5-1-export-repository-data-after.pdf
+[DocCapture] Manifest written: tests/pdfs/export/manifest.json (5 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/export/index.html
+  ✓  39 [chromium] › tests/import-export-documented.spec.js:327:7 › Import/Export › export Turtle format [REQ-3.5.1] (5.0s)
+[DocCapture] REQ-3.5.1 before: req-3-5-1-export-repository-data-before.pdf
+[DocCapture] REQ-3.5.1 format: req-3-5-1-export-repository-data-format.pdf
+[DocCapture] REQ-3.5.1 after: req-3-5-1-export-repository-data-after.pdf
+[DocCapture] REQ-3.5.2 before: req-3-5-2-direct-download-url-before.pdf
+[DocCapture] REQ-3.5.2 after: req-3-5-2-direct-download-url-after.pdf
+[DocCapture] Manifest written: tests/pdfs/export/manifest.json (5 entries, 5 from this test)
+[DocCapture] Index written: tests/pdfs/export/index.html
+  ✓  40 [chromium] › tests/import-export-documented.spec.js:337:7 › Import/Export › export N-Triples format [REQ-3.5.1, REQ-3.5.2] (6.1s)
+[DocCapture] REQ-5.1.1 before: req-5-1-1-client-side-routing-before.pdf
+[DocCapture] REQ-5.1.1 after: req-5-1-1-client-side-routing-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  41 [chromium] › tests/navigation-documented.spec.js:39:7 › Navigation › client-side routing [REQ-5.1.1] (4.0s)
+[DocCapture] REQ-5.1.2 before: req-5-1-2-browser-back-forward-before.pdf
+  ✘  42 [chromium] › tests/navigation-documented.spec.js:82:7 › Navigation › browser back/forward [REQ-5.1.2] (18.8s)
+[DocCapture] REQ-6.3.1 before: req-6-3-1-tab-management-before.pdf
+[DocCapture] REQ-6.3.1 after: req-6-3-1-tab-management-after.pdf
+[DocCapture] REQ-6.3.2 before: req-6-3-2-close-tabs-before.pdf
+[DocCapture] REQ-6.3.2 after: req-6-3-2-close-tabs-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 4 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  43 [chromium] › tests/navigation-documented.spec.js:115:7 › Navigation › tab management [REQ-6.3.1, REQ-6.3.2] (4.8s)
+[DocCapture] REQ-5.2.4 before: req-5-2-4-location-bar-display-before.pdf
+[DocCapture] REQ-5.2.4 after: req-5-2-4-location-bar-display-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  44 [chromium] › tests/navigation-documented.spec.js:143:7 › Navigation › location bar display [REQ-5.2.4] (4.0s)
+[DocCapture] REQ-5.2.5 before: req-5-2-5-tabbed-interface-before.pdf
+[DocCapture] REQ-5.2.5 after: req-5-2-5-tabbed-interface-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  45 [chromium] › tests/navigation-documented.spec.js:163:7 › Navigation › tabbed interface [REQ-5.2.5] (4.0s)
+[DocCapture] REQ-5.1.1 before: req-5-1-1-client-side-routing-before.pdf
+[DocCapture] REQ-5.1.1 after: req-5-1-1-client-side-routing-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  46 [chromium] › tests/navigation-documented.spec.js:184:7 › Navigation › direct URL navigation [REQ-5.1.1] (8.1s)
+[DocCapture] REQ-5.2.5 before: req-5-2-5-tabbed-interface-before.pdf
+[DocCapture] REQ-5.2.5 repository: req-5-2-5-tabbed-interface-repository.pdf
+  ✘  47 [chromium] › tests/navigation-documented.spec.js:211:7 › Navigation › navigation between account and repositories [REQ-5.2.5] (19.1s)
+[DocCapture] REQ-3.2.1 before: req-3-2-1-edit-repository-metadata-before.pdf
+  ✘  48 [chromium] › tests/repository-documented.spec.js:46:7 › Repository › repository profile properties [REQ-3.2.1, REQ-3.2.3] (4.0s)
+[DocCapture] REQ-3.7.1 before: req-3-7-1-manage-collaborators-before.pdf
+[DocCapture] REQ-3.7.1 after: req-3-7-1-manage-collaborators-after.pdf
+[DocCapture] Manifest written: tests/pdfs/repository/manifest.json (11 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/repository/index.html
+  ✓  49 [chromium] › tests/repository-documented.spec.js:78:7 › Repository › repository collaboration [REQ-3.7.1, REQ-3.7.2, REQ-3.7.3] (5.3s)
+[DocCapture] REQ-3.3.1 before: req-3-3-1-create-repository-before.pdf
+[DocCapture] REQ-3.3.1 dialog-open: req-3-3-1-create-repository-dialog-open.pdf
+[DocCapture] REQ-3.3.1 after: req-3-3-1-create-repository-after.pdf
+[DocCapture] Manifest written: tests/pdfs/repository/manifest.json (11 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/repository/index.html
+  ✓  50 [chromium] › tests/repository-documented.spec.js:104:7 › Repository › repository creation [REQ-3.3.1] (7.0s)
+[DocCapture] REQ-3.6.1 before: req-3-6-1-clear-repository-before.pdf
+[DocCapture] REQ-3.6.1 after: req-3-6-1-clear-repository-after.pdf
+[DocCapture] Manifest written: tests/pdfs/repository/manifest.json (11 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/repository/index.html
+  ✓  51 [chromium] › tests/repository-documented.spec.js:139:7 › Repository › repository clear [REQ-3.6.1] (6.0s)
+[DocCapture] REQ-4.1.1 before: req-4-1-1-sparql-editor-with-syntax-highlighting-before.pdf
+[DocCapture] REQ-4.1.1 after: req-4-1-1-sparql-editor-with-syntax-highlighting-after.pdf
+[DocCapture] REQ-4.1.2 before: req-4-1-2-execute-sparql-queries-before.pdf
+  ✘  52 [chromium] › tests/sparql-documented.spec.js:89:7 › SPARQL Editor › execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4] (5.1s)
+[DocCapture] REQ-4.1.3 before: req-4-1-3-multiple-response-media-types-before.pdf
+  ✘  53 [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - JSON [REQ-4.1.3] (4.7s)
+[DocCapture] REQ-4.1.3 before: req-4-1-3-multiple-response-media-types-before.pdf
+  ✘  54 [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - CSV [REQ-4.1.3] (4.6s)
+[DocCapture] REQ-4.1.3 before: req-4-1-3-multiple-response-media-types-before.pdf
+  ✘  55 [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - XML [REQ-4.1.3] (4.9s)
+[DocCapture] REQ-4.3.4 before: req-4-3-4-execution-time-display-before.pdf
+  ✘  56 [chromium] › tests/sparql-documented.spec.js:150:7 › SPARQL Editor › query execution time display [REQ-4.3.4] (4.7s)
+[DocCapture] REQ-4.3.2 before: req-4-3-2-keyboard-shortcuts-before.pdf
+  ✘  57 [chromium] › tests/sparql-documented.spec.js:173:7 › SPARQL Editor › query keyboard shortcut [REQ-4.3.2] (4.6s)
+[DocCapture] REQ-4.3.3 before: req-4-3-3-query-reset-before.pdf
+[DocCapture] REQ-4.3.3 after: req-4-3-3-query-reset-after.pdf
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  58 [chromium] › tests/sparql-documented.spec.js:195:7 › SPARQL Editor › query reset functionality [REQ-4.3.3] (8.0s)
+[DocCapture] REQ-4.3.6 before: req-4-3-6-multiple-query-tabs-before.pdf
+[DocCapture] REQ-4.3.6 after: req-4-3-6-multiple-query-tabs-after.pdf
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  59 [chromium] › tests/sparql-documented.spec.js:216:7 › SPARQL Editor › multiple query tabs [REQ-4.3.6] (5.5s)
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+[DocCapture] REQ-6.2.1 shown: req-6-2-1-flash-messages-shown.pdf
+[DocCapture] REQ-6.2.1 after: req-6-2-1-flash-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  60 [chromium] › tests/ui-components-documented.spec.js:38:7 › UI Components › flash message display [REQ-6.2.1] (5.3s)
+[DocCapture] REQ-6.2.2 before: req-6-2-2-loading-indicators-before.pdf
+[DocCapture] REQ-6.2.2 loading: req-6-2-2-loading-indicators-loading.pdf
+[DocCapture] REQ-6.2.2 after: req-6-2-2-loading-indicators-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  61 [chromium] › tests/ui-components-documented.spec.js:66:7 › UI Components › loading indicator [REQ-6.2.2] (13.4s)
+[DocCapture] REQ-9.1.2 before: req-9-1-2-api-error-messages-before.pdf
+[DocCapture] REQ-9.1.2 after: req-9-1-2-api-error-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  62 [chromium] › tests/ui-components-documented.spec.js:98:7 › UI Components › error message display [REQ-9.1.2] (729ms)
+[DocCapture] REQ-9.1.3 before: req-9-1-3-404-page-before.pdf
+[DocCapture] REQ-9.1.3 after: req-9-1-3-404-page-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  63 [chromium] › tests/ui-components-documented.spec.js:122:7 › UI Components › 404 page [REQ-9.1.3] (3.9s)
+[DocCapture] REQ-6.2.3 before: req-6-2-3-form-validation-before.pdf
+[DocCapture] REQ-6.2.3 open: req-6-2-3-form-validation-open.pdf
+[DocCapture] REQ-6.2.3 after: req-6-2-3-form-validation-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  64 [chromium] › tests/ui-components-documented.spec.js:140:7 › UI Components › modal dialog behavior [REQ-6.2.3] (4.3s)
+[DocCapture] REQ-6.2.3 before: req-6-2-3-form-validation-before.pdf
+[DocCapture] REQ-6.2.3 after: req-6-2-3-form-validation-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  65 [chromium] › tests/ui-components-documented.spec.js:161:7 › UI Components › confirmation dialog [REQ-6.2.3] (6.0s)
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+[DocCapture] REQ-6.2.1 after: req-6-2-1-flash-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  66 [chromium] › tests/ui-components-documented.spec.js:182:7 › UI Components › responsive layout elements (4.8s)
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+[DocCapture] REQ-6.2.1 after: req-6-2-1-flash-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  67 [chromium] › tests/ui-components-documented.spec.js:205:7 › UI Components › keyboard navigation (684ms)
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+[DocCapture] REQ-6.2.1 after: req-6-2-1-flash-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  68 [chromium] › tests/ui-components-documented.spec.js:226:7 › UI Components › tooltip display (3.9s)
+[DocCapture] REQ-4.2.1 before: req-4-2-1-crud-sparql-views-before.pdf
+[DocCapture] REQ-4.2.1 after: req-4-2-1-crud-sparql-views-after.pdf
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json (10 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  69 [chromium] › tests/view-documented.spec.js:116:7 › View Management › create view [REQ-4.2.1] (6.0s)
+[DocCapture] REQ-4.2.5 before: req-4-2-5-open-view-in-pane-editor-before.pdf
+[DocCapture] REQ-4.2.5 after: req-4-2-5-open-view-in-pane-editor-after.pdf
+[DocCapture] REQ-4.2.2 before: req-4-2-2-load-view-query-text-before.pdf
+[DocCapture] REQ-4.2.2 after: req-4-2-2-load-view-query-text-after.pdf
+[DocCapture] REQ-4.2.3 before: req-4-2-3-save-view-query-text-before.pdf
+[DocCapture] REQ-4.2.3 after: req-4-2-3-save-view-query-text-after.pdf
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json (10 entries, 6 from this test)
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  70 [chromium] › tests/view-documented.spec.js:136:7 › View Management › edit view [REQ-4.2.2, REQ-4.2.3, REQ-4.2.5] (7.4s)
+[DocCapture] REQ-4.2.1 before: req-4-2-1-crud-sparql-views-before.pdf
+[DocCapture] REQ-4.2.1 after: req-4-2-1-crud-sparql-views-after.pdf
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json (10 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  71 [chromium] › tests/view-documented.spec.js:190:7 › View Management › delete view [REQ-4.2.1] (5.7s)
+[DocCapture] REQ-4.2.5 before: req-4-2-5-open-view-in-pane-editor-before.pdf
+[DocCapture] REQ-4.2.5 after: req-4-2-5-open-view-in-pane-editor-after.pdf
+[DocCapture] REQ-4.2.6 before: req-4-2-6-open-view-in-new-pane-before.pdf
+[DocCapture] REQ-4.2.6 after: req-4-2-6-open-view-in-new-pane-after.pdf
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json (10 entries, 4 from this test)
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  72 [chromium] › tests/view-documented.spec.js:208:7 › View Management › open view in pane editor [REQ-4.2.5, REQ-4.2.6] (6.6s)
+[DocCapture] REQ-4.2.2 before: req-4-2-2-load-view-query-text-before.pdf
+  ✘  73 [chromium] › tests/view-documented.spec.js:246:7 › View Management › execute view [REQ-4.2.2] (5.1s)
+logged in: true
+explore button: 1
+pane visible: true
+connection: connected
+errors: []
+  ✓  74 [chromium] › tests/zz-shot-documented.spec.js:14:5 › open the exploration pane (10.3s)
+
+
+  1) [chromium] › tests/import-export-documented.spec.js:238:7 › Import/Export › import Turtle file [REQ-3.4.4, REQ-3.4.7] 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m500[39m
+    Received array: [31m[200, 201, 202, 204][39m
+
+      111 |       await cap.step('file-selected', `${format} file selected for import`);
+      112 |       if (response) {
+    > 113 |         expect([200, 201, 202, 204]).toContain(response.status());
+          |                                      ^
+      114 |       }
+      115 |       await waitForNetworkIdle(page);
+      116 |       await cap.after('File import completed');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:113:38
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_4_4_importFromFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:108:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:245:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-999fd-e-file-REQ-3-4-4-REQ-3-4-7--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-999fd-e-file-REQ-3-4-4-REQ-3-4-7--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-999fd-e-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-999fd-e-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/import-export-documented.spec.js:256:7 › Import/Export › import N-Triples file [REQ-3.4.4, REQ-3.4.7] 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m500[39m
+    Received array: [31m[200, 201, 202, 204][39m
+
+      111 |       await cap.step('file-selected', `${format} file selected for import`);
+      112 |       if (response) {
+    > 113 |         expect([200, 201, 202, 204]).toContain(response.status());
+          |                                      ^
+      114 |       }
+      115 |       await waitForNetworkIdle(page);
+      116 |       await cap.after('File import completed');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:113:38
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_4_4_importFromFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:108:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:269:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-9a6b4-s-file-REQ-3-4-4-REQ-3-4-7--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-9a6b4-s-file-REQ-3-4-4-REQ-3-4-7--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-9a6b4-s-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-9a6b4-s-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/import-export-documented.spec.js:279:7 › Import/Export › import N-Quads file [REQ-3.4.4, REQ-3.4.7] 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m500[39m
+    Received array: [31m[200, 201, 202, 204][39m
+
+      111 |       await cap.step('file-selected', `${format} file selected for import`);
+      112 |       if (response) {
+    > 113 |         expect([200, 201, 202, 204]).toContain(response.status());
+          |                                      ^
+      114 |       }
+      115 |       await waitForNetworkIdle(page);
+      116 |       await cap.after('File import completed');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:113:38
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_4_4_importFromFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:108:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:286:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-4c356-s-file-REQ-3-4-4-REQ-3-4-7--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-4c356-s-file-REQ-3-4-4-REQ-3-4-7--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-4c356-s-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-4c356-s-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/import-export-documented.spec.js:306:7 › Import/Export › import progress display [REQ-3.4.6] 
+
+    Error: a larger import should be accepted
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m500[39m
+    Received array: [31m[200, 201, 202, 204][39m
+
+      131 |       const { response } = await importLocalFile(page, filePath);
+      132 |       if (response) {
+    > 133 |         expect([200, 201, 202, 204], 'a larger import should be accepted').toContain(response.status());
+          |                                                                            ^
+      134 |       }
+      135 |       await waitForNetworkIdle(page);
+      136 |       await cap.after('Larger import completed');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:133:76
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_4_6_importProgressDisplay (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:124:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:317:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-88572-progress-display-REQ-3-4-6--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-88572-progress-display-REQ-3-4-6--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-88572-progress-display-REQ-3-4-6--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-88572-progress-display-REQ-3-4-6--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests/repository-documented.spec.js:46:7 › Repository › repository profile properties [REQ-3.2.1, REQ-3.2.3] 
+
+    Error: locator.fill: Error: Element is not an <input>, <textarea>, <select> or [contenteditable] and does not have a role allowing [aria-readonly]
+    Call log:
+    [2m  - waiting for getByTestId('repo-field-abstract')[22m
+    [2m    - locator resolved to <span class="value empty" data-editable="true" data-field-type="text" data-repo-field="abstract" data-pane-handler-bound="true" data-testid="repo-field-abstract">-</span>[22m
+    [2m    - fill("Test summary 1793061200120")[22m
+    [2m  - attempting fill action[22m
+    [2m    - waiting for element to be visible, enabled and editable[22m
+
+
+      53 |       const summary = await activateRepoField(page, 'repo-field-abstract');
+      54 |       await expect(summary, 'the summary field should become editable').toBeVisible({ timeout: 10000 });
+    > 55 |       await summary.fill(`Test summary ${stamp}`);
+         |                     ^
+      56 |       await expect(summary).toHaveValue(`Test summary ${stamp}`);
+      57 |       await cap.after('Profile fields populated with new values');
+      58 |     });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:55:21
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:51:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/error-context.md
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests/sparql-documented.spec.js:89:7 › SPARQL Editor › execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4] 
+
+    Error: executing a query should succeed
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m500[39m
+
+      103 |       await cap.before('Query ready for execution');
+      104 |       const res = await run(page, name);
+    > 105 |       expect(res.status(), 'executing a query should succeed').toBe(200);
+          |                                                                ^
+      106 |       await cap.after('Query executed');
+      107 |     });
+      108 |
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:105:64
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:102:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-28515--4-1-1-REQ-4-1-2-REQ-4-1-4--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-28515--4-1-1-REQ-4-1-2-REQ-4-1-4--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-28515--4-1-1-REQ-4-1-2-REQ-4-1-4--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-28515--4-1-1-REQ-4-1-2-REQ-4-1-4--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - JSON [REQ-4.1.3] 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m500[39m
+
+      135 |                                    .selectOption(mediaType);
+      136 |         const res = await run(page, name);
+    > 137 |         expect(res.status()).toBe(200);
+          |                              ^
+      138 |         // The selected media type must be what is actually requested.
+      139 |         expect(res.request().headers()['accept'],
+      140 |                `${label} should be requested as ${mediaType}`).toContain(mediaType);
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:137:30
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:132:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-63c71-t-formats---JSON-REQ-4-1-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-63c71-t-formats---JSON-REQ-4-1-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-63c71-t-formats---JSON-REQ-4-1-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-63c71-t-formats---JSON-REQ-4-1-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - CSV [REQ-4.1.3] 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m500[39m
+
+      135 |                                    .selectOption(mediaType);
+      136 |         const res = await run(page, name);
+    > 137 |         expect(res.status()).toBe(200);
+          |                              ^
+      138 |         // The selected media type must be what is actually requested.
+      139 |         expect(res.request().headers()['accept'],
+      140 |                `${label} should be requested as ${mediaType}`).toContain(mediaType);
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:137:30
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:132:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-b6c9b-lt-formats---CSV-REQ-4-1-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-b6c9b-lt-formats---CSV-REQ-4-1-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-b6c9b-lt-formats---CSV-REQ-4-1-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-b6c9b-lt-formats---CSV-REQ-4-1-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - XML [REQ-4.1.3] 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m500[39m
+
+      135 |                                    .selectOption(mediaType);
+      136 |         const res = await run(page, name);
+    > 137 |         expect(res.status()).toBe(200);
+          |                              ^
+      138 |         // The selected media type must be what is actually requested.
+      139 |         expect(res.request().headers()['accept'],
+      140 |                `${label} should be requested as ${mediaType}`).toContain(mediaType);
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:137:30
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:132:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-1e4ab-lt-formats---XML-REQ-4-1-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-1e4ab-lt-formats---XML-REQ-4-1-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-1e4ab-lt-formats---XML-REQ-4-1-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-1e4ab-lt-formats---XML-REQ-4-1-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests/sparql-documented.spec.js:150:7 › SPARQL Editor › query execution time display [REQ-4.3.4] 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m500[39m
+
+      156 |       await cap.before('Before execution');
+      157 |       const res = await run(page, name);
+    > 158 |       expect(res.status()).toBe(200);
+          |                            ^
+      159 |       // The editor carries an event log; after a run it must have something to
+      160 |       // say.  A narrower assertion on an elapsed-time element is not possible:
+      161 |       // there is no .execution-time / [data-execution-time] in this build, which
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:158:28
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:155:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-95717-ion-time-display-REQ-4-3-4--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-95717-ion-time-display-REQ-4-3-4--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-95717-ion-time-display-REQ-4-3-4--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-95717-ion-time-display-REQ-4-3-4--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium] › tests/sparql-documented.spec.js:173:7 › SPARQL Editor › query keyboard shortcut [REQ-4.3.2] 
+
+    Error: Ctrl+Enter should execute the query
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m500[39m
+
+      184 |       await page.keyboard.press('Control+Enter');
+      185 |       const res = await posted;
+    > 186 |       expect(res.status(), 'Ctrl+Enter should execute the query').toBe(200);
+          |                                                                   ^
+      187 |       await cap.after('Query executed from the keyboard');
+      188 |     });
+      189 |
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:186:67
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:178:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-576dd-eyboard-shortcut-REQ-4-3-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-576dd-eyboard-shortcut-REQ-4-3-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-576dd-eyboard-shortcut-REQ-4-3-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-576dd-eyboard-shortcut-REQ-4-3-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium] › tests/view-documented.spec.js:246:7 › View Management › execute view [REQ-4.2.2] 
+
+    Error: executing a view should succeed
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: [32m200[39m
+    Received: [31m500[39m
+
+      259 |       await editorFor(page, name).getByTestId('sparql-editor-run-btn').click();
+      260 |       const res = await posted;
+    > 261 |       expect(res.status(), 'executing a view should succeed').toBe(200);
+          |                                                               ^
+      262 |       await cap.after('View executed and results returned');
+      263 |     });
+      264 |
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:261:63
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:254:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/view-documented-View-Management-execute-view-REQ-4-2-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/view-documented-View-Management-execute-view-REQ-4-2-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/view-documented-View-Management-execute-view-REQ-4-2-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/view-documented-View-Management-execute-view-REQ-4-2-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12 failed
+    [chromium] › tests/import-export-documented.spec.js:238:7 › Import/Export › import Turtle file [REQ-3.4.4, REQ-3.4.7] 
+    [chromium] › tests/import-export-documented.spec.js:256:7 › Import/Export › import N-Triples file [REQ-3.4.4, REQ-3.4.7] 
+    [chromium] › tests/import-export-documented.spec.js:279:7 › Import/Export › import N-Quads file [REQ-3.4.4, REQ-3.4.7] 
+    [chromium] › tests/import-export-documented.spec.js:306:7 › Import/Export › import progress display [REQ-3.4.6] 
+    [chromium] › tests/repository-documented.spec.js:46:7 › Repository › repository profile properties [REQ-3.2.1, REQ-3.2.3] 
+    [chromium] › tests/sparql-documented.spec.js:89:7 › SPARQL Editor › execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4] 
+    [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - JSON [REQ-4.1.3] 
+    [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - CSV [REQ-4.1.3] 
+    [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - XML [REQ-4.1.3] 
+    [chromium] › tests/sparql-documented.spec.js:150:7 › SPARQL Editor › query execution time display [REQ-4.3.4] 
+    [chromium] › tests/sparql-documented.spec.js:173:7 › SPARQL Editor › query keyboard shortcut [REQ-4.3.2] 
+    [chromium] › tests/view-documented.spec.js:246:7 › View Management › execute view [REQ-4.2.2] ──
+  10 skipped
+  52 passed (6.9m)

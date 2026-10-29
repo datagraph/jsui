@@ -8,14 +8,14 @@
     "test:router": "node tests/router-query.test.mjs",
     "clean:test-repos": "node tests/clean-test-repos.mjs",
     "test:adapter": "node tests/tool-adapter.test.mjs",
-    "test:unit": "npm run test:router && npm run test:adapter && npm run test:log && npm run test:format && npm run test:record && npm run test:names && npm run test:dashboard && npm run test:figure && npm run test:shape && npm run test:wasm && npm run test:app && npm run test:toolbox",
+    "test:unit": "npm run test:router && npm run test:adapter && npm run test:log && npm run test:format && npm run test:record && npm run test:names && npm run test:dashboard && npm run test:figure && npm run test:shape && npm run test:provenance && npm run test:wasm && npm run test:app && npm run test:toolbox && npm run test:admin",
     "test:log": "node tests/session-log.test.mjs",
     "test:format": "node tests/transcript.test.mjs",
     "test:pane": "node tests/exploration-pane.browser.mjs",
     "test:record": "node tests/transcript-store.test.mjs",
     "test:names": "node tests/name-policy.test.mjs",
     "test:name-ui": "node tests/name-input.browser.mjs",
-    "test:browser": "npm run test:pane && npm run test:name-ui && npm run test:editor-ui && npm run test:dashboard-ui && npm run test:figure-ui && npm run test:wasm-ui && npm run test:app-ui && npm run test:app-interaction",
+    "test:browser": "npm run test:pane && npm run test:name-ui && npm run test:editor-ui && npm run test:dashboard-ui && npm run test:figure-ui && npm run test:wasm-ui && npm run test:app-ui && npm run test:app-interaction && npm run test:admin-ui",
     "test:editor-ui": "node tests/view-editor-layout.browser.mjs",
     "test:dashboard": "node tests/dashboard.test.mjs",
     "test:dashboard-ui": "node tests/dashboard-frame.browser.mjs",
@@ -27,6 +27,9 @@
     "test:toolbox": "node tests/toolbox.test.mjs",
     "test:app-ui": "node tests/app-frame.browser.mjs",
     "test:app-interaction": "node tests/app-interaction.browser.mjs",
-    "test:shape": "node tests/result-shape.test.mjs"
+    "test:shape": "node tests/result-shape.test.mjs",
+    "test:provenance": "node tests/provenance.test.mjs",
+    "test:admin": "node tests/administration.test.mjs",
+    "test:admin-ui": "node tests/administration.browser.mjs"
   }
 }

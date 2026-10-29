@@ -1,0 +1,60 @@
+module : spocq/gensrc/test/alf-probe.lisp
+run    : cd spocq/gensrc && ./utilities/execute-spocq < test/alf-probe.lisp
+needs  : ssh to nl4; runs the listener binary over the live store.
+         NOTE push-source excludes /test/, so the probe exists only on
+         the development machine and is piped in — never found on a host.
+date   : 2026-10-23T12:31:27Z
+----------------------------------------------------------------------
+* #<PACKAGE "PROBE">
+* #<PACKAGE "PROBE">
+* *PASS*
+* *FAIL*
+* OK
+* ACCT
+* *TRUE*
+* *FALSE*
+* *READER-PRESENT*
+* STUB-READ-SQL-EVENTS
+* *ACCOUNTS-LISTING-DETAIL-LIMIT*
+* ACCOUNT-LIFECYCLE-TIMES
+* COMPUTE-GET-ACCOUNTS
+* *JAMES*
+* the row has one field per declared dimension
+NIL
+*   ok   eight fields for eight dimensions -- the defect being corrected was one field for five
+  ok   the name is the `id' field, as in the repositories listing
+  ok   readable is the rdf boolean, not a string
+  ok   the repository count is a number
+NIL
+* creation is the LAST creation row, because the reader orders descending
+NIL
+*   ok   the original creation, not the most recent creation event
+  ok   last use is the newest event of any kind
+NIL
+* an account recreated under the same name keeps its FIRST creation
+NIL
+*   ok   taking the first row would have answered 2026-09-10 -- eight months late
+  ok   and last use is still the newest
+NIL
+* with no event reader in the image the two time fields are empty
+NIL
+*   ok   both nil, and nothing signalled
+  ok   the row still has eight fields -- the shape does not vary by host
+  ok   the two are empty
+  ok   and the repository count is still filled, since it needs no events
+NIL
+* past the detail limit nothing is derived
+NIL
+*   ok   eight fields still
+  ok   all three derived fields are empty, and the name and flags are not
+  ok   the name is unaffected
+NIL
+* an account with no events at all
+NIL
+*   ok   S-2: an account older than the event record has no creation time, and gets none invented
+  ok   no repositories is an empty count, which the client draws as not-fetched
+NIL
+* 
+17 passed, 0 failed
+NIL
+* 

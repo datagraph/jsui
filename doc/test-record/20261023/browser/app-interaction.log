@@ -1,0 +1,96 @@
+module : jsui/tests/app-interaction.browser.mjs
+run    : cd jsui && npm run test:app-interaction
+needs  : node + playwright's chromium; the script starts its own http
+         server over the working copy — fixtures, no host, no credentials
+date   : 2026-10-23T12:31:03Z
+----------------------------------------------------------------------
+
+§6.3 prompt 1: a page, through Gate 1
+  ok   Gate 1 says what the page will weigh — the model cannot measure that itself
+  ok   and shows the parameter, which is the one thing the page may vary after this screen
+  ok   with the domain it will admit, read off a panel rather than asserted
+  ok   nothing has run yet
+  ok   both panels run, once each
+  ok   and the page comes up with a box to ask for a change — §3.1's gap, closed
+
+D-AC: several views in one frame
+  ok   both views are in the one document
+  ok   one is shown at a time
+  ok   a data-view link switches view
+  ok   and switching posts nothing and runs nothing: it is one frame with one data posting
+  ok   the view that was hidden was already filled, so it appears complete (<table class="dash-table"><thead><tr><th>month</th><th>total</th></tr></thead><tbody><tr><td>2026-01</td><td class="num")
+
+§10.3: the page's state reaches the pane, bounded
+  ok   which view is open is written into the document, so a reopen comes back here
+  ok   and so is anything else the page chooses to remember
+  ok   a page that writes a megabyte of state is refused
+  ok   and told why, in the page
+
+D-X: the control re-runs ONE panel, with the value bound
+  ok   the selector's options are the values the store returned, not a list the model wrote
+  ok   choosing a region runs one panel, not the page
+  ok   and the query that ran begins with the query that was authorised, byte for byte
+  ok   with the value bound as a term after it — nothing was interpolated
+  ok   the pane records what the page chose
+
+D-X: a value outside the domain is refused, with a reason shown in the page
+  ok   nothing was fetched: the refusal happens before the store is touched
+  ok   and the page is told which values there were
+  ok   a panel the document does not declare is refused too — `run' is not a query channel
+
+§15 q.3: the page's runs are metered, and the meter moves
+  ok   the meter is beside the page, where the reader is when they wonder what a click cost
+  ok   showing what was allowed at Gate 0
+  ok   and what the one selection so far has spent — a meter that moved rather than appeared
+  ok   the value refused for being outside its domain cost nothing: that check is free and local, and never reached the store
+  ok   three more selections, three more runs
+  ok   and the budget is spent
+  ok   the page is told, so a control can be honest about it
+  ok   and the selector greys itself out rather than offering a choice that cannot be answered
+  ok   a run past the budget does not reach the store: charged before the call, like the grant
+  ok   and the reason says what was spent and that nothing is wrong
+  ok   shown in the page, beside the control the reader touched
+
+§15 q.3: renewal asks nobody anything
+  ok   no gate opens: the queries behind the page are the ones already approved
+  ok   renewal is a meter reaching its mark, not a change to review
+  ok   the renewal is counted, because the count is the signal a page's shape is wrong
+  ok   the control comes back without the reader having to touch it twice
+  ok   and the page can ask again
+  ok   with the pane keeping the count for the record
+
+§6.3 prompt 2: a patch that changes what runs stops at Gate 1
+  ok   nothing has run: the change is shown before it is applied
+  ok   classified data, because a panel is new
+  ok   with a per-panel diff for the panel that changed
+  ok   and none for the two that did not
+  ok   and the button says how much will run — one panel of three
+  ok   on acceptance exactly the new panel runs
+  ok   revision 2
+  ok   and the new region is in the page
+
+§6.3 prompt 3: a presentational change, with no gate and no store
+  ok   classified presentational
+  ok   applied without a gate: a change of colour that asked permission would teach the user to stop reading the ones that matter
+  ok   the store was touched zero times
+  ok   and the frame was NOT reloaded — this is the case that makes design feel like design
+  ok   the region changed
+  ok   so did the stylesheet
+  ok   revision 3
+  ok   and the operations that produced it are kept, which is the history the archive cannot otherwise show
+
+§11: a page that breaks at run time is repaired without the user retyping
+  ok   the frame reports the transform that threw
+  ok   one repair attempt is started, and it is visible in the pane
+  ok   saying which attempt it is
+  ok   and which region would not come right
+  ok   the repair is a patch like any other, classified like any other
+  ok   and the region it was about is no longer failing
+  ok   one attempt was spent, of the two there are
+
+a patch that does not apply is refused whole and reported
+  ok   the revision fails
+  ok   and says so, naming the operation
+  ok   the document is still the revision it was: half a patch is not applied
+
+66 passed, 0 failed

@@ -1,0 +1,10 @@
+module : spocq/gensrc/test/patch-readcheck.lisp
+run    : sbcl --script test/patch-readcheck.lisp   (NOT through execute-spocq:
+         it make-package's the spocq packages, which already exist in an image)
+needs  : /tmp/stubs.lisp — one package per prefix the patch files name, one
+         symbol per reference, GENERATED FROM THE FILES THEMSELVES.
+status : NOT RUN. The generator is not in the repository, so this check
+         cannot be repeated by anyone. Committing it is an open item.
+date   : 2026-10-23T12:31:48Z
+----------------------------------------------------------------------
+(not run — see the header)

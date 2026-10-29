@@ -1,3 +1,5 @@
+import { credential } from './credentials.js';
+
 /**
  * Common test helper functions for Dydra JSUI Playwright tests
  *
@@ -5,19 +7,63 @@
  * in ui/pages/index.js. The test ID is based on the 'field' property, not the key.
  */
 
-export const USER_URL  = 'https://dydra.com/ui/user';
-export const ADMIN_URL = 'https://dydra.com/ui/admin';
+/**
+ * The origin under test.  playwright.config.js already reads JSUI_ORIGIN into
+ * `baseURL', but every helper here navigates with an ABSOLUTE url, so baseURL
+ * never applied and the suite went to dydra.com whatever JSUI_ORIGIN said.
+ * Reading it here is what makes the two documented runs possible:
+ *
+ *   JSUI_ORIGIN=https://dydra.com         the deployed client, deployed server
+ *   JSUI_ORIGIN=http://localhost:8099     this working copy, live API upstream
+ *                                         (node tests/dev-server.mjs)
+ *
+ * Which one was used must be stated in the test record: a spec whose server
+ * half is newer than the deployment cannot pass against the first.
+ */
+export const ORIGIN    = (process.env.JSUI_ORIGIN || 'https://dydra.com').replace(/\/+$/, '');
+export const USER_URL  = `${ORIGIN}/ui/user`;
+export const ADMIN_URL = `${ORIGIN}/ui/admin`;
+
+/**
+ * What goes in the login form's Host field.
+ *
+ * It must carry the SCHEME.  `normalizeHost' in lib/auth.js prepends https://
+ * to anything that has none, so a bare `localhost:8099' becomes
+ * `https://localhost:8099' and every API call dies with ERR_SSL_PROTOCOL_ERROR
+ * against a plain-http dev server.  Passing the full origin avoids that: a
+ * value that already has a scheme is left alone.
+ *
+ * Default: the origin the client is served from, so the dev server's proxy
+ * keeps page and API on one origin.  Override with JSUI_API_HOST to drive a
+ * local client against a remote API.
+ */
+export const API_HOST = process.env.JSUI_API_HOST || ORIGIN;
 
 /**
  * Login to the user (Studio) application.
  * @param {import('@playwright/test').Page} page
- * @param {string} username
- * @param {string} password
+ * The credentials default to the configured ones, NOT to a literal: see
+ * tests/credentials.js.  There is no built-in password.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {string} [username]
+ * @param {string} [password]
  */
-export async function login(page, username = 'playwright', password = 'shakespear') {
+export async function login(page, username = credential('JSUI_ACCOUNT', 'playwright'),
+                            password = credential('JSUI_PASSWORD')) {
   await page.goto(USER_URL);
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(1000);
+  // Fill the Host field, as adminLogin already did.  Left alone it keeps
+  // APP_CONFIG.baseHost -- dydra.com -- so a client served from the dev server
+  // sends its API calls cross-origin with an Authorization header, which makes
+  // them preflighted, and the upstream does not answer the preflight for a
+  // foreign origin: the login simply fails.  Against the deployed origin this
+  // fills in the same host it already had.
+  const hostInput = page.getByTestId('login-host-input');
+  if (await hostInput.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await hostInput.fill(API_HOST);
+  }
   await page.getByTestId('login-username-input').click();
   await page.getByTestId('login-username-input').fill(username);
   await page.getByTestId('login-username-input').press('Tab');
@@ -40,12 +86,13 @@ export async function login(page, username = 'playwright', password = 'shakespea
  * @param {string} username
  * @param {string} password
  */
-export async function adminLogin(page, username = 'playwright', password = 'shakespear') {
+export async function adminLogin(page, username = credential('ADMIN_USERNAME', credential('JSUI_ACCOUNT', 'playwright')),
+                                 password = credential('ADMIN_PASSWORD', credential('JSUI_PASSWORD'))) {
   await page.goto(ADMIN_URL);
   await page.waitForLoadState('networkidle');
   const hostInput = page.getByTestId('login-host-input');
   if (await hostInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-    await hostInput.fill('dydra.com');
+    await hostInput.fill(API_HOST);
   }
   await page.getByTestId('login-username-input').fill(username);
   await page.getByTestId('login-password-input').fill(password);
@@ -59,7 +106,7 @@ export async function adminLogin(page, username = 'playwright', password = 'shak
  * @param {import('@playwright/test').Page} page
  */
 export async function logout(page) {
-  await page.goto('https://dydra.com/logout');
+  await page.goto(`${ORIGIN}/logout`);
   await page.waitForLoadState('networkidle');
 }
 
@@ -70,8 +117,13 @@ export async function logout(page) {
  * @param {string} repositoryName
  */
 export async function openRepository(page, accountName, repositoryName) {
-  // First try navigating directly to the repository URL
-  const repoUrl = `https://dydra.com/${accountName}/${repositoryName}`;
+  // The fallback URL, on the origin under test rather than a hardcoded
+  // dydra.com.  Note what it costs when it is reached: the client holds its
+  // token in memory (REQ-1.1.3), so ANY navigation signs the session out and
+  // the pane this function is trying to open cannot appear.  The link-click
+  // path below is the one that works; this remains only as the last resort it
+  // already was.
+  const repoUrl = `${ORIGIN}/ui/account/${accountName}/repositories/${repositoryName}`;
 
   // Check if we're already on a repository pane
   const repoPane = page.locator('.repository-pane');

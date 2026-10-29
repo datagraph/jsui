@@ -1,0 +1,46 @@
+[
+  {
+    "requirement": "REQ-2.5.1",
+    "title": "Account History Tab",
+    "section": "account-history",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Events expanded in place beneath the account row",
+    "filename": "req-2-5-1-account-history-tab-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:57.166Z"
+  },
+  {
+    "requirement": "REQ-2.5.1",
+    "title": "Account History Tab",
+    "section": "account-history",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account listing, events not yet expanded",
+    "filename": "req-2-5-1-account-history-tab-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:56.863Z"
+  },
+  {
+    "requirement": "REQ-2.5.4",
+    "title": "Filter Account Events",
+    "section": "account-history",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Filters accepted: 0 unfiltered, 0 matching a type pattern",
+    "filename": "req-2-5-4-filter-account-events-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:02.178Z"
+  },
+  {
+    "requirement": "REQ-2.5.4",
+    "title": "Filter Account Events",
+    "section": "account-history",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account listing before a filtered history request",
+    "filename": "req-2-5-4-filter-account-events-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:01.752Z"
+  }
+]

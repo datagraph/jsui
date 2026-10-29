@@ -1,0 +1,137 @@
+module : jsui/tests/tool-adapter.test.mjs
+run    : cd jsui && npm run test:adapter
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:30Z
+----------------------------------------------------------------------
+
+narrowing the server's tool list
+  ok   only survey is offered by default
+  ok   the writing tools are withheld, and are named so a transcript can say so
+  ok   the default allow-list is one tool, not a policy engine
+  ok   it widens deliberately when a pane asks
+  ok   deprecated spellings are dropped even with no allow-list
+
+a prompt that needs one tool round
+  ok   six requests: tools/list, two primer reads, ask, tools/call, ask
+  ok   the tool definitions are read from the server, not written here
+  ok   inputSchema is handed to the provider as input_schema, and only survey is sent
+  ok   the Messages API headers are the ones a browser needs
+  ok   no workspace header is sent when none is configured
+  ok   the tool_use is relayed to MCP as a tools/call with its arguments intact
+  ok   the relay carries the account token, so the service enforces access
+  ok   the conversation grows user, assistant, user
+  ok   the assistant's tool_use block is replayed verbatim
+  ok   the payload returns as a tool_result under the same id
+  ok   a successful result is not flagged as an error
+  ok   the loop ran twice and succeeded
+  ok   the fenced query is extracted
+  ok   the event sequence is the one a transcript renders (prompt,tools,primer,primer,assistant,tool_call,tool_result,assistant,done)
+  ok   the server's own operations and grammar are in the system prompt
+  ok   both primer documents were read
+  ok   the withheld write tool is reported to the transcript
+  ok   the tool call event carries the operation body, so it can be lifted into the MCP editor
+
+a key scoped to the organization
+  ok   the workspace is named, as an org-scoped key requires
+
+an MCP call that fails
+  ok   a failed call is flagged is_error
+  ok   the model is told what went wrong, so it can correct itself
+  ok   a failed tool call is not a failed run
+  ok   the transcript records the failure as such
+
+a provider that refuses
+  ok   the key error is reported, not thrown
+  ok   and it reaches the transcript as an error event
+
+a model that will not stop calling tools
+  ok   the loop stops at maxIterations
+  ok   and says why
+  ok   no further requests are made
+
+no MCP endpoint configured
+  ok   with no MCP the request carries no tools at all
+  ok   and the answer is still read
+
+the exploration handle is carried, not left to the model
+  ok   the handle is read out of the first payload
+  ok   the first call has no handle to carry
+  ok   the second call is made in the same exploration
+  ok   and the model's own arguments are untouched
+  ok   the transcript records that the adapter supplied the handle
+  ok   the handle is read from score notation, which is not JSON
+
+a model that carries its own handle
+  ok   an explicit handle is never overwritten
+
+documentation that cannot be read
+  ok   an unreadable document does not stop the run
+  ok   the document that did read is still used
+  ok   and the transcript says which one failed, and why
+
+the resource read carries Mcp-Name
+  ok   the uri is sent in the header as well as the body
+
+the same round through OpenAI Chat Completions
+  ok   the key is a bearer token, and the workspace field names the project
+  ok   the system prompt is the first message, not a field
+  ok   a tool is a function whose parameters are the MCP input schema
+  ok   the token limit is spelled as the current models want it
+  ok   the arguments string is parsed, and each call is relayed in turn
+  ok   the session handle from the first call is carried into the second
+  ok   each result goes back as its own tool message
+  ok   the assistant message is replayed with its tool_calls
+  ok   and each tool message answers its call by id
+  ok   the run finishes with the query, as it does through Messages
+
+which provider a location speaks, and where it lists its models
+  ok   a preset location names its provider
+  ok   another location is read by its path
+  ok   models are listed at /v1/models beside the location
+  ok   the Anthropic list is read with the key, by GET, and keeps the display names
+  ok   a refusal is returned, not thrown
+  ok   and the listing is where a bad key is usually met first, so it says what was sent
+
+OpenCode: one location, each model in its own shape
+  ok   a Claude model goes to /anthropic/v1/messages
+  ok   with the service-account key as a bearer token, and the organization if given
+  ok   in the Messages shape, max_tokens included as OpenCode requires
+  ok   and is read as Messages
+  ok   kimi, glm, minimax and the like go to /openai/v1/chat/completions
+  ok   a GPT model goes to /openai/v1/responses
+  ok   the system prompt is instructions, and the conversation is the input list
+  ok   a tool is a flat function
+  ok   the function_call is relayed to MCP
+  ok   every output item is replayed, then the result as a function_call_output
+  ok   answering the call by its call_id
+  ok   and the run ends with the query
+  ok   it is offered as a third location
+  ok   whose models are listed at /inference/v1/models
+  ok   the menu leaves out Gemini (no adapter speaks it) and the free models (OpenCode's client only)
+
+a request the browser refuses is explained
+  ok   a TypeError from fetch names CORS as the likely cause
+
+a run says how it ENDED, not only what it last said
+  ok   the run reports that it was cut off at the ceiling, which is not the same as declining
+  ok   finalText is still the last turn that spoke, and says which turn that was
+  ok   so a caller can tell that the LAST turn said nothing at all
+  ok   and no dashboard was read, because an unclosed block is not a block
+  ok   the transcript carries the same verdict as the return
+
+a refused key is answered with what was sent
+  ok   the length and the last four identify the key without disclosing it
+  ok   and the key itself is not in the message
+  ok   the workspace header is reported too, because its absence is also an answer
+  ok   a zero-width character picked up in the copy is named
+  ok   and so is an interior space
+  ok   an Admin key is a key of the wrong kind, which no retry fixes
+  ok   and a console session token is not an API key at all
+  ok   an empty value is the one case the field cannot be showing
+  ok   a 401 from the provider carries the note with it
+  ok   and no other failure is treated as a credential problem
+
+a run that simply finishes says so too
+  ok   end_turn is reported as itself, so `truncated' means something
+
+94 passed, 0 failed

@@ -1,0 +1,64 @@
+module : jsui/tests/provenance.test.mjs
+run    : cd jsui && npm run test:provenance
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:32Z
+----------------------------------------------------------------------
+
+R-P1: the model recorded is the one the provider served, not the one asked for
+  ok   the served identifier is what the mark shows
+  ok   and the requested one is kept beside it, because they are two different facts that look like one string
+  ok   with no served identifier the requested one is used — and flagged as not served, rather than passed off as the fact
+  ok   a mark with no time given is stamped now: there is no such thing as an undated one
+  ok   and an unparsable time does not produce an unparsable mark
+
+the line a person reads says what, when and from where
+  ok   the model
+  ok   the date
+  ok   and the repository — R-P5: the mark names the model AND the data, so it cannot be read as saying a model invented the numbers
+  ok   short, because a footnote stops being read by becoming a paragraph, and an unread mark fails 50(5) as surely as no mark
+  ok   the date is the day, in UTC
+
+R-P4: the same facts, for a program that will not parse prose
+  ok   generated, and by what
+  ok   with the served/requested distinction preserved in the data too
+  ok   the repository, qualified by its account
+  ok   and which obligation it answers, so a reader of the data knows what it is for
+
+§2.6.1: the ledger is drawn INSIDE the figure, not around it
+  ok   an SVG with a viewBox can be marked
+  ok   the viewBox GREW by the band's height (18), so the drawing is moved over, not covered — a ledger laid on a chart's corner can sit on a data point
+  ok   and every original element is still there, at its original coordinates
+  ok   the text is inside the <svg> element, so it survives a copy of the picture — which is exactly when 50(4) applies and a pane footnote is already gone
+  ok   with the machine-readable half beside it (R-P4)
+  ok   styled by presentation attributes, not a <style> block: a copied figure may land where inline CSS does not survive, and an illegible mark is not a mark
+
+marking is idempotent, bounded, and never half-done
+  ok   a figure already marked is left alone — a redraw must not stack ledgers
+  ok   which is detectable without re-parsing
+  ok   a figure with no viewBox is returned UNCHANGED with a reason, rather than marked at a guessed scale — the caller shows the reason, because silently unmarked is the one outcome §2.6 does not allow
+  ok   and nothing that is not a figure is mistaken for one
+  ok   the viewBox is read, not assumed
+  ok   and a degenerate one is refused rather than divided by
+
+the interface draws it, never the model
+  ok   the saved page carries the ledger, because it is built from the same function as the mounted one
+  ok   and a caller that knows of no model marks nothing, rather than inventing one
+  ok   a DOT figure is marked on the SVG graphviz RETURNED — after layout, for the same reason: the model does not write the mark and cannot omit it
+  ok   while DOT source shown as source is not an image and gets no ledger drawn on it
+
+R-P1: every provider reports the model it actually served
+  ok   all 3 wire shapes are checked — anthropic, chat completions and responses — not just the default one
+  ok   anthropic surfaces the served model identifier
+  ok   openai surfaces the served model identifier
+  ok   openai-responses surfaces the served model identifier
+  ok   and a response that names no model says null rather than guessing at one
+
+R-P1 at the MCP boundary: the client states the model, because the server cannot see it
+  ok   a tools/call carries the SERVED identifier in its own _meta
+  ok   with the requested one and the provider beside it
+  ok   every model field is under our own reverse-DNS prefix, since io.modelcontextprotocol/* is reserved to the specification
+  ok   and the required spec fields are still there — this is an addition, not a replacement
+  ok   a requested identifier equal to the served one is NOT sent: a field repeated on every request to say nothing is a field a reader learns to skip
+  ok   and a call with no model behind it — tools/list, a primer read, the interface's own housekeeping — states none, rather than recording a model for work it did not do
+
+41 passed, 0 failed

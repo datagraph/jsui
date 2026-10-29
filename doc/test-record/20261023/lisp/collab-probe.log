@@ -1,0 +1,81 @@
+module : spocq/gensrc/test/collab-probe.lisp
+run    : cd spocq/gensrc && ./utilities/execute-spocq < test/collab-probe.lisp
+needs  : ssh to nl4; runs the listener binary over the live store.
+         NOTE push-source excludes /test/, so the probe exists only on
+         the development machine and is piped in — never found on a host.
+date   : 2026-10-23T12:31:30Z
+----------------------------------------------------------------------
+* #<PACKAGE "PROBE">
+* #<PACKAGE "PROBE">
+* *PASS*
+* *FAIL*
+* OK
+* ROW
+* *ACCOUNTS*
+* *NOW*
+* APPLY-MODEL
+* MODEL
+* a collaborator is added
+NIL
+*   ok   one row
+  ok   read is recorded as the tinyint 1
+  ok   and so is write
+NIL
+* a collaborator is edited, and keeps the date it was created
+NIL
+*   ok   still one row -- the old one was replaced, not duplicated
+  ok   write has been withdrawn
+  ok   created-at survives the edit: the collaboration is the same one
+  ok   and updated-at moved
+NIL
+* a collaborator is REMOVED by posting it with neither mode
+NIL
+*   ok   no row -- and this IS the removal protocol: the pane has no delete button, 
+NIL
+* the POST replaces the set
+NIL
+*   ok   two to start with
+  ok   an entry NOT named in a later post is untouched: the loop runs over the 
+  ok   and the one that was named is updated
+NIL
+* posting the same list twice changes nothing
+NIL
+*   ok   idempotent in the row count
+  ok   and in the creation date
+NIL
+* OMITTING an entry does not remove it -- only both modes false does
+NIL
+*   ok   jhacker is still there, although the second post did not mention it
+  ok   removing both takes posting both with neither mode, which is what the pane does
+NIL
+* an account that does not exist is an error, not a silent skip
+NIL
+*   ok   the error names the account, so a 400 can say which one was wrong
+NIL
+*   ok   an entry with no account at all is refused too
+NIL
+* ACL
+* BY-AGENT
+* BY-GRAPH
+* *GRAPH*
+* the ACL refresh is scoped to the agents the save named
+NIL
+*   ok   the OWNER's grant survives, which is the whole reason for the scoping
+  ok   and so does everything else in the graph that is not about this collaborator
+  ok   while the collaborator's own description is the new one
+  ok   exactly once -- the old description was removed, not added to
+NIL
+* and the obvious implementation would revoke the owner
+NIL
+*   ok   clearing the graph and inserting the generated set loses the owner's grant
+  ok   and the rest of the graph with it -- which is why the delete names the agent
+NIL
+* an account named in the save but holding no access leaves no description
+NIL
+*   ok   removal removes the grant as well as the row
+  ok   and touches nothing else
+NIL
+* 
+25 passed, 0 failed
+NIL
+* 

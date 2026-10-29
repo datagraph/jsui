@@ -134,23 +134,27 @@ window.fetch = async (url, init = {}) => {
     if (window.__truncate) {
       window.__tTurn = (window.__tTurn || 0) + 1;
       if (window.__tTurn === 1) {
-        return json({ id: "t1", type: "message", role: "assistant", stop_reason: "tool_use",
+        return json({ id: "t1", type: "message", role: "assistant", model: "served-model-id",
+          stop_reason: "tool_use",
           content: [{ type: "text",
                       text: "I'll start by reading the vocabulary and cataloguing the repository." },
                     { type: "tool_use", id: "x1", name: "survey", input: { op: "catalog" } }],
           usage: { input_tokens: 5, output_tokens: 5 } });
       }
-      return json({ id: "t2", type: "message", role: "assistant", stop_reason: "max_tokens",
+      return json({ id: "t2", type: "message", role: "assistant", model: "served-model-id",
+        stop_reason: "max_tokens",
         content: [], usage: { input_tokens: 37989, output_tokens: 32000 } });
     }
     llmTurn += 1;
     if (llmTurn === 1) {
-      return json({ id: "m1", type: "message", role: "assistant", stop_reason: "tool_use",
+      return json({ id: "m1", type: "message", role: "assistant", model: "served-model-id",
+        stop_reason: "tool_use",
         content: [{ type: "text", text: "Looking at what is there." },
                   { type: "tool_use", id: "t1", name: "survey", input: { op: "catalog" } }],
         usage: { input_tokens: 5, output_tokens: 5 } });
     }
-    return json({ id: "m2", type: "message", role: "assistant", stop_reason: "end_turn",
+    return json({ id: "m2", type: "message", role: "assistant", model: "served-model-id",
+      stop_reason: "end_turn",
       content: [{ type: "text",
         text: "One panel, one computed total, one sentence.\\n\\n\`\`\`dashboard\\n"
             + JSON.stringify(PROPOSAL) + "\\n\`\`\`" }],
@@ -364,6 +368,113 @@ console.log("\nPhase 1 runs inside the grant, and Gate 1 reviews the set");
   ok(gate1.includes("outside knowledge"), "and which sentences nothing in the repository supports");
   ok((await page.locator('[data-testid="dashboard-run-panels"]').textContent()).includes("1 panel"),
      "and the button says how much will run");
+}
+
+/*
+ * Show/hide, as the view editors have it.
+ *
+ * A run leaves every stage on the screen, because each is evidence for the
+ * next -- and by the time the page itself is up, that is a column several
+ * screens long with the thing you want to look at at the bottom of it.  The
+ * remedy is the control this interface already uses everywhere else, so the
+ * assertions are about it being the SAME control: the caret from the view
+ * editor, open by default, on the stages and on each box inside Gate 1.
+ */
+console.log("\nevery stage and every box can be collapsed, like a view editor");
+{
+  const pane = '[data-testid="dashboard-pane"]';
+  const gate1Body = `${pane} [data-testid="dashboard-toggle-gate1"]`;
+
+  ok(await page.locator(`${pane} [data-testid="dashboard-toggle-gate0"]`).count() === 1
+     && await page.locator(gate1Body).count() === 1
+     && await page.locator(`${pane} [data-testid="dashboard-toggle-phase1"]`).count() === 1,
+     "every stage carries one");
+  ok(await page.locator(gate1Body).getAttribute("aria-expanded") === "true",
+     "open by default — a gate that hid what it was asking about would not be a gate");
+  ok(await page.locator(`${gate1Body} svg path`).getAttribute("d") === "M6 10l6 6l6 -6h-12",
+     "drawn as the caret js/sparql-editor.js draws, down for shown");
+
+  // The boxes: one per panel, transform, parameter and assertion.
+  for (const [what, id] of [["the panel", "panel-sales"], ["the transform", "transform-total"],
+                            ["the assertion", "assertion-lead"]]) {
+    ok(await page.locator(`${pane} [data-testid="dashboard-toggle-${id}"]`).count() === 1,
+       `${what} has its own`);
+  }
+
+  const box = `${pane} [data-testid="dashboard-toggle-panel-sales"]`;
+  const query = `${pane} section.dsh-gate pre.dsh-pre`;
+  const before = await page.locator(query).first().isVisible();
+  await page.locator(box).click();
+  ok(before && !(await page.locator(query).first().isVisible()),
+     "and pressing it hides the query, which is what buries this screen");
+  ok(await page.locator(box).getAttribute("aria-expanded") === "false"
+     && await page.locator(`${box} svg path`).getAttribute("d") === "M10 18l6 -6l-6 -6v12",
+     "with the caret turned to face the state it is now in");
+  ok(await page.locator(`${pane} [data-testid="dashboard-run-panels"]`).isVisible(),
+     "the button to run stays where it was: collapsing is tidying, not withdrawing");
+
+  // The header is the target, not only the 16px square at the end of it.
+  await page.locator(`${pane} [data-testid="dashboard-toggle-panel-sales"]`)
+            .evaluate((b) => b.parentElement.click());
+  ok(await page.locator(query).first().isVisible(),
+     "clicking anywhere on the header works too, since a 16px square is findable "
+   + "only by someone already looking for it");
+
+  // And a stage collapses whole, with its gate still legible by its heading.
+  await page.locator(gate1Body).click();
+  ok(!(await page.locator(`${pane} [data-testid="dashboard-run-panels"]`).isVisible()),
+     "a collapsed stage takes its body with it");
+  ok(await page.locator(`${pane} section.dsh-gate`).nth(1).isVisible(),
+     "while the stage itself stays on the screen, so the run is still readable as a sequence");
+  await page.locator(gate1Body).click();
+  ok(await page.locator(`${pane} [data-testid="dashboard-run-panels"]`).isVisible(),
+     "and it comes back");
+}
+
+/*
+ * EU AI Act Article 50, as the panes answer it.  `ui-generator.md' §2.6 R-P2.
+ *
+ * 50(5) wants the disclosure "in a clear and distinguishable manner at the
+ * latest at the time of the first interaction or exposure".  A tooltip does
+ * not meet that and neither does a detail view: it is met by text on the
+ * screen while the content is.  The assertions below are about the two ways
+ * that is easy to lose -- a footnote that folds away with its stage, and a
+ * footnote that names the model the interface ASKED for rather than the one
+ * the provider served.
+ */
+console.log("\nevery stage discloses what produced it, and when");
+{
+  const pane = '[data-testid="dashboard-pane"]';
+  const note = `${pane} [data-testid="dashboard-provenance-gate1"]`;
+  ok(await page.locator(note).count() === 1, "a stage carries a footnote");
+  const text = await page.locator(note).textContent();
+  ok(/Generated by/.test(text), "saying what generated it");
+  ok(/served-model-id/.test(text),
+     "named as the PROVIDER SERVED it — the fixture answers a request for one model "
+   + "with another, and the served identifier is the fact a reconstruction needs");
+  ok(new RegExp(new Date().toISOString().slice(0, 10)).test(text), "and when");
+  ok(/playwright\/test/.test(text),
+     "with the repository, so the mark cannot be read as saying a model invented the data");
+  ok(/Art\. 50/.test(text), "and which obligation it answers");
+
+  const data = await page.locator(note).evaluate((n) => ({ ...n.dataset }));
+  ok(data.aiModel === "served-model-id" && Boolean(data.aiGeneratedAt),
+     "the same facts as data on the element, for a program that will not parse prose (R-P4)");
+  ok(data.aiModelServed === "true",
+     "including whether the identifier is the served one or only the requested one");
+
+  const gate0 = `${pane} [data-testid="dashboard-provenance-gate0"]`;
+  ok(/Nothing on this stage was produced by a model/.test(
+       await page.locator(gate0).textContent()),
+     "a stage nothing was generated on says so, rather than showing a mark with blanks "
+   + "in it — over-marking is how a reader learns to ignore every mark");
+
+  // The one that would quietly undo all of it.
+  await page.locator(`${pane} [data-testid="dashboard-toggle-gate1"]`).click();
+  ok(await page.locator(note).isVisible(),
+     "and collapsing the stage does NOT take its disclosure with it: a mark the reader "
+   + "can fold away is absent exactly when someone is looking past the interface");
+  await page.locator(`${pane} [data-testid="dashboard-toggle-gate1"]`).click();
 }
 
 console.log("\nPhase 2 is the interface's own, and Gate 2 follows it");

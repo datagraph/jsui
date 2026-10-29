@@ -420,14 +420,53 @@ npm install          # installs @playwright/test
 npx playwright install chromium
 ```
 
-No `playwright.config.js` exists at the project root; tests use Playwright defaults. Tests run against the live `https://dydra.com` deployment.
+`playwright.config.js` at the project root collects `tests/*-documented.spec.js`
+with one worker. `JSUI_ORIGIN` selects the target and defaults to the live
+`https://dydra.com` deployment; point it at `http://localhost:8099` with
+`node tests/dev-server.mjs` running to test the working copy instead. The dev
+server serves `/ui/` from this tree and proxies everything else to
+`JSUI_UPSTREAM` (default `dydra.com`); a host whose certificate node will not
+verify needs `JSUI_UPSTREAM_INSECURE=1` beside it, or node refuses the upstream
+and every API call fails as a socket error. **`nl4.dydra.com` is not such a
+host** — measured 27 Oct 2026, its chain verifies and node accepts it — so do
+not pass the switch for nl4.
 
-Default test credentials (configurable via environment variables):
+**Test credentials have no defaults** (changed 2026-10-24). They are resolved
+by `tests/credentials.js`, in this order:
+
+1. the environment — `JSUI_PASSWORD=...` or `JSUI_TOKEN=...`
+2. `~/.dydra/<host>.<account>.password`, then `~/.dydra/<host>.<account>.token`
+3. `~/.dydra/<account>.password`, then `~/.dydra/<account>.token`
+
+**Host-qualified beats bare, and within a tier a password beats a token.** An
+unqualified `<account>.password` must not shadow the token that is the only
+thing a particular host accepts — which is how nl4 is reached, since its
+`/system/accounts/<a>/configuration` answers the JSON string `"NIL"` and a
+password login has nowhere to get a token from.
+
+A token is supplied to the login field as `:<token>`; `lib/auth.js` reads the
+leading `:` as *this IS the bearer token* and does not look the account's
+configuration up. When a test needs an `Authorization` header of its own, it
+must use `authorizationFor()` rather than composing `Basic btoa(user +
+":" + secret)` in page context — that is a 401 the moment the secret is a
+token.
+
+This is the convention the shell test suites already use for bearer tokens
+(`~/.dydra/<host>.<account>.token`), with `.password` added beside it. Both
+live outside the working copy, where no `git add -A` can reach them. The host
+is the one the API is on, not the origin the client is served from: a loopback
+origin (the dev server) resolves to `JSUI_UPSTREAM`, else `dydra.com`.
 
 | Variable | Default |
 |---|---|
-| `ADMIN_USERNAME` | `playwright` |
-| `ADMIN_PASSWORD` | `shakespear` |
+| `JSUI_ACCOUNT` | `playwright` |
+| `JSUI_PASSWORD` / `JSUI_TOKEN` | **none — raises when neither resolves** |
+| `ADMIN_USERNAME` | `JSUI_ACCOUNT` |
+| `ADMIN_PASSWORD` | `JSUI_PASSWORD` |
+
+A working password used to sit here and in six source files. This repository
+has a github remote and those files are tracked, so it was published; the
+value must be treated as compromised and rotated.
 
 ### 12.2 Running Tests
 

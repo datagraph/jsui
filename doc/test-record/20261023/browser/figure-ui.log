@@ -1,0 +1,73 @@
+module : jsui/tests/figure-frame.browser.mjs
+run    : cd jsui && npm run test:figure-ui
+needs  : node + playwright's chromium; the script starts its own http
+         server over the working copy — fixtures, no host, no credentials
+date   : 2026-10-23T12:30:52Z
+----------------------------------------------------------------------
+
+D-M: the figure frame runs nothing
+  ok   the sandbox attribute is present and empty: every restriction
+  ok   allow-scripts is not among them -- a picture does not have to run
+  ok   the document is opaque to its embedder, so nothing can reach into it either
+  ok   a <script> inside the model's SVG did not run
+  ok   nor did the onload= handler on its root element
+  ok   the frame said nothing at all: there was no script in it to say anything
+  ok   the control -- the same markup, scripts allowed, no policy -- fires both halves of the probe, so the silence above is the sandbox and not a flaw in the probe
+  ok   and the second control, which HAS allow-scripts but keeps the page's own policy, is silent too: the sandbox flag and the CSP each stop this on their own
+
+D-N: the artifact says who drew it
+  ok   the saved file carries the statement, not only the transcript
+  ok   with the digest of the result it was drawn from
+  ok   and its own policy, so a copy opened elsewhere is governed too
+  ok   the figure is saved exactly as written -- nothing was sanitised out of it
+
+Gate 1: the last point before anything runs
+  ok   nothing has been run against the store
+  ok   the query is shown
+  ok   and what the model says it will draw, which is what makes the query reviewable
+  ok   the notation the model chose is preselected (D-L)
+  ok   and the others a SELECT can produce are offered beside it
+  ok   with the row cap, which is the lever for a result too large to send (§6)
+  ok   the temporary view is off by default: one write for one query is the worst of the trade
+
+Phase 2 is the interface's own run
+  ok   the temporary view was written, once
+  ok   under a name that says which run it belongs to
+  ok   and it was executed BY NAME, in the notation chosen at the gate, not the one proposed
+  ok   then the model was asked once, to draw
+  ok   and the direct route was not used, because the catalogue route was chosen
+
+Phase 3 has no store and no tools
+  ok   the drawing turn is given no tools: there is nothing for it to fetch
+  ok   it is told the frame's rules, which it could not otherwise discover
+  ok   and the real result -- the one the interface fetched, not one the model reported
+  ok   with the question that started the run
+  ok   and room to finish the figure
+
+Gate 2: the figure, in the frame the policy describes
+  ok   the drawn figure is mounted under the same empty sandbox
+  ok   Gate 2 offers keep
+  ok   Gate 2 offers download
+  ok   Gate 2 offers draw-again-2
+  ok   Gate 2 offers discard
+  ok   the model's caption travels inside the figure's own document, not around it
+
+the disposition is recorded, discard included (U-16, U-17)
+  ok   a figure node was written, typed with rdf:type
+  ok   saying it was discarded -- which is the line that explains a pane that keeps getting it wrong
+  ok   beside the query and the digest of what was drawn from
+  ok   and the figure itself, so the record holds the picture
+  ok   and the temporary view was swept, because it was not kept
+  ok   the gate closed
+
+a figure cut off at the token limit is refused, not shown
+  ok   it is not mounted: a truncated SVG still draws, and does not look truncated
+  ok   and the pane says why, rather than failing silently
+  ok   with the way out: ask for a simpler one
+
+the exploration pane offers the path at all
+  ok   Figure is a mode of the exploration, not a second pane
+  ok   off by default: most runs still want a query
+  ok   and a turn carrying a query gets Draw it… beside Add as a view
+
+47 passed, 0 failed

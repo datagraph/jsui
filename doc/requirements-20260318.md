@@ -1,5 +1,12 @@
 # Requirements Document
 
+> **Superseded as a standalone document, 2026-10-22.** This text is carried
+> complete as **Part I** of `spocq-gensrc/doc/code-generation/jsui-project.md`,
+> which consolidates it with the LLM/MCP presentation path, the generated
+> interface and the replication plan. Read it here for the March baseline as it
+> stood; edit it there.
+
+
 ## Version 2026-03-18
 
 This document supersedes `requirements.md` and reflects the current implementation status as of February 7, 2026. Each requirement is marked with its status: **satisfied**, **to be satisfied**, or **deprecated**.

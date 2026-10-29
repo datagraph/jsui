@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { adminLogin, ADMIN_URL } from './test-helpers.js';
+import { adminLogin, ADMIN_URL, API_HOST } from './test-helpers.js';
 import { DocCapture, REQ } from './doc-capture.js';
+import { ADMIN_USER, ADMIN_PASS } from './credentials.js';
 import path from 'path';
 import fs from 'fs';
 
@@ -11,14 +12,16 @@ import fs from 'fs';
  * Run with documentation:
  *   CAPTURE_DOCS=true npx playwright test tests/admin-documented.spec.js
  *
- * Credentials are read from environment variables with fallbacks:
- *   ADMIN_USERNAME  (default: playwright)
- *   ADMIN_PASSWORD  (default: shakespear)
+ * Credentials come from tests/credentials.js: the environment, else
+ * ~/.dydra/<host>.<account>.password -- the same convention as the shell
+ * suites' ~/.dydra/<host>.<account>.token, and outside the working copy.
+ * ADMIN_USERNAME defaults to the account name; ADMIN_PASSWORD has NO default
+ * and raises when it is not configured.
  */
 
 const CAPTURE_ENABLED = process.env.CAPTURE_DOCS === 'true';
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'playwright';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'shakespear';
+const ADMIN_USERNAME = ADMIN_USER();
+const ADMIN_PASSWORD = ADMIN_PASS();
 
 // Where the admin manual expects its screenshots
 const MANUAL_IMAGES_DIR = path.join(process.cwd(), 'doc', 'admin-manual', 'images');
@@ -110,7 +113,7 @@ async function REQ_A_1_1_adminLogin(page, capture) {
 
     const hostInput = page.getByTestId('login-host-input');
     if (await hostInput.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await hostInput.fill('dydra.com');
+      await hostInput.fill(API_HOST);
     }
     await page.getByTestId('login-username-input').fill(ADMIN_USERNAME);
     await page.getByTestId('login-password-input').fill(ADMIN_PASSWORD);

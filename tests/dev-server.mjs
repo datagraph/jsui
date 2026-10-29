@@ -20,6 +20,17 @@ const TYPES = { '.html':'text/html', '.js':'text/javascript', '.mjs':'text/javas
 // upstream does not answer the preflight for a foreign origin.
 const UPSTREAM = process.env.JSUI_UPSTREAM || 'dydra.com';
 
+// Some development hosts serve a certificate node will not verify -- the proxy
+// then answers every API call with a socket error and the client reads it as the
+// service being down.  Opt-in, and named for what it gives up: nothing verifies
+// the upstream is who it claims to be.
+//
+// NOT needed for nl4.dydra.com, whatever an earlier reading of this file said:
+// measured 27 Oct 2026, that host presents a complete, valid chain and node
+// accepts it unaided.  Pass this only for a host that has actually been shown
+// to need it.
+const INSECURE = process.env.JSUI_UPSTREAM_INSECURE === '1';
+
 function proxy(req, res) {
   const headers = { ...req.headers, host: UPSTREAM };
   delete headers['accept-encoding'];
@@ -34,7 +45,8 @@ function proxy(req, res) {
   delete headers.origin;
   delete headers.referer;
   const up = httpsRequest(
-    { host: UPSTREAM, port: 443, path: req.url, method: req.method, headers },
+    { host: UPSTREAM, port: 443, path: req.url, method: req.method, headers,
+      ...(INSECURE ? { rejectUnauthorized: false } : {}) },
     (r) => {
       const out = { ...r.headers };
       // A 401 from the upstream carries `WWW-Authenticate: Basic'.  The browser
@@ -45,8 +57,78 @@ function proxy(req, res) {
       // which has its own login.  It hides nothing: the status is unchanged, and
       // a request arriving here unauthenticated is still answered 401.
       delete out['www-authenticate'];
-      res.writeHead(r.statusCode || 502, out);
-      r.pipe(res);
+      const status = r.statusCode || 502;
+
+      // ── The upstream's Content-Length cannot be trusted ──────────────────
+      //
+      // Measured 2026-10-23 against dydra.com:
+      //
+      //   POST .../collaboration, success  ->  204 No Content, Content-Length: 33,
+      //                                        no body at all
+      //   POST .../collaboration, refusal  ->  400 Bad Request, Content-Length: 2166,
+      //                                        362 bytes sent
+      //
+      // Both are malformed: a 204 carries no content (RFC 9110 §15.3.5), and a
+      // declared length must be the length actually sent.  curl tolerates the
+      // short read and returns what arrived; a STRICT client -- the browser,
+      // and node's own http client, which is what this proxy is built on --
+      // waits for the missing bytes on a keep-alive connection that never
+      // closes.  So the fetch never settles: in the browser the collaboration
+      // pane's Save sits on "Saving…" for ever and a refusal is never shown,
+      // and through this proxy every POST to that resource hung.
+      //
+      // What follows is a WORKAROUND in the harness, not a fix.  The defect is
+      // in the service's response framing (spocq-server/http, which
+      // push-source excludes); it is recorded in the test record.  Here: a
+      // bodiless status is forwarded without framing headers, and a response
+      // small enough to hold is buffered and re-sent under the length it
+      // ACTUALLY had, so a truncated body arrives complete-as-sent instead of
+      // hanging.  Anything large keeps streaming, untouched.
+      if (status === 204 || status === 304) {
+        delete out['content-length'];
+        delete out['transfer-encoding'];
+        res.writeHead(status, out);
+        r.resume();
+        res.end();
+        return;
+      }
+
+      const declared = Number(out['content-length']);
+      const BUFFER_LIMIT = 8 * 1024 * 1024;
+      if (!Number.isFinite(declared) || declared > BUFFER_LIMIT) {
+        res.writeHead(status, out);
+        r.pipe(res);
+        return;
+      }
+
+      const chunks = [];
+      let received = 0;
+      // The socket stays open after a short body, so 'end' may never come;
+      // this fires when the upstream has gone quiet with the body incomplete.
+      let idle = null;
+      const finish = () => {
+        if (res.headersSent) return;
+        clearTimeout(idle);
+        const body = Buffer.concat(chunks);
+        if (body.length !== declared) {
+          console.warn(`[dev-server] ${status} ${req.method} ${req.url}: upstream `
+                     + `declared Content-Length ${declared}, sent ${body.length}`);
+        }
+        out['content-length'] = String(body.length);
+        delete out['transfer-encoding'];
+        res.writeHead(status, out);
+        res.end(body);
+      };
+      const nudge = () => {
+        clearTimeout(idle);
+        idle = setTimeout(finish, 1500);
+      };
+      r.on('data', (c) => { chunks.push(c); received += c.length;
+                            if (received >= declared) finish(); else nudge(); });
+      r.on('end', finish);
+      r.on('aborted', finish);
+      r.on('error', finish);
+      nudge();
     });
   up.on('error', (e) => { res.writeHead(502, {'Content-Type':'text/plain'}); res.end('proxy: ' + e.message); });
   req.pipe(up);

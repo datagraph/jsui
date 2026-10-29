@@ -38,6 +38,22 @@ const REQ = {
   '2.2.3': { id: 'REQ-2.2.3', title: 'Save Account Configuration', section: 'account' },
   '2.2.4': { id: 'REQ-2.2.4', title: 'Display Authentication Token', section: 'account' },
 
+  // Section 2.4: Account Listing (admin console accounts pane)
+  '2.4.1': { id: 'REQ-2.4.1', title: 'Account Listing Table', section: 'admin-accounts' },
+  '2.4.2': { id: 'REQ-2.4.2', title: 'Account Entry Fields', section: 'admin-accounts' },
+  '2.4.3': { id: 'REQ-2.4.3', title: 'Order Account Listing', section: 'admin-accounts' },
+  '2.4.4': { id: 'REQ-2.4.4', title: 'Account Listing Scoped by Role', section: 'admin-accounts' },
+
+  // Section 2.5: Account History
+  '2.5.1': { id: 'REQ-2.5.1', title: 'Account History Tab', section: 'account-history' },
+  '2.5.2': { id: 'REQ-2.5.2', title: 'Fetch Account Events', section: 'account-history' },
+  '2.5.3': { id: 'REQ-2.5.3', title: 'Render Account Events', section: 'account-history' },
+  '2.5.4': { id: 'REQ-2.5.4', title: 'Filter Account Events', section: 'account-history' },
+
+  // Section 2.6: Account Deletion
+  '2.6.1': { id: 'REQ-2.6.1', title: 'Delete Account Control', section: 'admin-accounts' },
+  '2.6.2': { id: 'REQ-2.6.2', title: 'Log Account Deletion', section: 'account-history' },
+
   // Section 3: Repository Management
   '3.1.1': { id: 'REQ-3.1.1', title: 'Display Repository List', section: 'repository' },
   '3.1.2': { id: 'REQ-3.1.2', title: 'Display Repository Details', section: 'repository' },
@@ -55,6 +71,14 @@ const REQ = {
   '3.7.1': { id: 'REQ-3.7.1', title: 'Manage Collaborators', section: 'collaboration' },
   '3.7.2': { id: 'REQ-3.7.2', title: 'Add/Edit/Remove Collaborators', section: 'collaboration' },
   '3.7.3': { id: 'REQ-3.7.3', title: 'Save Collaboration Changes', section: 'collaboration' },
+  '3.7.4': { id: 'REQ-3.7.4', title: 'Remove Collaborator by Clearing Access', section: 'collaboration' },
+  '3.7.5': { id: 'REQ-3.7.5', title: 'Idempotent Collaboration Save', section: 'collaboration' },
+  '3.7.6': { id: 'REQ-3.7.6', title: 'Unknown Collaborator Refused', section: 'collaboration' },
+
+  // Section 3.8: Repository History
+  '3.8.1': { id: 'REQ-3.8.1', title: 'Repository Lifecycle Events', section: 'repository-history' },
+  '3.8.3': { id: 'REQ-3.8.3', title: 'Render Repository Events', section: 'repository-history' },
+  '3.8.7': { id: 'REQ-3.8.7', title: 'Rails-Shaped Event Type Names', section: 'repository-history' },
 
   // Section 4: SPARQL Query Management
   '4.1.1': { id: 'REQ-4.1.1', title: 'SPARQL Editor with Syntax Highlighting', section: 'sparql' },
@@ -270,12 +294,60 @@ class DocCapture {
   }
 
   /**
-   * Write manifest file for documentation index
+   * Write manifest file for documentation index.
+   *
+   * ── Why this merges instead of replacing (fixed 2026-10-23) ───────────────
+   *
+   * Every test in a spec file builds its OWN DocCapture and calls this at the
+   * end, and this used to write `this.manifest' -- one test's captures -- over
+   * whatever the previous test had written.  The last test won.  When the last
+   * test captured nothing it wrote `[]'.
+   *
+   * That is what had happened: all twelve manifests under tests/pdfs/ held
+   * ZERO entries while 130 PDFs sat beside them, so every index.html rendered
+   * empty and no capture could be cited against the requirement it documents.
+   * The evidence existed and was unusable.
+   *
+   * So: read what is on disk, drop entries whose file has since been deleted,
+   * merge this instance's entries over the rest by filename, and write the
+   * union.  Each test then adds to the record rather than replacing it, and a
+   * capture that is no longer produced stops being claimed.
    */
+  _mergeManifest() {
+    const manifestPath = path.join(this.outputDir, 'manifest.json');
+    let existing = [];
+    try {
+      if (fs.existsSync(manifestPath)) {
+        const parsed = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+        if (Array.isArray(parsed)) existing = parsed;
+      }
+    } catch (e) {
+      // A manifest we cannot read is replaced, not merged -- but say so, because
+      // silently discarding the record of previous runs is the failure above.
+      console.warn(`[DocCapture] Unreadable manifest replaced: ${manifestPath}`);
+    }
+
+    const byFile = new Map();
+    for (const entry of existing) {
+      // Prune: an entry whose capture is gone is not evidence of anything.
+      if (entry && entry.filename
+          && fs.existsSync(path.join(this.outputDir, entry.filename))) {
+        byFile.set(entry.filename, entry);
+      }
+    }
+    for (const entry of this.manifest) byFile.set(entry.filename, entry);
+
+    return [...byFile.values()].sort((a, b) =>
+      (a.requirement || '').localeCompare(b.requirement || '')
+      || (a.stepIndex ?? 0) - (b.stepIndex ?? 0)
+      || (a.filename || '').localeCompare(b.filename || ''));
+  }
+
   async writeManifest() {
     const manifestPath = path.join(this.outputDir, 'manifest.json');
-    fs.writeFileSync(manifestPath, JSON.stringify(this.manifest, null, 2));
-    console.log(`[DocCapture] Manifest written: ${manifestPath}`);
+    const merged = this._mergeManifest();
+    fs.writeFileSync(manifestPath, JSON.stringify(merged, null, 2));
+    console.log(`[DocCapture] Manifest written: ${manifestPath} (${merged.length} entries, ${this.manifest.length} from this test)`);
   }
 
   /**
@@ -283,7 +355,9 @@ class DocCapture {
    */
   async writeIndex() {
     const sections = {};
-    for (const entry of this.manifest) {
+    // The merged manifest, not `this.manifest': an index built from one test's
+    // captures is the same bug as the manifest it is generated beside.
+    for (const entry of this._mergeManifest()) {
       if (!sections[entry.section]) {
         sections[entry.section] = [];
       }

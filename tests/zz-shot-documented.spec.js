@@ -7,15 +7,19 @@
  * the view editors rather than as a panel in the repository sidebar.
  */
 import { test } from '@playwright/test';
+import { ACCOUNT, PASSWORD } from './credentials.js';
+
+const ORIGIN = process.env.JSUI_ORIGIN || 'http://localhost:8099';
+
 test('open the exploration pane', async ({ page }) => {
   test.setTimeout(120000);
   const errs = [];
   page.on('pageerror', (e) => errs.push('PAGEERROR ' + String(e).slice(0, 160)));
-  await page.goto('http://localhost:8099/ui/user');
+  await page.goto(`${ORIGIN}/ui/user`);
   await page.waitForTimeout(1500);
-  await page.locator('[name="host"]').fill('http://localhost:8099');
-  await page.getByTestId('login-username-input').fill('playwright');
-  await page.getByTestId('login-password-input').fill('shakespear');
+  await page.locator('[name="host"]').fill(ORIGIN);
+  await page.getByTestId('login-username-input').fill(ACCOUNT());
+  await page.getByTestId('login-password-input').fill(PASSWORD());
   await page.getByTestId('login-submit').click();
   await page.waitForTimeout(3500);
   console.log('logged in: ' + await page.locator('[data-tab-type="account"]').first().isVisible().catch(() => false));

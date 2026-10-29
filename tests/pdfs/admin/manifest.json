@@ -1,1 +1,233 @@
-[]
+[
+  {
+    "requirement": "REQ-A.1.1",
+    "title": "Admin Login as Administrator",
+    "section": "admin-authentication",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Authenticated, dashboard loaded",
+    "filename": "req-a-1-1-admin-login-as-administrator-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:40.097Z"
+  },
+  {
+    "requirement": "REQ-A.1.1",
+    "title": "Admin Login as Administrator",
+    "section": "admin-authentication",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Admin login form displayed",
+    "filename": "req-a-1-1-admin-login-as-administrator-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:38.942Z"
+  },
+  {
+    "requirement": "REQ-A.1.1",
+    "title": "Admin Login as Administrator",
+    "section": "admin-authentication",
+    "phase": "form-filled",
+    "stepIndex": 0,
+    "description": "Credentials entered in login form",
+    "filename": "req-a-1-1-admin-login-as-administrator-form-filled.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:39.296Z"
+  },
+  {
+    "requirement": "REQ-A.1.3",
+    "title": "Admin Logout",
+    "section": "admin-authentication",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Login page displayed after logout",
+    "filename": "req-a-1-3-admin-logout-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:42.286Z"
+  },
+  {
+    "requirement": "REQ-A.1.3",
+    "title": "Admin Logout",
+    "section": "admin-authentication",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Authenticated admin session",
+    "filename": "req-a-1-3-admin-logout-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:41.658Z"
+  },
+  {
+    "requirement": "REQ-A.2.1",
+    "title": "Dashboard Tab Navigation",
+    "section": "admin-dashboard",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Navigated through dashboard tabs",
+    "filename": "req-a-2-1-dashboard-tab-navigation-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:47.021Z"
+  },
+  {
+    "requirement": "REQ-A.2.1",
+    "title": "Dashboard Tab Navigation",
+    "section": "admin-dashboard",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Dashboard loaded, Accounts tab active by default",
+    "filename": "req-a-2-1-dashboard-tab-navigation-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:44.204Z"
+  },
+  {
+    "requirement": "REQ-A.2.2",
+    "title": "Location Bar Navigation",
+    "section": "admin-dashboard",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Navigated via location bar to /invitations",
+    "filename": "req-a-2-2-location-bar-navigation-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:50.210Z"
+  },
+  {
+    "requirement": "REQ-A.2.2",
+    "title": "Location Bar Navigation",
+    "section": "admin-dashboard",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Location bar displaying current route",
+    "filename": "req-a-2-2-location-bar-navigation-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:48.926Z"
+  },
+  {
+    "requirement": "REQ-A.3.1",
+    "title": "View System Accounts",
+    "section": "admin-accounts",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Accounts list displayed",
+    "filename": "req-a-3-1-view-system-accounts-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:52.980Z"
+  },
+  {
+    "requirement": "REQ-A.3.1",
+    "title": "View System Accounts",
+    "section": "admin-accounts",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Accounts pane loading",
+    "filename": "req-a-3-1-view-system-accounts-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:52.300Z"
+  },
+  {
+    "requirement": "REQ-A.3.2",
+    "title": "Account Details Dialog",
+    "section": "admin-accounts",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Account details dialog displayed",
+    "filename": "req-a-3-2-account-details-dialog-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:55.985Z"
+  },
+  {
+    "requirement": "REQ-A.3.2",
+    "title": "Account Details Dialog",
+    "section": "admin-accounts",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Accounts list before opening details dialog",
+    "filename": "req-a-3-2-account-details-dialog-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:54.923Z"
+  },
+  {
+    "requirement": "REQ-A.4.1",
+    "title": "View Account Repositories",
+    "section": "admin-repositories",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Repositories list displayed",
+    "filename": "req-a-4-1-view-account-repositories-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:01.357Z"
+  },
+  {
+    "requirement": "REQ-A.4.1",
+    "title": "View Account Repositories",
+    "section": "admin-repositories",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account checked, navigating to Repositories tab",
+    "filename": "req-a-4-1-view-account-repositories-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:59.879Z"
+  },
+  {
+    "requirement": "REQ-A.5.1",
+    "title": "View Invitations",
+    "section": "admin-invitations",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Invitations list displayed",
+    "filename": "req-a-5-1-view-invitations-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:05.902Z"
+  },
+  {
+    "requirement": "REQ-A.5.1",
+    "title": "View Invitations",
+    "section": "admin-invitations",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Navigating to Invitations tab",
+    "filename": "req-a-5-1-view-invitations-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:04.414Z"
+  },
+  {
+    "requirement": "REQ-A.6.1",
+    "title": "Query History Table",
+    "section": "admin-monitoring",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Query history table displayed",
+    "filename": "req-a-6-1-query-history-table-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:12.265Z"
+  },
+  {
+    "requirement": "REQ-A.6.1",
+    "title": "Query History Table",
+    "section": "admin-monitoring",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Navigating to Query History tab",
+    "filename": "req-a-6-1-query-history-table-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:10.779Z"
+  },
+  {
+    "requirement": "REQ-A.6.2",
+    "title": "Query History Graph",
+    "section": "admin-monitoring",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Query history graph displayed",
+    "filename": "req-a-6-2-query-history-graph-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:13.590Z"
+  },
+  {
+    "requirement": "REQ-A.6.2",
+    "title": "Query History Graph",
+    "section": "admin-monitoring",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Query history table view",
+    "filename": "req-a-6-2-query-history-graph-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:12.531Z"
+  }
+]

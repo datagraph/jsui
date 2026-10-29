@@ -18,6 +18,167 @@
 </head>
 <body>
   <h1>Dydra JSUI - Requirements Documentation</h1>
-  <p>Generated: 2026-10-08T07:41:52.240Z</p>
+  <p>Generated: 2026-10-27T03:18:13.628Z</p>
+  <h2>Admin-authentication</h2>
+  <div class="requirement">
+    <h3>REQ-A.1.1: Admin Login as Administrator</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-1-1-admin-login-as-administrator-after.pdf">req-a-1-1-admin-login-as-administrator-after.pdf</a>
+        <div class="description">Authenticated, dashboard loaded</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-1-1-admin-login-as-administrator-before.pdf">req-a-1-1-admin-login-as-administrator-before.pdf</a>
+        <div class="description">Admin login form displayed</div>
+      </div>
+      <div class="capture">
+        <div class="phase">form-filled</div>
+        <a href="req-a-1-1-admin-login-as-administrator-form-filled.pdf">req-a-1-1-admin-login-as-administrator-form-filled.pdf</a>
+        <div class="description">Credentials entered in login form</div>
+      </div>
+    </div>
+  </div>
+  <div class="requirement">
+    <h3>REQ-A.1.3: Admin Logout</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-1-3-admin-logout-after.pdf">req-a-1-3-admin-logout-after.pdf</a>
+        <div class="description">Login page displayed after logout</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-1-3-admin-logout-before.pdf">req-a-1-3-admin-logout-before.pdf</a>
+        <div class="description">Authenticated admin session</div>
+      </div>
+    </div>
+  </div>
+  <h2>Admin-dashboard</h2>
+  <div class="requirement">
+    <h3>REQ-A.2.1: Dashboard Tab Navigation</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-2-1-dashboard-tab-navigation-after.pdf">req-a-2-1-dashboard-tab-navigation-after.pdf</a>
+        <div class="description">Navigated through dashboard tabs</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-2-1-dashboard-tab-navigation-before.pdf">req-a-2-1-dashboard-tab-navigation-before.pdf</a>
+        <div class="description">Dashboard loaded, Accounts tab active by default</div>
+      </div>
+    </div>
+  </div>
+  <div class="requirement">
+    <h3>REQ-A.2.2: Location Bar Navigation</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-2-2-location-bar-navigation-after.pdf">req-a-2-2-location-bar-navigation-after.pdf</a>
+        <div class="description">Navigated via location bar to /invitations</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-2-2-location-bar-navigation-before.pdf">req-a-2-2-location-bar-navigation-before.pdf</a>
+        <div class="description">Location bar displaying current route</div>
+      </div>
+    </div>
+  </div>
+  <h2>Admin-accounts</h2>
+  <div class="requirement">
+    <h3>REQ-A.3.1: View System Accounts</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-3-1-view-system-accounts-after.pdf">req-a-3-1-view-system-accounts-after.pdf</a>
+        <div class="description">Accounts list displayed</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-3-1-view-system-accounts-before.pdf">req-a-3-1-view-system-accounts-before.pdf</a>
+        <div class="description">Accounts pane loading</div>
+      </div>
+    </div>
+  </div>
+  <div class="requirement">
+    <h3>REQ-A.3.2: Account Details Dialog</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-3-2-account-details-dialog-after.pdf">req-a-3-2-account-details-dialog-after.pdf</a>
+        <div class="description">Account details dialog displayed</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-3-2-account-details-dialog-before.pdf">req-a-3-2-account-details-dialog-before.pdf</a>
+        <div class="description">Accounts list before opening details dialog</div>
+      </div>
+    </div>
+  </div>
+  <h2>Admin-repositories</h2>
+  <div class="requirement">
+    <h3>REQ-A.4.1: View Account Repositories</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-4-1-view-account-repositories-after.pdf">req-a-4-1-view-account-repositories-after.pdf</a>
+        <div class="description">Repositories list displayed</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-4-1-view-account-repositories-before.pdf">req-a-4-1-view-account-repositories-before.pdf</a>
+        <div class="description">Account checked, navigating to Repositories tab</div>
+      </div>
+    </div>
+  </div>
+  <h2>Admin-invitations</h2>
+  <div class="requirement">
+    <h3>REQ-A.5.1: View Invitations</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-5-1-view-invitations-after.pdf">req-a-5-1-view-invitations-after.pdf</a>
+        <div class="description">Invitations list displayed</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-5-1-view-invitations-before.pdf">req-a-5-1-view-invitations-before.pdf</a>
+        <div class="description">Navigating to Invitations tab</div>
+      </div>
+    </div>
+  </div>
+  <h2>Admin-monitoring</h2>
+  <div class="requirement">
+    <h3>REQ-A.6.1: Query History Table</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-6-1-query-history-table-after.pdf">req-a-6-1-query-history-table-after.pdf</a>
+        <div class="description">Query history table displayed</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-6-1-query-history-table-before.pdf">req-a-6-1-query-history-table-before.pdf</a>
+        <div class="description">Navigating to Query History tab</div>
+      </div>
+    </div>
+  </div>
+  <div class="requirement">
+    <h3>REQ-A.6.2: Query History Graph</h3>
+    <div class="captures">
+      <div class="capture">
+        <div class="phase">after</div>
+        <a href="req-a-6-2-query-history-graph-after.pdf">req-a-6-2-query-history-graph-after.pdf</a>
+        <div class="description">Query history graph displayed</div>
+      </div>
+      <div class="capture">
+        <div class="phase">before</div>
+        <a href="req-a-6-2-query-history-graph-before.pdf">req-a-6-2-query-history-graph-before.pdf</a>
+        <div class="description">Query history table view</div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

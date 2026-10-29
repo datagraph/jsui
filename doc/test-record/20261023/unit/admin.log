@@ -1,0 +1,145 @@
+module : jsui/tests/administration.test.mjs
+run    : cd jsui && npm run test:admin
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:33Z
+----------------------------------------------------------------------
+
+REQ-1.1.5: the admin flag is `administrator_of' in the account metadata
+  ok   a single IRI naming the service sets it
+  ok   so does one among several — the value is a list when there is more than one
+  ok   administering some other service is not administering this one
+  ok   absent, and no configuration at all, both mean no
+  ok   an empty value is absent, not a wildcard
+  ok   a trailing slash and a different case name the same service
+  ok   the list is reported as given, for an interface that wants to show it
+
+REQ-1.1.6 is rescinded: nothing here derives a role from system/system
+  ok   there is no manager role — read/write on system/system no longer implies one
+  ok   three roles: administrator, owner, user
+
+what the interface offers follows from the role, and excludes self-deletion
+  ok   the flag gives the role
+  ok   without it, an agent is the owner of its own account
+  ok   REQ-2.6.1: an administrator may delete another account
+  ok   REQ-2.6.1: and may not delete the account it is authenticated as — there is no way back from deleting the credential you are holding
+  ok   an owner may not delete accounts at all
+  ok   REQ-3.9.1: an administrator may delete any repository
+  ok   REQ-3.9.2: an owner may delete its own
+  ok   and not another account's
+  ok   REQ-4.5.1: views follow the repository, so the repository's owner
+  ok   REQ-2.4.4: the listing is everyone's for an administrator and not for anyone else
+
+the event field is `agent' — the renderer read `actor', which no event has
+  ok   REGRESSION: the server sends `agent'; reading `actor' left every cell empty
+  ok   and an `actor' from an older response or a fixture is still read
+  ok   the other three fields pass through
+  ok   a missing field is an empty string, never undefined in the markup
+
+an action says what happened, in the rails-shaped spelling
+  ok   noun first, participle second — `events.type' is a rails STI class name
+  ok   Updated → modified, which is the word the requirements use
+  ok   REQ-3.6.2: a clear is its own event now, and rails already has the class
+  ok   REQ-3.8.1: and so is an import
+  ok   the service's `Query' is this interface's `view'
+  ok   a type this interface has not seen is shown raw rather than dropped
+  ok   the parse reports failure rather than guessing
+
+the verb-first spelling a development host still holds is read too
+  ok   `CreateAccountEvent' was what the service wrote before 2026-10-23
+  ok   and so was this
+  ok   and the two spellings are distinguishable, so a reader can tell which host wrote a row
+  ok   there is no legacy clear or import: nothing ever wrote one
+
+the full matrix, so a missing rails class is at least predictable
+  ok   five actions by three subjects
+  ok   every one of the fifteen parses
+  ok   including the four rails already defines classes for
+
+events are ordered newest first, and creation is the earliest Create
+  ok   newest first
+  ok   creation is the earliest Create, not the newest event
+  ok   last use is the newest of any kind
+  ok   and nothing recorded is null, not a fabricated date
+  ok   a response that is not an array is no events, not a throw
+
+the history paths and their filters (REQ-2.5.4, 3.8.4, 4.4.3)
+  ok   account
+  ok   repository
+  ok   view
+  ok   every segment is encoded — a view name can carry a slash
+  ok   a shell wildcard becomes the SQL one the server matches with
+  ok   the date boundaries pass through
+  ok   no filter is an empty string, so a caller may always concatenate
+
+REQ-2.4.1: a row out of each of the three shapes the listing answers
+  ok   an array of names
+  ok   an array of objects, under either key
+  ok   an object keyed by name
+  ok   duplicates collapse
+  ok   nothing nameless becomes a row
+  ok   a row from the listing alone is PENDING — the other three columns are not in it
+
+S-1: the listing now carries the three derived columns itself
+  ok   the name is the `id' dimension, as for repositories
+  ok   creation and last use come from the response when the service fills them
+  ok   so does the repository count
+  ok   and such a row needs no enrichment pass
+  ok   S-2: an account older than the event record has no creation time, and the service omits the key rather than inventing one — the row stays pending
+
+REQ-2.4.2: the three columns are still derivable client-side
+  ok   creation from the CreateAccountEvent
+  ok   last use from the most recent event
+  ok   repository count from the repositories listing
+  ok   and the row is no longer pending
+  ok   with nothing fetched the count is null — which is not zero
+
+REQ-2.4.3: ordered by any field, with the unfetched sorting last both ways
+  ok   by name
+  ok   by repository count, descending — a number compares as a number
+  ok   by creation
+  ok   by last use
+  ok   a null sorts LAST in both directions — an unfetched count is not zero, and ascending would otherwise put every unfetched account first
+  ok   an unknown field falls back to the name rather than returning nothing
+  ok   the input is not sorted in place
+
+REQ-2.4.4: who appears
+  ok   an administrator sees all of them
+  ok   anyone else sees their own
+  ok   plus the accounts they collaborate with
+  ok   a collaboration the server did not list stays absent — this narrows, never widens
+
+REQ-2.1.2: the repositories an account reaches that it does not own
+  ok   the account's own repository is not indirect metadata
+  ok   the identifier splits into the owning account and the repository
+  ok   an entry with no mode field reports null — an older service, and the table must show that as unknown rather than as read-only
+  ok   a bare string is accepted too
+  ok   an identifier that is not owner/name is dropped rather than half-parsed
+  ok   and the accounts behind them feed REQ-2.4.4
+  ok   the path is built in one place
+
+S-5: the access mode, now that the service reports it
+  ok   the service's own one-word summary is preferred
+  ok   and both flags are kept
+  ok   with no summary the mode is derived from the flags
+  ok   write implies read-write
+  ok   and both false is a recorded `none', not an unknown
+  ok   a boolean that arrived as a string is compared, not coerced — "false" is truthy
+  ok   and an older service that sends neither stays unknown
+
+REQ-23.1.4: the prompt budget refuses instead of only measuring
+  ok   a small prompt passes with nothing said
+  ok   a large one passes and says what share of the ceiling it took
+  ok   an oversized one is REFUSED, not logged
+  ok   and the refusal says nothing was sent, since the cost is the point
+  ok   it names the two things that are actually adjustable
+  ok   the ceiling is the caller's to set
+  ok   the token figure is an estimate for display; the verdict is on characters
+
+REQ-23.1.4: an answer cut at the ceiling is refused, not annotated
+  ok   max_tokens is a refusal
+  ok   because the thing being refused is markup, and half of it renders
+  ok   the other providers' spellings of the same event are refused too
+  ok   a complete answer passes
+  ok   and no text at all is its own refusal — a different event from being cut off
+
+102 passed, 0 failed

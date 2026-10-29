@@ -16,3 +16,11 @@ failed.txt
 node_modules
 tests-results
 tests-archive
+
+# Test credentials live OUTSIDE the working copy, in ~/.dydra/ :
+#   ~/.dydra/<host>.<account>.password   read by tests/credentials.js
+#   ~/.dydra/<host>.<account>.token      read by the shell suites' common.sh
+# These two entries remain only so that a credentials file created here by
+# mistake cannot be committed.
+tests/credentials.local.json
+.env.test

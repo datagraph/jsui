@@ -1,0 +1,50 @@
+module : jsui/tests/session-log.test.mjs
+run    : cd jsui && npm run test:log
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:30Z
+----------------------------------------------------------------------
+
+the endpoint and the clock
+  ok   the log is read from <account>/mcp, not the repository being explored
+  ok   lisp universal time is converted, not read as unix seconds
+  ok   an absent or unparsable timestamp is null rather than 1900
+
+listing sessions
+  ok   both sessions are returned
+  ok   posted to the account's exploration repository
+  ok   under the account token
+  ok   the id and the active node are reduced to their local names
+  ok   newest first
+
+reading one session
+  ok   the header is separated from the nodes
+  ok   the header is read
+  ok   nodes are ordered by the sequence they ran, not by the rows' order
+  ok   parent becomes a depth the presentation can indent by
+  ok   operation and status are reduced to their local names
+  ok   what was asked and what came back are both kept
+
+a store that will not answer
+  ok   the failure is reported, not thrown
+  ok   and the shape is still usable
+
+listing the request journals
+  ok   both days are returned
+  ok   newest day first
+  ok   the target repository is carried, not the log's own
+
+reading a journal
+  ok   the journal's own header is not read as a request
+  ok   requests come back in the order they were made
+  ok   the authorized agent and the target repository are both kept
+  ok   what was asked and what came back are both kept
+  ok   a clipped payload still reports its true size
+  ok   status and duration are shaped for the presentation
+  ok   a call made during an exploration names it
+  ok   a protocol error keeps its code
+
+the requests of one exploration
+  ok   the exploration's calls are found
+  ok   the graph is left unbound: an exploration may span more than one day's journal
+
+29 passed, 0 failed

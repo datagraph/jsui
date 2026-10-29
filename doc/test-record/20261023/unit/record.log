@@ -1,0 +1,54 @@
+module : jsui/tests/transcript-store.test.mjs
+run    : cd jsui && npm run test:record
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:30Z
+----------------------------------------------------------------------
+
+where it is written
+  ok   the transcript is a graph beside the exploration, not inside it
+  ok   which is what keeps the server's next rewrite from erasing it
+
+what is kept
+  ok   every event that carried content becomes an exchange, in order
+  ok   numbered by the order they happened
+  ok   the payload is kept whole, not summarised
+  ok   and its stated cardinality is read out for the indicator
+  ok   with which way it moved, and what was asked
+  ok   the schema half -- the documents the model read -- is kept as well
+  ok   the model's prose is kept, with what the turn cost
+
+an oversized payload
+  ok   is cut, and says both what was kept and what there was
+
+the update it writes
+  ok   one INSERT DATA, in the server's own vocabulary
+  ok   into the transcript graph
+  ok   pointing back at the exploration it belongs to
+  ok   quotes and backslashes in the payload are escaped, not dropped
+  ok   and newlines travel as escapes, so one payload is one literal
+  ok   which is what the escaper does
+  ok   an IRI that would break the update is refused rather than escaped
+
+writing it
+  ok   the run is recorded
+  ok   into the account's exploration repository, where the log already lives
+  ok   as a SPARQL update, which the graph-store resource decodes
+  ok   under the user's own token
+  ok   and the body carries the payload
+
+when the store will not take it
+  ok   the failure is returned, not thrown -- the run already happened
+
+a run with no exploration handle
+  ok   is still recorded, under a graph of its own rather than discarded
+  ok   with nothing to point at, and no pretence that there is
+
+reading it back
+  ok   the runs are separated from their exchanges
+  ok   a run carries what was asked of it
+  ok   its exchanges come back in the order they happened, not the rows'
+  ok   and the payload reads back exactly as it was written
+  ok   a document the model read keeps its name without overwriting the record's own
+  ok   and the header says which model, against which exploration
+
+31 passed, 0 failed

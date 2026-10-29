@@ -29,6 +29,8 @@ import { createToolAdapter, FIGURE_TOOLS, DEFAULT_SYSTEM } from "../../lib/llm/t
 import { figureSystem } from "../../lib/llm/figure-prompt.js";
 import { openFigureGate } from "./figure-gate.js";
 import { queriesRan } from "../../lib/figure/provenance.js";
+import { setCaret } from "./disclosure.js";
+import { markStage } from "./provenance-note.js";
 import { renderSessionLog } from "./session-log.js";
 import { recordRun } from "../../lib/mcp/transcript-store.js";
 import { paneState } from "./mcp-pane-state.js";
@@ -227,32 +229,6 @@ function blockEl(label, text, { prose = false } = {}) {
   return wrap;
 }
 
-/* The page's own show/hide glyph, as js/sparql-editor.js draws it on every view
-   editor: a caret down when the thing is shown, a caret right when it is not. */
-const SVG_NS = "http://www.w3.org/2000/svg";
-const CARET = { open: "M6 10l6 6l6 -6h-12", shut: "M10 18l6 -6l-6 -6v12" };
-
-function caretSvg(doc, open) {
-  const svg = doc.createElementNS(SVG_NS, "svg");
-  for (const [k, v] of Object.entries({ width: 12, height: 12, viewBox: "0 0 24 24",
-                                        fill: "none", stroke: "currentColor",
-                                        "stroke-width": 1, "stroke-linecap": "round",
-                                        "stroke-linejoin": "round" })) {
-    svg.setAttribute(k, String(v));
-  }
-  const path = doc.createElementNS(SVG_NS, "path");
-  path.setAttribute("d", open ? CARET.open : CARET.shut);
-  svg.appendChild(path);
-  return svg;
-}
-
-function setCaret(btn, open) {
-  const doc = btn.ownerDocument;
-  btn.replaceChildren(caretSvg(doc, open));
-  btn.title = open ? "Hide" : "Show";
-  btn.setAttribute("aria-expanded", String(open));
-}
-
 /** A collapsed-by-default block, for the envelope nobody reads until they must. */
 function rawEl(label, text) {
   const d = document.createElement("details");
@@ -353,6 +329,12 @@ explore, propose a query, then draw from what the interface fetched">
 
       <div class="exp-exchanges" data-testid="exploration-exchanges"></div>
     </div>`;
+
+  // §2.6 R-P2: the disclosure is on the screen while the content is, in a
+  // small face at the foot of the pane.  Added before anything has run, so a
+  // reader sees "nothing here came from a model" become a model and a date
+  // rather than a mark appearing from nowhere at the end.
+  markStage(wrapper, null, { testid: "exploration-provenance" });
   container.appendChild(wrapper);
 
   const q = (sel) => wrapper.querySelector(sel);
@@ -694,6 +676,15 @@ explore, propose a query, then draw from what the interface fetched">
       });
       const result = await adapter.run(text);
       st.session = result.session || st.session;
+      // What produced what is now on this pane (§2.6 R-P2).  The identifier
+      // is the one the provider SERVED: the model asked for is the request,
+      // and the request is not the fact a reconstruction needs.
+      st.lastProvenance = {
+        model: result.model, servedModel: result.servedModel, served: result.served,
+        provider: result.provider, endpoint: result.endpoint, at: result.at,
+        account: accountName, repository: repositoryName,
+      };
+      markStage(wrapper, st.lastProvenance);
       setStatus(result.ok ? `done · ${result.iterations} turn(s)` : `failed · ${result.error}`);
 
       // Keep the run.  The service records which operations ran; only this side

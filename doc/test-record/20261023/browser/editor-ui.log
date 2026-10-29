@@ -1,0 +1,38 @@
+module : jsui/tests/view-editor-layout.browser.mjs
+run    : cd jsui && npm run test:editor-ui
+needs  : node + playwright's chromium; the script starts its own http
+         server over the working copy — fixtures, no host, no credentials
+date   : 2026-10-23T12:30:47Z
+----------------------------------------------------------------------
+
+the mouse inside a panel — firefox
+  ok   a click places the caret where it was clicked, not at 0 (got 7)
+  ok   and a sweep selects text rather than starting a drag (got "LECT * WHERE { ")
+  ok   no drag was begun from inside the text
+
+and the title bar still moves the panel — firefox
+  ok   a gesture that begins on the header is a drag
+  ok   and the panel is inert again as soon as it ends -- it is not left draggable
+
+the column follows the window — firefox
+  ok   a taller window makes the editors column taller (420 → 980)
+  ok   and the views list grows with it, so the two still close on the same line
+  ok   the content fills what the chrome leaves (1270 of 1400)
+  ok   and 420px is a floor, not a target, on a short window (got 420)
+
+the mouse inside a panel — chromium
+  ok   a click places the caret where it was clicked, not at 0 (got 7)
+  ok   and a sweep selects text rather than starting a drag (got "LECT * WHERE { ")
+  ok   no drag was begun from inside the text
+
+and the title bar still moves the panel — chromium
+  ok   a gesture that begins on the header is a drag
+  ok   and the panel is inert again as soon as it ends -- it is not left draggable
+
+the column follows the window — chromium
+  ok   a taller window makes the editors column taller (420 → 980)
+  ok   and the views list grows with it, so the two still close on the same line
+  ok   the content fills what the chrome leaves (1270 of 1400)
+  ok   and 420px is a floor, not a target, on a short window (got 420)
+
+18 passed, 0 failed

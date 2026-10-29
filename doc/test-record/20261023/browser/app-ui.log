@@ -1,0 +1,70 @@
+module : jsui/tests/app-frame.browser.mjs
+run    : cd jsui && npm run test:app-ui
+needs  : node + playwright's chromium; the script starts its own http
+         server over the working copy — fixtures, no host, no credentials
+date   : 2026-10-23T12:30:57Z
+----------------------------------------------------------------------
+
+the document mounts, and the toolbox is in the page
+  ok   the document validates
+  ok   its one view is a region of the page (D-AC)
+  ok   the toolbox helper is inlined, not imported — the frame loads nothing
+  ok   and the components it declared are registered
+  ok   while one it did not declare does not exist
+
+§8.2: a component in a bound slot is given the data, not drawn over
+  ok   the table the model put in the slot drew the rows
+  ok   and the runtime did not draw a second table over it
+  ok   and the provenance marking the page cannot opt out of is still on the slot
+
+§8.2: every component renders something sensible with nothing set
+  ok   nothing renders blank (all twelve say something)
+  ok   `graph` with no engine behind it says so rather than showing an empty box (§7.4)
+  ok   `tabs` builds its strip from the children's labels
+  ok   and opens on the first one
+
+§6.2.1: a presentational patch is applied IN PLACE
+  ok   the change is classified presentational
+  ok   and applied in place, not by reloading
+  ok   the slot changed
+  ok   the stylesheet changed
+  ok   and the page is the same document it was: nothing the reader had done was thrown away
+  ok   the replaced region was re-marked, because the fill runs after the patch
+  ok   and the data that was already in the page is still drawn — nothing was re-posted
+
+§6.2.1: patch-then-read equals rebuild-then-read
+  ok   the page reached by patching and the page reached by rebuilding are the same page
+
+§6.2.1: what the reader has done to the page survives a patch
+  ok   a tab switches on a click, inside the one view — tabs are not views (D-AC)
+  ok   clicking a header sorts without a round trip — the whole reason the component exists
+  ok   a patch to another region is applied in place
+  ok   the region named by the patch changed
+  ok   and the sort the reader had applied is still there
+  ok   as is the tab they had open
+
+§6.2.1: what the runtime cannot apply, it says so rather than guessing
+  ok   the component the document did not declare is not in the page
+  ok   a change to `uses` cannot be applied in place: a component that was not inlined is not there
+  ok   so the page is rebuilt
+  ok   and now it is
+  ok   with the data the page already had posted back into it, not fetched again
+
+U-37: only what `uses` names is in the page
+  ok   the size reported at Gate 1 counts the components
+  ok   and the saved page carries them, because it has nowhere to load them from
+
+U-42: `graph` draws through the vendored engine, not through a layout it wrote
+  ok   the component asked the pane to lay the graph out
+  ok   and an SVG came back into the page
+  ok   laid out by graphviz — three nodes, positioned by the engine rather than by a model
+  ok   with the coordinate system the engine computed
+
+U-43: a saved copy degrades honestly
+  ok   the saved page knows it is standalone
+  ok   and carries its data inline, so it still draws offline
+  ok   opened with no interface behind it, it draws the data it holds
+  ok   and a request it does not hold the answer to says so, rather than hanging
+  ok   with the reason shown in the page, where the reader is looking
+
+42 passed, 0 failed

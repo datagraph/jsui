@@ -1,0 +1,46 @@
+module : jsui/tests/router-query.test.mjs
+run    : cd jsui && npm run test:router
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:29Z
+----------------------------------------------------------------------
+1. views/new with an encoded query
+[Router] handlePath() called with: /account/test/repositories/foaf/views/new?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D%20%23%20all%0ALIMIT%2010
+[Router] Normalized to: /account/test/repositories/foaf/views/new?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D%20%23%20all%0ALIMIT%2010
+[Router] Route match found: true /account/:account_name/repositories/:repository_name/views/new
+[Router] Calling route handler for: /account/:account_name/repositories/:repository_name/views/new
+[Router] Route handler completed
+[Router] Calling onRouteChange with: /account/test/repositories/foaf/views/new
+  PASS the route matches (it did not before: ? is not in the ^...$ pattern)
+  PASS params still bind
+  PASS the query arrives verbatim, ? # and newline intact
+  PASS ctx.path carries no query
+  PASS onRouteChange gets the bare path
+  PASS currentPath is bare; currentSearch holds the rest
+2. the same route without a query still behaves
+[Router] handlePath() called with: /account/test/repositories/foaf/views/new
+[Router] Normalized to: /account/test/repositories/foaf/views/new
+[Router] Route match found: true /account/:account_name/repositories/:repository_name/views/new
+[Router] Calling route handler for: /account/:account_name/repositories/:repository_name/views/new
+[Router] Route handler completed
+[Router] Calling onRouteChange with: /account/test/repositories/foaf/views/new
+  PASS matches
+  PASS no seed
+  PASS empty search
+3. an unrelated route is unaffected
+[Router] handlePath() called with: /account/test/repositories/foaf
+[Router] Normalized to: /account/test/repositories/foaf
+[Router] Route match found: true /account/:account_name/repositories/:repository_name
+[Router] Calling route handler for: /account/:account_name/repositories/:repository_name
+[Router] Route handler completed
+[Router] Calling onRouteChange with: /account/test/repositories/foaf
+  PASS repository route matches
+4. a genuinely unknown path still reaches onNotFound
+[Router] handlePath() called with: /nope/at/all?x=1
+[Router] Normalized to: /nope/at/all?x=1
+[Router] Route match found: false none
+[Router] No route match, calling onNotFound
+[Router] Calling onRouteChange with: /nope/at/all
+  PASS onNotFound called
+  PASS and is given the query too
+
+  12 passed, 0 failed

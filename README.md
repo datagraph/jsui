@@ -290,6 +290,31 @@ PDF output is written to `tests/pdfs/` grouped by functional area, with an `inde
 | `requireSignupInvite` | `true` | Gate signup behind an invitation |
 | `showAccountBalances` | `false` | Show billing balance in account UI |
 
+## Installation
+
+In addition to the implementation files, the NGINX configuration must locate them.
+
+```
+  # Handle other /ui/ files (CSS, JS, images, etc.) normally
+  location ^~ /ui/ {
+    alias /opt/rails/public/javascripts/jsui/;
+    try_files $uri $uri/ =404;
+  }
+
+  # Serve /ui/user as HTML (replaces index.html)
+  location = /ui/user {
+    # root /opt/rails/public/javascripts/jsui;
+    default_type text/html;
+    alias /opt/rails/public/javascripts/jsui/index.html;
+  }
+  # Serve /ui/admin as HTML (replaces admin.html)
+  location = /ui/admin {
+    # root /opt/rails/public/javascripts/jsui;
+    default_type text/html;
+    alias /opt/rails/public/javascripts/jsui/admin.html;
+  }
+```
+
 ---
 
 ## License

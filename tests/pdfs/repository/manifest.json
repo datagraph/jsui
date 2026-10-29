@@ -1,1 +1,123 @@
-[]
+[
+  {
+    "requirement": "REQ-3.2.1",
+    "title": "Edit Repository Metadata",
+    "section": "repository",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Profile fields populated with new values",
+    "filename": "req-3-2-1-edit-repository-metadata-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:58:48.594Z"
+  },
+  {
+    "requirement": "REQ-3.2.1",
+    "title": "Edit Repository Metadata",
+    "section": "repository",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository profile before editing",
+    "filename": "req-3-2-1-edit-repository-metadata-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:58:48.307Z"
+  },
+  {
+    "requirement": "REQ-3.2.3",
+    "title": "Save Repository Configuration",
+    "section": "repository",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Repository configuration saved",
+    "filename": "req-3-2-3-save-repository-configuration-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:58:49.930Z"
+  },
+  {
+    "requirement": "REQ-3.2.3",
+    "title": "Save Repository Configuration",
+    "section": "repository",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository with unsaved changes",
+    "filename": "req-3-2-3-save-repository-configuration-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:58:48.868Z"
+  },
+  {
+    "requirement": "REQ-3.3.1",
+    "title": "Create Repository",
+    "section": "repository",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Repository created and open",
+    "filename": "req-3-3-1-create-repository-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:21:37.104Z"
+  },
+  {
+    "requirement": "REQ-3.3.1",
+    "title": "Create Repository",
+    "section": "repository",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account pane before creating a repository",
+    "filename": "req-3-3-1-create-repository-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:21:35.616Z"
+  },
+  {
+    "requirement": "REQ-3.3.1",
+    "title": "Create Repository",
+    "section": "repository",
+    "phase": "dialog-open",
+    "stepIndex": 0,
+    "description": "New repository dialog displayed",
+    "filename": "req-3-3-1-create-repository-dialog-open.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:21:35.960Z"
+  },
+  {
+    "requirement": "REQ-3.6.1",
+    "title": "Clear Repository",
+    "section": "repository",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Clear confirmation requested and declined",
+    "filename": "req-3-6-1-clear-repository-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:21:43.450Z"
+  },
+  {
+    "requirement": "REQ-3.6.1",
+    "title": "Clear Repository",
+    "section": "repository",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository before clear",
+    "filename": "req-3-6-1-clear-repository-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:21:41.157Z"
+  },
+  {
+    "requirement": "REQ-3.7.1",
+    "title": "Manage Collaborators",
+    "section": "collaboration",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "New collaborator row with permissions",
+    "filename": "req-3-7-1-manage-collaborators-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:21:30.515Z"
+  },
+  {
+    "requirement": "REQ-3.7.1",
+    "title": "Manage Collaborators",
+    "section": "collaboration",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Collaboration section",
+    "filename": "req-3-7-1-manage-collaborators-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:21:28.988Z"
+  }
+]

@@ -3,6 +3,13 @@ import { escapeHtml, joinHtml } from "../utils.js";
 import { APP_CONFIG } from "../../lib/config.js";
 import { authenticateAccount } from "../../lib/auth.js";
 import { buildLoginFormHtml, readLastUsername } from "../components/login-form.js";
+import { isAdministrator, agentRole } from "../../lib/models/roles.js";
+import { accountRows, enrichAccount, sortAccounts, visibleAccounts, COLUMNS }
+  from "../../lib/models/accounts.js";
+import { collaborationRows, collaboratingAccounts, collaborationPath }
+  from "../../lib/models/collaboration.js";
+import { historyPath } from "../../lib/models/history.js";
+import { renderHistoryTable } from "../components/history-table.js";
 
 const BASE_PATH = APP_CONFIG.basePath || "";
 const ADMIN_PATH = `${BASE_PATH}/admin`;
@@ -56,9 +63,11 @@ export class AdminLoginPage extends BasePage {
         const result = await authenticateAccount({ host, accountName, secret });
 
         // Determine admin status from the config already returned by authenticateAccount
-        const adminOf = result.config.administrator_of;
-        const isAdmin = adminOf === "http://dydra.com"
-          || (Array.isArray(adminOf) && adminOf.includes("http://dydra.com"));
+        // REQ-1.1.5.  One derivation, in `lib/models/roles.js', used by this
+        // app and the user app alike.  It used to be the expression below,
+        // here and nowhere else, which is why the user app could not tell an
+        // administrator from anyone else.
+        const isAdmin = isAdministrator(result.config);
 
         // Store auth, admin status, and navigate
         app.state.authStore.setAuth(accountName, result.token, result.config, result.baseUrl);
@@ -200,12 +209,36 @@ export class AdminDashboardPage extends BasePage {
     this.attachPaneHandlers(lazyType, auth);
   }
 
+  /**
+   * The account listing (REQ-2.4.1 … REQ-2.4.4).
+   *
+   * Four columns, orderable by any of them, scoped by role.  Only the first
+   * column is in the response: `compute-get-accounts' declares the dimensions
+   * `(id uri title readable writable)' and then collects `(list name)', so
+   * `GET /system/accounts' answers names.  Creation, last use and the
+   * repository count are each derived per account -- events for the first
+   * two, the repositories listing for the third -- which is three requests
+   * per row and is why they are fetched AFTER the table is on screen, by
+   * `enrichAccountsPane', rather than held in front of it.
+   *
+   * A column that has not arrived shows `—', not `0'.  An unfetched count
+   * displayed as zero is a wrong answer rather than a missing one, and it
+   * sorts as a wrong answer too.
+   */
   async renderAccountsPane(auth) {
     if (!auth) return "<p>Not authenticated.</p>";
 
-    const isAdmin = this.context?.app?.state?.isAdmin;
+    const state = this.context?.app?.state;
+    const accountName = state?.session?.accountName || null;
+    const isAdmin = !!(state?.isAdmin
+      || isAdministrator(auth?.config)
+      || (accountName && isAdministrator(state?.authStore?.getConfig(accountName))));
 
-    let accounts;
+    this._accountSort = this._accountSort || { field: "name", direction: "asc" };
+    this._accountFacts = this._accountFacts || new Map();
+
+    let rows = [];
+    let note = "";
     if (isAdmin) {
       const url = `${auth.host}/system/accounts?_=${Date.now()}`;
       const resp = await fetch(url, {
@@ -219,16 +252,44 @@ export class AdminDashboardPage extends BasePage {
       if (!resp.ok) {
         return `<p>Error loading accounts: ${resp.status}</p>`;
       }
-      const data = await resp.json();
-      accounts = Array.isArray(data)
-        ? data.map((item) => typeof item === "string" ? item : (item.id || item.name || item.friendlyId))
-        : Object.keys(data);
-      accounts.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+      rows = accountRows(await resp.json());
     } else {
-      // Non-admin: show only the authenticated user's own account
-      const ownAccount = this.context?.app?.state?.session?.accountName;
-      accounts = ownAccount ? [ownAccount] : [];
+      // REQ-2.4.4: everyone else sees their own account and the accounts
+      // behind the repositories shared with them.  The collaborations are
+      // read here rather than assumed, and the result NARROWS what the
+      // server returned -- it cannot add an account the server withheld.
+      let collaborations = [];
+      try {
+        const resp = await fetch(`${auth.host}${collaborationPath(accountName || "")}`, {
+          cache: "no-store",
+          headers: { Accept: "application/json", Authorization: `Bearer ${auth.token}` },
+        });
+        if (resp.ok) {
+          collaborations = collaboratingAccounts(
+            collaborationRows(await resp.json(), { accountName }));
+        }
+      } catch { /* a listing of one is still a listing */ }
+      rows = visibleAccounts(
+        accountRows([accountName, ...collaborations].filter(Boolean)),
+        { administrator: false, accountName, collaborations });
+      note = `<p style="color:#8a94a0;font-size:11px;margin:4px 0;">`
+           + `Your own account and the accounts that share a repository with you.</p>`;
     }
+
+    // Anything already fetched by a previous pass survives a re-render.
+    rows = rows.map((r) => this._accountFacts.has(r.name)
+      ? enrichAccount(r, this._accountFacts.get(r.name)) : r);
+    rows = sortAccounts(rows, this._accountSort.field, this._accountSort.direction);
+
+    const caps = agentRole({
+      configuration: accountName ? state?.authStore?.getConfig(accountName) : null,
+      accountName,
+    });
+    const arrow = (key) => this._accountSort.field === key
+      ? (this._accountSort.direction === "asc" ? " ▲" : " ▼") : "";
+    const cell = (value) => value == null || value === ""
+      ? `<span style="color:#b3bac1;" title="not yet fetched">—</span>`
+      : escapeHtml(String(value));
 
     return `
       <h2>
@@ -238,23 +299,28 @@ export class AdminDashboardPage extends BasePage {
         </span>
         Accounts
       </h2>
+      ${note}
       <div class="scrollable-list" style="max-height:400px;overflow-y:auto;border:1px solid #ccc;">
-        <table class="admin" style="width:100%;">
+        <table class="admin" style="width:100%;" data-testid="admin-accounts-table">
           <thead style="position:sticky;top:0;background:#eee;z-index:1;">
             <tr>
               <th style="width:30px;"><input type="checkbox" class="account-checkbox-all" title="Check/uncheck all" /></th>
-              <th>Account</th>
+              ${COLUMNS.map((c) => `<th><a href="#" class="account-sort" data-sort="${c.key}" data-testid="account-sort-${c.key}" style="color:inherit;text-decoration:none;">${escapeHtml(c.label)}${arrow(c.key)}</a></th>`).join("")}
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            ${accounts.map((name, i) => `
-              <tr class="${i % 2 === 0 ? "even" : "odd"}">
-                <td><input type="checkbox" class="account-checkbox" data-account="${escapeHtml(name)}" ${this.checkedAccounts.has(name) ? "checked" : ""} /></td>
-                <td><a href="${BASE_PATH}/account/${encodeURIComponent(name)}" data-external>${escapeHtml(name)}</a></td>
+            ${rows.map((row, i) => `
+              <tr class="${i % 2 === 0 ? "even" : "odd"}" data-account-row="${escapeHtml(row.name)}">
+                <td><input type="checkbox" class="account-checkbox" data-account="${escapeHtml(row.name)}" ${this.checkedAccounts.has(row.name) ? "checked" : ""} /></td>
+                <td><a href="${BASE_PATH}/account/${encodeURIComponent(row.name)}" data-external>${escapeHtml(row.name)}</a></td>
+                <td data-field="created">${cell(row.created)}</td>
+                <td data-field="lastUsed">${cell(row.lastUsed)}</td>
+                <td data-field="repositories" style="text-align:right;">${cell(row.repositories)}</td>
                 <td class="actions">
-                  <a href="#" class="account-details" data-account="${escapeHtml(name)}">Details</a>
-                  ${isAdmin ? `<button type="button" class="account-delete-btn" data-account="${escapeHtml(name)}" data-testid="admin-account-delete-btn-${escapeHtml(name)}" style="background:transparent;border:none;padding:4px;cursor:pointer;margin-left:8px;vertical-align:middle;" title="Delete Account">
+                  <a href="#" class="account-details" data-account="${escapeHtml(row.name)}">Details</a>
+                  <a href="#" class="account-events" data-account="${escapeHtml(row.name)}" data-testid="account-events-${escapeHtml(row.name)}" style="margin-left:8px;">Events</a>
+                  ${caps.mayDeleteAccount(row.name) ? `<button type="button" class="account-delete-btn" data-account="${escapeHtml(row.name)}" data-testid="admin-account-delete-btn-${escapeHtml(row.name)}" style="background:transparent;border:none;padding:4px;cursor:pointer;margin-left:8px;vertical-align:middle;" title="Delete Account">
                     <img src="${BASE_PATH}/images/trash.svg" alt="Delete" style="width:16px;height:16px;opacity:0.6;" />
                   </button>` : ""}
                 </td>
@@ -264,6 +330,57 @@ export class AdminDashboardPage extends BasePage {
         </table>
       </div>
     `;
+  }
+
+  /**
+   * Fill the three columns the listing does not carry (REQ-2.4.2).
+   *
+   * Three requests per account, so: after the paint, bounded, and cached on
+   * the instance so that sorting or refreshing does not pay for them again.
+   * A failure fills nothing and says nothing -- the cell keeps its `—', which
+   * is what it already said.
+   */
+  async enrichAccountsPane(auth, { limit = 50 } = {}) {
+    if (!auth?.token || !auth?.host) return;
+    const table = document.querySelector('[data-testid="admin-accounts-table"]');
+    if (!table) return;
+    this._accountFacts = this._accountFacts || new Map();
+    const names = [...table.querySelectorAll("[data-account-row]")]
+      .map((tr) => tr.dataset.accountRow)
+      .filter((n) => n && !this._accountFacts.has(n))
+      .slice(0, limit);
+
+    const ask = async (path) => {
+      try {
+        const r = await fetch(`${auth.host}${path}`, {
+          cache: "no-store",
+          headers: { Accept: "application/json", Authorization: `Bearer ${auth.token}` },
+        });
+        return r.ok ? await r.json() : null;
+      } catch { return null; }
+    };
+
+    await Promise.all(names.map(async (name) => {
+      const [events, repositories] = await Promise.all([
+        ask(historyPath({ account: name })),
+        ask(`/system/accounts/${encodeURIComponent(name)}/repositories`),
+      ]);
+      const facts = {
+        events: Array.isArray(events) ? events : null,
+        repositories: Array.isArray(repositories) ? repositories : null,
+      };
+      this._accountFacts.set(name, facts);
+      const filled = enrichAccount({ name }, facts);
+      const row = table.querySelector(`[data-account-row="${CSS.escape(name)}"]`);
+      if (!row) return;
+      const put = (field, value) => {
+        const td = row.querySelector(`[data-field="${field}"]`);
+        if (td && value != null) td.textContent = String(value);
+      };
+      put("created", filled.created);
+      put("lastUsed", filled.lastUsed);
+      put("repositories", filled.repositories);
+    }));
   }
 
   async renderRepositoriesPane(auth) {
@@ -1152,6 +1269,66 @@ export class AdminDashboardPage extends BasePage {
     const app = this.context?.app;
 
     if (lazyType === "accounts") {
+      // REQ-2.4.2: the three derived columns, after the paint.
+      this.enrichAccountsPane(auth).catch(() => {});
+
+      // REQ-2.4.3: ordered optionally by any field.  The sort is held on the
+      // instance and the pane re-rendered, so that the order survives the
+      // enrichment arriving and a refresh alike.
+      document.querySelectorAll(".account-sort").forEach((link) => {
+        link.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const field = link.dataset.sort;
+          const current = this._accountSort || { field: "name", direction: "asc" };
+          this._accountSort = {
+            field,
+            direction: current.field === field && current.direction === "asc" ? "desc" : "asc",
+          };
+          const pane = document.getElementById("admin-accounts");
+          if (pane) {
+            pane.dataset.loaded = "false";
+            await this.loadPaneContent("admin-accounts", auth);
+          }
+        });
+      });
+
+      // S-6/S-7: there is no endpoint that answers events for several accounts,
+      // and the event JSON carries no target field, so one could not be built
+      // on the shape the service has.  The listing therefore offers to fetch
+      // ONE account's events, on demand, from the per-account resource that
+      // does exist.  Expanded in place under the row, because an account's
+      // events only mean anything beside the account they belong to.
+      document.querySelectorAll(".account-events").forEach((link) => {
+        link.addEventListener("click", async (e) => {
+          e.preventDefault();
+          const name = link.dataset.account;
+          const row = link.closest("tr");
+          if (!row || !name) return;
+          const existing = row.nextElementSibling;
+          if (existing && existing.dataset.eventsFor === name) {
+            existing.remove();                      // a second click closes it
+            return;
+          }
+          const span = row.children.length;
+          const holder = document.createElement("tr");
+          holder.dataset.eventsFor = name;
+          holder.setAttribute("data-testid", `account-events-row-${name}`);
+          holder.innerHTML = `<td colspan="${span}" style="background:#fbfbfc;padding:8px 12px;">Loading events…</td>`;
+          row.after(holder);
+          const cell = holder.firstElementChild;
+          try {
+            const resp = await fetch(`${auth.host}${historyPath({ account: name })}`, {
+              cache: "no-store",
+              headers: { Accept: "application/json", Authorization: `Bearer ${auth.token}` },
+            });
+            const events = resp.ok ? await resp.json() : [];
+            cell.innerHTML = renderHistoryTable(events);
+          } catch (err) {
+            cell.textContent = `Could not read events: ${err.message}`;
+          }
+        });
+      });
+
       const refreshAccountsBtn = document.querySelector(".admin-refresh-accounts-btn");
       if (refreshAccountsBtn && auth) {
         refreshAccountsBtn.addEventListener("click", async () => {

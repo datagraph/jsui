@@ -1,0 +1,164 @@
+module : jsui/tests/figure.test.mjs
+run    : cd jsui && npm run test:figure
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:31Z
+----------------------------------------------------------------------
+
+U-10: the payload travels with its media type
+  ok   the document is returned
+  ok   and the notation it is written in, which used to be dropped one line early
+  ok   a resource that states no type says null rather than guessing one
+  ok   a bare text content is still read
+  ok   and nothing is read out of nothing
+  ok   callers that only ever wanted the text have that
+  ok   and sparqlFrom still reads a message as well as a string
+
+U-10: and the model is told, in the tool result itself
+  ok   the notation is stated above the document the model reads
+  ok   and the document itself is all still there
+  ok   the event carries it too, so the record can say what the model was handed
+
+U-11: offering `query' is not offering a write
+  ok   a figure run offers both, because a figure is drawn from a query
+  ok   while the plain exploration run still offers survey alone
+  ok   the dashboard run offers the same pair, for the same reason
+  ok   a write notation is refused
+  ok   and the refusal names it, rather than saying `not allowed'
+  ok   so is a body whose operative keyword is a DELETE, whatever the notation said
+  ok   while a SELECT carrying the word in a literal is a read, which is why this is not a grep
+  ok   a tool outside the list is refused
+  ok   and an ordinary survey goes through
+
+U-11: the screen reads the arguments the SERVICE actually defines
+  ok   a document may arrive as `text' (query) or as `body' (survey), and both are read
+  ok   a DELETE in `text' is refused -- screening only `body' left the one tool the screen exists for entirely unread
+  ok   and the refusal names the argument it found it in
+  ok   the score notation is `application/score', which is what the service advertises
+  ok   and not `text/x-score', which it has never accepted -- a model asking for the notation its own primer teaches would have been refused by this side
+  ok   response notations are not request notations and are no longer mixed in
+  ok   one notation writes by its name alone; GraphQL does not, which is why it is read
+  ok   so an ordinary score request goes through
+
+U-11: GraphQL writes by a keyword, not by a media type
+  ok   a mutation is one
+  ok   the anonymous shorthand is a query -- that is what it means
+  ok   a document that opens with a fragment is still what its operation says
+  ok   the word inside a string is not an operation
+  ok   nor is it inside a comment
+  ok   nor is a FIELD called mutation, which is why the scan tracks depth
+  ok   so a GraphQL mutation is refused
+  ok   and said to be one, rather than reported as a SPARQL form it is not
+  ok   while a GraphQL query goes through
+  ok   the JSON envelope is opened and the document inside it screened
+  ok   and an enveloped query is still a read
+
+U-11: the adapter applies it when nothing else is
+  ok   the write never reached the service -- it was stopped on this side
+  ok   and the refusal is in the record, with its reason
+  ok   the model is told, rather than left to infer it from a silence
+
+U-11: a grant, where there is one, remains the policy
+  ok   a grant made writable passes a write
+  ok   while the default read-only grant refuses it, using the same screen
+
+U-12: the prompt says that drawing is step 3
+  ok   the base prompt is kept
+  ok   and the three steps are named
+  ok   with the instruction NOT to draw from what it sampled, which is the point of the split
+  ok   the proposal's output contract is stated
+  ok   and the notations are priced, since the model is choosing one (D-L)
+  ok   the drawing turn is told it has no store
+  ok   and the frame's rules, which it cannot discover: a blocked fetch reports nothing
+  ok   the figure must scale
+  ok   and it is warned that running out of tokens does not look like failure
+  ok   the drawing turn gets room, for the same reason
+  ok   a CONSTRUCT is offered turtle, not a table
+
+U-12: the drawing turn carries the result and the question
+  ok   the original question travels, or the figure is a generic rendering of the columns
+  ok   so does the query -- column names rarely say what a column means
+  ok   and the result is announced as what it is
+  ok   including the view it was run as, when there was one
+  ok   a whole document says nothing about being cut
+  ok   and a head says so, because a total drawn from a head is wrong in the way nobody checks
+
+U-15: figureFrom
+  ok   an svg fence is an svg
+  ok   the element comes back whole
+  ok   and the caption is the model's own sentence, not the pane's guess at one
+  ok   a terminated element is complete
+  ok   a figure cut off mid-element is still READ
+  ok   and reported incomplete -- it would render, which is exactly why it must not be shown
+  ok   DOT is recognised and brace-checked
+  ok   an unbalanced DOT graph is incomplete
+  ok   an answer that forgot the fence is still an answer
+  ok   and prose with no figure is null
+  ok   the last block wins, so a model that reconsiders is not overruled by its first attempt
+
+the proposal is validated, not trusted
+  ok   the query and the figure block are both read
+  ok   the model's own choices are kept
+  ok   a malformed block is simply absent
+  ok   a proposal that is not a read does not reach the user as runnable
+  ok   a notation the form cannot produce is corrected to one it can
+  ok   and the correction is visible at Gate 1, not applied quietly
+  ok   a DOT proposal is given a layout engine, since there is one to give
+  ok   and is no longer warned that nothing will draw it
+  ok   the model's choice of engine is honoured
+  ok   an engine that does not exist is corrected, visibly, before anything runs
+  ok   and an SVG carries no engine: there is nothing to lay out
+  ok   an ASK is asked for in a notation that can express a boolean
+
+the row cap is the lever Gate 1 offers
+  ok   a cap is appended
+  ok   no cap, no change
+  ok   a query that already limits is left alone: the model chose that number and said why
+
+D-M: the figure frame runs nothing
+  ok   every sandbox restriction, scripts included -- a picture does not have to run
+  ok   and the policy says so a second time
+  ok   nothing is loaded and nothing is sent
+  ok   the dashboard's one concession is not made here
+  ok   the figure is in the document as written -- nothing is sanitised
+  ok   and the document says who drew it, in the artifact and not only in the transcript (D-N)
+  ok   with the digest of what it was drawn from, so a copy found later can be matched
+  ok   the policy travels with the file it governs, so a saved copy is governed too
+  ok   a DOT figure that has not been laid out is shown as source
+  ok   and the reason is given, rather than leaving a wall of text unexplained
+  ok   a graph that would not lay out says what the engine said
+  ok   a laid-out graph saves as the drawing AND the source it was drawn from
+  ok   with the source escaped, since it is text in a document and not markup
+  ok   and the provenance names the engine: the geometry is not the model's work
+  ok   and does not also carry the note for a graph that was not drawn
+
+what the policy will silently refuse is said out loud
+  ok   a script element is named
+  ok   so is an inline handler
+  ok   so is an external image
+  ok   so is a foreignObject
+  ok   and a figure that keeps inside the rules draws no notes
+  ok   a figure with no viewBox cannot scale, and is told so
+  ok   the ratio is read from the viewBox, since nothing in the frame can measure itself
+  ok   and a figure without one falls back rather than collapsing
+
+U-16: a figure is its own exchange kind
+  ok   Phase 2 is recorded with the document the INTERFACE fetched
+  ok   and by what route, because that is the difference between proposing and executing
+  ok   the figure is kept, not just the fact that there was one
+  ok   with its caption
+
+U-16: and its own node, joined to the result by a digest
+  ok   the figure is a node of its own, typed with rdf:type -- which is what a query for it asks
+  ok   marked model-produced, which D-N says is never presented as the repository's own output
+  ok   carrying the digest and the cardinality of what it was drawn from
+  ok   and the query, so the run can be repeated
+  ok   and what the user decided, which is the most useful line in the record later
+  ok   the figure itself is digested too
+  ok   and kept whole: a record of a picture holds it
+
+U-16: reading it back does not mistake a figure for a run
+  ok   one run -- the figure and the dashboard nodes are not read as runs with no prompt
+  ok   the figure comes back attached to the run that drew it
+  ok   with the digest that joins it to the data, which is the question the record exists to answer
+
+123 passed, 0 failed

@@ -1,0 +1,151 @@
+module : jsui/tests/toolbox.test.mjs
+run    : cd jsui && npm run test:toolbox
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:33Z
+----------------------------------------------------------------------
+
+§8.3: twelve components, in two tiers, cut from the first draft's seventy
+  ok   seven in tier 1 — the page's own furniture
+  ok   six in tier 2 — five data components and `graph'
+  ok   thirteen names a document may use, and `base' is not one of them
+  ok   tier 1 is layout and text
+  ok   tier 2 is bound to data
+  ok   and the whole of it answers to contract version 1
+
+every component keeps the same shape (Appendix A, Appendix B)
+  ok   base: has source
+  ok   base: a manifest with a name, a version and one line of purpose
+  ok   grid: has source
+  ok   grid: a manifest with a name, a version and one line of purpose
+  ok   grid: one element name, and the manifest agrees with it
+  ok   grid: and the source registers exactly that name
+  ok   panel: has source
+  ok   panel: a manifest with a name, a version and one line of purpose
+  ok   panel: one element name, and the manifest agrees with it
+  ok   panel: and the source registers exactly that name
+  ok   card: has source
+  ok   card: a manifest with a name, a version and one line of purpose
+  ok   card: one element name, and the manifest agrees with it
+  ok   card: and the source registers exactly that name
+  ok   tabs: has source
+  ok   tabs: a manifest with a name, a version and one line of purpose
+  ok   tabs: one element name, and the manifest agrees with it
+  ok   tabs: and the source registers exactly that name
+  ok   metric: has source
+  ok   metric: a manifest with a name, a version and one line of purpose
+  ok   metric: one element name, and the manifest agrees with it
+  ok   metric: and the source registers exactly that name
+  ok   badge: has source
+  ok   badge: a manifest with a name, a version and one line of purpose
+  ok   badge: one element name, and the manifest agrees with it
+  ok   badge: and the source registers exactly that name
+  ok   key-value: has source
+  ok   key-value: a manifest with a name, a version and one line of purpose
+  ok   key-value: one element name, and the manifest agrees with it
+  ok   key-value: and the source registers exactly that name
+  ok   table: has source
+  ok   table: a manifest with a name, a version and one line of purpose
+  ok   table: one element name, and the manifest agrees with it
+  ok   table: and the source registers exactly that name
+  ok   bar-chart: has source
+  ok   bar-chart: a manifest with a name, a version and one line of purpose
+  ok   bar-chart: one element name, and the manifest agrees with it
+  ok   bar-chart: and the source registers exactly that name
+  ok   line-chart: has source
+  ok   line-chart: a manifest with a name, a version and one line of purpose
+  ok   line-chart: one element name, and the manifest agrees with it
+  ok   line-chart: and the source registers exactly that name
+  ok   select: has source
+  ok   select: a manifest with a name, a version and one line of purpose
+  ok   select: one element name, and the manifest agrees with it
+  ok   select: and the source registers exactly that name
+  ok   term: has source
+  ok   term: a manifest with a name, a version and one line of purpose
+  ok   term: one element name, and the manifest agrees with it
+  ok   term: and the source registers exactly that name
+  ok   graph: has source
+  ok   graph: a manifest with a name, a version and one line of purpose
+  ok   graph: one element name, and the manifest agrees with it
+  ok   graph: and the source registers exactly that name
+
+§8.2: no component may fetch, store or import
+  ok   base: reaches for nothing the frame does not have
+  ok   grid: reaches for nothing the frame does not have
+  ok   panel: reaches for nothing the frame does not have
+  ok   card: reaches for nothing the frame does not have
+  ok   tabs: reaches for nothing the frame does not have
+  ok   metric: reaches for nothing the frame does not have
+  ok   badge: reaches for nothing the frame does not have
+  ok   key-value: reaches for nothing the frame does not have
+  ok   table: reaches for nothing the frame does not have
+  ok   bar-chart: reaches for nothing the frame does not have
+  ok   line-chart: reaches for nothing the frame does not have
+  ok   select: reaches for nothing the frame does not have
+  ok   term: reaches for nothing the frame does not have
+  ok   graph: reaches for nothing the frame does not have
+  ok   and none of them carries a </script, which would end the element it is inlined into
+
+§8.2: a component backed by an engine declares what it needs
+  ok   `graph' declares graphviz rather than carrying a layout algorithm (§8.4)
+  ok   and computes no layout itself — the pane runs the vendored engine
+  ok   it asks for one through the channel the frame provides
+  ok   and says so when there is none, instead of showing an empty box (§7.4)
+  ok   which this host can provide, so the document validates
+
+§8.2: every component renders something with no properties set
+  ok   metric: says what is missing rather than rendering nothing
+  ok   key-value: says what is missing rather than rendering nothing
+  ok   table: says what is missing rather than rendering nothing
+  ok   bar-chart: says what is missing rather than rendering nothing
+  ok   line-chart: says what is missing rather than rendering nothing
+  ok   term: says what is missing rather than rendering nothing
+  ok   graph: says what is missing rather than rendering nothing
+  ok   select: says what is missing rather than rendering nothing
+
+D-Y: only the components a document names are inlined
+  ok   the two that were named
+  ok   and not the other eleven
+  ok   with the shared helper first, because the components call into it as they register
+  ok   which is what reaches the page
+  ok   a page that names none carries none — not even the helper
+  ok   and a component named twice is inlined once
+
+U-37: the page carries what it uses, and Gate 1 can say what that costs
+  ok   a page using a chart validates
+  ok   and its size is reported with the component's share broken out
+  ok   including the helper it pulled in, because those are bytes too
+  ok   the built page holds the chart and not the graph
+  ok   and the helper the chart calls into
+  ok   after the runtime, which the components use
+  ok   a page that uses no component carries no component at all
+
+§8.5: the catalog is subsettable, because it costs tokens on every request
+  ok   a request that mentions no graph does not carry the graph manifest
+  ok   while the core is always carried: layout costs almost nothing and every page uses some
+  ok   a request about a network does carry it
+  ok   and one about a trend, the line chart
+  ok   and one about choosing, the control
+  ok   a caller may name components outright — which a follow-up turn does, for what the page already uses
+  ok   and `all' is the whole toolbox
+
+the catalog reads as one line of purpose, the properties, and one example
+  ok   the element name
+  ok   and the COMPONENT name beside it, which is the one `uses' takes
+  ok   with the instruction saying which of the two goes where, and showing it
+  ok   its properties with their types
+  ok   its events
+  ok   and exactly one example each — not three
+  ok   closing with D-AB: the catalog describes conveniences, not the grammar
+  ok   stated plainly, because a model handed a list will reach for it even where markup says it better
+  ok   and one component can be described on its own, for a follow-up turn that needs only that
+  ok   an unknown name describes nothing
+
+§13.9: what the catalog costs is measured, not guessed
+  ok   the whole toolbox costs more than a subset of it
+  ok   and the figure is an estimate, labelled as one
+  ok   the full catalog is thirteen components
+
+the measurement and the inlining agree
+  ok   the size reported at Gate 1 is the size of what is actually put in the page
+
+122 passed, 0 failed

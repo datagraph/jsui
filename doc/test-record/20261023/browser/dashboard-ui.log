@@ -1,0 +1,112 @@
+module : jsui/tests/dashboard-frame.browser.mjs
+run    : cd jsui && npm run test:dashboard-ui
+needs  : node + playwright's chromium; the script starts its own http
+         server over the working copy — fixtures, no host, no credentials
+date   : 2026-10-23T12:30:50Z
+----------------------------------------------------------------------
+
+D-R: the sandbox is the enabling constraint
+  ok   scripts are allowed
+  ok   and same-origin is not -- the one pair that must never appear together
+  ok   so the embedder cannot read into the frame: its origin is opaque
+  ok   the page is there and running
+  ok   and the frame cannot read out: parent.document throws
+  ok   storage is unavailable, so nothing can be stashed between runs
+  ok   reading a cookie does not return empty -- it throws, because there is no origin to have cookies for
+  ok   the origin is opaque, which is what makes all of the above true at once
+  ok   connect-src 'none': a fetch the page tries anyway is refused
+
+D-P: the page binds, computes and marks
+  ok   a bound slot is filled from the results the pane posted in
+  ok   and marked with the view it came from
+  ok   a derived slot runs the model's own function over that data -- 120 + 80
+  ok   and says it was computed rather than fetched
+  ok   a sentence written from a panel says which
+  ok   and one that came from outside says that instead -- the distinction survives into the artifact
+
+D-T: a sentence is marked when the data under it moves
+  ok   the passage is flagged in place, not removed
+  ok   and the flag names the panel whose data changed
+  ok   a passage citing nothing is left alone, because it never claimed a number
+  ok   while the computed value simply recomputes -- which is the whole point of declaring it
+
+the page asks for a refresh; it cannot perform one
+  ok   dashboard.refresh() reaches the pane by postMessage
+  ok   and the pane, not the page, decides whether to honour it
+
+a transform that throws says what it said
+  ok   the report still says where
+  ok   and now also what: "TypeError: rows is not iterable"
+  ok   the slot is marked as failed rather than left blank
+  ok   and says so in the page, where the reader is looking
+  ok   with its provenance intact -- a failed region is still a declared region
+
+the pane: Gate 0 before anything is asked
+  ok   the pane opens beside the view editors
+  ok   the grant names its repos
+  ok   the grant names its queries
+  ok   the grant names its rows
+  ok   the grant names its bytes
+  ok   the grant names its readonly
+  ok   the grant names its catalog
+  ok   read-only by default
+  ok   and nothing has been sent to the model: the grant comes first
+  ok   Gate 1 does not exist yet
+
+Phase 1 runs inside the grant, and Gate 1 reviews the set
+  ok   the model ran
+  ok   and NOTHING was run against the store on its behalf: the model proposes, it does not execute
+  ok   the meter shows what the grant has spent, live
+  ok   Gate 1 shows the query
+  ok   every region, by kind
+  ok   including the transform's source -- a derived number is only checkable against it
+  ok   and which sentences nothing in the repository supports
+  ok   and the button says how much will run
+
+every stage and every box can be collapsed, like a view editor
+  ok   every stage carries one
+  ok   open by default — a gate that hid what it was asking about would not be a gate
+  ok   drawn as the caret js/sparql-editor.js draws, down for shown
+  ok   the panel has its own
+  ok   the transform has its own
+  ok   the assertion has its own
+  ok   and pressing it hides the query, which is what buries this screen
+  ok   with the caret turned to face the state it is now in
+  ok   the button to run stays where it was: collapsing is tidying, not withdrawing
+  ok   clicking anywhere on the header works too, since a 16px square is findable only by someone already looking for it
+  ok   a collapsed stage takes its body with it
+  ok   while the stage itself stays on the screen, so the run is still readable as a sequence
+  ok   and it comes back
+
+every stage discloses what produced it, and when
+  ok   a stage carries a footnote
+  ok   saying what generated it
+  ok   named as the PROVIDER SERVED it — the fixture answers a request for one model with another, and the served identifier is the fact a reconstruction needs
+  ok   and when
+  ok   with the repository, so the mark cannot be read as saying a model invented the data
+  ok   and which obligation it answers
+  ok   the same facts as data on the element, for a program that will not parse prose (R-P4)
+  ok   including whether the identifier is the served one or only the requested one
+  ok   a stage nothing was generated on says so, rather than showing a mark with blanks in it — over-marking is how a reader learns to ignore every mark
+  ok   and collapsing the stage does NOT take its disclosure with it: a mark the reader can fold away is absent exactly when someone is looking past the interface
+
+Phase 2 is the interface's own, and Gate 2 follows it
+  ok   the panel is run once, by the pane
+  ok   in the notation the panel asked for
+  ok   and the catalogue was not written, because that box was not ticked
+  ok   the page is mounted
+  ok   in the same frame the policy describes
+  ok   Gate 2 offers keep
+  ok   Gate 2 offers save
+  ok   Gate 2 offers refresh
+  ok   Gate 2 offers discard-page
+
+an answer cut off at the ceiling is reported as that, not as a refusal
+  ok   the gate says the turn hit the ceiling, and names the ceiling
+  ok   and gives the remedy that belongs to THIS failure
+  ok   not the one that belongs to a model that declined
+  ok   prose from an earlier turn is marked as not being the answer
+  ok   naming which turn it came from
+  ok   and nothing is offered to run, because there is nothing to run
+
+82 passed, 0 failed

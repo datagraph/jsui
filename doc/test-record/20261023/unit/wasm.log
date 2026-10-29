@@ -1,0 +1,59 @@
+module : jsui/tests/wasm-graphviz.test.mjs
+run    : cd jsui && npm run test:wasm
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:32Z
+----------------------------------------------------------------------
+
+the engine is in the repository, not on a CDN
+  ok   the engine is checked in
+  ok   and it is the whole thing (796K)
+  ok   with the licence it came under, beside it
+  ok   and the exact version, so what is here can be re-derived
+  ok   by a script that is in the repository too -- the conversion is not folklore
+  ok   it is a classic script: an opaque origin cannot resolve a module specifier
+  ok   and fetches nothing of its own, which a frame with no network could not honour
+  ok   it publishes itself as globalThis.GraphvizWasm, which is how the driver reaches it
+  ok   and contains no </script, which would end the element and turn the rest into text
+
+the conversion is one substitution, and says so when it is not
+  ok   an export clause becomes an assignment to the global
+  ok   an unrenamed export keeps its name
+  ok   a bundle with no export clause is refused, not patched
+  ok   and so is one with two: this conversion has been read against exactly one shape
+
+the frame that runs the engine is not the frame that shows the figure
+  ok   the engine frame is given script
+  ok   and nothing else: not same-origin, so it cannot reach the page that made it
+  ok   while the frame that shows the drawing still runs nothing at all (D-M, unchanged)
+  ok   and says so in its own policy, as it did before there was an engine
+  ok   the engine has no network: a compiled blob that phones home cannot
+  ok   it may instantiate WebAssembly and may not eval JavaScript
+  ok   the document carries the policy
+  ok   the engine is inlined before the driver that calls it
+  ok   a source that would end the script element early is refused rather than inlined
+
+the model's text is an argument, never part of the document
+  ok   no graph is in the frame's document: it is built before any figure exists
+  ok   and the driver never touches the DOM -- it takes a string and returns a string
+  ok   it answers only its embedder, not any window that can find it
+
+graphviz writes a file; a figure is a fragment
+  ok   the XML declaration goes: this is an element, not a document
+  ok   and the doctype, which the figure policy would rightly report as ignored
+  ok   the point size goes, so the drawing scales to the pane instead of to the page
+  ok   the viewBox stays: it is how the frame is sized, there being no script to measure
+  ok   and the generator comment stays -- it is the engine saying what drew this
+  ok   nothing else is touched: this is not a sanitiser
+
+the engines offered, and what each is for
+  ok   the two that answer different questions are both there
+  ok   and the layered one is the default, as graphviz's own is
+  ok   each is offered with a line saying when to pick it, for the prompt and the menu
+  ok   the treemap layouts are not offered: picked by mistake they draw the wrong kind of thing
+
+a layout that cannot happen is an outcome, not an exception
+  ok   an empty source comes back as a failure, having started nothing
+  ok   and so does an engine that will not start -- a caller is never made to catch
+  ok   the frame itself is explicit about what it needs, rather than failing later
+
+38 passed, 0 failed

@@ -1,1 +1,156 @@
-[]
+[
+  {
+    "requirement": "REQ-2.1.2",
+    "title": "View Current Account Details",
+    "section": "account",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "No repositories are shared with this account",
+    "filename": "req-2-1-2-view-current-account-details-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:55.328Z"
+  },
+  {
+    "requirement": "REQ-2.1.2",
+    "title": "View Current Account Details",
+    "section": "account",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account pane",
+    "filename": "req-2-1-2-view-current-account-details-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:54.943Z"
+  },
+  {
+    "requirement": "REQ-3.7.1",
+    "title": "Manage Collaborators",
+    "section": "collaboration",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Collaboration table: 0 collaborator(s)",
+    "filename": "req-3-7-1-manage-collaborators-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:43.551Z"
+  },
+  {
+    "requirement": "REQ-3.7.1",
+    "title": "Manage Collaborators",
+    "section": "collaboration",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Collaboration panel for a repository",
+    "filename": "req-3-7-1-manage-collaborators-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:43.251Z"
+  },
+  {
+    "requirement": "REQ-3.7.2",
+    "title": "Add/Edit/Remove Collaborators",
+    "section": "collaboration",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Collaborator demo saved with read access",
+    "filename": "req-3-7-2-add-edit-remove-collaborators-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:56:11.636Z"
+  },
+  {
+    "requirement": "REQ-3.7.2",
+    "title": "Add/Edit/Remove Collaborators",
+    "section": "collaboration",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Collaboration table with 1 collaborator(s)",
+    "filename": "req-3-7-2-add-edit-remove-collaborators-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:56:09.597Z"
+  },
+  {
+    "requirement": "REQ-3.7.2",
+    "title": "Add/Edit/Remove Collaborators",
+    "section": "collaboration",
+    "phase": "form-filled",
+    "stepIndex": 0,
+    "description": "Collaborator demo entered with read access",
+    "filename": "req-3-7-2-add-edit-remove-collaborators-form-filled.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:56:09.923Z"
+  },
+  {
+    "requirement": "REQ-3.7.4",
+    "title": "Remove Collaborator by Clearing Access",
+    "section": "collaboration",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Collaborator demo removed and confirmed by re-reading",
+    "filename": "req-3-7-4-remove-collaborator-by-clearing-access-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:56:16.543Z"
+  },
+  {
+    "requirement": "REQ-3.7.4",
+    "title": "Remove Collaborator by Clearing Access",
+    "section": "collaboration",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Collaborator demo before removal",
+    "filename": "req-3-7-4-remove-collaborator-by-clearing-access-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:56:13.934Z"
+  },
+  {
+    "requirement": "REQ-3.7.4",
+    "title": "Remove Collaborator by Clearing Access",
+    "section": "collaboration",
+    "phase": "form-filled",
+    "stepIndex": 0,
+    "description": "Both access boxes cleared -- this is the removal",
+    "filename": "req-3-7-4-remove-collaborator-by-clearing-access-form-filled.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:56:14.251Z"
+  },
+  {
+    "requirement": "REQ-3.7.5",
+    "title": "Idempotent Collaboration Save",
+    "section": "collaboration",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Collaborator demo now has read and write",
+    "filename": "req-3-7-5-idempotent-collaboration-save-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:56:13.649Z"
+  },
+  {
+    "requirement": "REQ-3.7.5",
+    "title": "Idempotent Collaboration Save",
+    "section": "collaboration",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Collaborator demo with read access",
+    "filename": "req-3-7-5-idempotent-collaboration-save-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:56:11.906Z"
+  },
+  {
+    "requirement": "REQ-3.7.6",
+    "title": "Unknown Collaborator Refused",
+    "section": "collaboration",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Refused with 400, naming no-such-account-1793071119223",
+    "filename": "req-3-7-6-unknown-collaborator-refused-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:51.310Z"
+  },
+  {
+    "requirement": "REQ-3.7.6",
+    "title": "Unknown Collaborator Refused",
+    "section": "collaboration",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Collaboration panel before naming an unknown account",
+    "filename": "req-3-7-6-unknown-collaborator-refused-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:18:50.865Z"
+  }
+]

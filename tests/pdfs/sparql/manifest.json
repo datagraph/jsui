@@ -1,1 +1,178 @@
-[]
+[
+  {
+    "requirement": "REQ-4.1.1",
+    "title": "SPARQL Editor with Syntax Highlighting",
+    "section": "sparql",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Editor with query text",
+    "filename": "req-4-1-1-sparql-editor-with-syntax-highlighting-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:16.039Z"
+  },
+  {
+    "requirement": "REQ-4.1.1",
+    "title": "SPARQL Editor with Syntax Highlighting",
+    "section": "sparql",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "SPARQL editor open",
+    "filename": "req-4-1-1-sparql-editor-with-syntax-highlighting-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:15.748Z"
+  },
+  {
+    "requirement": "REQ-4.1.2",
+    "title": "Execute SPARQL Queries",
+    "section": "sparql",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Query executed",
+    "filename": "req-4-1-2-execute-sparql-queries-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:16.767Z"
+  },
+  {
+    "requirement": "REQ-4.1.2",
+    "title": "Execute SPARQL Queries",
+    "section": "sparql",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Query ready for execution",
+    "filename": "req-4-1-2-execute-sparql-queries-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:16.318Z"
+  },
+  {
+    "requirement": "REQ-4.1.3",
+    "title": "Multiple Response Media Types",
+    "section": "sparql",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Results returned as XML",
+    "filename": "req-4-1-3-multiple-response-media-types-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:32.312Z"
+  },
+  {
+    "requirement": "REQ-4.1.3",
+    "title": "Multiple Response Media Types",
+    "section": "sparql",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Editor before requesting XML",
+    "filename": "req-4-1-3-multiple-response-media-types-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:31.930Z"
+  },
+  {
+    "requirement": "REQ-4.1.4",
+    "title": "Display Query Results",
+    "section": "sparql",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Results displayed",
+    "filename": "req-4-1-4-display-query-results-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:17.335Z"
+  },
+  {
+    "requirement": "REQ-4.1.4",
+    "title": "Display Query Results",
+    "section": "sparql",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Before results render",
+    "filename": "req-4-1-4-display-query-results-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:17.050Z"
+  },
+  {
+    "requirement": "REQ-4.3.2",
+    "title": "Keyboard Shortcuts",
+    "section": "sparql",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Query executed from the keyboard",
+    "filename": "req-4-3-2-keyboard-shortcuts-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:42.023Z"
+  },
+  {
+    "requirement": "REQ-4.3.2",
+    "title": "Keyboard Shortcuts",
+    "section": "sparql",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Editor focused, before the shortcut",
+    "filename": "req-4-3-2-keyboard-shortcuts-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:41.627Z"
+  },
+  {
+    "requirement": "REQ-4.3.3",
+    "title": "Query Reset",
+    "section": "sparql",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Query reset to the saved text",
+    "filename": "req-4-3-3-query-reset-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:34:29.495Z"
+  },
+  {
+    "requirement": "REQ-4.3.3",
+    "title": "Query Reset",
+    "section": "sparql",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Editor with the saved query",
+    "filename": "req-4-3-3-query-reset-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:34:27.646Z"
+  },
+  {
+    "requirement": "REQ-4.3.4",
+    "title": "Execution Time Display",
+    "section": "sparql",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Execution reported",
+    "filename": "req-4-3-4-execution-time-display-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:37.168Z"
+  },
+  {
+    "requirement": "REQ-4.3.4",
+    "title": "Execution Time Display",
+    "section": "sparql",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Before execution",
+    "filename": "req-4-3-4-execution-time-display-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-26T00:59:36.768Z"
+  },
+  {
+    "requirement": "REQ-4.3.6",
+    "title": "Multiple Query Tabs",
+    "section": "sparql",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Two editors open at once",
+    "filename": "req-4-3-6-multiple-query-tabs-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:34:35.432Z"
+  },
+  {
+    "requirement": "REQ-4.3.6",
+    "title": "Multiple Query Tabs",
+    "section": "sparql",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "One editor open",
+    "filename": "req-4-3-6-multiple-query-tabs-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:34:34.639Z"
+  }
+]

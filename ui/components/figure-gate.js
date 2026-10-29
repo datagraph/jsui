@@ -158,6 +158,10 @@ export function openFigureGate(container, {
   // query was typed again by the model and may not be one of them; see
   // `lib/figure/provenance.js' for what that costs and how it is detected.
   let proposal = validateProposal({ query: query || sparqlFrom(text) || "", text, ran });
+  // What drew the figure, for the ledger (§2.6.1).  Set by Phase 3, not here:
+  // the exploration that proposed a figure and the turn that drew it can be
+  // different models, and the ledger names the one that made the picture.
+  let drawnBy = null;
   const run = runId();
   const started = new Date();
 
@@ -423,6 +427,15 @@ export function openFigureGate(container, {
     status.remove();
 
     const fig = out.figure || figureFrom(out.finalText || "");
+    // §2.6.1 / U-48: what to draw into the picture.  Taken from the turn that
+    // DREW it -- phase 3 -- rather than from the exploration that proposed it,
+    // because those can be different models and the ledger names the one that
+    // made the thing it is drawn on.
+    drawnBy = {
+      model: out.model, servedModel: out.servedModel, served: out.served,
+      provider: out.provider, endpoint: out.endpoint, at: out.at,
+      account, repository,
+    };
     const assistant = [...out.events].reverse().find((e) => e.type === "assistant");
     const ranOut = assistant?.stopReason === "max_tokens";
 
@@ -488,6 +501,7 @@ export function openFigureGate(container, {
     mounted = mountFigure(holder, drawn, {
       caption, title: proposal.figure.title, notes, doc: d,
       engine: proposal.figure.engine || null,
+      aiProvenance: drawnBy,
       meta: { view: promoted || temp, query: phase2.query, rows: phase2.rows,
               mimeType: phase2.mimeType, resultDigest: phase2.digest },
     });

@@ -1,0 +1,90 @@
+[
+  {
+    "requirement": "REQ-2.4.1",
+    "title": "Account Listing Table",
+    "section": "admin-accounts",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Account listing with name, created, last used and repository count",
+    "filename": "req-2-4-1-account-listing-table-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:21.246Z"
+  },
+  {
+    "requirement": "REQ-2.4.1",
+    "title": "Account Listing Table",
+    "section": "admin-accounts",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Accounts pane with the account listing",
+    "filename": "req-2-4-1-account-listing-table-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:20.990Z"
+  },
+  {
+    "requirement": "REQ-2.4.2",
+    "title": "Account Entry Fields",
+    "section": "admin-accounts",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Columns after enrichment (2 unfetched at first paint)",
+    "filename": "req-2-4-2-account-entry-fields-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:27.758Z"
+  },
+  {
+    "requirement": "REQ-2.4.2",
+    "title": "Account Entry Fields",
+    "section": "admin-accounts",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Columns before enrichment has filled them",
+    "filename": "req-2-4-2-account-entry-fields-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:21.481Z"
+  },
+  {
+    "requirement": "REQ-2.4.4",
+    "title": "Account Listing Scoped by Role",
+    "section": "admin-accounts",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "User: 1 account(s) — own plus 0 collaborating",
+    "filename": "req-2-4-4-account-listing-scoped-by-role-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:37.525Z"
+  },
+  {
+    "requirement": "REQ-2.4.4",
+    "title": "Account Listing Scoped by Role",
+    "section": "admin-accounts",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account listing as this agent sees it",
+    "filename": "req-2-4-4-account-listing-scoped-by-role-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:37.212Z"
+  },
+  {
+    "requirement": "REQ-2.6.1",
+    "title": "Delete Account Control",
+    "section": "admin-accounts",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Role user: no account offers a delete control (0 other account(s) listed)",
+    "filename": "req-2-6-1-delete-account-control-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:38.016Z"
+  },
+  {
+    "requirement": "REQ-2.6.1",
+    "title": "Delete Account Control",
+    "section": "admin-accounts",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Account listing with its row actions",
+    "filename": "req-2-6-1-delete-account-control-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:17:37.769Z"
+  }
+]

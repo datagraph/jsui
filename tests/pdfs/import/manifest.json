@@ -1,1 +1,123 @@
-[]
+[
+  {
+    "requirement": "REQ-3.4.3",
+    "title": "Import from URL",
+    "section": "import",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "URL import initiated",
+    "filename": "req-3-4-3-import-from-url-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:57.315Z"
+  },
+  {
+    "requirement": "REQ-3.4.3",
+    "title": "Import from URL",
+    "section": "import",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository with import button",
+    "filename": "req-3-4-3-import-from-url-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:25.630Z"
+  },
+  {
+    "requirement": "REQ-3.4.3",
+    "title": "Import from URL",
+    "section": "import",
+    "phase": "url-entered",
+    "stepIndex": 0,
+    "description": "Import URL entered and submitted",
+    "filename": "req-3-4-3-import-from-url-url-entered.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:56.038Z"
+  },
+  {
+    "requirement": "REQ-3.4.4",
+    "title": "Import from File Upload",
+    "section": "import",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "File import completed",
+    "filename": "req-3-4-4-import-from-file-upload-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:21.862Z"
+  },
+  {
+    "requirement": "REQ-3.4.4",
+    "title": "Import from File Upload",
+    "section": "import",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository ready for file import",
+    "filename": "req-3-4-4-import-from-file-upload-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:19.860Z"
+  },
+  {
+    "requirement": "REQ-3.4.4",
+    "title": "Import from File Upload",
+    "section": "import",
+    "phase": "file-selected",
+    "stepIndex": 0,
+    "description": "N-Quads file selected for import",
+    "filename": "req-3-4-4-import-from-file-upload-file-selected.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:20.572Z"
+  },
+  {
+    "requirement": "REQ-3.4.6",
+    "title": "Import Progress Display",
+    "section": "import",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Larger import completed",
+    "filename": "req-3-4-6-import-progress-display-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:03.010Z"
+  },
+  {
+    "requirement": "REQ-3.4.6",
+    "title": "Import Progress Display",
+    "section": "import",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository before a larger import",
+    "filename": "req-3-4-6-import-progress-display-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:01.171Z"
+  },
+  {
+    "requirement": "REQ-3.4.7",
+    "title": "Auto-detect File Format",
+    "section": "import",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Import with auto-detected format completed",
+    "filename": "req-3-4-7-auto-detect-file-format-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:10.522Z"
+  },
+  {
+    "requirement": "REQ-3.4.7",
+    "title": "Auto-detect File Format",
+    "section": "import",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Import dialog before file selection",
+    "filename": "req-3-4-7-auto-detect-file-format-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:08.360Z"
+  },
+  {
+    "requirement": "REQ-3.4.7",
+    "title": "Auto-detect File Format",
+    "section": "import",
+    "phase": "format-detected",
+    "stepIndex": 0,
+    "description": "format auto-detected as text/turtle",
+    "filename": "req-3-4-7-auto-detect-file-format-format-detected.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:19:09.235Z"
+  }
+]

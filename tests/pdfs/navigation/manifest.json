@@ -1,1 +1,112 @@
-[]
+[
+  {
+    "requirement": "REQ-5.1.1",
+    "title": "Client-Side Routing",
+    "section": "navigation",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Direct URL navigation resolved",
+    "filename": "req-5-1-1-client-side-routing-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:57.563Z"
+  },
+  {
+    "requirement": "REQ-5.1.1",
+    "title": "Client-Side Routing",
+    "section": "navigation",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Before direct navigation",
+    "filename": "req-5-1-1-client-side-routing-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:53.105Z"
+  },
+  {
+    "requirement": "REQ-5.2.4",
+    "title": "Location Bar Display",
+    "section": "navigation",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Location bar showing the repository",
+    "filename": "req-5-2-4-location-bar-display-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:45.544Z"
+  },
+  {
+    "requirement": "REQ-5.2.4",
+    "title": "Location Bar Display",
+    "section": "navigation",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Location bar after login",
+    "filename": "req-5-2-4-location-bar-display-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:45.155Z"
+  },
+  {
+    "requirement": "REQ-5.2.5",
+    "title": "Tabbed Interface",
+    "section": "navigation",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Repository pane in front, account pane behind",
+    "filename": "req-5-2-5-tabbed-interface-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:49.504Z"
+  },
+  {
+    "requirement": "REQ-5.2.5",
+    "title": "Tabbed Interface",
+    "section": "navigation",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Tabbed interface",
+    "filename": "req-5-2-5-tabbed-interface-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:49.212Z"
+  },
+  {
+    "requirement": "REQ-6.3.1",
+    "title": "Tab Management",
+    "section": "ui",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Both tabs present, repository active",
+    "filename": "req-6-3-1-tab-management-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:40.952Z"
+  },
+  {
+    "requirement": "REQ-6.3.1",
+    "title": "Tab Management",
+    "section": "ui",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Tabs for account and repository",
+    "filename": "req-6-3-1-tab-management-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:40.671Z"
+  },
+  {
+    "requirement": "REQ-6.3.2",
+    "title": "Close Tabs",
+    "section": "ui",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "Repository tab closed",
+    "filename": "req-6-3-2-close-tabs-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:41.559Z"
+  },
+  {
+    "requirement": "REQ-6.3.2",
+    "title": "Close Tabs",
+    "section": "ui",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Repository tab before closing",
+    "filename": "req-6-3-2-close-tabs-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T03:20:41.212Z"
+  }
+]

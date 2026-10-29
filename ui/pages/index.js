@@ -7,6 +7,12 @@ import { buildLoginFormHtml, readLastUsername } from "../components/login-form.j
 import { installExplorationLauncher } from "../components/exploration-pane.js";
 import { attachNameControl, installNamePolicy } from "../components/name-input.js";
 import { makeDragHandleOnly } from "../components/drag-handle.js";
+import { historyPath, historyQuery } from "../../lib/models/history.js";
+import { collaborationPath } from "../../lib/models/collaboration.js";
+import { renderHistoryTable, renderCollaborationTable }
+  from "../components/history-table.js";
+import { applyDeletionPermissions as stripDeletionControls }
+  from "../components/deletion-controls.js";
 
 export const errorMessages = () => `
   <div class="widget">
@@ -537,8 +543,17 @@ const setupCollaborationHandlers = (app, pane, content) => {
         if (dataDiv) {
           dataDiv.dataset.collaboration = JSON.stringify(collaborators);
         }
-        updateCollaborationSaveButton(content);
+        // Clear the "Saving..." label BEFORE recomputing the button state.
+        // `updateCollaborationSaveButton' refuses to touch a button that is
+        // disabled and still says "Saving...", so calling it first left
+        // `disabled' permanently true: after one successful save the control
+        // never came back, and a collaborator added in a session could not
+        // then be modified or removed without reloading the pane.  Worse, a
+        // change made WHILE the save was in flight hit the same guard and was
+        // dropped from the button state even though the table had it.
         saveBtn.innerHTML = '<img src="./images/file-upload.svg" alt="Save" width="16" height="16" />';
+        saveBtn.disabled = false;
+        updateCollaborationSaveButton(content);
         // Show success message or reload
         content.dataset.collaborationState = "needs-reload";
       } catch (error) {
@@ -1414,6 +1429,18 @@ const handleRepositoryExport = async (app, accountName, repositoryName, button) 
 
   // Focus on media type select
   mediaTypeSelect.focus();
+};
+
+/**
+ * Draw a delete control only where the role permits one.
+ *
+ * The rule, and the reason it is a DOM pass rather than six template tests,
+ * is in `ui/components/deletion-controls.js'.  This is the binding to the
+ * application's own notion of who is authenticated.
+ */
+const applyDeletionPermissions = (app, root = document) => {
+  if (!app?.state?.agentCapabilities) return { removed: [], kept: [] };
+  return stripDeletionControls(root, app.state.agentCapabilities());
 };
 
 const handleRepositoryDelete = async (app, accountName, repositoryName, button) => {
@@ -3470,6 +3497,8 @@ const initializePaneEditing = (app) => {
     });
   });
 
+  applyDeletionPermissions(app, document);
+
   document.querySelectorAll(".repo-delete-btn:not([data-handler-bound])").forEach((btn) => {
     btn.dataset.handlerBound = "true";
     btn.addEventListener("click", () => {
@@ -4522,10 +4551,27 @@ const fetchViewText = async ({ auth, accountName, repositoryName, viewName }) =>
   return response.text();
 };
 
-const fetchHistory = async (auth, resourcePath) => {
+/**
+ * Lifecycle events for an account, a repository or a view.
+ *
+ * `resourcePath' is the legacy calling convention -- everything after
+ * `/system/accounts/' and before `/history'.  It is still accepted, because
+ * several call sites compose it, but a caller may instead pass
+ * `{account, repository, view}' and let `historyPath' build it: three callers
+ * composing the same URL by hand is how the view history came to have no
+ * caller at all.
+ *
+ * The filter (REQ-2.5.4, 3.8.4, 4.4.3) is passed through rather than applied
+ * here: the server does the matching, including the `*' → `%' translation
+ * `historyQuery' performs on the way out.
+ */
+const fetchHistory = async (auth, resourcePath, filter = null) => {
   if (!auth?.token || !auth?.host) return [];
+  const path = typeof resourcePath === "string"
+    ? `/system/accounts/${resourcePath}/history`
+    : historyPath(resourcePath || {});
   try {
-    const response = await fetch(`${auth.host}/system/accounts/${resourcePath}/history`, {
+    const response = await fetch(`${auth.host}${path}${historyQuery(filter || {})}`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -4540,32 +4586,27 @@ const fetchHistory = async (auth, resourcePath) => {
   }
 };
 
-const renderHistoryTable = (events) => {
-  if (!Array.isArray(events) || events.length === 0) {
-    return `<p style="color: #666; font-style: italic;">No events recorded.</p>`;
+/**
+ * The repositories this account collaborates on but does not own (REQ-2.1.2).
+ *
+ * `GET /system/accounts/{account}/collaboration' has existed all along and had
+ * no caller here, which is explained by its absence from the resource map in
+ * `admin.lisp''s docstring: the map lists the repository-level collaboration
+ * resource and not the account-level one.
+ */
+const fetchCollaborations = async (auth, accountName) => {
+  if (!auth?.token || !auth?.host) return [];
+  try {
+    const response = await fetch(`${auth.host}${collaborationPath(accountName)}`, {
+      method: "GET",
+      headers: { Accept: "application/json", Authorization: `Bearer ${auth.token}` },
+    });
+    if (!response.ok) return [];
+    return await response.json();
+  } catch (e) {
+    console.error("fetchCollaborations error:", e);
+    return [];
   }
-  return `
-    <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-      <thead>
-        <tr style="border-bottom: 2px solid #dee2e6;">
-          <th style="text-align: left; padding: 6px 8px;">Time</th>
-          <th style="text-align: left; padding: 6px 8px;">Action</th>
-          <th style="text-align: left; padding: 6px 8px;">Actor</th>
-          <th style="text-align: left; padding: 6px 8px;">Details</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${events.map((e, i) => `
-          <tr style="border-bottom: 1px solid #eee; background: ${i % 2 === 0 ? "#fff" : "#f8f9fa"};">
-            <td style="padding: 4px 8px; white-space: nowrap;">${escapeHtml(e.timestamp || "")}</td>
-            <td style="padding: 4px 8px;">${escapeHtml(e.action || "")}</td>
-            <td style="padding: 4px 8px;">${escapeHtml(e.actor || "")}</td>
-            <td style="padding: 4px 8px; word-break: break-word;">${escapeHtml(e.details || "")}</td>
-          </tr>
-        `).join("")}
-      </tbody>
-    </table>
-  `;
 };
 
 const fetchAccountRepositories = async (state, accountName) => {
@@ -4797,6 +4838,7 @@ const renderAccountSidebar = ({ account, accountName, containerId = "", config =
           <button type="button" class="manage-tab" data-tab="settings" title="Configuration"><img src="./images/settings.svg" alt="Configuration" width="16" height="16" /></button>
           <button type="button" class="manage-tab" data-tab="authentication" title="Authentication"><img src="./images/lock.svg" alt="Authentication" width="16" height="16" /></button>
           <button type="button" class="manage-tab" data-tab="prefixes" title="Prefixes"><img src="./images/puzzle.svg" alt="Prefixes" width="16" height="16" /></button>
+          <button type="button" class="manage-tab" data-tab="collaboration" data-testid="account-tab-collaboration" title="Collaborations"><img src="./images/users.svg" alt="Collaborations" width="16" height="16" /></button>
           <button type="button" class="manage-tab" data-tab="history" title="History"><img src="./images/logs.svg" alt="History" width="16" height="16" /></button>
         </div>
         <div class="manage-tab-content">
@@ -4870,6 +4912,11 @@ const renderAccountSidebar = ({ account, accountName, containerId = "", config =
               <span class="foaf-label">Prefixes:</span>
               <textarea class="prefix-input" data-field="prefixes" rows="8" placeholder="Enter prefixes (one per line, separated by newlines)">${escapeHtml(prefixesText)}</textarea>
               </div>
+          </div>
+          <div class="tab-panel" data-panel="collaboration">
+            <div class="account-collaboration-content" data-account="${escapeHtml(accountName)}" data-testid="account-collaboration" style="font-size: 12px;">
+              <p style="color: #666; font-style: italic;">Click to load collaborations...</p>
+            </div>
           </div>
           <div class="tab-panel" data-panel="history">
             <div class="account-history-content" data-account="${escapeHtml(accountName)}" style="font-size: 12px;">
@@ -5105,6 +5152,20 @@ const attachAccountSidebarHandlers = (app) => {
               const events = await fetchHistory(auth, encodeURIComponent(accountName));
               historyContent.innerHTML = renderHistoryTable(events);
               historyContent.dataset.loaded = "true";
+            }
+          }
+        }
+        if (target === "collaboration") {
+          const box = pane.querySelector(".account-collaboration-content");
+          if (box && !box.dataset.loaded) {
+            const accountName = pane.dataset.account;
+            if (accountName && app?.state) {
+              box.innerHTML = `<p style="color: #666;">Loading...</p>`;
+              const auth = app.state.getAuthContext(accountName);
+              box.innerHTML = renderCollaborationTable(
+                await fetchCollaborations(auth, accountName),
+                { accountName, basePath: BASE_PATH });
+              box.dataset.loaded = "true";
             }
           }
         }

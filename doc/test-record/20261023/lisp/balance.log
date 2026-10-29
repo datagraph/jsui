@@ -1,0 +1,11 @@
+module : spocq/gensrc/test/balance.py
+run    : cd spocq/gensrc && python3 -I test/balance.py <file.lisp>...
+needs  : python3 only. A LINT, not a test of behaviour: it counts parens
+         with awareness of ;, #| |#, #\( and |sym with ( parens )|.
+date   : 2026-10-23T12:31:47Z
+----------------------------------------------------------------------
+odbc/views.lisp: balanced
+store/rdfcache/rdfcache.lisp: balanced
+spocq-server/response-functions.lisp: balanced
+spocq-server/admin.lisp: balanced
+algebra/operators/sparql-update-operators.lisp: balanced

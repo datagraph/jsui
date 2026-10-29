@@ -1,0 +1,60 @@
+module : spocq/gensrc/test/identity (ad hoc; the form is in this log below the rule)
+run    : cd spocq/gensrc && ./utilities/execute-spocq < <form>
+needs  : ssh to nl4; runs /opt/spocq/spocq-listener, NOT a server
+date   : 2026-10-23T12:31:25Z
+----------------------------------------------------------------------
+* === listener identity
+BUILD 20261023T131410
+REVISION development-gensrc@bf329b06efb2ee7dfc474804f68c30c5bae9b685
+NIL
+* 
+=== spocq.i (implementation)
+NIL
+* COMPUTE-CACHED-SLUG                : FBOUND
+ENSURE-SQL-CACHED-SLUG             : FBOUND
+LIFECYCLE-EVENT-TYPES              : FBOUND
+MAKE-LIFECYCLE-EVENT-TYPE          : FBOUND
+READ-COLLABORATIONS                : FBOUND
+READ-SQL-EVENTS                    : FBOUND
+WRITE-SQL-ACCOUNT                  : FBOUND
+WRITE-SQL-REPOSITORY               : FBOUND
+WRITE-SQL-QUERY                    : FBOUND
+NIL
+* 
+=== spocq.si (server implementation)
+NIL
+* RECORD-REPOSITORY-OPERATION-EVENT  : FBOUND
+RECORD-GRAPH-STORE-UPDATE          : FBOUND
+COMPUTE-GET-ACCOUNTS               : FBOUND
+ACCOUNT-LIFECYCLE-TIMES            : FBOUND
+NIL
+* 
+=== the generated event types
+NIL
+*   AccountCreatedEvent
+  AccountUpdatedEvent
+  AccountDeletedEvent
+  AccountClearedEvent
+  AccountImportedEvent
+  RepositoryCreatedEvent
+  RepositoryUpdatedEvent
+  RepositoryDeletedEvent
+  RepositoryClearedEvent
+  RepositoryImportedEvent
+  QueryCreatedEvent
+  QueryUpdatedEvent
+  QueryDeletedEvent
+  QueryClearedEvent
+  QueryImportedEvent
+NIL
+* 
+=== cached_slug derivation
+NIL
+*   "mcp" -> "mcp"
+  "graphql-test" -> "graphql-test"
+  "my repo" -> "my-repo"
+  "  test  " -> "test"
+  "MixedCase" -> "MixedCase"
+  "" -> NIL
+NIL
+* 

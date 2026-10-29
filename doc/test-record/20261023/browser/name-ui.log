@@ -1,0 +1,39 @@
+module : jsui/tests/name-input.browser.mjs
+run    : cd jsui && npm run test:name-ui
+needs  : node + playwright's chromium; the script starts its own http
+         server over the working copy — fixtures, no host, no credentials
+date   : 2026-10-23T12:30:46Z
+----------------------------------------------------------------------
+
+as it is typed
+  ok   a space becomes the separator at the moment it is typed, not on submit
+  ok   every interfering character goes the same way, one for one
+  ok   and the field says what it did rather than silently editing
+
+where the caret is
+  ok   the replacement lands where it was typed
+  ok   and the caret is after it -- the field does not throw you back to the end
+  ok   so the next character continues from there
+
+the trailing separator
+  ok   a two-word name can be typed at all
+  ok   the separator survives while the field has focus
+  ok   and is tidied away when it does not
+  ok   as are the runs
+
+what Create does with the verdict
+  ok   an empty name cannot be created
+  ok   nor can a reserved one
+  ok   and the field says which rule it fell to
+  ok   a good name enables it again
+  ok   with nothing left to explain
+
+the lists are the served files
+  ok   an account name from accounts.txt is refused in the browser
+  ok   one list per kind, as limits.json names them
+
+a field that only says what it is
+  ok   a marked field takes charge of itself
+  ok   under its own kind's list
+
+19 passed, 0 failed

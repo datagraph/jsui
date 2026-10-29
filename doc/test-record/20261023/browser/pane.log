@@ -1,0 +1,133 @@
+module : jsui/tests/exploration-pane.browser.mjs
+run    : cd jsui && npm run test:pane
+needs  : node + playwright's chromium; the script starts its own http
+         server over the working copy — fixtures, no host, no credentials
+date   : 2026-10-23T12:30:43Z
+----------------------------------------------------------------------
+
+it opens where the view editors are, and connects by itself
+  ok   the Explore button opens one pane
+  ok   it is a child of the editor container -- a peer of the view editors
+  ok   the button that opens it sits in the view catalog, with New
+  ok   immediately to the left of New
+  ok   and the pair is pushed to the right edge of the panel
+  ok   it connects on open, with no first click
+  ok   the connect output is kept, in the collapsible at the top
+  ok   llm-endpoint is in that same block
+  ok   llm-key is in that same block
+  ok   llm-workspace is in that same block
+  ok   llm-model is in that same block
+  ok   mcp-endpoint is in that same block
+  ok   and it is open to begin with, because no key has been given yet
+
+opening it twice does not make two
+  ok   a second Explore scrolls to the one that is open
+
+run needs a key, and says so where the key goes
+  ok   with no key it asks for one rather than failing at the provider
+  ok   and nothing was sent
+
+a run, end to end
+  ok   every exchange is an entry (9 of them)
+  ok   the tool offer is in the record
+  ok   so is each primer read
+  ok   so is the model's first turn
+  ok   so is the call it caused
+  ok   and the handle the run is carrying
+  ok   the indicator line carries the operation, the cardinality and the time
+  ok   and whether it worked
+  ok   request and response are inside the entry the indicator belongs to
+  ok   the score payload is styled as score, not as undifferentiated text
+
+the transcript reads as a conversation
+  ok   the model is on the left
+  ok   the service is on the right
+  ok   the pane's own notices are down the middle
+  ok   a left-hand bubble carries its control on its left
+  ok   a right-hand bubble carries its control on its right
+  ok   every entry has one
+  ok   the caret is the page's own, and shows the state it is in
+  ok   the control hides and shows the bubble
+  ok   and the caret turns with it
+  ok   the summary still discloses, and the control follows rather than diverging
+
+the answer, and the query inside it
+  ok   the final turn opens itself
+  ok   the prose is paragraphs, not one block
+  ok   the fenced query is kept as a query
+  ok   byte for byte -- it is about to be offered as a view
+  ok   and it is offered as one
+  ok   both envelopes are there, collapsed, for when they are needed
+
+the run is recorded, not just run
+  ok   one update per run, written once the run is over
+  ok   into the transcript graph, beside the exploration rather than inside it
+  ok   pointing at the exploration the handle names
+  ok   and it carries the payload the model was shown, not a count of it
+  ok   including the primer -- the schema half of what it read
+  ok   and the prompt that started it
+  ok   each exchange says what it was and which way it moved
+  ok   the pane says the record was kept, where it says everything else
+
+a failure opens itself
+  ok   the failure is an entry like any other
+  ok   but it opens itself, unlike any other
+  ok   and is marked as one
+
+the primer actually reads
+  ok   the server's own documentation is read, not reported unreadable
+
+the request the model was sent
+  ok   the request body is formatted, not stringified
+  ok   it is digested to what varies: the model, the messages, the tools offered
+  ok   the primer is measured rather than reprinted on every turn
+  ok   and the whole body is one disclosure away, primer and all
+
+the session button, and the log it opens
+  ok   the log is out of the way until it is asked for
+  ok   Session shows it
+  ok   the account's sessions are listed
+  ok   the newest session opens itself, with its operations
+  ok   an operation is a row of aligned columns: what, how it went, how much
+  ok   JSON parameters are digested to key=value rather than shown as JSON on one line
+  ok   a child operation is indented under its parent
+  ok   and the session's active node is marked
+  ok   only the row with more than its columns can hold gets a disclosure
+  ok   the pane's disclosure triangle does not leak into the log nested inside it
+  ok   the log draws its own caret column, on every row, so the columns line up
+  ok   the run is listed under the operations
+  ok   headed by what was asked of it
+  ok   with one row per exchange that carried content
+  ok   a document the model read is named
+  ok   and the payload itself is there to be read, which the operation log never held
+  ok   the status counts what was recovered
+  ok   the calls that named this exploration are shown under it
+  ok   a call is named by its method and its tool
+  ok   a day's journal shows every call it served, exploration or not
+  ok   each call is attributed to the agent the token authorized
+  ok   a call that failed says how
+  ok   and the response itself is one disclosure away, as the request is
+  ok   and hides it again
+
+the location and the model are linked menus
+  ok   the location is a menu
+  ok   of Anthropic, OpenAI, and other
+  ok   the model is a menu too
+  ok   filled from the location's own list, which the key made readable
+  ok   read from api.anthropic.com/v1/models
+  ok   choosing OpenAI sets the location and the provider together
+  ok   and the model menu follows: chat models only, newest first
+  ok   with the provider's default chosen when the list has it
+  ok   the OpenAI list is read with the key as a bearer token
+  ok   other… opens a field for the location
+  ok   a typed location is used, and spoken to as Chat Completions
+  ok   and its models are read from the sibling /v1/models
+  ok   other… opens a field for the model
+  ok   and the typed model is the one used
+  ok   choosing a preset closes the field
+  ok   and a model typed by hand is kept until it is changed
+
+close
+  ok   the pane closes like a view editor
+
+99 passed, 0 failed

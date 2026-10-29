@@ -1,1 +1,112 @@
-[]
+[
+  {
+    "requirement": "REQ-4.2.1",
+    "title": "CRUD SPARQL Views",
+    "section": "view",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "View removed from list after deletion",
+    "filename": "req-4-2-1-crud-sparql-views-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:37.976Z"
+  },
+  {
+    "requirement": "REQ-4.2.1",
+    "title": "CRUD SPARQL Views",
+    "section": "view",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "View listed with delete button",
+    "filename": "req-4-2-1-crud-sparql-views-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:37.073Z"
+  },
+  {
+    "requirement": "REQ-4.2.2",
+    "title": "Load View Query Text",
+    "section": "view",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "View query text loaded in editor",
+    "filename": "req-4-2-2-load-view-query-text-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:30.486Z"
+  },
+  {
+    "requirement": "REQ-4.2.2",
+    "title": "Load View Query Text",
+    "section": "view",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "Views list showing saved view",
+    "filename": "req-4-2-2-load-view-query-text-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:30.190Z"
+  },
+  {
+    "requirement": "REQ-4.2.3",
+    "title": "Save View Query Text",
+    "section": "view",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "View query saved via PUT request",
+    "filename": "req-4-2-3-save-view-query-text-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:31.150Z"
+  },
+  {
+    "requirement": "REQ-4.2.3",
+    "title": "Save View Query Text",
+    "section": "view",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "View query modified in editor",
+    "filename": "req-4-2-3-save-view-query-text-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:30.767Z"
+  },
+  {
+    "requirement": "REQ-4.2.5",
+    "title": "Open View in Pane Editor",
+    "section": "view",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "View opened in pane editor",
+    "filename": "req-4-2-5-open-view-in-pane-editor-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:43.104Z"
+  },
+  {
+    "requirement": "REQ-4.2.5",
+    "title": "Open View in Pane Editor",
+    "section": "view",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "View listed in repository pane",
+    "filename": "req-4-2-5-open-view-in-pane-editor-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:42.805Z"
+  },
+  {
+    "requirement": "REQ-4.2.6",
+    "title": "Open View in New Pane",
+    "section": "view",
+    "phase": "after",
+    "stepIndex": 0,
+    "description": "View opened in new pane",
+    "filename": "req-4-2-6-open-view-in-new-pane-after.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:43.648Z"
+  },
+  {
+    "requirement": "REQ-4.2.6",
+    "title": "Open View in New Pane",
+    "section": "view",
+    "phase": "before",
+    "stepIndex": 0,
+    "description": "View with open-in-pane button",
+    "filename": "req-4-2-6-open-view-in-new-pane-before.pdf",
+    "captureType": "pdf",
+    "timestamp": "2026-10-27T00:35:43.390Z"
+  }
+]

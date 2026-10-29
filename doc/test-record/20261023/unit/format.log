@@ -1,0 +1,71 @@
+module : jsui/tests/transcript.test.mjs
+run    : cd jsui && npm run test:format
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:30Z
+----------------------------------------------------------------------
+
+what a payload is
+  ok   a JSON-RPC envelope is json
+  ok   a query is sparql even with leading whitespace
+  ok   a PREFIX leads a query
+  ok   the survey tool's own notation is score, not undifferentiated text
+  ok   a brace-led shape is score
+  ok   a live answer leads with the handle it restates, and is still score
+  ok   prose with a capital is not mistaken for a declaration
+  ok   prose is text
+  ok   nothing is empty, not text
+  ok   JSON that mentions SELECT is still JSON -- the order of the tests matters
+
+JSON is re-indented, and only when it is JSON
+  ok   a compact object is expanded
+  ok   a query is not mangled through JSON.parse
+  ok   a brace alone does not make it JSON
+  ok   formatBlock returns both the kind and the formatted text
+
+an object is formatted, not stringified
+  ok   an object becomes indented JSON
+  ok   and is classified as JSON without a round trip through text
+  ok   formatBlock shows its fields
+  ok   nothing stays nothing
+  ok   a number is its digits
+  ok   a cycle does not throw
+
+fenced blocks are kept whole, prose is kept apart
+  ok   prose, code, prose
+  ok   the fence language is carried
+  ok   the query survives byte for byte -- it is about to be offered as a view
+  ok   the prose either side is separate
+  ok   more than one fence is handled
+  ok   a fence without a language is still code
+  ok   unfenced prose is one text segment
+  ok   nothing in, nothing out
+  ok   an unterminated fence is kept as prose rather than dropped
+
+the provider request, digested
+  ok   the model is named
+  ok   the primer is measured, not reprinted -- it is the same every turn
+  ok   and really not reprinted
+  ok   the tools actually offered are named
+  ok   each message is digested to what it carries, which is the part that varies
+  ok   a serialised body digests the same
+  ok   and anything else digests to nothing, so the caller can fall back
+
+the indicator line
+  ok   a successful call: what, how much, how long -- and no HTTP 200 noise
+  ok   a status worth seeing is shown
+  ok   one row is singular
+  ok   a model turn: why it stopped, what it cost, how long
+  ok   nothing known, nothing claimed
+
+scales
+  ok   ms below a second, s above
+  ok   counts shorten as they grow
+  ok   an absent number is absent, not NaN
+
+row counts and clipping
+  ok   a cardinality stated in the payload is read out for the summary
+  ok   and not invented when it is absent
+  ok   an oversized payload is clipped before it reaches the DOM, and says so
+  ok   a short one is untouched
+
+48 passed, 0 failed

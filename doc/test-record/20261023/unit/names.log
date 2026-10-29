@@ -1,0 +1,54 @@
+module : jsui/tests/name-policy.test.mjs
+run    : cd jsui && npm run test:names
+needs  : node only — fixtures, no network, no credentials
+date   : 2026-10-23T12:30:31Z
+----------------------------------------------------------------------
+
+the characters that interfere
+  ok   an apostrophe becomes the separator
+  ok   a dot does
+  ok   a comma does
+  ok   a double quote does, and so does a space
+  ok   a backslash does
+  ok   the separator is configurable: an underscore where that is wanted
+  ok   letters, digits, hyphen and underscore are left alone
+
+one character in, one character out
+  ok   the length never changes while typing, so the caret never moves
+  ok   runs are left alone on the way in
+  ok   and collapsed on the way out
+  ok   where the ends are trimmed as well
+  ok   a trailing separator survives typing -- trimming it makes a two-word name untypeable
+
+the lists, as shipped
+  ok   the account list is the rails one
+  ok   so is the repository list
+  ok   and the view list
+  ok   comments are not terms
+  ok   the length limit is the rails column's, read from the file
+  ok   a reserved account name is refused
+  ok   whatever its case
+  ok   and a view may not be called `query', which already means something there
+  ok   the lists are per kind: what a repository may not be called, a view may
+  ok   a longer name that merely begins with a reserved one is not reserved
+
+names that will not be accepted
+  ok   an empty name says so
+  ok   and so does one with nothing in it but punctuation
+  ok   a name past the column's width is refused before the server sees it
+  ok   and one that fits is not
+  ok   an offensive name is refused
+  ok   including an inflection of a listed term, by its segment
+  ok   while an ordinary word that merely contains one is not refused
+  ok   an acceptable name comes back in the form it will be stored under
+
+without its configuration
+  ok   a list that cannot be read is an empty list, not a broken field
+  ok   and the sanitising needs no configuration
+  ok   nor does the length check
+
+malformed configuration
+  ok   a limits file that will not parse leaves the defaults standing
+  ok   and the lists it names are still read
+
+35 passed, 0 failed

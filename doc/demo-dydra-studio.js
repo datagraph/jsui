@@ -2,8 +2,24 @@ const fs = require("fs");
 const path = require("path");
 const { chromium } = require("playwright");
 
-const BASE_URL = "https://dydra.com/ui/user";
-const CREDS = { username: "playwright", password: "shakespear" };
+const BASE_URL = process.env.JSUI_ORIGIN
+  ? `${process.env.JSUI_ORIGIN.replace(/\/+$/, "")}/ui/user`
+  : "https://dydra.com/ui/user";
+
+// Credentials from the environment.  This file is tracked and jsui has a
+// github remote, so the literal that used to sit here was a published secret
+// (removed 2026-10-24).  There is no default: a demo that cannot sign in must
+// say so rather than fall back to a shared account.
+//   JSUI_ACCOUNT=playwright JSUI_PASSWORD=... node doc/demo-dydra-studio.js
+const CREDS = {
+  username: process.env.JSUI_ACCOUNT || "playwright",
+  password: process.env.JSUI_PASSWORD,
+};
+if (!CREDS.password) {
+  console.error("demo-dydra-studio: set JSUI_PASSWORD (and JSUI_ACCOUNT if not"
+              + " 'playwright'). There is no default.");
+  process.exit(2);
+}
 
 const viewport = { width: 1280, height: 800 };
 

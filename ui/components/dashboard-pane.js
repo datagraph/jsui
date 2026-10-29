@@ -44,6 +44,9 @@ import {
   validateApplication, applicationFrom, mintId, specOf,
 } from "../../lib/app/document.js";
 import { applyPatch, patchFrom, panelDiff, classify } from "../../lib/app/patch.js";
+import { makeDisclosure } from "./disclosure.js";
+import { markStage } from "./provenance-note.js";
+import { promptVerdict, answerVerdict, budgetLine } from "../../lib/llm/budget.js";
 import { defaultValues, bindParameters } from "../../lib/app/parameters.js";
 import { createRepairLoop, groupFailures, repairPrompt } from "../../lib/app/repair.js";
 import {
@@ -134,6 +137,19 @@ const STYLE = `
 .dashboard-pane .dsh-kind-derived  { background: #eaf2ea; color: #2d662d; }
 .dashboard-pane .dsh-kind-asserted { background: #fdf3e0; color: #8a5a1a; }
 .dashboard-pane .dsh-kind-param    { background: #f0eaf6; color: #5a3d7a; }
+/* The show/hide control, as js/sparql-editor.js draws it on every view editor.
+   It sits at the end of its header, which is itself the click target -- a 16px
+   square is findable only by someone already hunting for it. */
+.dashboard-pane .dsh-toggle {
+  flex: none; margin-left: auto; width: 16px; height: 16px; padding: 1px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid #e5e7eb; border-radius: 4px; background: #f9fafb;
+  color: #111827; cursor: pointer; align-self: center; }
+.dashboard-pane .dsh-toggle:hover { background: #eef1f4; }
+.dashboard-pane .dsh-disclosing { cursor: pointer; user-select: none; }
+/* A header whose own note already claims the right-hand margin: the caret
+   follows it rather than fighting it for the same auto margin. */
+.dashboard-pane .dsh-panel > header .dsh-note[style*="auto"] ~ .dsh-toggle { margin-left: 8px; }
 .dashboard-pane pre.dsh-was { background: #fdf3f3; color: #7a5252;
   text-decoration: line-through; text-decoration-color: #d8b4b4; }
 .dashboard-pane pre.dsh-pre { margin: 0; padding: 6px 8px; background: #fbfcfd;
@@ -203,16 +219,72 @@ function openFence(text) {
   return /```(?:dashboard|application|patch|json)\s*\n(?![\s\S]*```)/i.test(String(text || ""));
 }
 
-function stage(doc, title, sub, { gate = false } = {}) {
+/**
+ * One stage of the run, with the view editors' own show/hide control.
+ *
+ * A dashboard run leaves every stage on the screen -- the grant, the model's
+ * work, the panel set, the page, the revise box -- because each of them is
+ * evidence for the next and throwing one away would make the page the only
+ * thing left to trust.  The cost is a column several screens long by the time
+ * anyone is reading the page itself.  Collapsing is the answer to that, and
+ * it is the one this interface already has: the same caret `js/sparql-editor.js'
+ * puts on every view editor (`ui/components/disclosure.js').
+ *
+ * Open by default, all of them.  A stage that hid itself would be a gate that
+ * hid what it was asking about.
+ */
+function stage(doc, title, sub, { gate = false, open = true, testid = null } = {}) {
   const sec = el(doc, "section", { class: `dsh-stage${gate ? " dsh-gate" : ""}` });
   const h = el(doc, "h3", {}, [el(doc, "span", { text: title })]);
   if (sub) h.appendChild(el(doc, "span", { class: "dsh-sub", text: sub }));
   sec.appendChild(h);
   const body = el(doc, "div", { class: "dsh-stage-body" });
   sec.appendChild(body);
+  const toggle = makeDisclosure(doc, {
+    header: h, body, open, className: "dsh-toggle",
+    testid: testid ? `dashboard-toggle-${testid}` : null,
+    labels: { shown: `Hide ${title}`, hidden: `Show ${title}` },
+  });
+  h.appendChild(toggle);
+  // §2.6 R-P2: the disclosure is on the screen while the content is.  It is
+  // added here, at construction, so that no stage can be built without one --
+  // and appended to the SECTION rather than the body, so that collapsing a
+  // stage does not fold its disclosure away.
+  sec._provenance = markStage(sec, null,
+                              { testid: testid ? `dashboard-provenance-${testid}` : null });
   sec._body = body;
-  sec._sub = h.lastChild;
+  sec._sub = h.lastChild === toggle ? h.children[h.children.length - 2] : h.lastChild;
+  sec._toggle = toggle;
   return sec;
+}
+
+/**
+ * A box inside a stage -- one panel, transform, parameter or assertion -- with
+ * the same control on its own header.
+ *
+ * These are what actually bury Gate 1: a query is a dozen lines and a
+ * transform body can be thirty, and six of them put the run button below the
+ * fold on the one screen where the user is deciding whether to press it.  The
+ * header keeps the kind, the name and the note visible when the body is
+ * hidden, which is what makes a collapsed set still readable as a list.
+ */
+function panelBox(doc, { kind, label, name, notes = [], body, open = true, testid = null }) {
+  const box = el(doc, "div", { class: "dsh-panel" });
+  const head = el(doc, "header", {}, [
+    el(doc, "span", { class: `dsh-kind dsh-kind-${kind}`, text: label }),
+    el(doc, "b", { text: name }),
+    ...notes.filter(Boolean),
+  ]);
+  box.appendChild(head);
+  if (body) box.appendChild(body);
+  const toggle = makeDisclosure(doc, {
+    header: head, body, open, className: "dsh-toggle",
+    testid: testid ? `dashboard-toggle-${testid}` : null,
+    labels: { shown: `Hide ${name}`, hidden: `Show ${name}` },
+  });
+  head.appendChild(toggle);
+  box._toggle = toggle;
+  return box;
 }
 
 /* ─────────────────────────── the pane ─────────────────────────── */
@@ -254,6 +326,30 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
 
   let grant = null;
   let adapterResult = null;
+  /**
+   * What produced the content on each stage, told to the stages (§2.6 R-P2).
+   *
+   * The model identifier used is the one the PROVIDER SERVED -- a family name
+   * can be answered with a point release, and the served identifier is the
+   * fact a reconstruction needs.  `provenanceOf' falls back to the requested
+   * one and records which it got, rather than silently passing off one as the
+   * other.
+   *
+   * Gate 0 is deliberately NOT marked: nothing on it came from a model, and
+   * its footnote says exactly that.  Marking it would be the over-marking
+   * that teaches a reader to stop reading these.
+   */
+  function markRun(result) {
+    const p = result ? {
+      model: result.model, servedModel: result.servedModel, served: result.served,
+      provider: result.provider, endpoint: result.endpoint, at: result.at,
+      account: accountName, repository: repositoryName,
+    } : null;
+    for (const sec of [phase1, gate1, stagePage, stageRevise, gatePatch, gate2]) {
+      if (sec) markStage(sec, p);
+    }
+    return p;
+  }
   let validated = null;         // {ok, document, errors, warnings, size}
   let results = null;           // {panel: {ok, text, digest, …}}
   let mounted = null;           // the frame handle
@@ -298,13 +394,14 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   // view editor does all day.  It is the baseline path of §1 applied to a page
   // -- which is also why a reopened dashboard is live rather than a snapshot,
   // and why its prose can turn out to be stale the moment the panels run.
-  const archive = stage(doc, "Saved dashboards", "reopened live, not replayed");
+  const archive = stage(doc, "Saved dashboards", "reopened live, not replayed", { testid: "archive" });
   archive.hidden = true;
   body.appendChild(archive);
 
   /* ── Gate 0: the grant ── */
 
-  const gate0 = stage(doc, "Gate 0 — authority", "granted once, charged per call", { gate: true });
+  const gate0 = stage(doc, "Gate 0 — authority", "granted once, charged per call",
+                        { gate: true, testid: "gate0" });
   body.appendChild(gate0);
 
   const promptEl = el(doc, "div", {
@@ -505,7 +602,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
 
   /* ── Phase 1: the meter and the log ── */
 
-  const phase1 = stage(doc, "Phase 1 — the model works inside the grant", "");
+  const phase1 = stage(doc, "Phase 1 — the model works inside the grant", "", { testid: "phase1" });
   phase1.hidden = true;
   body.appendChild(phase1);
 
@@ -568,13 +665,14 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   /* ── Gate 1: the panel set ── */
 
   const gate1 = stage(doc, "Gate 1 — the panel set", "reviewed together, before anything runs",
-                      { gate: true });
+                      { gate: true, testid: "gate1" });
   gate1.hidden = true;
   body.appendChild(gate1);
 
   /* ── Phase 2/3: the page ── */
 
-  const stagePage = stage(doc, "The page", "sandboxed: scripts on, origin opaque, no network");
+  const stagePage = stage(doc, "The page", "sandboxed: scripts on, origin opaque, no network",
+                           { testid: "page" });
   stagePage.hidden = true;
   body.appendChild(stagePage);
 
@@ -585,7 +683,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   // the user liked about the first page had to survive being described rather
   // than being kept.  §3.1 called that the gap that makes the feature feel
   // absent, and this box is what closes it.
-  const stageRevise = stage(doc, "Revise", "changes the page; does not replace it");
+  const stageRevise = stage(doc, "Revise", "changes the page; does not replace it", { testid: "revise" });
   stageRevise.hidden = true;
   body.appendChild(stageRevise);
 
@@ -606,13 +704,13 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
 
   /* ── the patch gate: whichever gate the change earns (D-W) ── */
 
-  const gatePatch = stage(doc, "The change", "", { gate: true });
+  const gatePatch = stage(doc, "The change", "", { gate: true, testid: "patch" });
   gatePatch.hidden = true;
   body.appendChild(gatePatch);
 
   /* ── Gate 2: disposition ── */
 
-  const gate2 = stage(doc, "Gate 2 — disposition", "", { gate: true });
+  const gate2 = stage(doc, "Gate 2 — disposition", "", { gate: true, testid: "gate2" });
   gate2.hidden = true;
   body.appendChild(gate2);
 
@@ -688,8 +786,20 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     const system = dashboardSystem(DEFAULT_SYSTEM, { grant, digesting: true,
                                                      answerTokens: ANSWER_TOKENS,
                                                      request: text });
-    log(`prompt: ${Math.round(system.length / 1024)} KiB `
-      + `(~${Math.ceil(system.length / 4)} tokens), answer ceiling ${ANSWER_TOKENS}`);
+    const verdict = promptVerdict(system);
+    log(`${budgetLine(verdict)}, answer ceiling ${ANSWER_TOKENS}`,
+        verdict.ok ? (verdict.level === "warned" ? "dsh-warn" : "") : "dsh-err");
+    if (!verdict.ok) {
+      // REQ-23.1.4.  Measuring without refusing was the worst of the three
+      // options: it paid for knowing and bought none of the protection, and
+      // it taught the reader to scroll past a number that never meant
+      // anything.  Nothing is sent.
+      log(verdict.reason, "dsh-err");
+      grantStatus.textContent = "refused — the prompt is over its ceiling";
+      running = false;
+      grantBtn.disabled = false;
+      return null;
+    }
 
     try {
       const adapter = createToolAdapter({
@@ -711,6 +821,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       });
       adapterResult = await adapter.run(text);
       st.session = adapterResult.session || st.session;
+      markRun(adapterResult);
       grantStatus.textContent = adapterResult.ok
         ? `phase 1 done · ${adapterResult.iterations} turn(s)`
         : `phase 1 failed · ${adapterResult.error}`;
@@ -753,7 +864,15 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       // first two are the interface's budget running out in the middle of the
       // model's answer, and the remedy for them is not the remedy for the
       // third.  They used to be reported identically, as the third.
-      const cut = Boolean(adapterResult?.truncated) || openFence(last.text);
+      // `truncated' is set by the adapter for the stop reason it knows; the
+      // three providers spell that reason three ways, and `answerVerdict'
+      // holds the one list (REQ-23.1.4).  An open fence catches the case no
+      // stop reason reports: a block that simply never closed.
+      const verdictOnAnswer = answerVerdict({ stopReason: last.stopReason,
+                                              text: last.text,
+                                              maxTokens: ANSWER_TOKENS });
+      const cut = Boolean(adapterResult?.truncated) || verdictOnAnswer.truncated
+                || openFence(last.text);
       if (cut) {
         gate1._body.appendChild(el(doc, "p", { class: "dsh-err", dataset: { testid: "dsh-truncated" },
           text: `The last turn ran out of room: it stopped at the ${ANSWER_TOKENS}-token `
@@ -803,61 +922,52 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     }
 
     for (const p of spec.panels) {
-      const box = el(doc, "div", { class: "dsh-panel" });
-      box.appendChild(el(doc, "header", {}, [
-        el(doc, "span", { class: "dsh-kind dsh-kind-bound", text: "bound" }),
-        el(doc, "b", { text: p.name }),
-        el(doc, "span", { class: "dsh-note", text: p.caption || "" }),
-        el(doc, "span", { class: "dsh-note", style: "margin-left:auto",
-                          text: viaCatalog ? tempName(run, p.name) : p.accept }),
-      ]));
-      box.appendChild(el(doc, "pre", { class: "dsh-pre", text: p.query }));
-      gate1._body.appendChild(box);
+      gate1._body.appendChild(panelBox(doc, {
+        kind: "bound", label: "bound", name: p.name, testid: `panel-${p.name}`,
+        notes: [
+          el(doc, "span", { class: "dsh-note", text: p.caption || "" }),
+          el(doc, "span", { class: "dsh-note", style: "margin-left:auto",
+                            text: viaCatalog ? tempName(run, p.name) : p.accept }),
+        ],
+        body: el(doc, "pre", { class: "dsh-pre", text: p.query }),
+      }));
     }
     for (const t of spec.transforms) {
-      const box = el(doc, "div", { class: "dsh-panel" });
-      box.appendChild(el(doc, "header", {}, [
-        el(doc, "span", { class: "dsh-kind dsh-kind-derived", text: "derived" }),
-        el(doc, "b", { text: t.name }),
-        el(doc, "span", { class: "dsh-note", text: `from ${t.inputs.join(", ") || "nothing"}` }),
-      ]));
-      box.appendChild(el(doc, "pre", { class: "dsh-pre", text: t.body }));
-      gate1._body.appendChild(box);
+      gate1._body.appendChild(panelBox(doc, {
+        kind: "derived", label: "derived", name: t.name, testid: `transform-${t.name}`,
+        notes: [el(doc, "span", { class: "dsh-note",
+                                  text: `from ${t.inputs.join(", ") || "nothing"}` })],
+        body: el(doc, "pre", { class: "dsh-pre", text: t.body }),
+      }));
     }
     for (const x of spec.parameters) {
-      const box = el(doc, "div", { class: "dsh-panel" });
-      box.appendChild(el(doc, "header", {}, [
-        el(doc, "span", { class: "dsh-kind dsh-kind-param", text: "parameter" }),
-        el(doc, "b", { text: x.name }),
-        el(doc, "span", { class: "dsh-note",
+      gate1._body.appendChild(panelBox(doc, {
+        kind: "param", label: "parameter", name: x.name, testid: `parameter-${x.name}`,
+        notes: [el(doc, "span", { class: "dsh-note",
           text: `${x.kind}${x.datatype ? ` ${x.datatype}` : ""} · `
               + `used by ${spec.panels.filter((p) => p.parameters.includes(x.name))
-                               .map((p) => p.name).join(", ") || "nothing"}` }),
-      ]));
-      // What the control will admit, shown at the gate: this is the whole of
-      // what the page may vary, and it is the one thing on this screen the
-      // user is authorising to change after they have left it.
-      box.appendChild(el(doc, "pre", { class: "dsh-pre",
-        text: x.domain
-          ? (Array.isArray(x.domain.values)
-              ? `one of: ${x.domain.values.join(", ")}`
-              : (x.domain.from
-                  ? `any value \`${x.domain.from}'.${x.domain.column || "(first column)"} returns`
-                  : `between ${x.domain.min ?? "−∞"} and ${x.domain.max ?? "∞"}`))
-          : "any value — no domain declared" }));
-      gate1._body.appendChild(box);
+                               .map((p) => p.name).join(", ") || "nothing"}` })],
+        // What the control will admit, shown at the gate: this is the whole of
+        // what the page may vary, and it is the one thing on this screen the
+        // user is authorising to change after they have left it.
+        body: el(doc, "pre", { class: "dsh-pre",
+          text: x.domain
+            ? (Array.isArray(x.domain.values)
+                ? `one of: ${x.domain.values.join(", ")}`
+                : (x.domain.from
+                    ? `any value \`${x.domain.from}'.${x.domain.column || "(first column)"} returns`
+                    : `between ${x.domain.min ?? "−∞"} and ${x.domain.max ?? "∞"}`))
+            : "any value — no domain declared" }),
+      }));
     }
     for (const a of spec.assertions) {
-      const box = el(doc, "div", { class: "dsh-panel" });
-      box.appendChild(el(doc, "header", {}, [
-        el(doc, "span", { class: "dsh-kind dsh-kind-asserted", text: "asserted" }),
-        el(doc, "b", { text: a.id }),
-        el(doc, "span", { class: "dsh-note",
+      gate1._body.appendChild(panelBox(doc, {
+        kind: "asserted", label: "asserted", name: a.id, testid: `assertion-${a.id}`,
+        notes: [el(doc, "span", { class: "dsh-note",
           text: a.inputs.length ? `written from ${a.inputs.join(", ")}`
-                                : "outside knowledge — nothing here supports or contradicts it" }),
-      ]));
-      box.appendChild(el(doc, "pre", { class: "dsh-pre", text: a.text }));
-      gate1._body.appendChild(box);
+                                : "outside knowledge — nothing here supports or contradicts it" })],
+        body: el(doc, "pre", { class: "dsh-pre", text: a.text }),
+      }));
     }
 
     // §13.9: what the page will weigh, which the model cannot measure and the
@@ -1260,8 +1370,17 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     const system = dashboardSystem(DEFAULT_SYSTEM, { grant, digesting: true,
                                                      answerTokens: ANSWER_TOKENS,
                                                      request: text });
-    log(`prompt: ${Math.round(system.length / 1024)} KiB `
-      + `(~${Math.ceil(system.length / 4)} tokens), answer ceiling ${ANSWER_TOKENS}`);
+    const verdict = promptVerdict(system);
+    log(`${budgetLine(verdict)}, answer ceiling ${ANSWER_TOKENS}`,
+        verdict.ok ? (verdict.level === "warned" ? "dsh-warn" : "") : "dsh-err");
+    if (!verdict.ok) {
+      // REQ-23.1.4, as above: refused before the call, not reported after it.
+      log(verdict.reason, "dsh-err");
+      reviseStatus.textContent = "refused — the prompt is over its ceiling";
+      revising = false;
+      reviseBtn.disabled = false;
+      return null;
+    }
 
     try {
       const adapter = createToolAdapter({
@@ -1279,6 +1398,10 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       });
       const out = await adapter.run(ask);
       st.session = out.session || st.session;
+      // A revision is a new model answer, so the stages say so: the page on
+      // the screen after it is applied was produced by THIS turn, and a
+      // footnote still naming the first run's model would be false.
+      markRun(out);
       reviseStatus.textContent = out.ok ? "answered" : `failed · ${out.error}`;
       return receiveRevision(out, ask);
     } catch (e) {
@@ -1377,15 +1500,15 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       // lines that changed in the thirty that did not.
       for (const d of panelDiff(appDoc, applied.document)) {
         if (d.change === "unchanged") continue;
-        const box = el(doc, "div", { class: "dsh-panel",
-                                     dataset: { testid: `dashboard-diff-${d.name}` } });
-        box.appendChild(el(doc, "header", {}, [
-          el(doc, "span", { class: `dsh-kind dsh-kind-${d.change === "removed" ? "asserted" : "bound"}`,
-                            text: d.change }),
-          el(doc, "b", { text: d.name }),
-        ]));
-        if (d.before) box.appendChild(el(doc, "pre", { class: "dsh-pre dsh-was", text: d.before.query }));
-        if (d.after) box.appendChild(el(doc, "pre", { class: "dsh-pre", text: d.after.query }));
+        const box = panelBox(doc, {
+          kind: d.change === "removed" ? "asserted" : "bound", label: d.change, name: d.name,
+          testid: `diff-${d.name}`,
+          body: el(doc, "div", {}, [
+            d.before ? el(doc, "pre", { class: "dsh-pre dsh-was", text: d.before.query }) : null,
+            d.after ? el(doc, "pre", { class: "dsh-pre", text: d.after.query }) : null,
+          ]),
+        });
+        box.dataset.testid = `dashboard-diff-${d.name}`;
         gatePatch._body.appendChild(box);
       }
       const keeping = c.unchanged.filter((n) => !c.rerun.includes(n));

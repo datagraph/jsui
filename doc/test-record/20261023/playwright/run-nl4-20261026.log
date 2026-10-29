@@ -1,0 +1,2033 @@
+
+Running 74 tests using 1 worker
+
+[DocCapture] REQ-2.1.1 before: req-2-1-1-display-account-information-before.pdf
+[DocCapture] REQ-2.1.1 after: req-2-1-1-display-account-information-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account/manifest.json (4 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/account/index.html
+  ✓   1 [chromium] › tests/account-documented.spec.js:48:7 › Account › display account information [REQ-2.1.1, REQ-2.1.2] (6.1s)
+  -   2 [chromium] › tests/account-documented.spec.js:83:7 › Account › edit account profile fields [REQ-2.2.1, REQ-2.2.3]
+[DocCapture] REQ-2.2.4 before: req-2-2-4-display-authentication-token-before.pdf
+[DocCapture] REQ-2.2.4 after: req-2-2-4-display-authentication-token-after.pdf
+[DocCapture] Manifest written: tests/pdfs/account/manifest.json (4 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/account/index.html
+  ✓   3 [chromium] › tests/account-documented.spec.js:134:7 › Account › view authentication token [REQ-2.2.4] (6.5s)
+[DocCapture] REQ-2.4.1 before: req-2-4-1-account-listing-table-before.pdf
+[DocCapture] REQ-2.4.1 after: req-2-4-1-account-listing-table-after.pdf
+[DocCapture] REQ-2.4.2 before: req-2-4-2-account-entry-fields-before.pdf
+[DocCapture] REQ-2.4.2 after: req-2-4-2-account-entry-fields-after.pdf
+[DocCapture] Manifest written: tests/pdfs/admin-accounts/manifest.json (8 entries, 4 from this test)
+[DocCapture] Index written: tests/pdfs/admin-accounts/index.html
+  ✓   4 [chromium] › tests/accounts-pane-documented.spec.js:322:7 › Accounts Pane › account listing [REQ-2.4.1, REQ-2.4.2] (8.5s)
+[DocCapture] REQ-2.4.3 before: req-2-4-3-order-account-listing-before.pdf
+  -   5 [chromium] › tests/accounts-pane-documented.spec.js:334:7 › Accounts Pane › order the listing by any column [REQ-2.4.3]
+[DocCapture] REQ-2.4.4 before: req-2-4-4-account-listing-scoped-by-role-before.pdf
+  ✘   6 [chromium] › tests/accounts-pane-documented.spec.js:346:7 › Accounts Pane › listing scope and delete control [REQ-2.4.4, REQ-2.6.1] (1.8s)
+[DocCapture] REQ-A.1.1 before: req-a-1-1-admin-login-as-administrator-before.pdf
+[ManualImage] admin-login-form.png
+[DocCapture] REQ-A.1.1 form-filled: req-a-1-1-admin-login-as-administrator-form-filled.pdf
+[DocCapture] REQ-A.1.1 after: req-a-1-1-admin-login-as-administrator-after.pdf
+[ManualImage] admin-login-success.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓   7 [chromium] › tests/admin-documented.spec.js:528:7 › Admin Console › login as administrator [REQ-A.1.1] (2.3s)
+[DocCapture] REQ-A.1.3 before: req-a-1-3-admin-logout-before.pdf
+[DocCapture] REQ-A.1.3 after: req-a-1-3-admin-logout-after.pdf
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓   8 [chromium] › tests/admin-documented.spec.js:544:7 › Admin Console › logout [REQ-A.1.3] (2.1s)
+  ✘   9 [chromium] › tests/admin-documented.spec.js:555:7 › Admin Console › dashboard tab navigation [REQ-A.2.1] (21.4s)
+  ✘  10 [chromium] › tests/admin-documented.spec.js:567:7 › Admin Console › location bar navigation [REQ-A.2.2] (21.7s)
+[DocCapture] REQ-A.3.1 before: req-a-3-1-view-system-accounts-before.pdf
+  ✘  11 [chromium] › tests/admin-documented.spec.js:579:7 › Admin Console › view system accounts [REQ-A.3.1] (21.8s)
+  ✘  12 [chromium] › tests/admin-documented.spec.js:590:7 › Admin Console › account details dialog [REQ-A.3.2] (21.5s)
+  -  13 [chromium] › tests/admin-documented.spec.js:603:7 › Admin Console › create and delete account [REQ-A.3.3, REQ-A.3.4]
+  ✘  14 [chromium] › tests/admin-documented.spec.js:628:7 › Admin Console › view repositories for selected account [REQ-A.4.1] (21.3s)
+  -  15 [chromium] › tests/admin-documented.spec.js:640:7 › Admin Console › create and delete repository [REQ-A.4.2, REQ-A.4.3]
+[DocCapture] REQ-A.5.1 before: req-a-5-1-view-invitations-before.pdf
+  ✘  16 [chromium] › tests/admin-documented.spec.js:672:7 › Admin Console › view invitations [REQ-A.5.1] (11.6s)
+  -  17 [chromium] › tests/admin-documented.spec.js:683:7 › Admin Console › create and delete invitation [REQ-A.5.2, REQ-A.5.3]
+  ✘  18 [chromium] › tests/admin-documented.spec.js:708:7 › Admin Console › query history table and graph [REQ-A.6.1, REQ-A.6.2] (21.3s)
+  -  19 [chromium] › tests/admin-documented.spec.js:734:7 › Admin Console › transaction history [REQ-A.6.3]
+  -  20 [chromium] › tests/admin-documented.spec.js:773:7 › Admin Console › import history table and graph [REQ-A.6.4, REQ-A.6.5]
+[DocCapture] REQ-1.1.1 before: req-1-1-1-basic-bearer-authentication-before.pdf
+  ✘  21 [chromium] › tests/authentication-documented.spec.js:37:7 › Authentication › login with valid credentials [REQ-1.1.1, REQ-1.1.2] (18.7s)
+[DocCapture] REQ-9.1.1 before: req-9-1-1-authentication-error-messages-before.pdf
+[DocCapture] REQ-9.1.1 after: req-9-1-1-authentication-error-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  22 [chromium] › tests/authentication-documented.spec.js:59:7 › Authentication › login with invalid credentials [REQ-9.1.1] (3.9s)
+  ✘  23 [chromium] › tests/authentication-documented.spec.js:85:7 › Authentication › logout functionality [REQ-1.2.2] (18.4s)
+[DocCapture] REQ-1.2.3 before: req-1-2-3-auth-based-navigation-links-before.pdf
+[DocCapture] REQ-1.2.3 logged-in: req-1-2-3-auth-based-navigation-links-logged-in.pdf
+  ✘  24 [chromium] › tests/authentication-documented.spec.js:103:7 › Authentication › navigation links based on auth status [REQ-1.2.3] (19.2s)
+  ✘  25 [chromium] › tests/authentication-documented.spec.js:126:7 › Authentication › session persistence of account name [REQ-1.2.1] (18.6s)
+  ✘  26 [chromium] › tests/collaboration-documented.spec.js:468:7 › Collaboration › read collaborators [REQ-3.7.1] (18.7s)
+  -  27 [chromium] › tests/collaboration-documented.spec.js:480:7 › Collaboration › add, modify and remove a collaborator [REQ-3.7.2, REQ-3.7.3, REQ-3.7.4, REQ-3.7.5]
+  ✘  28 [chromium] › tests/collaboration-documented.spec.js:518:7 › Collaboration › unknown account refused [REQ-3.7.6] (18.5s)
+[DocCapture] REQ-2.1.2 before: req-2-1-2-view-current-account-details-before.pdf
+  ✘  29 [chromium] › tests/collaboration-documented.spec.js:530:7 › Collaboration › collaborations an account reaches [REQ-2.1.2] (18.9s)
+  ✘  30 [chromium] › tests/events-documented.spec.js:269:7 › Lifecycle Events › events offered and fetched per account [REQ-2.5.1, REQ-2.5.2] (21.5s)
+  ✘  31 [chromium] › tests/events-documented.spec.js:280:7 › Lifecycle Events › event table columns and agent [REQ-2.5.3, REQ-3.8.3] (21.6s)
+  ✘  32 [chromium] › tests/events-documented.spec.js:291:7 › Lifecycle Events › event type names [REQ-3.8.1, REQ-3.8.7] (21.5s)
+  ✘  33 [chromium] › tests/events-documented.spec.js:302:7 › Lifecycle Events › history filters [REQ-2.5.4] (21.6s)
+[DocCapture] REQ-3.4.4 before: req-3-4-4-import-from-file-upload-before.pdf
+  ✘  34 [chromium] › tests/import-export-documented.spec.js:238:7 › Import/Export › import Turtle file [REQ-3.4.4, REQ-3.4.7] (19.3s)
+[DocCapture] REQ-3.4.4 before: req-3-4-4-import-from-file-upload-before.pdf
+  ✘  35 [chromium] › tests/import-export-documented.spec.js:256:7 › Import/Export › import N-Triples file [REQ-3.4.4, REQ-3.4.7] (19.3s)
+[DocCapture] REQ-3.4.4 before: req-3-4-4-import-from-file-upload-before.pdf
+  ✘  36 [chromium] › tests/import-export-documented.spec.js:279:7 › Import/Export › import N-Quads file [REQ-3.4.4, REQ-3.4.7] (19.5s)
+[DocCapture] REQ-3.4.3 before: req-3-4-3-import-from-url-before.pdf
+  ✘  37 [chromium] › tests/import-export-documented.spec.js:296:7 › Import/Export › import from URL [REQ-3.4.3] (19.4s)
+[DocCapture] REQ-3.4.6 before: req-3-4-6-import-progress-display-before.pdf
+  ✘  38 [chromium] › tests/import-export-documented.spec.js:306:7 › Import/Export › import progress display [REQ-3.4.6] (19.3s)
+[DocCapture] REQ-3.5.1 before: req-3-5-1-export-repository-data-before.pdf
+  ✘  39 [chromium] › tests/import-export-documented.spec.js:327:7 › Import/Export › export Turtle format [REQ-3.5.1] (29.3s)
+[DocCapture] REQ-3.5.1 before: req-3-5-1-export-repository-data-before.pdf
+  ✘  40 [chromium] › tests/import-export-documented.spec.js:337:7 › Import/Export › export N-Triples format [REQ-3.5.1, REQ-3.5.2] (29.3s)
+[DocCapture] REQ-5.1.1 before: req-5-1-1-client-side-routing-before.pdf
+  ✘  41 [chromium] › tests/navigation-documented.spec.js:39:7 › Navigation › client-side routing [REQ-5.1.1] (19.5s)
+  ✘  42 [chromium] › tests/navigation-documented.spec.js:82:7 › Navigation › browser back/forward [REQ-5.1.2] (19.1s)
+[DocCapture] REQ-6.3.1 before: req-6-3-1-tab-management-before.pdf
+  ✘  43 [chromium] › tests/navigation-documented.spec.js:115:7 › Navigation › tab management [REQ-6.3.1, REQ-6.3.2] (19.3s)
+[DocCapture] REQ-5.2.4 before: req-5-2-4-location-bar-display-before.pdf
+  ✘  44 [chromium] › tests/navigation-documented.spec.js:143:7 › Navigation › location bar display [REQ-5.2.4] (19.4s)
+[DocCapture] REQ-5.2.5 before: req-5-2-5-tabbed-interface-before.pdf
+  ✘  45 [chromium] › tests/navigation-documented.spec.js:163:7 › Navigation › tabbed interface [REQ-5.2.5] (4.4s)
+[DocCapture] REQ-5.1.1 before: req-5-1-1-client-side-routing-before.pdf
+[DocCapture] REQ-5.1.1 after: req-5-1-1-client-side-routing-after.pdf
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  46 [chromium] › tests/navigation-documented.spec.js:184:7 › Navigation › direct URL navigation [REQ-5.1.1] (8.2s)
+[DocCapture] REQ-5.2.5 before: req-5-2-5-tabbed-interface-before.pdf
+  ✘  47 [chromium] › tests/navigation-documented.spec.js:211:7 › Navigation › navigation between account and repositories [REQ-5.2.5] (18.7s)
+  ✘  48 [chromium] › tests/repository-documented.spec.js:46:7 › Repository › repository profile properties [REQ-3.2.1, REQ-3.2.3] (24.1s)
+  ✘  49 [chromium] › tests/repository-documented.spec.js:78:7 › Repository › repository collaboration [REQ-3.7.1, REQ-3.7.2, REQ-3.7.3] (24.0s)
+[DocCapture] REQ-3.3.1 before: req-3-3-1-create-repository-before.pdf
+  ✘  50 [chromium] › tests/repository-documented.spec.js:104:7 › Repository › repository creation [REQ-3.3.1] (20.3s)
+  ✘  51 [chromium] › tests/repository-documented.spec.js:139:7 › Repository › repository clear [REQ-3.6.1] (24.0s)
+  ✘  52 [chromium] › tests/sparql-documented.spec.js:89:7 › SPARQL Editor › execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4] (19.3s)
+  ✘  53 [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - JSON [REQ-4.1.3] (19.5s)
+  ✘  54 [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - CSV [REQ-4.1.3] (19.5s)
+  ✘  55 [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - XML [REQ-4.1.3] (19.4s)
+  ✘  56 [chromium] › tests/sparql-documented.spec.js:150:7 › SPARQL Editor › query execution time display [REQ-4.3.4] (19.5s)
+  ✘  57 [chromium] › tests/sparql-documented.spec.js:173:7 › SPARQL Editor › query keyboard shortcut [REQ-4.3.2] (19.4s)
+  ✘  58 [chromium] › tests/sparql-documented.spec.js:195:7 › SPARQL Editor › query reset functionality [REQ-4.3.3] (19.5s)
+  ✘  59 [chromium] › tests/sparql-documented.spec.js:216:7 › SPARQL Editor › multiple query tabs [REQ-4.3.6] (19.4s)
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+[DocCapture] REQ-6.2.1 shown: req-6-2-1-flash-messages-shown.pdf
+[DocCapture] REQ-6.2.1 after: req-6-2-1-flash-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 3 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  60 [chromium] › tests/ui-components-documented.spec.js:38:7 › UI Components › flash message display [REQ-6.2.1] (6.2s)
+[DocCapture] REQ-6.2.2 before: req-6-2-2-loading-indicators-before.pdf
+  ✘  61 [chromium] › tests/ui-components-documented.spec.js:66:7 › UI Components › loading indicator [REQ-6.2.2] (23.3s)
+[DocCapture] REQ-9.1.2 before: req-9-1-2-api-error-messages-before.pdf
+[DocCapture] REQ-9.1.2 after: req-9-1-2-api-error-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  62 [chromium] › tests/ui-components-documented.spec.js:98:7 › UI Components › error message display [REQ-9.1.2] (948ms)
+[DocCapture] REQ-9.1.3 before: req-9-1-3-404-page-before.pdf
+[DocCapture] REQ-9.1.3 after: req-9-1-3-404-page-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  63 [chromium] › tests/ui-components-documented.spec.js:122:7 › UI Components › 404 page [REQ-9.1.3] (4.4s)
+[DocCapture] REQ-6.2.3 before: req-6-2-3-form-validation-before.pdf
+  ✘  64 [chromium] › tests/ui-components-documented.spec.js:140:7 › UI Components › modal dialog behavior [REQ-6.2.3] (19.1s)
+[DocCapture] REQ-6.2.3 before: req-6-2-3-form-validation-before.pdf
+  ✘  65 [chromium] › tests/ui-components-documented.spec.js:161:7 › UI Components › confirmation dialog [REQ-6.2.3] (19.4s)
+  ✘  66 [chromium] › tests/ui-components-documented.spec.js:182:7 › UI Components › responsive layout elements (19.1s)
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+[DocCapture] REQ-6.2.1 after: req-6-2-1-flash-messages-after.pdf
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 2 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  67 [chromium] › tests/ui-components-documented.spec.js:205:7 › UI Components › keyboard navigation (901ms)
+[DocCapture] REQ-6.2.1 before: req-6-2-1-flash-messages-before.pdf
+  ✘  68 [chromium] › tests/ui-components-documented.spec.js:226:7 › UI Components › tooltip display (19.2s)
+[DocCapture] REQ-4.2.1 before: req-4-2-1-crud-sparql-views-before.pdf
+  ✘  69 [chromium] › tests/view-documented.spec.js:116:7 › View Management › create view [REQ-4.2.1] (20.2s)
+  ✘  70 [chromium] › tests/view-documented.spec.js:136:7 › View Management › edit view [REQ-4.2.2, REQ-4.2.3, REQ-4.2.5] (19.9s)
+  ✘  71 [chromium] › tests/view-documented.spec.js:190:7 › View Management › delete view [REQ-4.2.1] (19.9s)
+  ✘  72 [chromium] › tests/view-documented.spec.js:208:7 › View Management › open view in pane editor [REQ-4.2.5, REQ-4.2.6] (20.0s)
+  ✘  73 [chromium] › tests/view-documented.spec.js:246:7 › View Management › execute view [REQ-4.2.2] (19.9s)
+logged in: false
+  ✘  74 [chromium] › tests/zz-shot-documented.spec.js:14:5 › open the exploration pane (20.6s)
+
+
+  1) [chromium] › tests/accounts-pane-documented.spec.js:346:7 › Accounts Pane › listing scope and delete control [REQ-2.4.4, REQ-2.6.1] 
+
+    Error: the collaboration resource should answer, so the rule can be checked
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mnot[2m.[22mtoBeNull[2m()[22m
+
+    Received: [31mnull[39m
+
+      248 |     expect(collaborating,
+      249 |            'the collaboration resource should answer, so the rule can be checked')
+    > 250 |       .not.toBeNull();
+          |            ^
+      251 |
+      252 |     const permitted = new Set([ACCOUNT_UNDER_TEST, ...collaborating]);
+      253 |     const surplus = names.filter((n) => !permitted.has(n));
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/accounts-pane-documented.spec.js:250:12
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_2_4_4_scope (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/accounts-pane-documented.spec.js:209:3)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/accounts-pane-documented.spec.js:351:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/accounts-pane-documented-A-582cb-ontrol-REQ-2-4-4-REQ-2-6-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/accounts-pane-documented-A-582cb-ontrol-REQ-2-4-4-REQ-2-6-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/accounts-pane-documented-A-582cb-ontrol-REQ-2-4-4-REQ-2-6-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/accounts-pane-documented-A-582cb-ontrol-REQ-2-4-4-REQ-2-6-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/admin-documented.spec.js:555:7 › Admin Console › dashboard tab navigation [REQ-A.2.1] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      72 |   // this helper exists to detect, and swallowing the timeout turned every pane
+      73 |   // test into a screenshot of a spinner.
+    > 74 |   await page.waitForFunction(
+         |              ^
+      75 |     (id) => {
+      76 |       const el = document.getElementById(id);
+      77 |       return el && el.dataset.loaded === 'true';
+        at waitForPaneLoaded (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:74:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:558:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-0bfc2-d-tab-navigation-REQ-A-2-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-documented-Admin-Con-0bfc2-d-tab-navigation-REQ-A-2-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-0bfc2-d-tab-navigation-REQ-A-2-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/admin-documented-Admin-Con-0bfc2-d-tab-navigation-REQ-A-2-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/admin-documented.spec.js:567:7 › Admin Console › location bar navigation [REQ-A.2.2] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      72 |   // this helper exists to detect, and swallowing the timeout turned every pane
+      73 |   // test into a screenshot of a spinner.
+    > 74 |   await page.waitForFunction(
+         |              ^
+      75 |     (id) => {
+      76 |       const el = document.getElementById(id);
+      77 |       return el && el.dataset.loaded === 'true';
+        at waitForPaneLoaded (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:74:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:570:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-216ff-n-bar-navigation-REQ-A-2-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-documented-Admin-Con-216ff-n-bar-navigation-REQ-A-2-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-216ff-n-bar-navigation-REQ-A-2-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/admin-documented-Admin-Con-216ff-n-bar-navigation-REQ-A-2-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/admin-documented.spec.js:579:7 › Admin Console › view system accounts [REQ-A.3.1] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      72 |   // this helper exists to detect, and swallowing the timeout turned every pane
+      73 |   // test into a screenshot of a spinner.
+    > 74 |   await page.waitForFunction(
+         |              ^
+      75 |     (id) => {
+      76 |       const el = document.getElementById(id);
+      77 |       return el && el.dataset.loaded === 'true';
+        at waitForPaneLoaded (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:74:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:210:11
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_A_3_1_viewAccounts (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:207:3)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:583:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-b6fe7--system-accounts-REQ-A-3-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-documented-Admin-Con-b6fe7--system-accounts-REQ-A-3-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-b6fe7--system-accounts-REQ-A-3-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/admin-documented-Admin-Con-b6fe7--system-accounts-REQ-A-3-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests/admin-documented.spec.js:590:7 › Admin Console › account details dialog [REQ-A.3.2] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      72 |   // this helper exists to detect, and swallowing the timeout turned every pane
+      73 |   // test into a screenshot of a spinner.
+    > 74 |   await page.waitForFunction(
+         |              ^
+      75 |     (id) => {
+      76 |       const el = document.getElementById(id);
+      77 |       return el && el.dataset.loaded === 'true';
+        at waitForPaneLoaded (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:74:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:593:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-14040-t-details-dialog-REQ-A-3-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-documented-Admin-Con-14040-t-details-dialog-REQ-A-3-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-14040-t-details-dialog-REQ-A-3-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/admin-documented-Admin-Con-14040-t-details-dialog-REQ-A-3-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests/admin-documented.spec.js:628:7 › Admin Console › view repositories for selected account [REQ-A.4.1] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      72 |   // this helper exists to detect, and swallowing the timeout turned every pane
+      73 |   // test into a screenshot of a spinner.
+    > 74 |   await page.waitForFunction(
+         |              ^
+      75 |     (id) => {
+      76 |       const el = document.getElementById(id);
+      77 |       return el && el.dataset.loaded === 'true';
+        at waitForPaneLoaded (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:74:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:631:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-cbcaf-selected-account-REQ-A-4-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-documented-Admin-Con-cbcaf-selected-account-REQ-A-4-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-cbcaf-selected-account-REQ-A-4-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/admin-documented-Admin-Con-cbcaf-selected-account-REQ-A-4-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests/admin-documented.spec.js:672:7 › Admin Console › view invitations [REQ-A.5.1] 
+
+    Error: the admin-invitations tab should be offered
+
+    [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-tab-link][href="#admin-invitations"]')
+    Expected: visible
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - the admin-invitations tab should be offered with timeout 10000ms[22m
+    [2m  - waiting for locator('[data-tab-link][href="#admin-invitations"]')[22m
+
+
+      48 |   // make its captures of whatever happened to be on screen.
+      49 |   const link = page.locator(`[data-tab-link][href="#${panelId}"]`);
+    > 50 |   await expect(link, `the ${panelId} tab should be offered`).toBeVisible({ timeout: 10000 });
+         |                                                              ^
+      51 |   await link.click();
+      52 |   await expect(page.locator(`#${panelId}`), `${panelId} should open`).toBeVisible({ timeout: 15000 });
+      53 |   await page.waitForTimeout(800);
+        at clickTab (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:50:62)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:393:11
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_A_5_1_viewInvitations (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:391:3)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:676:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Console-view-invitations-REQ-A-5-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-documented-Admin-Console-view-invitations-REQ-A-5-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Console-view-invitations-REQ-A-5-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/admin-documented-Admin-Console-view-invitations-REQ-A-5-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests/admin-documented.spec.js:708:7 › Admin Console › query history table and graph [REQ-A.6.1, REQ-A.6.2] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      72 |   // this helper exists to detect, and swallowing the timeout turned every pane
+      73 |   // test into a screenshot of a spinner.
+    > 74 |   await page.waitForFunction(
+         |              ^
+      75 |     (id) => {
+      76 |       const el = document.getElementById(id);
+      77 |       return el && el.dataset.loaded === 'true';
+        at waitForPaneLoaded (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:74:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/admin-documented.spec.js:711:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-d58b0--graph-REQ-A-6-1-REQ-A-6-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/admin-documented-Admin-Con-d58b0--graph-REQ-A-6-1-REQ-A-6-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/admin-documented-Admin-Con-d58b0--graph-REQ-A-6-1-REQ-A-6-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/admin-documented-Admin-Con-d58b0--graph-REQ-A-6-1-REQ-A-6-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests/authentication-documented.spec.js:37:7 › Authentication › login with valid credentials [REQ-1.1.1, REQ-1.1.2] 
+
+    Error: an account tab should appear
+
+    [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-tab-type="account"]').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - an account tab should appear with timeout 15000ms[22m
+    [2m  - waiting for locator('[data-tab-type="account"]').first()[22m
+
+
+      48 |       // Authenticated means the account is actually open, not merely that the
+      49 |       // form went away.
+    > 50 |       await expect(accountTab(page), 'an account tab should appear').toBeVisible({ timeout: 15000 });
+         |                                                                      ^
+      51 |       await expect(accountPane(page)).toContainText(ACCOUNT, { timeout: 15000 });
+      52 |       await cap.after('Account open after authentication');
+      53 |     });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/authentication-documented.spec.js:50:70
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/authentication-documented.spec.js:40:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/authentication-documented--4a3c2-ntials-REQ-1-1-1-REQ-1-1-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/authentication-documented--4a3c2-ntials-REQ-1-1-1-REQ-1-1-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/authentication-documented--4a3c2-ntials-REQ-1-1-1-REQ-1-1-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/authentication-documented--4a3c2-ntials-REQ-1-1-1-REQ-1-1-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests/authentication-documented.spec.js:85:7 › Authentication › logout functionality [REQ-1.2.2] 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-tab-type="account"]').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('[data-tab-type="account"]').first()[22m
+
+
+      86 |     const capture = new DocCapture(page, 'tests/pdfs/authentication', { enabled: CAPTURE_ENABLED });
+      87 |     await login(page);
+    > 88 |     await expect(accountTab(page)).toBeVisible({ timeout: 15000 });
+         |                                    ^
+      89 |
+      90 |     await capture.requirement(REQ['1.2.2'], async (cap) => {
+      91 |       await cap.before('Logged in, before logout');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/authentication-documented.spec.js:88:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/authentication-documented--1cf8b-ut-functionality-REQ-1-2-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/authentication-documented--1cf8b-ut-functionality-REQ-1-2-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/authentication-documented--1cf8b-ut-functionality-REQ-1-2-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/authentication-documented--1cf8b-ut-functionality-REQ-1-2-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium] › tests/authentication-documented.spec.js:103:7 › Authentication › navigation links based on auth status [REQ-1.2.3] 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-tab-type="account"]').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('[data-tab-type="account"]').first()[22m
+
+
+      115 |       await cap.step('logged-in', 'Navigation when logged in');
+      116 |       // Logged in: the account tab is, and a logout link is offered.
+    > 117 |       await expect(accountTab(page)).toBeVisible({ timeout: 15000 });
+          |                                      ^
+      118 |       await expect(page.getByRole('link', { name: /logout/i }).first()).toBeVisible();
+      119 |       await cap.after('Navigation reflects the authenticated state');
+      120 |     });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/authentication-documented.spec.js:117:38
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/authentication-documented.spec.js:106:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/authentication-documented--78db9-d-on-auth-status-REQ-1-2-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/authentication-documented--78db9-d-on-auth-status-REQ-1-2-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/authentication-documented--78db9-d-on-auth-status-REQ-1-2-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/authentication-documented--78db9-d-on-auth-status-REQ-1-2-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium] › tests/authentication-documented.spec.js:126:7 › Authentication › session persistence of account name [REQ-1.2.1] 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-tab-type="account"]').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('[data-tab-type="account"]').first()[22m
+
+
+      127 |     const capture = new DocCapture(page, 'tests/pdfs/authentication', { enabled: CAPTURE_ENABLED });
+      128 |     await login(page);
+    > 129 |     await expect(accountTab(page)).toBeVisible({ timeout: 15000 });
+          |                                    ^
+      130 |
+      131 |     await capture.requirement(REQ['1.2.1'], async (cap) => {
+      132 |       await cap.before('Authenticated, before reload');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/authentication-documented.spec.js:129:36
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/authentication-documented--7a9dd--of-account-name-REQ-1-2-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/authentication-documented--7a9dd--of-account-name-REQ-1-2-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/authentication-documented--7a9dd--of-account-name-REQ-1-2-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/authentication-documented--7a9dd--of-account-name-REQ-1-2-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [chromium] › tests/collaboration-documented.spec.js:468:7 › Collaboration › read collaborators [REQ-3.7.1] 
+
+    Error: the account pane should list the test repository
+
+    [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('a[href$="/account/playwright/repositories/test"]').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - the account pane should list the test repository with timeout 15000ms[22m
+    [2m  - waiting for locator('a[href$="/account/playwright/repositories/test"]').first()[22m
+
+
+      114 |     `a[href$="/account/${account}/repositories/${repository}"]`).first();
+      115 |   await expect(link, `the account pane should list the ${repository} repository`)
+    > 116 |     .toBeVisible({ timeout: 15000 });
+          |      ^
+      117 |   await link.click();
+      118 |   await expect(page.locator(`#tab-repository-${account}-${repository}`),
+      119 |                `the ${repository} pane should open`)
+        at openRepositoryPane (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/collaboration-documented.spec.js:116:6)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/collaboration-documented.spec.js:471:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/collaboration-documented-C-a3510-ad-collaborators-REQ-3-7-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/collaboration-documented-C-a3510-ad-collaborators-REQ-3-7-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/collaboration-documented-C-a3510-ad-collaborators-REQ-3-7-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/collaboration-documented-C-a3510-ad-collaborators-REQ-3-7-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [chromium] › tests/collaboration-documented.spec.js:518:7 › Collaboration › unknown account refused [REQ-3.7.6] 
+
+    Error: the account pane should list the test repository
+
+    [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('a[href$="/account/playwright/repositories/test"]').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - the account pane should list the test repository with timeout 15000ms[22m
+    [2m  - waiting for locator('a[href$="/account/playwright/repositories/test"]').first()[22m
+
+
+      114 |     `a[href$="/account/${account}/repositories/${repository}"]`).first();
+      115 |   await expect(link, `the account pane should list the ${repository} repository`)
+    > 116 |     .toBeVisible({ timeout: 15000 });
+          |      ^
+      117 |   await link.click();
+      118 |   await expect(page.locator(`#tab-repository-${account}-${repository}`),
+      119 |                `the ${repository} pane should open`)
+        at openRepositoryPane (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/collaboration-documented.spec.js:116:6)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/collaboration-documented.spec.js:521:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/collaboration-documented-C-0ffbd--account-refused-REQ-3-7-6--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/collaboration-documented-C-0ffbd--account-refused-REQ-3-7-6--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/collaboration-documented-C-0ffbd--account-refused-REQ-3-7-6--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/collaboration-documented-C-0ffbd--account-refused-REQ-3-7-6--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  15) [chromium] › tests/collaboration-documented.spec.js:530:7 › Collaboration › collaborations an account reaches [REQ-2.1.2] 
+
+    Error: the account pane should offer a Collaborations tab
+
+    [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('account-tab-collaboration').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - the account pane should offer a Collaborations tab with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('account-tab-collaboration').first()[22m
+
+
+      409 |     const tab = page.getByTestId('account-tab-collaboration').first();
+      410 |     await expect(tab, 'the account pane should offer a Collaborations tab')
+    > 411 |       .toBeVisible({ timeout: 15000 });
+          |        ^
+      412 |     await tab.click();
+      413 |
+      414 |     const box = page.getByTestId('account-collaboration').first();
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/collaboration-documented.spec.js:411:8
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_2_1_2_collaborationsTab (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/collaboration-documented.spec.js:402:3)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/collaboration-documented.spec.js:534:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/collaboration-documented-C-1111a--account-reaches-REQ-2-1-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/collaboration-documented-C-1111a--account-reaches-REQ-2-1-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/collaboration-documented-C-1111a--account-reaches-REQ-2-1-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/collaboration-documented-C-1111a--account-reaches-REQ-2-1-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  16) [chromium] › tests/events-documented.spec.js:269:7 › Lifecycle Events › events offered and fetched per account [REQ-2.5.1, REQ-2.5.2] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      51 |
+      52 | async function waitForAccountsPane(page) {
+    > 53 |   await page.waitForFunction(
+         |              ^
+      54 |     () => document.getElementById('admin-accounts')?.dataset.loaded === 'true',
+      55 |     null, { timeout: 20000 });
+      56 |   await expect(page.locator('#admin-accounts')).not.toContainText(/Error loading|Error:/);
+        at waitForAccountsPane (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/events-documented.spec.js:53:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/events-documented.spec.js:272:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/events-documented-Lifecycl-cd7e0-ccount-REQ-2-5-1-REQ-2-5-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/events-documented-Lifecycl-cd7e0-ccount-REQ-2-5-1-REQ-2-5-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/events-documented-Lifecycl-cd7e0-ccount-REQ-2-5-1-REQ-2-5-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/events-documented-Lifecycl-cd7e0-ccount-REQ-2-5-1-REQ-2-5-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  17) [chromium] › tests/events-documented.spec.js:280:7 › Lifecycle Events › event table columns and agent [REQ-2.5.3, REQ-3.8.3] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      51 |
+      52 | async function waitForAccountsPane(page) {
+    > 53 |   await page.waitForFunction(
+         |              ^
+      54 |     () => document.getElementById('admin-accounts')?.dataset.loaded === 'true',
+      55 |     null, { timeout: 20000 });
+      56 |   await expect(page.locator('#admin-accounts')).not.toContainText(/Error loading|Error:/);
+        at waitForAccountsPane (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/events-documented.spec.js:53:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/events-documented.spec.js:283:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/events-documented-Lifecycl-96daa--agent-REQ-2-5-3-REQ-3-8-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/events-documented-Lifecycl-96daa--agent-REQ-2-5-3-REQ-3-8-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/events-documented-Lifecycl-96daa--agent-REQ-2-5-3-REQ-3-8-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/events-documented-Lifecycl-96daa--agent-REQ-2-5-3-REQ-3-8-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  18) [chromium] › tests/events-documented.spec.js:291:7 › Lifecycle Events › event type names [REQ-3.8.1, REQ-3.8.7] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      51 |
+      52 | async function waitForAccountsPane(page) {
+    > 53 |   await page.waitForFunction(
+         |              ^
+      54 |     () => document.getElementById('admin-accounts')?.dataset.loaded === 'true',
+      55 |     null, { timeout: 20000 });
+      56 |   await expect(page.locator('#admin-accounts')).not.toContainText(/Error loading|Error:/);
+        at waitForAccountsPane (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/events-documented.spec.js:53:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/events-documented.spec.js:294:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/events-documented-Lifecycl-73ee2--names-REQ-3-8-1-REQ-3-8-7--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/events-documented-Lifecycl-73ee2--names-REQ-3-8-1-REQ-3-8-7--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/events-documented-Lifecycl-73ee2--names-REQ-3-8-1-REQ-3-8-7--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/events-documented-Lifecycl-73ee2--names-REQ-3-8-1-REQ-3-8-7--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19) [chromium] › tests/events-documented.spec.js:302:7 › Lifecycle Events › history filters [REQ-2.5.4] 
+
+    TimeoutError: page.waitForFunction: Timeout 20000ms exceeded.
+
+      51 |
+      52 | async function waitForAccountsPane(page) {
+    > 53 |   await page.waitForFunction(
+         |              ^
+      54 |     () => document.getElementById('admin-accounts')?.dataset.loaded === 'true',
+      55 |     null, { timeout: 20000 });
+      56 |   await expect(page.locator('#admin-accounts')).not.toContainText(/Error loading|Error:/);
+        at waitForAccountsPane (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/events-documented.spec.js:53:14)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/events-documented.spec.js:305:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/events-documented-Lifecycl-50f5d--history-filters-REQ-2-5-4--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/events-documented-Lifecycl-50f5d--history-filters-REQ-2-5-4--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/events-documented-Lifecycl-50f5d--history-filters-REQ-2-5-4--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/events-documented-Lifecycl-50f5d--history-filters-REQ-2-5-4--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  20) [chromium] › tests/import-export-documented.spec.js:238:7 › Import/Export › import Turtle file [REQ-3.4.4, REQ-3.4.7] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('repo-import-btn').first()[22m
+
+
+      37 |
+      38 |   async function openImportSource(page, source) {
+    > 39 |     await page.getByTestId('repo-import-btn').first().click();
+         |                                                       ^
+      40 |     const continueBtn = page.getByTestId('import-source-continue');
+      41 |     await expect(continueBtn, 'the Import Source dialog should open').toBeVisible();
+      42 |     if (source === 'remote') {
+        at openImportSource (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:39:55)
+        at importLocalFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:66:31)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:110:34
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_4_4_importFromFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:108:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:245:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-999fd-e-file-REQ-3-4-4-REQ-3-4-7--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-999fd-e-file-REQ-3-4-4-REQ-3-4-7--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-999fd-e-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-999fd-e-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  21) [chromium] › tests/import-export-documented.spec.js:256:7 › Import/Export › import N-Triples file [REQ-3.4.4, REQ-3.4.7] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('repo-import-btn').first()[22m
+
+
+      37 |
+      38 |   async function openImportSource(page, source) {
+    > 39 |     await page.getByTestId('repo-import-btn').first().click();
+         |                                                       ^
+      40 |     const continueBtn = page.getByTestId('import-source-continue');
+      41 |     await expect(continueBtn, 'the Import Source dialog should open').toBeVisible();
+      42 |     if (source === 'remote') {
+        at openImportSource (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:39:55)
+        at importLocalFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:66:31)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:110:34
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_4_4_importFromFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:108:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:269:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-9a6b4-s-file-REQ-3-4-4-REQ-3-4-7--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-9a6b4-s-file-REQ-3-4-4-REQ-3-4-7--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-9a6b4-s-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-9a6b4-s-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  22) [chromium] › tests/import-export-documented.spec.js:279:7 › Import/Export › import N-Quads file [REQ-3.4.4, REQ-3.4.7] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('repo-import-btn').first()[22m
+
+
+      37 |
+      38 |   async function openImportSource(page, source) {
+    > 39 |     await page.getByTestId('repo-import-btn').first().click();
+         |                                                       ^
+      40 |     const continueBtn = page.getByTestId('import-source-continue');
+      41 |     await expect(continueBtn, 'the Import Source dialog should open').toBeVisible();
+      42 |     if (source === 'remote') {
+        at openImportSource (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:39:55)
+        at importLocalFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:66:31)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:110:34
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_4_4_importFromFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:108:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:286:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-4c356-s-file-REQ-3-4-4-REQ-3-4-7--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-4c356-s-file-REQ-3-4-4-REQ-3-4-7--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-4c356-s-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-4c356-s-file-REQ-3-4-4-REQ-3-4-7--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  23) [chromium] › tests/import-export-documented.spec.js:296:7 › Import/Export › import from URL [REQ-3.4.3] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('repo-import-btn').first()[22m
+
+
+      37 |
+      38 |   async function openImportSource(page, source) {
+    > 39 |     await page.getByTestId('repo-import-btn').first().click();
+         |                                                       ^
+      40 |     const continueBtn = page.getByTestId('import-source-continue');
+      41 |     await expect(continueBtn, 'the Import Source dialog should open').toBeVisible();
+      42 |     if (source === 'remote') {
+        at openImportSource (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:39:55)
+        at importRemoteUrl (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:74:31)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:94:34
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_4_3_importFromURL (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:92:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:299:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-3c1d4--import-from-URL-REQ-3-4-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-3c1d4--import-from-URL-REQ-3-4-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-3c1d4--import-from-URL-REQ-3-4-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-3c1d4--import-from-URL-REQ-3-4-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  24) [chromium] › tests/import-export-documented.spec.js:306:7 › Import/Export › import progress display [REQ-3.4.6] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('repo-import-btn').first()[22m
+
+
+      37 |
+      38 |   async function openImportSource(page, source) {
+    > 39 |     await page.getByTestId('repo-import-btn').first().click();
+         |                                                       ^
+      40 |     const continueBtn = page.getByTestId('import-source-continue');
+      41 |     await expect(continueBtn, 'the Import Source dialog should open').toBeVisible();
+      42 |     if (source === 'remote') {
+        at openImportSource (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:39:55)
+        at importLocalFile (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:66:31)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:131:34
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_4_6_importProgressDisplay (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:124:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:317:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-88572-progress-display-REQ-3-4-6--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-88572-progress-display-REQ-3-4-6--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-88572-progress-display-REQ-3-4-6--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-88572-progress-display-REQ-3-4-6--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  25) [chromium] › tests/import-export-documented.spec.js:327:7 › Import/Export › export Turtle format [REQ-3.5.1] 
+
+    Error: the export control should be ready
+
+    [2mexpect([22m[31mlocator[39m[2m).[22mtoBeEnabled[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('repo-export-btn').first()
+    Expected: enabled
+    Timeout: 25000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - the export control should be ready with timeout 25000ms[22m
+    [2m  - waiting for getByTestId('repo-export-btn').first()[22m
+
+
+      170 |       // timeout, not as a visible failure.  Wait for it rather than race it.
+      171 |       const exportBtn = page.getByTestId('repo-export-btn').first();
+    > 172 |       await expect(exportBtn, 'the export control should be ready').toBeEnabled({ timeout: 25000 });
+          |                                                                     ^
+      173 |       await exportBtn.click();
+      174 |       const form = page.locator(`#export-data-form-${ACCOUNT}-${REPOSITORY}`);
+      175 |       await expect(form, 'the export form should open').toBeVisible({ timeout: 15000 });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:172:69
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_5_1_exportRepositoryData (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:163:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:330:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-8c246-rt-Turtle-format-REQ-3-5-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-8c246-rt-Turtle-format-REQ-3-5-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-8c246-rt-Turtle-format-REQ-3-5-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-8c246-rt-Turtle-format-REQ-3-5-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  26) [chromium] › tests/import-export-documented.spec.js:337:7 › Import/Export › export N-Triples format [REQ-3.5.1, REQ-3.5.2] 
+
+    Error: the export control should be ready
+
+    [2mexpect([22m[31mlocator[39m[2m).[22mtoBeEnabled[2m([22m[2m)[22m failed
+
+    Locator: getByTestId('repo-export-btn').first()
+    Expected: enabled
+    Timeout: 25000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - the export control should be ready with timeout 25000ms[22m
+    [2m  - waiting for getByTestId('repo-export-btn').first()[22m
+
+
+      170 |       // timeout, not as a visible failure.  Wait for it rather than race it.
+      171 |       const exportBtn = page.getByTestId('repo-export-btn').first();
+    > 172 |       await expect(exportBtn, 'the export control should be ready').toBeEnabled({ timeout: 25000 });
+          |                                                                     ^
+      173 |       await exportBtn.click();
+      174 |       const form = page.locator(`#export-data-form-${ACCOUNT}-${REPOSITORY}`);
+      175 |       await expect(form, 'the export form should open').toBeVisible({ timeout: 15000 });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:172:69
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at REQ_3_5_1_exportRepositoryData (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:163:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/import-export-documented.spec.js:340:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-b2303-format-REQ-3-5-1-REQ-3-5-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/import-export-documented-I-b2303-format-REQ-3-5-1-REQ-3-5-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/import-export-documented-I-b2303-format-REQ-3-5-1-REQ-3-5-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/import-export-documented-I-b2303-format-REQ-3-5-1-REQ-3-5-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  27) [chromium] › tests/navigation-documented.spec.js:39:7 › Navigation › client-side routing [REQ-5.1.1] 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#tab-repository-playwright-test')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('#tab-repository-playwright-test')[22m
+
+
+      48 |       await page.evaluate(() => { window.__navProbe = 'alive'; });
+      49 |       await openRepository(page, ACCOUNT, REPOSITORY);
+    > 50 |       await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 15000 });
+         |                                              ^
+      51 |       expect(await page.evaluate(() => window.__navProbe),
+      52 |              'opening a repository must not reload the document').toBe('alive');
+      53 |       await cap.after('Repository pane opened without a page load');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/navigation-documented.spec.js:50:46
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/navigation-documented.spec.js:43:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/navigation-documented-Navi-83ff0-ent-side-routing-REQ-5-1-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/navigation-documented-Navi-83ff0-ent-side-routing-REQ-5-1-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/navigation-documented-Navi-83ff0-ent-side-routing-REQ-5-1-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/navigation-documented-Navi-83ff0-ent-side-routing-REQ-5-1-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  28) [chromium] › tests/navigation-documented.spec.js:115:7 › Navigation › tab management [REQ-6.3.1, REQ-6.3.2] 
+
+    Error: an account tab should exist
+
+    [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-tab-type="account"]').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - an account tab should exist with timeout 15000ms[22m
+    [2m  - waiting for locator('[data-tab-type="account"]').first()[22m
+
+
+      120 |     await capture.requirement(REQ['6.3.1'], async (cap) => {
+      121 |       await cap.before('Tabs for account and repository');
+    > 122 |       await expect(tab(page, 'account'), 'an account tab should exist').toBeVisible();
+          |                                                                         ^
+      123 |       await expect(tab(page, 'repository'), 'a repository tab should exist').toBeVisible();
+      124 |       await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 15000 });
+      125 |       await cap.after('Both tabs present, repository active');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/navigation-documented.spec.js:122:73
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/navigation-documented.spec.js:120:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/navigation-documented-Navi-30f51-gement-REQ-6-3-1-REQ-6-3-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/navigation-documented-Navi-30f51-gement-REQ-6-3-1-REQ-6-3-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/navigation-documented-Navi-30f51-gement-REQ-6-3-1-REQ-6-3-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/navigation-documented-Navi-30f51-gement-REQ-6-3-1-REQ-6-3-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  29) [chromium] › tests/navigation-documented.spec.js:143:7 › Navigation › location bar display [REQ-5.2.4] 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#tab-repository-playwright-test')
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 15000ms[22m
+    [2m  - waiting for locator('#tab-repository-playwright-test')[22m
+
+
+      150 |       await expect(bar, 'a location bar should be shown').toBeVisible();
+      151 |       await openRepository(page, ACCOUNT, REPOSITORY);
+    > 152 |       await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 15000 });
+          |                                              ^
+      153 |       // It is a LOCATION bar: opening the repository must be reflected in it.
+      154 |       await expect(bar, 'the location bar should name the open repository')
+      155 |         .toContainText(REPOSITORY, { timeout: 15000 });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/navigation-documented.spec.js:152:46
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/navigation-documented.spec.js:147:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/navigation-documented-Navi-55a7b-tion-bar-display-REQ-5-2-4--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/navigation-documented-Navi-55a7b-tion-bar-display-REQ-5-2-4--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/navigation-documented-Navi-55a7b-tion-bar-display-REQ-5-2-4--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/navigation-documented-Navi-55a7b-tion-bar-display-REQ-5-2-4--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  30) [chromium] › tests/navigation-documented.spec.js:163:7 › Navigation › tabbed interface [REQ-5.2.5] 
+
+    Error: login, account and repository tabs
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoBeGreaterThanOrEqual[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected: >= [32m3[39m
+    Received:    [31m0[39m
+
+      169 |       await cap.before('Tabbed interface');
+      170 |       const links = page.locator('[data-tab-link]');
+    > 171 |       expect(await links.count(), 'login, account and repository tabs').toBeGreaterThanOrEqual(3);
+          |                                                                         ^
+      172 |       await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 15000 });
+      173 |       // Exactly one pane is in front at a time: the account pane is still in the
+      174 |       // DOM behind the repository pane, which is why it is checked attached.
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/navigation-documented.spec.js:171:73
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/navigation-documented.spec.js:168:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/navigation-documented-Navigation-tabbed-interface-REQ-5-2-5--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/navigation-documented-Navigation-tabbed-interface-REQ-5-2-5--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/navigation-documented-Navigation-tabbed-interface-REQ-5-2-5--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/navigation-documented-Navigation-tabbed-interface-REQ-5-2-5--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  31) [chromium] › tests/repository-documented.spec.js:46:7 › Repository › repository profile properties [REQ-3.2.1, REQ-3.2.3] 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#tab-repository-playwright-test')
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 20000ms[22m
+    [2m  - waiting for locator('#tab-repository-playwright-test')[22m
+
+
+      40 |     await login(page);
+      41 |     await openRepository(page, ACCOUNT, REPOSITORY);
+    > 42 |     await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 20000 });
+         |                                            ^
+      43 |   }
+      44 |
+      45 |   // ── REQ-3.2.1 / 3.2.3 ───────────────────────────────────────────────────────
+        at open (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:42:44)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:48:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/error-context.md
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  32) [chromium] › tests/repository-documented.spec.js:78:7 › Repository › repository collaboration [REQ-3.7.1, REQ-3.7.2, REQ-3.7.3] 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#tab-repository-playwright-test')
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 20000ms[22m
+    [2m  - waiting for locator('#tab-repository-playwright-test')[22m
+
+
+      40 |     await login(page);
+      41 |     await openRepository(page, ACCOUNT, REPOSITORY);
+    > 42 |     await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 20000 });
+         |                                            ^
+      43 |   }
+      44 |
+      45 |   // ── REQ-3.2.1 / 3.2.3 ───────────────────────────────────────────────────────
+        at open (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:42:44)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:80:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-07013--3-7-1-REQ-3-7-2-REQ-3-7-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/repository-documented-Repo-07013--3-7-1-REQ-3-7-2-REQ-3-7-3--chromium/error-context.md
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-07013--3-7-1-REQ-3-7-2-REQ-3-7-3--chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-07013--3-7-1-REQ-3-7-2-REQ-3-7-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/repository-documented-Repo-07013--3-7-1-REQ-3-7-2-REQ-3-7-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  33) [chromium] › tests/repository-documented.spec.js:104:7 › Repository › repository creation [REQ-3.3.1] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('repo-new-btn').first()[22m
+
+
+      110 |     await capture.requirement(REQ['3.3.1'], async (cap) => {
+      111 |       await cap.before('Account pane before creating a repository');
+    > 112 |       await page.getByTestId('repo-new-btn').first().click();
+          |                                                      ^
+      113 |       const nameBox = page.getByRole('textbox', { name: 'Repository name' });
+      114 |       await expect(nameBox, 'the new-repository dialog should open').toBeVisible({ timeout: 10000 });
+      115 |       await nameBox.fill(name);
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:112:54
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:110:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-19888-ository-creation-REQ-3-3-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/repository-documented-Repo-19888-ository-creation-REQ-3-3-1--chromium/error-context.md
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-19888-ository-creation-REQ-3-3-1--chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-19888-ository-creation-REQ-3-3-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/repository-documented-Repo-19888-ository-creation-REQ-3-3-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  34) [chromium] › tests/repository-documented.spec.js:139:7 › Repository › repository clear [REQ-3.6.1] 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('#tab-repository-playwright-test')
+    Expected: visible
+    Timeout: 20000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toBeVisible" with timeout 20000ms[22m
+    [2m  - waiting for locator('#tab-repository-playwright-test')[22m
+
+
+      40 |     await login(page);
+      41 |     await openRepository(page, ACCOUNT, REPOSITORY);
+    > 42 |     await expect(page.locator(repoPaneId)).toBeVisible({ timeout: 20000 });
+         |                                            ^
+      43 |   }
+      44 |
+      45 |   // ── REQ-3.2.1 / 3.2.3 ───────────────────────────────────────────────────────
+        at open (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:42:44)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:141:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repository-repository-clear-REQ-3-6-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/repository-documented-Repository-repository-clear-REQ-3-6-1--chromium/error-context.md
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repository-repository-clear-REQ-3-6-1--chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/repository-documented-Repository-repository-clear-REQ-3-6-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/repository-documented-Repository-repository-clear-REQ-3-6-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  35) [chromium] › tests/sparql-documented.spec.js:89:7 › SPARQL Editor › execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      50 |     await openRepository(page, ACCOUNT, REPOSITORY);
+      51 |     await settle(page);
+    > 52 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      53 |     const nameInput = page.getByTestId('new-view-name-input');
+      54 |     await expect(nameInput).toBeVisible({ timeout: 15000 });
+      55 |     await nameInput.fill(name);
+        at openScratchEditor (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:52:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:92:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-28515--4-1-1-REQ-4-1-2-REQ-4-1-4--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-28515--4-1-1-REQ-4-1-2-REQ-4-1-4--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-28515--4-1-1-REQ-4-1-2-REQ-4-1-4--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-28515--4-1-1-REQ-4-1-2-REQ-4-1-4--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  36) [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - JSON [REQ-4.1.3] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      50 |     await openRepository(page, ACCOUNT, REPOSITORY);
+      51 |     await settle(page);
+    > 52 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      53 |     const nameInput = page.getByTestId('new-view-name-input');
+      54 |     await expect(nameInput).toBeVisible({ timeout: 15000 });
+      55 |     await nameInput.fill(name);
+        at openScratchEditor (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:52:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:130:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-63c71-t-formats---JSON-REQ-4-1-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-63c71-t-formats---JSON-REQ-4-1-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-63c71-t-formats---JSON-REQ-4-1-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-63c71-t-formats---JSON-REQ-4-1-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  37) [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - CSV [REQ-4.1.3] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      50 |     await openRepository(page, ACCOUNT, REPOSITORY);
+      51 |     await settle(page);
+    > 52 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      53 |     const nameInput = page.getByTestId('new-view-name-input');
+      54 |     await expect(nameInput).toBeVisible({ timeout: 15000 });
+      55 |     await nameInput.fill(name);
+        at openScratchEditor (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:52:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:130:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-b6c9b-lt-formats---CSV-REQ-4-1-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-b6c9b-lt-formats---CSV-REQ-4-1-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-b6c9b-lt-formats---CSV-REQ-4-1-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-b6c9b-lt-formats---CSV-REQ-4-1-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  38) [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - XML [REQ-4.1.3] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      50 |     await openRepository(page, ACCOUNT, REPOSITORY);
+      51 |     await settle(page);
+    > 52 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      53 |     const nameInput = page.getByTestId('new-view-name-input');
+      54 |     await expect(nameInput).toBeVisible({ timeout: 15000 });
+      55 |     await nameInput.fill(name);
+        at openScratchEditor (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:52:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:130:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-1e4ab-lt-formats---XML-REQ-4-1-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-1e4ab-lt-formats---XML-REQ-4-1-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-1e4ab-lt-formats---XML-REQ-4-1-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-1e4ab-lt-formats---XML-REQ-4-1-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  39) [chromium] › tests/sparql-documented.spec.js:150:7 › SPARQL Editor › query execution time display [REQ-4.3.4] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      50 |     await openRepository(page, ACCOUNT, REPOSITORY);
+      51 |     await settle(page);
+    > 52 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      53 |     const nameInput = page.getByTestId('new-view-name-input');
+      54 |     await expect(nameInput).toBeVisible({ timeout: 15000 });
+      55 |     await nameInput.fill(name);
+        at openScratchEditor (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:52:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:153:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-95717-ion-time-display-REQ-4-3-4--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-95717-ion-time-display-REQ-4-3-4--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-95717-ion-time-display-REQ-4-3-4--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-95717-ion-time-display-REQ-4-3-4--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  40) [chromium] › tests/sparql-documented.spec.js:173:7 › SPARQL Editor › query keyboard shortcut [REQ-4.3.2] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      50 |     await openRepository(page, ACCOUNT, REPOSITORY);
+      51 |     await settle(page);
+    > 52 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      53 |     const nameInput = page.getByTestId('new-view-name-input');
+      54 |     await expect(nameInput).toBeVisible({ timeout: 15000 });
+      55 |     await nameInput.fill(name);
+        at openScratchEditor (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:52:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:176:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-576dd-eyboard-shortcut-REQ-4-3-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-576dd-eyboard-shortcut-REQ-4-3-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-576dd-eyboard-shortcut-REQ-4-3-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-576dd-eyboard-shortcut-REQ-4-3-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  41) [chromium] › tests/sparql-documented.spec.js:195:7 › SPARQL Editor › query reset functionality [REQ-4.3.3] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      50 |     await openRepository(page, ACCOUNT, REPOSITORY);
+      51 |     await settle(page);
+    > 52 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      53 |     const nameInput = page.getByTestId('new-view-name-input');
+      54 |     await expect(nameInput).toBeVisible({ timeout: 15000 });
+      55 |     await nameInput.fill(name);
+        at openScratchEditor (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:52:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:198:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-ce1ae-et-functionality-REQ-4-3-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-ce1ae-et-functionality-REQ-4-3-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-ce1ae-et-functionality-REQ-4-3-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-ce1ae-et-functionality-REQ-4-3-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  42) [chromium] › tests/sparql-documented.spec.js:216:7 › SPARQL Editor › multiple query tabs [REQ-4.3.6] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      50 |     await openRepository(page, ACCOUNT, REPOSITORY);
+      51 |     await settle(page);
+    > 52 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      53 |     const nameInput = page.getByTestId('new-view-name-input');
+      54 |     await expect(nameInput).toBeVisible({ timeout: 15000 });
+      55 |     await nameInput.fill(name);
+        at openScratchEditor (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:52:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/sparql-documented.spec.js:219:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-8eec7-tiple-query-tabs-REQ-4-3-6--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/sparql-documented-SPARQL-E-8eec7-tiple-query-tabs-REQ-4-3-6--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/sparql-documented-SPARQL-E-8eec7-tiple-query-tabs-REQ-4-3-6--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/sparql-documented-SPARQL-E-8eec7-tiple-query-tabs-REQ-4-3-6--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  43) [chromium] › tests/ui-components-documented.spec.js:66:7 › UI Components › loading indicator [REQ-6.2.2] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('#tab-repository-playwright-test [data-tab="collaboration"]').first()[22m
+
+
+      81 |       await cap.before('Repository pane before loading collaboration');
+      82 |       await page.locator(`#tab-repository-${ACCOUNT}-${REPOSITORY} [data-tab="collaboration"]`)
+    > 83 |                 .first().click();
+         |                          ^
+      84 |       await expect(page.getByText(/Loading collaboration data/i),
+      85 |                    'a loading state should be shown while the request is open')
+      86 |         .toBeVisible({ timeout: 10000 });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:83:26
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:80:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-components-documented-U-bfda4-oading-indicator-REQ-6-2-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-components-documented-U-bfda4-oading-indicator-REQ-6-2-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-components-documented-U-bfda4-oading-indicator-REQ-6-2-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-components-documented-U-bfda4-oading-indicator-REQ-6-2-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  44) [chromium] › tests/ui-components-documented.spec.js:140:7 › UI Components › modal dialog behavior [REQ-6.2.3] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      145 |     await capture.requirement(REQ['6.2.3'], async (cap) => {
+      146 |       await cap.before('Repository pane before opening a dialog');
+    > 147 |       await page.getByTestId('view-new-btn').first().click();
+          |                                                      ^
+      148 |       const nameInput = page.getByTestId('new-view-name-input');
+      149 |       await expect(nameInput, 'the dialog should open').toBeVisible({ timeout: 15000 });
+      150 |       await cap.step('open', 'Modal dialog open');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:147:54
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:145:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-components-documented-U-ba0b9--dialog-behavior-REQ-6-2-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-components-documented-U-ba0b9--dialog-behavior-REQ-6-2-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-components-documented-U-ba0b9--dialog-behavior-REQ-6-2-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-components-documented-U-ba0b9--dialog-behavior-REQ-6-2-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  45) [chromium] › tests/ui-components-documented.spec.js:161:7 › UI Components › confirmation dialog [REQ-6.2.3] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('repo-clear-btn').first()[22m
+
+
+      170 |       // suite reads from.  What is asserted is that the guard exists.
+      171 |       page.once('dialog', async (d) => { asked = d.message(); await d.dismiss(); });
+    > 172 |       await page.getByTestId('repo-clear-btn').first().click();
+          |                                                        ^
+      173 |       await page.waitForTimeout(2000);
+      174 |       expect(asked, 'a destructive action should ask for confirmation').toContain('clear');
+      175 |       await cap.after('Confirmation requested and declined');
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:172:56
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:166:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-components-documented-U-a94c8-firmation-dialog-REQ-6-2-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-components-documented-U-a94c8-firmation-dialog-REQ-6-2-3--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-components-documented-U-a94c8-firmation-dialog-REQ-6-2-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-components-documented-U-a94c8-firmation-dialog-REQ-6-2-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  46) [chromium] › tests/ui-components-documented.spec.js:182:7 › UI Components › responsive layout elements 
+
+    Error: tabs should be usable at desktop width
+
+    [2mexpect([22m[31mlocator[39m[2m).[22mtoBeVisible[2m([22m[2m)[22m failed
+
+    Locator: locator('[data-tab-link]').first()
+    Expected: visible
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - tabs should be usable at desktop width with timeout 15000ms[22m
+    [2m  - waiting for locator('[data-tab-link]').first()[22m
+
+
+      188 |     await capture.requirement(REQ['6.2.1'], async (cap) => {
+      189 |       await page.setViewportSize({ width: 1440, height: 900 });
+    > 190 |       await expect(tabs, 'tabs should be usable at desktop width').toBeVisible();
+          |                                                                    ^
+      191 |       await cap.before('Desktop layout');
+      192 |
+      193 |       await page.setViewportSize({ width: 375, height: 667 });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:190:68
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:188:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-components-documented-U-535fd--responsive-layout-elements-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-components-documented-U-535fd--responsive-layout-elements-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-components-documented-U-535fd--responsive-layout-elements-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-components-documented-U-535fd--responsive-layout-elements-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  47) [chromium] › tests/ui-components-documented.spec.js:226:7 › UI Components › tooltip display ──
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoHaveAttribute[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByTestId('repo-import-btn').first()
+    Expected pattern: [32m/import/i[39m
+    Timeout: 15000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toHaveAttribute" with timeout 15000ms[22m
+    [2m  - waiting for getByTestId('repo-import-btn').first()[22m
+
+
+      233 |       // Tooltips here are title attributes on the icon controls; the import and
+      234 |       // clear buttons carry them and are the ones a user needs explained.
+    > 235 |       await expect(page.getByTestId('repo-import-btn').first()).toHaveAttribute('title', /import/i);
+          |                                                                 ^
+      236 |       await expect(page.getByTestId('repo-clear-btn').first()).toHaveAttribute('title', /clear/i);
+      237 |       await cap.after('Controls carry explanatory titles');
+      238 |     });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:235:65
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/ui-components-documented.spec.js:231:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-components-documented-UI-Components-tooltip-display-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-components-documented-UI-Components-tooltip-display-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-components-documented-UI-Components-tooltip-display-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-components-documented-UI-Components-tooltip-display-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  48) [chromium] › tests/view-documented.spec.js:116:7 › View Management › create view [REQ-4.2.1] ─
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      51 |   async function createView(page, name) {
+      52 |     await settle(page);
+    > 53 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      54 |     const nameInput = page.getByTestId('new-view-name-input');
+      55 |     await expect(nameInput, 'the New View dialog should open').toBeVisible();
+      56 |     await nameInput.fill(name);
+        at createView (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:53:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:123:7
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:121:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/view-documented-View-Management-create-view-REQ-4-2-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/view-documented-View-Management-create-view-REQ-4-2-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/view-documented-View-Management-create-view-REQ-4-2-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/view-documented-View-Management-create-view-REQ-4-2-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  49) [chromium] › tests/view-documented.spec.js:136:7 › View Management › edit view [REQ-4.2.2, REQ-4.2.3, REQ-4.2.5] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      51 |   async function createView(page, name) {
+      52 |     await settle(page);
+    > 53 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      54 |     const nameInput = page.getByTestId('new-view-name-input');
+      55 |     await expect(nameInput, 'the New View dialog should open').toBeVisible();
+      56 |     await nameInput.fill(name);
+        at createView (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:53:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:143:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/view-documented-View-Manag-1dd26--4-2-2-REQ-4-2-3-REQ-4-2-5--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/view-documented-View-Manag-1dd26--4-2-2-REQ-4-2-3-REQ-4-2-5--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/view-documented-View-Manag-1dd26--4-2-2-REQ-4-2-3-REQ-4-2-5--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/view-documented-View-Manag-1dd26--4-2-2-REQ-4-2-3-REQ-4-2-5--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  50) [chromium] › tests/view-documented.spec.js:190:7 › View Management › delete view [REQ-4.2.1] ─
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      51 |   async function createView(page, name) {
+      52 |     await settle(page);
+    > 53 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      54 |     const nameInput = page.getByTestId('new-view-name-input');
+      55 |     await expect(nameInput, 'the New View dialog should open').toBeVisible();
+      56 |     await nameInput.fill(name);
+        at createView (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:53:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:194:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/view-documented-View-Management-delete-view-REQ-4-2-1--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/view-documented-View-Management-delete-view-REQ-4-2-1--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/view-documented-View-Management-delete-view-REQ-4-2-1--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/view-documented-View-Management-delete-view-REQ-4-2-1--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  51) [chromium] › tests/view-documented.spec.js:208:7 › View Management › open view in pane editor [REQ-4.2.5, REQ-4.2.6] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      51 |   async function createView(page, name) {
+      52 |     await settle(page);
+    > 53 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      54 |     const nameInput = page.getByTestId('new-view-name-input');
+      55 |     await expect(nameInput, 'the New View dialog should open').toBeVisible();
+      56 |     await nameInput.fill(name);
+        at createView (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:53:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:212:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/view-documented-View-Manag-ad6ac-editor-REQ-4-2-5-REQ-4-2-6--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/view-documented-View-Manag-ad6ac-editor-REQ-4-2-5-REQ-4-2-6--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/view-documented-View-Manag-ad6ac-editor-REQ-4-2-5-REQ-4-2-6--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/view-documented-View-Manag-ad6ac-editor-REQ-4-2-5-REQ-4-2-6--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  52) [chromium] › tests/view-documented.spec.js:246:7 › View Management › execute view [REQ-4.2.2] 
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByTestId('view-new-btn').first()[22m
+
+
+      51 |   async function createView(page, name) {
+      52 |     await settle(page);
+    > 53 |     await page.getByTestId('view-new-btn').first().click();
+         |                                                    ^
+      54 |     const nameInput = page.getByTestId('new-view-name-input');
+      55 |     await expect(nameInput, 'the New View dialog should open').toBeVisible();
+      56 |     await nameInput.fill(name);
+        at createView (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:53:52)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/view-documented.spec.js:250:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/view-documented-View-Management-execute-view-REQ-4-2-2--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/view-documented-View-Management-execute-view-REQ-4-2-2--chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/view-documented-View-Management-execute-view-REQ-4-2-2--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/view-documented-View-Management-execute-view-REQ-4-2-2--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  53) [chromium] › tests/zz-shot-documented.spec.js:14:5 › open the exploration pane ───────────────
+
+    TimeoutError: locator.click: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for getByRole('link', { name: 'test', exact: true }).filter({ visible: true }).first()[22m
+
+
+      24 |   await page.waitForTimeout(3500);
+      25 |   console.log('logged in: ' + await page.locator('[data-tab-type="account"]').first().isVisible().catch(() => false));
+    > 26 |   await page.getByRole('link', { name: 'test', exact: true }).locator('visible=true').first().click();
+         |                                                                                               ^
+      27 |   await page.waitForTimeout(2500);
+      28 |   console.log('explore button: ' + await page.getByTestId('view-explore-btn').count());
+      29 |   await page.getByTestId('view-explore-btn').first().click();
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/zz-shot-documented.spec.js:26:95
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/zz-shot-documented-open-the-exploration-pane-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/zz-shot-documented-open-the-exploration-pane-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/zz-shot-documented-open-the-exploration-pane-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/zz-shot-documented-open-the-exploration-pane-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  53 failed
+    [chromium] › tests/accounts-pane-documented.spec.js:346:7 › Accounts Pane › listing scope and delete control [REQ-2.4.4, REQ-2.6.1] 
+    [chromium] › tests/admin-documented.spec.js:555:7 › Admin Console › dashboard tab navigation [REQ-A.2.1] 
+    [chromium] › tests/admin-documented.spec.js:567:7 › Admin Console › location bar navigation [REQ-A.2.2] 
+    [chromium] › tests/admin-documented.spec.js:579:7 › Admin Console › view system accounts [REQ-A.3.1] 
+    [chromium] › tests/admin-documented.spec.js:590:7 › Admin Console › account details dialog [REQ-A.3.2] 
+    [chromium] › tests/admin-documented.spec.js:628:7 › Admin Console › view repositories for selected account [REQ-A.4.1] 
+    [chromium] › tests/admin-documented.spec.js:672:7 › Admin Console › view invitations [REQ-A.5.1] 
+    [chromium] › tests/admin-documented.spec.js:708:7 › Admin Console › query history table and graph [REQ-A.6.1, REQ-A.6.2] 
+    [chromium] › tests/authentication-documented.spec.js:37:7 › Authentication › login with valid credentials [REQ-1.1.1, REQ-1.1.2] 
+    [chromium] › tests/authentication-documented.spec.js:85:7 › Authentication › logout functionality [REQ-1.2.2] 
+    [chromium] › tests/authentication-documented.spec.js:103:7 › Authentication › navigation links based on auth status [REQ-1.2.3] 
+    [chromium] › tests/authentication-documented.spec.js:126:7 › Authentication › session persistence of account name [REQ-1.2.1] 
+    [chromium] › tests/collaboration-documented.spec.js:468:7 › Collaboration › read collaborators [REQ-3.7.1] 
+    [chromium] › tests/collaboration-documented.spec.js:518:7 › Collaboration › unknown account refused [REQ-3.7.6] 
+    [chromium] › tests/collaboration-documented.spec.js:530:7 › Collaboration › collaborations an account reaches [REQ-2.1.2] 
+    [chromium] › tests/events-documented.spec.js:269:7 › Lifecycle Events › events offered and fetched per account [REQ-2.5.1, REQ-2.5.2] 
+    [chromium] › tests/events-documented.spec.js:280:7 › Lifecycle Events › event table columns and agent [REQ-2.5.3, REQ-3.8.3] 
+    [chromium] › tests/events-documented.spec.js:291:7 › Lifecycle Events › event type names [REQ-3.8.1, REQ-3.8.7] 
+    [chromium] › tests/events-documented.spec.js:302:7 › Lifecycle Events › history filters [REQ-2.5.4] 
+    [chromium] › tests/import-export-documented.spec.js:238:7 › Import/Export › import Turtle file [REQ-3.4.4, REQ-3.4.7] 
+    [chromium] › tests/import-export-documented.spec.js:256:7 › Import/Export › import N-Triples file [REQ-3.4.4, REQ-3.4.7] 
+    [chromium] › tests/import-export-documented.spec.js:279:7 › Import/Export › import N-Quads file [REQ-3.4.4, REQ-3.4.7] 
+    [chromium] › tests/import-export-documented.spec.js:296:7 › Import/Export › import from URL [REQ-3.4.3] 
+    [chromium] › tests/import-export-documented.spec.js:306:7 › Import/Export › import progress display [REQ-3.4.6] 
+    [chromium] › tests/import-export-documented.spec.js:327:7 › Import/Export › export Turtle format [REQ-3.5.1] 
+    [chromium] › tests/import-export-documented.spec.js:337:7 › Import/Export › export N-Triples format [REQ-3.5.1, REQ-3.5.2] 
+    [chromium] › tests/navigation-documented.spec.js:39:7 › Navigation › client-side routing [REQ-5.1.1] 
+    [chromium] › tests/navigation-documented.spec.js:115:7 › Navigation › tab management [REQ-6.3.1, REQ-6.3.2] 
+    [chromium] › tests/navigation-documented.spec.js:143:7 › Navigation › location bar display [REQ-5.2.4] 
+    [chromium] › tests/navigation-documented.spec.js:163:7 › Navigation › tabbed interface [REQ-5.2.5] 
+    [chromium] › tests/repository-documented.spec.js:46:7 › Repository › repository profile properties [REQ-3.2.1, REQ-3.2.3] 
+    [chromium] › tests/repository-documented.spec.js:78:7 › Repository › repository collaboration [REQ-3.7.1, REQ-3.7.2, REQ-3.7.3] 
+    [chromium] › tests/repository-documented.spec.js:104:7 › Repository › repository creation [REQ-3.3.1] 
+    [chromium] › tests/repository-documented.spec.js:139:7 › Repository › repository clear [REQ-3.6.1] 
+    [chromium] › tests/sparql-documented.spec.js:89:7 › SPARQL Editor › execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4] 
+    [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - JSON [REQ-4.1.3] 
+    [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - CSV [REQ-4.1.3] 
+    [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - XML [REQ-4.1.3] 
+    [chromium] › tests/sparql-documented.spec.js:150:7 › SPARQL Editor › query execution time display [REQ-4.3.4] 
+    [chromium] › tests/sparql-documented.spec.js:173:7 › SPARQL Editor › query keyboard shortcut [REQ-4.3.2] 
+    [chromium] › tests/sparql-documented.spec.js:195:7 › SPARQL Editor › query reset functionality [REQ-4.3.3] 
+    [chromium] › tests/sparql-documented.spec.js:216:7 › SPARQL Editor › multiple query tabs [REQ-4.3.6] 
+    [chromium] › tests/ui-components-documented.spec.js:66:7 › UI Components › loading indicator [REQ-6.2.2] 
+    [chromium] › tests/ui-components-documented.spec.js:140:7 › UI Components › modal dialog behavior [REQ-6.2.3] 
+    [chromium] › tests/ui-components-documented.spec.js:161:7 › UI Components › confirmation dialog [REQ-6.2.3] 
+    [chromium] › tests/ui-components-documented.spec.js:182:7 › UI Components › responsive layout elements 
+    [chromium] › tests/ui-components-documented.spec.js:226:7 › UI Components › tooltip display ────
+    [chromium] › tests/view-documented.spec.js:116:7 › View Management › create view [REQ-4.2.1] ───
+    [chromium] › tests/view-documented.spec.js:136:7 › View Management › edit view [REQ-4.2.2, REQ-4.2.3, REQ-4.2.5] 
+    [chromium] › tests/view-documented.spec.js:190:7 › View Management › delete view [REQ-4.2.1] ───
+    [chromium] › tests/view-documented.spec.js:208:7 › View Management › open view in pane editor [REQ-4.2.5, REQ-4.2.6] 
+    [chromium] › tests/view-documented.spec.js:246:7 › View Management › execute view [REQ-4.2.2] ──
+    [chromium] › tests/zz-shot-documented.spec.js:14:5 › open the exploration pane ─────────────────
+  8 skipped
+  13 passed (20.6m)

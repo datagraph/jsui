@@ -1,0 +1,27 @@
+module : spocq/gensrc/mcp/test/  — run-all.sh (the 23 numbered scripts),
+         shakedown.sh (requirement-keyed, with a coverage roll-up),
+         mcp-selftest.lisp (in the image, via execute-spocq)
+run    : cd spocq/gensrc/mcp/test
+         STORE_HOST=https://nl4.dydra.com STORE_TOKEN=<token> \
+           MCP_PATH=/test/test/mcp MCP_INSECURE=1 ./run-all.sh
+         MCP_URL=<url> MCP_TOKEN=<token> ./shakedown.sh
+needs  : a live MCP endpoint AND A VALID TOKEN. common.sh carries a
+         default STORE_TOKEN for localhost; nl4 does not accept it.
+         Override it from the environment and REDACT tokens from any log
+         copied in here — the record names hosts and accounts, never a token.
+output : shakedown writes results/<UTC date>-<account>-<repo>.log; each
+         check carries an id that appears on every line it produced, so
+         one check reads end to end with  grep '\[12\]' results/<log>
+date   : 2026-10-23T12:34:40Z
+----------------------------------------------------------------------
+=== endpoint reachability
+nl4.dydra.com      mcp POST → 401
+nl9.dydra.com      mcp POST → 401
+
+=== run-all.sh with the default token
+═══ MCP test suite ══════════════════════════════════════════════
+
+── 01-import ────────────────────────────────────────────────────
+  Clearing /test/test
+  curl: (22) The requested URL returned error: 401 Authorization Required
+  FAIL  01-import (aborting — later tests depend on this data)
