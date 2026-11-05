@@ -41,6 +41,26 @@ export function paneState(account, repository, host) {
   return PANES.get(key);
 }
 
+/**
+ * Any pane the user has already connected, for a surface that has no
+ * repository of its own (U-72).
+ *
+ * The workspace is per account and names no repository, so there is no pane
+ * key for it -- but asking for a second provider key to rearrange the
+ * furniture would be absurd, and storing one somewhere else would be a
+ * second credential to keep.  So the chrome borrows the connection the user
+ * has already made, and says plainly when there is none.
+ *
+ * Preferring the named account's own panes is not cosmetic: a session may
+ * hold a key for someone else's repository, and the one the user is working
+ * in is the one they will recognise in a refusal.
+ */
+export function anyConnectedPane(account = null) {
+  const connected = [...PANES.values()].filter((p) => p.llmKey);
+  if (!connected.length) return null;
+  return connected.find((p) => p.account === account) || connected[0];
+}
+
 export function forgetPaneState(account, repository) {
   PANES.delete(`${account}/${repository}`);
 }

@@ -125,6 +125,20 @@ export class Router {
     this.isHistoryNavigation = false;
   }
 
+  /**
+   * Draw the current route again (U-72).
+   *
+   * No history entry and no URL change: the page is being redrawn because
+   * the CHROME changed under it, and a rearrangement that pushed a history
+   * entry would make the back button undo a layout change on one press and
+   * a navigation on the next.
+   */
+  renderCurrent() {
+    if (this.currentPath == null) return null;
+    return this.handlePath(this.currentSearch
+      ? `${this.currentPath}?${this.currentSearch}` : this.currentPath);
+  }
+
   recordHistory(path, { replace = false } = {}) {
     if (replace && this.historyIndex >= 0) {
       this.historyStack[this.historyIndex] = path;

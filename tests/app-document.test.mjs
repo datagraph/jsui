@@ -374,5 +374,62 @@ section("the fenced block is read under either name");
   ok(applicationFrom("```dashboard\n{not json}\n```") === null, "and nothing at all from a block that is not JSON");
 }
 
+/* ══════════ U-60: a view may be a tree, and its markup is generated ══════════ */
+
+section("U-60: a view made of elements");
+{
+  const doc = validateApplication({
+    title: "Sales",
+    panels: [{ name: "sales", query: SALES }],
+    uses: ["panel", "table"],
+    views: [{ name: "main", elements: [
+      { name: "e-wrap", kind: "panel", order: "a", attributes: { label: "Sales" },
+        children: [{ name: "e-t", kind: "table", order: "a", bound: "sales" }] },
+    ] }],
+  });
+  ok(doc.ok, doc.errors.join("; ") || "validates");
+  ok(/data-bound="sales"/.test(doc.document.views[0].html),
+     "its markup is generated, and carries the bindings the frame reads");
+  ok(/data-ui="e-wrap"/.test(doc.document.views[0].html),
+     "and the identities a patch will address");
+  ok(Array.isArray(doc.document.views[0].elements),
+     "the tree is kept beside the markup, so the classifier can compare two of them");
+  ok(doc.document.views[0].elements[0].children[0].name === "e-t",
+     "canonicalised, children in key order");
+  ok(!doc.warnings.some((w) => /gives its regions no id/.test(w)),
+     "and the no-id warning does not fire: a tree is addressed by element");
+}
+
+section("the slot checks still run, against the generated markup");
+{
+  const doc = validateApplication({
+    title: "Sales", panels: [{ name: "sales", query: SALES }],
+    views: [{ name: "main", elements: [
+      { name: "e-t", kind: "div", order: "a", bound: "nosuch" },
+    ] }],
+  });
+  ok(!doc.ok && doc.errors.some((e) => /binds `nosuch', which is not a panel/.test(e)),
+     "a tree that binds a panel there is none of is refused by the check that "
+   + "already existed, because the markup it generated says so");
+}
+
+section("a tree the vocabulary cannot carry is refused in the element's terms");
+{
+  const doc = validateApplication({
+    title: "x", panels: [{ name: "sales", query: SALES }],
+    views: [{ name: "main", elements: [{ name: "e-x", kind: "blink", order: "a" }] }],
+  });
+  ok(!doc.ok && doc.errors.some((e) => /view `main': element `e-x'/.test(e)),
+     "named by view and element, not by triple");
+}
+
+section("a markup view is unchanged by any of this");
+{
+  const doc = validateApplication(base());
+  ok(doc.ok && doc.document.views[0].elements === null,
+     "it carries no tree, and says so rather than omitting the field");
+  ok(doc.document.views[0].html === base().html, "and its markup is its own");
+}
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

@@ -3838,6 +3838,10 @@ const initializePaneEditing = (app) => {
           const repoEditorId = `repo-editor-${accountName.replace(/[^a-z0-9_-]/gi, "-")}-${repositoryName.replace(/[^a-z0-9_-]/gi, "-")}-${viewSlug.replace(/[^a-z0-9_-]/gi, "-")}`;
           app.editorInstances.set(repoEditorId, editorApi);
         }
+        // The editor exists now, so the wrapper finally has a height and the
+        // pane can be scrolled to it.  Scrolling at `appendChild' scrolls to
+        // an empty div and lands short of where the editor ends up.
+        wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
       };
 
       const getDragAfterElement = (containerEl, y) => {
@@ -6089,6 +6093,10 @@ export class RepositoryRoute extends BasePage {
           const repoEditorId = `repo-editor-${accountName.replace(/[^a-z0-9_-]/gi, "-")}-${repositoryName.replace(/[^a-z0-9_-]/gi, "-")}-${baseViewName.replace(/[^a-z0-9_-]/gi, "-")}`;
           app.editorInstances.set(repoEditorId, editorApi);
         }
+        // The editor exists now, so the wrapper finally has a height and the
+        // pane can be scrolled to it.  Scrolling at `appendChild' scrolls to
+        // an empty div and lands short of where the editor ends up.
+        wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
       };
 
       const getDragAfterElement = (containerEl, y) => {

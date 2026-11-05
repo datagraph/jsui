@@ -55,6 +55,13 @@ import {
 import { runPanels, payloadsFor, totals } from "../../lib/dashboard/runner.js";
 import { putPanelSet, promoteView, sweep, runId, tempName } from "../../lib/dashboard/catalog.js";
 import { listDashboards, readDashboard } from "../../lib/dashboard/archive.js";
+import {
+  lift as liftArrangement, apply as applyArrangement, checkApply, printName,
+  requestsOf,
+} from "../../lib/app/arrangement.js";
+import {
+  ensureRepository, writeArrangement, readArrangement, deleteArrangement, recordApplication,
+} from "../../lib/app/ui-store.js";
 import { recordRun } from "../../lib/mcp/transcript-store.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
@@ -374,8 +381,13 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   let revising = false;
   let lastPrompt = "";
   let startedAt = null;
+  let unregister = null;        // removes this pane from the bar's address book
 
   const teardown = () => {
+    // The bar may be addressing this pane; an address that outlived its
+    // target would send the next instruction to a page that is gone (U-77).
+    try { unregister?.(); } catch { /* the app may have gone first */ }
+    unregister = null;
     try { mounted?.destroy(); } catch { /* already gone */ }
     if (tempNames.length && st.token) {
       // Best effort, and deliberately not awaited: a pane closing must not
@@ -580,6 +592,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     mounted = mountDashboard(holder, appDoc, {
       onRefresh: () => refresh({ fromPage: true }),
       onRun: (request) => runOnePanel(request),
+      onSet: (request) => setOneParameter(request),
       onState: ({ key, value }) => rememberState(key, value),
       onLayout: (request) => layoutGraph(request),
       onPropose: ({ what, detail }) => presentProposalFromPage(what, detail),
@@ -591,6 +604,9 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
                    budget: budgetForPage(interaction) });
     paintInteraction();
     stageRevise.hidden = false;
+    // A reopened dashboard is as addressable as a new one: it is a page on
+    // the screen, which is all the bar's address means.
+    becomeAddressable();
     progress.appendChild(el(doc, "div", { class: stale.length ? "dsh-warn" : "dsh-note",
       text: stale.length
         ? `${stale.length} passage(s) were written against data that has since changed; `
@@ -707,6 +723,20 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   const gatePatch = stage(doc, "The change", "", { gate: true, testid: "patch" });
   gatePatch.hidden = true;
   body.appendChild(gatePatch);
+
+  /* ── the arrangement gate: what an applied component will ask for (U-88) ── */
+
+  // The disclosure of §21.3.  An applied component arrives with definitions
+  // and no content and recreates it by repeating the original's requests --
+  // so an apply costs queries the reader has never seen, against addresses
+  // the ARRANGEMENT'S AUTHOR chose, under the READER's credentials.  §20
+  // withholds four carriers of executable text behind an admission; a
+  // template's request text is a fifth, and the screen that holds the other
+  // four does not look at it.  This is where it is looked at.
+  const gateArrange = stage(doc, "Arrangement — what it will ask for", "",
+                              { gate: true, testid: "arrange" });
+  gateArrange.hidden = true;
+  body.appendChild(gateArrange);
 
   /* ── Gate 2: disposition ── */
 
@@ -1132,6 +1162,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     mounted = mountDashboard(holder, spec, {
       onRefresh: () => refresh({ fromPage: true }),
       onRun: (request) => runOnePanel(request),
+      onSet: (request) => setOneParameter(request),
       onState: ({ key, value }) => rememberState(key, value),
       onLayout: (request) => layoutGraph(request),
       onPropose: ({ what, detail }) => presentProposalFromPage(what, detail),
@@ -1154,6 +1185,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
                    budget: budgetForPage(interaction) });
     paintInteraction();
     stageRevise.hidden = false;
+    becomeAddressable();
     presentDisposition(promptText, started);
   }
 
@@ -1219,6 +1251,94 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
    * the page with its reason, because a control that appears to hang is
    * worse than one that says no.
    */
+  /**
+   * A control asked for a parameter (U-71).
+   *
+   * The difference from `runOnePanel' is which panels run: the control names
+   * none, so every panel that DECLARES the parameter does.  That is the
+   * whole point of the call -- the document already knows which those are,
+   * and a control that had to name one would be a second place for it to be
+   * written down, with no answer at all for a parameter two panels share.
+   *
+   * Everything else is the same and in the same order, for the same reasons:
+   * the domain is checked first because it is free and local and a value the
+   * store will never see must not cost the reader a run, and the budget is
+   * charged before the call because a refusal after the store has been read
+   * is a complaint rather than a limit.
+   */
+  async function setOneParameter({ id, parameter, value }) {
+    if (!appDoc || !mounted) return;
+    const declared = (appDoc.parameters || []).find((p) => p.name === parameter);
+    if (!declared) {
+      mounted.refuse({ id, request: { parameter },
+                       reason: `\`${parameter}' is not a parameter of this page` });
+      return;
+    }
+    const values = { ...parameterValues, [parameter]: value };
+    const dependents = (appDoc.panels || []).filter((p) => (p.parameters || []).includes(parameter));
+
+    // Checked against every panel that will run, before any of them does: a
+    // patch is refused whole and so is a change of parameter, or the page
+    // would show one panel at the new value and the rest at the old.
+    for (const panel of dependents) {
+      const binding = bindParameters(panel, values, { parameters: appDoc.parameters, results });
+      if (!binding.ok) {
+        const why = binding.refusals.map((r) => `${r.name}: ${r.reason}`).join("; ");
+        mounted.refuse({ id, request: { parameter, value }, reason: why,
+                         budget: budgetForPage(interaction) });
+        log(`  ✗ ${parameter}: ${why}`, "dsh-warn");
+        return;
+      }
+    }
+
+    // A parameter nothing reads still takes its value -- the validator
+    // already warns about one, and refusing here would make a control the
+    // model placed early, before the panel that uses it, look broken.
+    if (!dependents.length) {
+      parameterValues = values;
+      mounted.post({ id, partial: true, results: {}, stale: staleAssertions(appDoc, results),
+                     parameters: values, budget: budgetForPage(interaction) });
+      log(`page set ${parameter}=${value}; no panel declares it`);
+      return;
+    }
+
+    const allowed = interaction
+      ? interaction.check({ runs: dependents.length, panel: `(parameter ${parameter})`, parameters: values })
+      : { ok: true };
+    if (!allowed.ok) {
+      mounted.refuse({ id, request: { parameter, value }, reason: allowed.reason,
+                       budget: budgetForPage(interaction) });
+      log(`  ✗ ${parameter}: ${allowed.reason}`, "dsh-warn");
+      return;
+    }
+
+    log(`page set ${parameter}=${value}; re-running `
+      + `${dependents.map((p) => p.name).join(", ")}`);
+    const fresh = await runPanels({
+      host, account: accountName, repository: repositoryName, token: st.token,
+      panels: dependents, run, viaCatalog: false,
+      values, parameters: appDoc.parameters, have: results,
+    });
+    const broke = dependents.map((p) => p.name).find((n) => !fresh[n]?.ok);
+    if (broke) {
+      mounted.refuse({ id, request: { parameter, value },
+                       reason: fresh[broke]?.error || `${broke} did not run`,
+                       budget: budgetForPage(interaction) });
+      log(`  ✗ ${broke}: ${fresh[broke]?.error || "did not run"}`, "dsh-warn");
+      return;
+    }
+    results = { ...results, ...fresh };
+    parameterValues = values;
+    for (const p of dependents) {
+      interaction?.chargeResult({ rows: fresh[p.name].rows, bytes: fresh[p.name].bytes });
+    }
+    const changed = Object.fromEntries(dependents.map((p) => [p.name, fresh[p.name]]));
+    mounted.post({ id, partial: true, results: payloadsFor(appDoc, changed),
+                   stale: staleAssertions(appDoc, results), parameters: values,
+                   budget: budgetForPage(interaction) });
+    paintInteraction();
+  }
+
   async function runOnePanel({ id, panel, parameters }) {
     if (!appDoc || !mounted) return;
     const target = appDoc.panels.find((p) => p.name === panel);
@@ -1413,7 +1533,328 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     }
   }
 
-  reviseBtn.addEventListener("click", () => startRevision());
+  /**
+   * The Revise box, re-expressed as the instruction channel (U-79).
+   *
+   * There is one instruction path and not two.  The box is this channel with
+   * its target PRE-SET to the presentation it sits in -- which is exactly
+   * what it always meant and what made it correct -- so it calls the same
+   * function the location bar calls, and the bar's reply and the box's
+   * status line say the same thing because they are the same answer read
+   * twice.
+   *
+   * What the channel adds over `startRevision' is a sentence and an undo.
+   * `startRevision' answers in the vocabulary of gates; the bar needs one
+   * line and something to press.
+   */
+  async function instruct(text) {
+    const before = appDoc;
+    const out = await startRevision(text);
+    if (!out) {
+      return { ok: false, message: reviseStatus.textContent || "nothing was changed" };
+    }
+    if (out.ok === false) {
+      return { ok: false, message: (out.errors || []).join("; ")
+                                || `refused — ${out.classification?.class || "not applied"}` };
+    }
+    const klass = out.classification?.class || "presentational";
+    if (out.applied !== "immediately") {
+      // Nothing has changed yet, so there is nothing to undo: the change is
+      // waiting at the gate in the pane, where the per-panel diff is.
+      return { ok: true, message: `${klass} — waiting for you in the pane`, undo: null };
+    }
+    return {
+      ok: true,
+      message: `${klass} — applied, revision ${appDoc?.revision ?? "?"}`,
+      // Undo is the document as it was, put back through the same path the
+      // change took: `applyRevision' re-runs only what the classifier says
+      // changed, and going backwards over a presentational change says
+      // nothing changed, so nothing runs.
+      undo: before ? async () => {
+        const back = { ok: true, document: before, warnings: [],
+                       classification: classify(appDoc, before, []),
+                       size: null };
+        if (back.classification.class === "authority") {
+          return { ok: false, message: "that cannot be undone here — it needed a grant" };
+        }
+        await applyRevision(back, null, "undo");
+        return { ok: true, message: `put back — revision ${appDoc?.revision ?? "?"}` };
+      } : null,
+    };
+  }
+
+  /* ─────────────── the arrangement verbs (U-85, §21.4) ─────────────── */
+
+  /**
+   * The second channel, against the page in this pane.
+   *
+   * It is deliberately NOT the instruction path with four special cases in
+   * it.  `lift inventory#e-7k2m as stock-card' is exact: it costs nothing to
+   * be certain about, and sending it to a model would make a deterministic
+   * operation depend on a turn that can fail.  So the bar parses it, the App
+   * routes it, and this performs it — the same shape as `instruct', and the
+   * same reply and undo come back for the bar to show.
+   *
+   * **Two of the four verbs are refused here, and that is the design.**  A
+   * mount is a whole presentation loaded once, expanded by a press the
+   * chrome drew (§21.4.3).  This pane's page is rendered inside a sandboxed
+   * frame with no network and no channel to register a renderer in, so a
+   * mount placed in it could only ever be an empty band — and an operation
+   * that appears to succeed and shows nothing is the one failure §21.4.2
+   * exists to rule out.  The verb belongs to the workspace, and the refusal
+   * says so in the words of where to go instead.
+   */
+  async function arrange(instruction) {
+    if (!appDoc) return { ok: false, message: "there is no page in this pane yet" };
+    if (instruction.verb === "lift") return liftFromPage(instruction);
+    if (instruction.verb === "apply") return applyToPage(instruction);
+    if (instruction.verb === "mount" || instruction.verb === "unmount") {
+      return { ok: false,
+               message: `a presentation is mounted in the workspace, not in a page: the band `
+                      + `is drawn and opened by the chrome, and this page is in a frame with `
+                      + `nothing to register a renderer in — \`goto workspace' and `
+                      + `${instruction.verb} there` };
+    }
+    return { ok: false, message: `\`${instruction.verb}' is not an arrangement verb` };
+  }
+
+  /** Where this page's arrangements are kept, and under whose credentials. */
+  const arrangementStore = () => ({ host, account: accountName, token: st.token });
+
+  /**
+   * Keep one component of this page as a named arrangement (U-81, U-83).
+   *
+   * The name is `<presentation>#<anchor>', and the presentation half is
+   * checked rather than ignored.  `lift' itself would find the element
+   * whatever was written before the hash — every element name is unique
+   * within its presentation — but a name that can be written wrongly and
+   * still work is a name nobody keeps right, and the half that is wrong
+   * today is the half another page is addressed by tomorrow.
+   */
+  async function liftFromPage({ presentation, element, as }) {
+    if (presentation !== appDoc.id) {
+      return { ok: false,
+               message: `this page is \`${appDoc.id}'; \`${presentation}' is something else — `
+                      + `lift ${appDoc.id}#${element} as ${as}` };
+    }
+    // The source every request in the template will be repeated against: the
+    // repository THIS page was built over, recorded at the lift because it
+    // cannot be recovered at the apply (D-AV, §21.4.2).
+    const source = { host, account: accountName, repository: repositoryName };
+    const lifted = liftArrangement({
+      document: appDoc, source, revision: appDoc.revision,
+      name: printName({ presentation, element }),
+    });
+    if (!lifted.ok) return { ok: false, message: lifted.errors[0] };
+    const ready = await ensureRepository(arrangementStore());
+    if (!ready.ok) return { ok: false, message: `\`${accountName}/ui' is not there: ${ready.error}` };
+    const kept = await writeArrangement({
+      ...arrangementStore(), name: as, template: lifted.template, creator: accountName,
+      title: `${appDoc.title || appDoc.id} — ${element}`,
+    });
+    if (!kept.ok) return { ok: false, message: `it could not be kept: ${kept.error}` };
+    const t = lifted.template;
+    log(`lifted ${element} as \`${as}': ${t.panels.length} request(s), `
+      + `${t.parameters.length} parameter(s), ${t.transforms.length} transform(s)`);
+    return {
+      ok: true,
+      message: `lifted as \`${as}' — ${t.panels.length} request(s) it will repeat, against `
+             + `${accountName}/${repositoryName}`,
+      // The undo of a lift is to forget it.  Nothing on this page changed:
+      // a lift is a read, and the only thing it left behind is the entry.
+      undo: async () => {
+        const gone = await deleteArrangement({ ...arrangementStore(), name: as });
+        return gone.ok ? { ok: true, message: `\`${as}' forgotten` }
+                       : { ok: false, message: `it is still there: ${gone.error}` };
+      },
+    };
+  }
+
+  /**
+   * Put a named arrangement into this page (U-82, U-84, U-88).
+   *
+   * Read, checked, and then SHOWN — it is not applied by this call.  What an
+   * apply adds to a page is queries, run under the reader's credentials
+   * against addresses the arrangement's author chose, and a reader who has
+   * not seen them has authorised nothing.  That is the same question Gate 1
+   * asks of a model's proposal, asked of a template, so it is asked in the
+   * same place and in the same shape.
+   */
+  async function applyToPage({ arrangement, into }) {
+    const got = await readArrangement({ ...arrangementStore(), name: arrangement });
+    if (!got.ok) return { ok: false, message: got.error };
+    const can = checkApply({ document: appDoc, template: got.template });
+    if (!can.ok) return { ok: false, message: can.errors[0] };
+    presentArrangement({ name: arrangement, template: got.template,
+                         creator: got.creator, into: into || null });
+    const n = requestsOf(got.template).length;
+    return { ok: true, undo: null,
+             message: `\`${arrangement}' — ${n} request${n === 1 ? "" : "s"} to repeat, `
+                    + `waiting for you in the pane` };
+  }
+
+  /** The disclosure, and the one press that applies what it discloses. */
+  function presentArrangement({ name, template, creator, into }) {
+    gateArrange.hidden = false;
+    gateArrange._body.replaceChildren();
+    const requests = requestsOf(template);
+    const foreign = creator && creator !== accountName;
+
+    gateArrange._body.appendChild(el(doc, "p", { class: "dsh-note",
+      dataset: { testid: "arrange-provenance" },
+      text: `\`${name}' was lifted from ${template.source?.presentation || "a page"}`
+          + `${template.source?.element ? ` (${template.source.element})` : ""}`
+          + `${creator ? ` by ${creator}` : ""}`
+          + `${foreign ? " — somebody else" : ""}. It carries definitions and no data: `
+          + `everything it shows, it will ask for.` }));
+
+    for (const r of requests) {
+      const s = r.source;
+      const where = s ? `${s.account || "?"}/${s.repository || "?"}`
+                      + `${s.host && s.host !== host ? ` at ${s.host}` : ""}`
+                      : "(no source recorded)";
+      gateArrange._body.appendChild(panelBox(doc, {
+        kind: "bound", label: "request", name: r.panel, testid: `arrange-${r.panel}`,
+        notes: [
+          el(doc, "span", { class: "dsh-note", dataset: { testid: `arrange-where-${r.panel}` },
+                            text: `→ ${where}` }),
+          el(doc, "span", { class: "dsh-note", style: "margin-left:auto",
+                            text: r.parameters.length ? `bound to ${r.parameters.join(", ")}` : "" }),
+        ],
+        body: el(doc, "pre", { class: "dsh-pre", text: r.query,
+                               dataset: { testid: `arrange-query-${r.panel}` } }),
+      }));
+    }
+
+    // Said even when the sources are the reader's own, because what makes it
+    // worth reading is not that the address is strange but that the request
+    // is somebody else's and the credentials are yours.
+    gateArrange._body.appendChild(el(doc, "p", { class: "dsh-note",
+      dataset: { testid: "arrange-credentials" },
+      text: `These run under YOUR credentials, against the addresses above. `
+          + `The author chose where; you supply the token.` }));
+
+    const applyBtn = el(doc, "button", {
+      type: "button", class: "dsh-primary", dataset: { testid: "arrange-apply" },
+      text: `Apply and run ${requests.length} request${requests.length === 1 ? "" : "s"}`,
+    });
+    const discard = el(doc, "button", {
+      type: "button", text: "Discard", dataset: { testid: "arrange-discard" },
+      onclick: () => { gateArrange.hidden = true; },
+    });
+    const status = el(doc, "span", { class: "dsh-note",
+                                     dataset: { testid: "arrange-status" } });
+    gateArrange._body.appendChild(el(doc, "div", { class: "dsh-actions" },
+                                       [applyBtn, discard, status]));
+    applyBtn.addEventListener("click", async () => {
+      applyBtn.disabled = true;
+      status.textContent = "applying…";
+      const out = await putArrangement({ name, template, into });
+      status.textContent = out.ok ? `applied — ${out.message}` : `refused — ${out.message}`;
+      applyBtn.disabled = false;
+      if (out.ok) gateArrange.hidden = true;
+      if (app?.locationBar?.address()?.id === id) {
+        app.locationBar.say(out.message, { undo: out.undo || null });
+      }
+    });
+  }
+
+  /**
+   * Apply it, for real: one patch, one revision, and the requests repeated.
+   *
+   * The re-run is not written here.  `apply' produces a document whose new
+   * panels carry the source the lift recorded, `classify' sees panels that
+   * are new, and `applyRevision' runs exactly those — through `runPanel',
+   * which reads a panel's own source and sends the request there (U-84).
+   * So the one path that fetches on behalf of a page is still the one path,
+   * and an applied component is not a second kind of panel.
+   */
+  async function putArrangement({ name, template, into }) {
+    const before = appDoc;
+    const out = applyArrangement({ document: appDoc, template, parent: into || null });
+    if (!out.ok) return { ok: false, message: out.errors[0] };
+    // Through the validator, like every other whole-document change.  A view
+    // is a tree AND the markup projected from it, and the frame renders the
+    // markup: an apply that edited the tree and left the projection alone
+    // would put the component in the document and nothing on the screen.
+    // It is also the check — a merged document that no longer validates is
+    // refused here, whole, rather than drawn half.
+    const checked = validateApplication({ ...out.document, id: appDoc.id,
+                                          revision: appDoc.revision });
+    if (!checked.ok) return { ok: false, message: checked.errors.join("; ") };
+    const next = { ...checked.document, revision: (appDoc.revision || 1) + 1,
+                   revisionOf: `${appDoc.id}#${appDoc.revision || 1}` };
+    const how = await applyRevision(
+      { ok: true, document: next, warnings: checked.warnings, size: checked.size,
+        classification: classify(appDoc, checked.document, []) },
+      null, `apply ${name}`);
+    // Provenance, and nothing reads it (§21.4.4): which arrangement went
+    // into which page.  Written after the page is on the screen, because a
+    // record of an application that failed is worse than no record.
+    await recordApplication({ ...arrangementStore(), presentation: appDoc.id,
+                              arrangement: name, requests: out.requests });
+    const failed = out.requests.filter((r) => results?.[r.panel] && !results[r.panel].ok);
+    for (const r of out.requests) {
+      const got = results?.[r.panel];
+      log(`  ${r.panel} ← ${r.from} · ${got?.at || "?"}`
+        + (got ? (got.ok ? `: ${got.rows} rows` : `: ${got.error}`) : ""),
+          got?.ok === false ? "dsh-err" : "");
+    }
+    return {
+      ok: true,
+      message: failed.length
+        ? `\`${name}' applied, and ${failed.length} of its request(s) did not run — `
+          + `${failed[0] && results[failed[0].panel]?.error}`
+        : `\`${name}' applied — revision ${appDoc.revision}, `
+          + `${out.requests.length} request(s) repeated`,
+      how,
+      undo: async () => {
+        const back = { ok: true, document: before, warnings: [], size: null,
+                       classification: classify(appDoc, before, []) };
+        await applyRevision(back, null, "undo");
+        return { ok: true, message: `put back — revision ${appDoc?.revision ?? "?"}` };
+      },
+    };
+  }
+
+  reviseBtn.addEventListener("click", async () => {
+    const ask = String(revisePrompt.innerText || "").trim();
+    if (!ask) { reviseStatus.textContent = "nothing to change"; return; }
+    const out = await instruct(ask);
+    // The bar says it too when the pane is the address, so the user reads
+    // one answer wherever they are looking.
+    if (app?.locationBar?.address()?.id === id) app.locationBar.say(out.message, { undo: out.undo });
+  });
+
+  /**
+   * Make this pane the address when it is clicked (U-77).
+   *
+   * A presentation is a location, and clicking into one is how a user says
+   * which one they mean -- the same gesture they already use to start
+   * working in it.  `capture' so that a click on a control inside the pane
+   * still re-addresses: the gesture is "I am working here", not "I pressed
+   * this exact pixel".
+   */
+  wrapper.addEventListener("pointerdown", () => {
+    if (appDoc && app?.addressTarget) app.addressTarget(id);
+  }, true);
+
+  /** Put this pane in the bar's address book, once it has something to change. */
+  function becomeAddressable() {
+    if (unregister || !app?.registerTarget) return;
+    unregister = app.registerTarget({
+      id, kind: "presentation",
+      label: appDoc?.title || `${accountName}/${repositoryName}`,
+      presentation: appDoc?.id || null,
+      instruct,
+      arrange,
+      document: () => appDoc,
+    });
+    // Addressed as soon as it exists: the page the user just asked for is
+    // the one the next sentence is about, and making them say so would be
+    // ceremony.
+    app.addressTarget?.(id);
+  }
 
   /**
    * What came back: a patch, or a whole document, or neither.
@@ -1572,8 +2013,14 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
         values: parameterValues, parameters: next.parameters, have: results,
         onEvent: (e) => {
           if (e.type === "panel-done") {
+            // Where it went, and not only what came back: an applied
+            // component's request goes to the source the inclusion had
+            // (U-84), which may not be the repository this pane is over.
+            const went = e.at ? ` · ${e.at}` : "";
             progress.appendChild(el(doc, "div", { class: e.ok ? "" : "dsh-err",
-              text: e.ok ? `${e.name}: ${e.rows} rows in ${e.ms} ms` : `${e.name}: ${e.error}` }));
+              dataset: { testid: `patch-ran-${e.name}` },
+              text: e.ok ? `${e.name}: ${e.rows} rows in ${e.ms} ms${went}`
+                         : `${e.name}${went}: ${e.error}` }));
           }
         },
       });
@@ -1771,6 +2218,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   }
 
   const api = { wrapper, state: st, start: startRun, refresh, revise: startRevision,
+                instruct, becomeAddressable,
                 get grant() { return grant; },
                 get spec() { return appDoc ? specOf(appDoc) : null; },
                 get document() { return appDoc; },

@@ -32,6 +32,11 @@ const {
   appendIntoElement, OPERATIONS, GATE_FOR,
 } = await load("app/patch.js");
 const { validateApplication, canonical } = await load("app/document.js");
+const { documentSummary } = await load("llm/dashboard-prompt.js");
+
+/** The same summary, with the markup it replaced, for the size comparison. */
+const documentSummaryWithHtml = (d) =>
+  documentSummary(d) + (d.views || []).map((v) => v.html).join("");
 
 let pass = 0, fail = 0;
 const ok = (cond, what) => {
@@ -310,6 +315,319 @@ section("§6.3: the three prompts, end to end");
      "and no reload: this is the case that makes interactive design feel like design");
   ok(third.document.revision === 3 && third.document.revisionOf === "app-9#2",
      "revision 3, made from revision 2");
+}
+
+/* ═══════════════ U-64: addressing the page by element ═════════════════════ */
+
+const tree = (extra = {}) => validateApplication({
+  id: "app-t", revision: 1, title: "Inventory",
+  uses: ["panel", "table", "metric", "card"],
+  panels: [{ name: "parts", query: SALES, caption: "monthly totals" },
+           { name: "other", query: "SELECT ?x WHERE { ?s :x ?x }" }],
+  transforms: [{ name: "count", inputs: ["parts"], body: "return 1;" }],
+  views: [{ name: "main", elements: [
+    { name: "e-panel", kind: "panel", order: "a", attributes: { label: "Parts" },
+      layout: { columns: "1fr 1fr", gap: 12, areas: ["left right"] },
+      children: [
+        { name: "e-left", kind: "card", order: "a", placement: { area: "left" },
+          children: [{ name: "e-table", kind: "table", order: "a", bound: "parts" }] },
+        { name: "e-right", kind: "metric", order: "b", placement: { area: "right" },
+          attributes: { label: "Count", value: "7" } },
+      ] },
+    { name: "e-note", kind: "p", order: "b", text: "As at the last import." },
+  ] }],
+  ...extra,
+}).document;
+
+const elementsIn = (d, view = "main") =>
+  (d.views.find((v) => v.name === view) || {}).elements || [];
+const findIn = (d, name) => {
+  const out = [];
+  const walk = (ns) => ns.forEach((n) => { out.push(n); walk(n.children || []); });
+  walk(elementsIn(d));
+  return out.find((n) => n.name === name) || null;
+};
+const parentIn = (d, name) => {
+  let found = null;
+  const walk = (ns, parent) => ns.forEach((n) => {
+    if (n.name === name) found = parent;
+    walk(n.children || [], n.name);
+  });
+  walk(elementsIn(d), null);
+  return found;
+};
+
+section("U-64: insert-element puts one where it was asked for");
+{
+  const r = applyPatch(tree(), [{ op: "insert-element", parent: "e-left", after: "e-table",
+                                  name: "e-new", kind: "metric",
+                                  attributes: { label: "Added", value: "1" } }]);
+  ok(r.ok, r.errors.join("; ") || "applied");
+  ok(parentIn(r.document, "e-new") === "e-left", "under the container named");
+  const kids = findIn(r.document, "e-left").children.map((c) => c.name);
+  ok(kids.join() === "e-table,e-new", `after the sibling named (${kids})`);
+  ok(findIn(r.document, "e-table").order === findIn(tree(), "e-table").order,
+     "and the sibling's own key did not change — one insert, one key (D-AJ)");
+  ok(/data-ui="e-new"/.test(r.document.views[0].html), "the markup is regenerated from the tree");
+  ok(r.classification.class === "presentational", "and it costs nothing: no gate");
+}
+
+section("an element with no name gets one, and a repeated name is refused");
+{
+  const minted = applyPatch(tree(), [{ op: "insert-element", parent: "e-left", kind: "p",
+                                       text: "x" }]);
+  ok(minted.ok && elementsIn(minted.document).length === 2, "minted");
+  const clash = applyPatch(tree(), [{ op: "insert-element", parent: "e-left",
+                                      name: "e-table", kind: "p" }]);
+  ok(!clash.ok && /second element named `e-table'/.test(clash.errors[0]),
+     "a name already in the page is refused, because a name is an address");
+}
+
+section("set-attribute sets an attribute, a field, or neither");
+{
+  const r = applyPatch(tree(), [{ op: "set-attribute", element: "e-right",
+                                  name: "value", value: "12" }]);
+  ok(r.ok && findIn(r.document, "e-right").attributes.value === "12", "an attribute");
+
+  const t = applyPatch(tree(), [{ op: "set-attribute", element: "e-note",
+                                  name: "text", value: "Counted this morning." }]);
+  ok(t.ok && findIn(t.document, "e-note").text === "Counted this morning.",
+     "a field, by the same operation — six operations rather than sixteen");
+
+  const cleared = applyPatch(tree(), [{ op: "set-attribute", element: "e-right",
+                                        name: "value", value: null }]);
+  ok(cleared.ok && findIn(cleared.document, "e-right").attributes.value === undefined,
+     "null clears it");
+
+  const wrong = applyPatch(tree(), [{ op: "set-attribute", element: "e-table",
+                                      name: "nonesuch", value: "1" }]);
+  ok(!wrong.ok && /has no attribute `nonesuch'/.test(wrong.errors[0]),
+     "an attribute the component has not got is refused, not written and ignored");
+
+  const typed = applyPatch(tree(), [{ op: "set-attribute", element: "e-table",
+                                      name: "sortable", value: "true" }]);
+  ok(typed.ok && findIn(typed.document, "e-table").attributes.sortable === true,
+     "and a value is coerced to what the manifest declares");
+}
+
+section("move-element moves it, and refuses to put it inside itself");
+{
+  const r = applyPatch(tree(), [{ op: "move-element", element: "e-table",
+                                  parent: "e-panel", area: "right" }]);
+  ok(r.ok, r.errors.join("; ") || "moved");
+  ok(parentIn(r.document, "e-table") === "e-panel", "to its new container");
+  ok(findIn(r.document, "e-table").placement.area === "right", "with its new placement");
+  ok(findIn(r.document, "e-left").children.length === 0, "and out of the old one");
+
+  const loop = applyPatch(tree(), [{ op: "move-element", element: "e-left", parent: "e-table" }]);
+  ok(!loop.ok && /inside itself/.test(loop.errors[0]),
+     "a move into its own subtree would stop the tree being a tree");
+}
+
+section("remove-element takes the subtree with it");
+{
+  const r = applyPatch(tree(), [{ op: "remove-element", element: "e-left" }]);
+  ok(r.ok, r.errors.join("; ") || "removed");
+  ok(!findIn(r.document, "e-left") && !findIn(r.document, "e-table"),
+     "the element and everything under it");
+  ok(r.warnings.some((w) => /is run but never used/.test(w)),
+     "with the existing warning doing its job: a panel nothing reads now costs a query for nothing");
+}
+
+section("D-AK: rearranging is set-layout on the container, and touches no child");
+{
+  const before = tree();
+  const r = applyPatch(before, [{ op: "set-layout", element: "e-panel",
+                                  value: { columns: "1fr 1fr", gap: 12,
+                                           areas: ["right left"] } }]);
+  ok(r.ok, r.errors.join("; ") || "rearranged");
+  ok(findIn(r.document, "e-panel").layout.areas.join() === "right left", "the template is the new one");
+  ok(canonical(findIn(r.document, "e-left")) === canonical(findIn(before, "e-left"))
+     && canonical(findIn(r.document, "e-right")) === canonical(findIn(before, "e-right")),
+     "and neither child changed in any way");
+  ok(r.classification.class === "presentational", "no gate");
+}
+
+section("set-placement moves one child between areas");
+{
+  const r = applyPatch(tree(), [{ op: "set-placement", element: "e-right",
+                                  value: { area: "left" } }]);
+  ok(r.ok && findIn(r.document, "e-right").placement.area === "left", "placed");
+  const nowhere = applyPatch(tree(), [{ op: "set-placement", element: "e-right",
+                                        value: { area: "middle" } }]);
+  ok(!nowhere.ok && /does not declare/.test(nowhere.errors[0]),
+     "into an area the container never declared: refused, because it would render "
+   + "somewhere plausible and be found on a screen");
+}
+
+section("an element that is not there is named, not guessed at");
+{
+  const r = applyPatch(tree(), [{ op: "set-attribute", element: "e-nope", name: "id", value: "x" }]);
+  ok(!r.ok && /names element `e-nope', which is not in this page/.test(r.errors[0]), "by name");
+}
+
+section("a view that is still markup is promoted when something is put in it");
+{
+  const r = applyPatch(doc(), [{ op: "insert-element", kind: "metric", name: "e-added",
+                                 attributes: { label: "New", value: "1" } }]);
+  ok(r.ok, r.errors.join("; ") || "applied");
+  const kinds = elementsIn(r.document).map((n) => n.kind);
+  ok(kinds.join() === "html,metric",
+     `the old markup becomes one carrier with the new element beside it (${kinds})`);
+  ok(elementsIn(r.document)[0].html.includes('data-bound="sales"'),
+     "holding exactly what it held — not reinterpreted (D-AN)");
+  const slot = applyPatch(r.document, [{ op: "set-slot", id: "tbl", html: "<p>x</p>" }]);
+  ok(!slot.ok && /address the element instead/.test(slot.errors[0]),
+     "and from then on a slot operation is refused rather than silently overwritten");
+}
+
+/* ══════════════════ U-65: what an element change costs ════════════════════ */
+
+section("U-65: a binding gained takes the class of what it points at");
+{
+  const bound = applyPatch(tree(), [{ op: "set-attribute", element: "e-right",
+                                      name: "bound", value: "other" }]);
+  ok(bound.ok && bound.classification.class === "data",
+     "an element that starts showing a panel puts store data in front of the reader");
+  ok(bound.classification.gate === "gate1", "so Gate 1 opens");
+  ok(bound.classification.reasons.some((r) => /now shows bound `other'/.test(r.why)),
+     "and the reason names the element and the panel");
+
+  const moved = applyPatch(tree(), [{ op: "set-attribute", element: "e-table",
+                                      name: "bound", value: "other" }]);
+  ok(moved.ok && moved.classification.class === "data",
+     "and so does one that starts showing a different panel");
+
+  const derived = applyPatch(tree(), [{ op: "set-attribute", element: "e-right",
+                                        name: "derived", value: "count" }]);
+  ok(derived.ok && derived.classification.class === "computational",
+     "a transform is computational, which is the cheaper gate");
+}
+
+section("a binding LOST is presentational — the asymmetry is the point");
+{
+  const cleared = applyPatch(tree(), [{ op: "set-attribute", element: "e-table",
+                                        name: "bound", value: null }]);
+  ok(cleared.ok && cleared.classification.class === "presentational",
+     "a page that shows less cannot show the reader anything they did not consent to");
+  const gone = applyPatch(tree(), [{ op: "remove-element", element: "e-table" }]);
+  ok(gone.ok && gone.classification.class === "presentational",
+     "and deleting a chart stays free, as it should");
+}
+
+section("an ordinary element change is presentational and applies in place");
+{
+  const r = applyPatch(tree(), [{ op: "move-element", element: "e-right", parent: "e-left" },
+                                 { op: "set-attribute", element: "e-note", name: "text",
+                                   value: "later" }]);
+  ok(r.ok && r.classification.class === "presentational", "no gate");
+  ok(r.classification.rebuild === false, "and no rebuild: the runtime can do this where it stands");
+}
+
+/* ══════════════════════ U-66: immutable regions ═══════════════════════════ */
+
+const guarded = () => validateApplication({
+  id: "app-i", revision: 1, title: "Guarded",
+  uses: ["panel", "metric"],
+  panels: [{ name: "parts", query: SALES }],
+  views: [{ name: "main", elements: [
+    { name: "e-frame", kind: "div", order: "a",
+      layout: { columns: "1fr 1fr", areas: ["body gate"] },
+      children: [
+        { name: "e-body", kind: "div", order: "a", placement: { area: "body" },
+          children: [{ name: "e-tab", kind: "metric", order: "a", bound: "parts",
+                       attributes: { label: "Parts" } }] },
+        { name: "e-gate", kind: "div", order: "b", placement: { area: "gate" },
+          immutable: true, text: "Authority" },
+      ] },
+    // A sibling, so that removing the frame is a removal rather than an
+    // empty page: the question being asked is what happened to `e-gate'.
+    { name: "e-foot", kind: "p", order: "b", text: "foot" },
+  ] }],
+}).document;
+
+section("U-66: an immutable element cannot be removed, moved or re-kinded");
+{
+  ok(guarded().views[0].elements[0].children[1].immutable, "the fixture is marked");
+  const removed = applyPatch(guarded(), [{ op: "remove-element", element: "e-gate" }]);
+  ok(!removed.ok && /`e-gate' may not be removed/.test(removed.errors[0]), "removed");
+  const moved = applyPatch(guarded(), [{ op: "move-element", element: "e-gate", parent: "e-body" }]);
+  ok(!moved.ok && /may not be moved out of/.test(moved.errors[0]), "moved");
+  const rekinded = applyPatch(guarded(), [{ op: "set-attribute", element: "e-gate",
+                                            name: "kind", value: "span" }]);
+  ok(!rekinded.ok && /may not be changed from a div to a span/.test(rekinded.errors[0]), "re-kinded");
+}
+
+section("nor hidden — including by something that never names it");
+{
+  const hidden = applyPatch(guarded(), [{ op: "set-attribute", element: "e-gate",
+                                          name: "hidden", value: true }]);
+  ok(!hidden.ok && /may not be hidden/.test(hidden.errors[0]), "hidden outright");
+
+  const above = applyPatch(guarded(), [{ op: "set-attribute", element: "e-frame",
+                                         name: "hidden", value: true }]);
+  ok(!above.ok && /`e-frame' hides it/.test(above.errors[0]),
+     "hidden by an ancestor, which names the element nowhere");
+
+  const outOfTheTemplate = applyPatch(guarded(), [
+    { op: "set-layout", element: "e-frame", value: { columns: "1fr", areas: ["body"] } }]);
+  ok(!outOfTheTemplate.ok && /no longer\s+declares/.test(outOfTheTemplate.errors.join(" ")),
+     "and hidden by dropping its area from its container's template — the one that is "
+   + "genuinely hard to see, which is why the check is a post-condition on the result");
+
+  const containerGone = applyPatch(guarded(), [{ op: "remove-element", element: "e-frame" }]);
+  ok(!containerGone.ok && /`e-gate' may not be removed/.test(containerGone.errors[0]),
+     "or by deleting what holds it");
+}
+
+section("and a patch may not hand out the mark, in either direction");
+{
+  const claiming = applyPatch(guarded(), [{ op: "insert-element", parent: "e-body",
+                                            kind: "div", immutable: true }]);
+  ok(!claiming.ok && /set by the interface, not by a patch/.test(claiming.errors[0]),
+     "a model that could mark its own work immutable could lock the page");
+  const freeing = applyPatch(guarded(), [{ op: "set-attribute", element: "e-gate",
+                                           name: "immutable", value: null }]);
+  ok(!freeing.ok && /set by the interface, not by a patch/.test(freeing.errors[0]),
+     "and one that could clear the mark would only need two patches");
+}
+
+section("what an immutable element does not stop");
+{
+  const r = applyPatch(guarded(), [{ op: "set-attribute", element: "e-tab",
+                                     name: "label", value: "Components" }]);
+  ok(r.ok, r.errors.join("; ") || "the rest of the page is as free as it was");
+}
+
+/* ════════════════════════ U-73: the outline ═══════════════════════════════ */
+
+section("U-73: the model is shown an outline, not markup");
+{
+  const summary = documentSummary(tree());
+  ok(/Views and the elements a patch can address/.test(summary), "the views are listed by element");
+  ok(/e-panel\s+panel/.test(summary), "name first, kind second — the address in the first column");
+  ok(/grid\(cols=1fr 1fr areas="left right"\)/.test(summary), "with the grid on the container");
+  ok(/area=left/.test(summary), "the area on the child");
+  ok(/shows panel parts/.test(summary), "and what each element shows");
+  ok(!/<dydra-panel/.test(summary), "and no markup at all: it is several times the size");
+  ok(summary.length < documentSummaryWithHtml(tree()).length,
+     "which is the other half of the reason");
+}
+
+section("an immutable element says so in the outline");
+{
+  const summary = documentSummary(guarded());
+  ok(/e-gate.*IMMUTABLE/.test(summary),
+     "so the model is told before it writes the patch, not after it is refused");
+}
+
+section("a markup view is still listed by its ids");
+{
+  const summary = documentSummary(doc());
+  ok(/Views that are still markup/.test(summary) && /`tbl`/.test(summary),
+     "set-slot keeps working and keeps being described");
+  ok(/turns the whole view into one element/.test(summary),
+     "with what an insert there would do, since that is a decision the model is making");
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);

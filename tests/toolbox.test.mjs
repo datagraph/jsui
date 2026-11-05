@@ -43,16 +43,23 @@ const section = (s) => console.log(`\n${s}`);
 
 /* ═══════════════════════════ what is in it ═════════════════════════════════ */
 
-section("§8.3: twelve components, in two tiers, cut from the first draft's seventy");
+section("§8.3 and phase 5: the toolbox, in two tiers");
 {
-  ok(TIER_1.length === 7, "seven in tier 1 — the page's own furniture");
-  ok(TIER_2.length === 5 + 1, "six in tier 2 — five data components and `graph'");
-  ok(COMPONENT_NAMES.length === 13 && !COMPONENT_NAMES.includes("base"),
-     "thirteen names a document may use, and `base' is not one of them");
-  ok(TIER_1.map((c) => c.name).join(",") === "grid,panel,card,tabs,metric,badge,key-value",
+  // Twelve at first (§8.3 of `ui-generator.md'), twenty-five once phase 5
+  // added the generic elements and the controls.  The tier line is what the
+  // catalogue subsets on and is the thing worth asserting: tier 1 knows
+  // nothing about the store, tier 2 does.
+  ok(TIER_1.length === 11, "eleven in tier 1 — the page's own furniture");
+  ok(TIER_2.length === 14, "fourteen in tier 2 — what shows the data, and what edits a parameter of it");
+  ok(COMPONENT_NAMES.length === 25 && !COMPONENT_NAMES.includes("base"),
+     "twenty-five names a document may use, and `base' is not one of them");
+  ok(TIER_1.map((c) => c.name).join(",")
+     === "grid,stack,split-pane,panel,card,tabs,text,heading,metric,badge,key-value",
      "tier 1 is layout and text");
-  ok(TIER_2.map((c) => c.name).join(",") === "table,bar-chart,line-chart,select,term,graph",
-     "tier 2 is bound to data");
+  ok(TIER_2.map((c) => c.name).join(",")
+     === "table,bar-chart,line-chart,term,graph,select,radio-group,checkbox,button,"
+       + "text-input,text-area,number-input,slider,date-input",
+     "tier 2 is bound to data: five that show it, nine that edit a parameter of it");
   ok(TOOLBOX_VERSION === "1", "and the whole of it answers to contract version 1");
 }
 
@@ -177,7 +184,7 @@ section("§8.5: the catalog is subsettable, because it costs tokens on every req
   const named = selectComponents("nothing in particular", { include: ["graph"] });
   ok(named.includes("graph"),
      "a caller may name components outright — which a follow-up turn does, for what the page already uses");
-  ok(selectComponents("", { all: true }).length === 13, "and `all' is the whole toolbox");
+  ok(selectComponents("", { all: true }).length === 25, "and `all' is the whole toolbox");
 }
 
 section("the catalog reads as one line of purpose, the properties, and one example");
@@ -213,7 +220,7 @@ section("§13.9: what the catalog costs is measured, not guessed");
      "the whole toolbox costs more than a subset of it");
   ok(small.approximateTokens === Math.ceil(small.characters / 4),
      "and the figure is an estimate, labelled as one");
-  ok(big.components === 13, "the full catalog is thirteen components");
+  ok(big.components === 25, "the full catalog is twenty-five components");
 }
 
 section("the measurement and the inlining agree");

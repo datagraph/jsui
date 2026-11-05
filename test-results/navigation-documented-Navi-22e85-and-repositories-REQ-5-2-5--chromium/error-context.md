@@ -1,96 +1,96 @@
 # Page snapshot
 
 ```yaml
-- generic [ref=e2]:
-  - generic [ref=e5]:
-    - link "Dydra" [ref=e6] [cursor=pointer]:
+- generic [ref=e3]:
+  - generic [ref=e7]:
+    - link "Dydra" [ref=e8] [cursor=pointer]:
       - /url: /login
-    - list [ref=e8]:
-      - listitem [ref=e9]:
-        - link "Logout" [ref=e10] [cursor=pointer]:
-          - /url: "#"
+    - list [ref=e10]:
       - listitem [ref=e11]:
-        - link "Admin" [ref=e12] [cursor=pointer]:
-          - /url: /ui/admin
+        - link "Logout" [ref=e12] [cursor=pointer]:
+          - /url: "#"
       - listitem [ref=e13]:
-        - link "About" [ref=e14] [cursor=pointer]:
-          - /url: https://dydra.com/about
+        - link "Admin" [ref=e14] [cursor=pointer]:
+          - /url: /ui/admin
       - listitem [ref=e15]:
-        - link "Docs" [ref=e16] [cursor=pointer]:
-          - /url: http://docs.dydra.com/
+        - link "About" [ref=e16] [cursor=pointer]:
+          - /url: https://dydra.com/about
       - listitem [ref=e17]:
-        - link "Blog" [ref=e18] [cursor=pointer]:
+        - link "Docs" [ref=e18] [cursor=pointer]:
+          - /url: http://docs.dydra.com/
+      - listitem [ref=e19]:
+        - link "Blog" [ref=e20] [cursor=pointer]:
           - /url: http://blog.dydra.com/
-  - list [ref=e21]:
-    - listitem [ref=e22]:
-      - link "Login" [ref=e23] [cursor=pointer]:
-        - /url: "#tab-login"
-        - generic [ref=e24]: Login
+  - list [ref=e24]:
     - listitem [ref=e25]:
-      - link "playwright test" [ref=e26] [cursor=pointer]:
+      - link "Login" [ref=e26] [cursor=pointer]:
+        - /url: "#tab-login"
+        - generic [ref=e27]: Login
+    - listitem [ref=e28]:
+      - link "playwright test" [ref=e29] [cursor=pointer]:
         - /url: "#tab-repository-playwright-test"
-        - generic [ref=e27]:
+        - generic [ref=e30]:
           - text: playwright
           - text: test
-  - generic [ref=e32]:
+  - generic [ref=e36]:
     - text: ⚠
-    - generic [ref=e33]:
-      - group [ref=e34]:
-        - list [ref=e35]:
-          - listitem [ref=e36]:
-            - generic [ref=e37]: Host
-            - textbox "dydra.com" [ref=e38]: http://localhost:8099
-          - listitem [ref=e39]:
-            - generic [ref=e40]: Username
-            - textbox [ref=e41]: playwright
-          - listitem [ref=e42]:
-            - generic [ref=e43]: Password or Token
-            - textbox [ref=e44]
-      - group [ref=e45]:
-        - list:
+    - generic [ref=e37]:
+      - group [ref=e38]:
+        - list [ref=e39]:
+          - listitem [ref=e40]:
+            - generic [ref=e41]: Host
+            - textbox "dydra.com" [ref=e42]: http://localhost:8100
+          - listitem [ref=e43]:
+            - generic [ref=e44]: Username
+            - textbox [ref=e45]: playwright
           - listitem [ref=e46]:
-            - button "Log in" [ref=e47]
-    - paragraph [ref=e48]:
-      - link "Forgot your password?" [ref=e49] [cursor=pointer]:
+            - generic [ref=e47]: Password or Token
+            - textbox [ref=e48]
+      - group [ref=e49]:
+        - list:
+          - listitem [ref=e50]:
+            - button "Log in" [ref=e51]
+    - paragraph [ref=e52]:
+      - link "Forgot your password?" [ref=e53] [cursor=pointer]:
         - /url: /ui/reset_password.html
-    - paragraph [ref=e50]:
-      - link "Request an invitation" [ref=e51] [cursor=pointer]:
-        - /url: /ui/invite
-  - generic [ref=e53]:
     - paragraph [ref=e54]:
+      - link "Request an invitation" [ref=e55] [cursor=pointer]:
+        - /url: /ui/invite
+  - generic [ref=e58]:
+    - paragraph [ref=e59]:
       - text: A product of
-      - link "Datagraph, GmbH" [ref=e55] [cursor=pointer]:
+      - link "Datagraph, GmbH" [ref=e60] [cursor=pointer]:
         - /url: http://datagraph.org/
       - text: •
-      - link "About" [ref=e57] [cursor=pointer]:
+      - link "About" [ref=e62] [cursor=pointer]:
         - /url: https://dydra.com/about
       - text: •
-      - link "Docs" [ref=e59] [cursor=pointer]:
+      - link "Docs" [ref=e64] [cursor=pointer]:
         - /url: http://docs.dydra.com/
       - text: •
-      - link "Blog" [ref=e61] [cursor=pointer]:
+      - link "Blog" [ref=e66] [cursor=pointer]:
         - /url: http://blog.dydra.com/
-      - generic [ref=e62]:
+      - generic [ref=e67]:
         - text: •
-        - link "Signup" [ref=e64] [cursor=pointer]:
+        - link "Signup" [ref=e69] [cursor=pointer]:
           - /url: /signup
         - text: •
-        - link "Admin" [ref=e66] [cursor=pointer]:
+        - link "Admin" [ref=e71] [cursor=pointer]:
           - /url: /ui/admin
       - text: •
-      - link "Legal" [ref=e68] [cursor=pointer]:
+      - link "Legal" [ref=e73] [cursor=pointer]:
         - /url: https://dydra.com/legal
-    - paragraph [ref=e69]:
-      - link "Support" [ref=e70] [cursor=pointer]:
+    - paragraph [ref=e74]:
+      - link "Support" [ref=e75] [cursor=pointer]:
         - /url: https://github.com/dydra/support/blob/master/README.rst#readme
       - text: •
-      - link "GitHub" [ref=e71] [cursor=pointer]:
+      - link "GitHub" [ref=e76] [cursor=pointer]:
         - /url: https://github.com/dydra
       - text: •
-      - link "Twitter" [ref=e72] [cursor=pointer]:
+      - link "Twitter" [ref=e77] [cursor=pointer]:
         - /url: http://twitter.com/dydradata
       - text: •
-      - link "RSS" [ref=e73] [cursor=pointer]:
+      - link "RSS" [ref=e78] [cursor=pointer]:
         - /url: http://feeds.feedburner.com/dydra
-  - generic [ref=e75]: /ui/account/playwright
+  - generic [ref=e81]: Authenticated as playwright
 ```

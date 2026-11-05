@@ -798,6 +798,79 @@ body.repositories.show #content-container > #sidebar-gutter.dragging {
   background: #cbd5f5;
 }
 
+/* The chrome, when it is arranged by the workspace presentation (U-72).
+
+   `#app' is a flex column and the three band containers were its direct
+   children; under an arrangement they are one level further down, inside a
+   grid whose template came out of `<account>/ui'.  The direct-child flex
+   rules above stop matching, which is correct -- a grid places its own
+   children -- and these restore what they were doing.
+
+   The bar changes from `fixed' to `sticky' here, and that is the point
+   rather than a side effect: a fixed bar is out of flow, so a grid area for
+   it would place nothing and "move the bar to the top" would silently do
+   nothing at all.  Sticky keeps it against the foot of the viewport while a
+   long page scrolls, which is what `fixed' was there for, and still puts it
+   where the arrangement says. */
+#app > #chrome {
+  flex: 1 0 auto;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#chrome > [data-host] {
+  min-width: 0;
+  min-height: 0;
+}
+
+#chrome > [data-host="content"] {
+  display: flex;
+  flex-direction: column;
+}
+
+#chrome .location-bar {
+  position: sticky;
+  top: auto;
+  bottom: 0;
+  left: auto;
+  right: auto;
+}
+
+#chrome > [data-host][data-unplaced] {
+  grid-column: 1 / -1;
+}
+
+.location-target {
+  color: #4b5563;
+  margin-left: 8px;
+  font-style: italic;
+}
+
+.location-reply {
+  display: inline-block;
+  margin-left: 12px;
+  color: #374151;
+}
+
+.location-reply.location-err {
+  color: #b91c1c;
+}
+
+.location-undo {
+  font-size: 11px;
+  padding: 0 5px;
+  margin-left: 4px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.location-inert {
+  min-height: 0;
+}
+
 /* Location bar */
 .location-bar {
   position: fixed;
@@ -1844,4 +1917,55 @@ a.ui-state-active:active {
   padding: 24px;
   color: #666;
   font-size: 12px;
+}
+
+/* A mounted presentation's band, before and after it is opened (U-86).
+   Deliberately plain: what the reader is looking at is somebody else's
+   page, and a frame around it that looked like chrome would make the two
+   hard to tell apart. */
+.ui-mount {
+  border: 1px dashed #c3cad2;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  background: #fbfcfd;
+}
+
+.ui-mount[data-ui-expanded] {
+  border-style: solid;
+  background: #fff;
+}
+
+.ui-mount-note {
+  font-size: 12px;
+  color: #5b6670;
+}
+
+.ui-mount-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ui-mount-open {
+  font-size: 12px;
+  padding: 2px 10px;
+  border: 1px solid #9aa4ae;
+  border-radius: 3px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.ui-mount-status {
+  font-size: 11px;
+  color: #b91c1c;
+}
+
+.ui-mount-content:empty {
+  display: none;
+}
+
+.ui-mount-content {
+  margin-top: 10px;
 }

@@ -76,6 +76,8 @@ const HARNESS = `<!doctype html><meta charset="utf-8"><title>application harness
 <div id="host"></div>
 <div id="rebuilt"></div>
 <div id="graphhost"></div>
+<div id="treehost"></div>
+<div id="sharedhost"></div>
 <script type="module">
 import { mountDashboard, buildPage } from "/lib/dashboard/frame.js";
 import { validateApplication } from "/lib/app/document.js";
@@ -131,6 +133,64 @@ window.__mountGraph = () => new Promise((resolve) => {
   });
   window.__graph = g;
 });
+
+/* A document made of ELEMENTS rather than markup, so that the element
+   operations can be driven through the same pane-to-frame path as any other
+   patch.  The question is whether they are applied IN PLACE: the frame
+   cannot import the reconciler, so it runs the same applier inlined, and if
+   that does not work the pane falls back to a rebuild and the claim that a
+   change does not recreate the page is false in the only place it matters. */
+const TREE_DOC = {
+  id: "app-tree", revision: 1, title: "Inventory",
+  uses: ["panel", "card", "metric", "table"],
+  panels: [{ name: "sales", query: "SELECT ?month ?total WHERE { ?s :month ?month ; :total ?total }" }],
+  views: [{ name: "main", elements: [
+    { name: "e-panel", kind: "panel", order: "a", attributes: { label: "Parts" },
+      layout: { columns: "1fr 1fr", gap: 12, areas: ["left right"] },
+      children: [
+        { name: "e-left", kind: "card", order: "a", placement: { area: "left" },
+          children: [{ name: "e-tab", kind: "table", order: "a", bound: "sales" }] },
+        { name: "e-right", kind: "metric", order: "b", placement: { area: "right" },
+          attributes: { label: "Count", value: "3" } },
+      ] },
+    { name: "e-note", kind: "p", order: "b", text: "As at the last import." },
+  ] }],
+};
+let treeDoc = validateApplication(TREE_DOC).document;
+window.__treeValidation = validateApplication(TREE_DOC).errors;
+const treeHandle = mountDashboard(document.getElementById("treehost"), treeDoc, {
+  onEvent: (e) => { (window.__treeEvents = window.__treeEvents || []).push(e); },
+});
+treeHandle.post({ results: RESULTS, stale: [] });
+window.__treePatch = async (ops) => {
+  const applied = applyPatch(treeDoc, ops);
+  if (!applied.ok) return { ok: false, errors: applied.errors };
+  treeDoc = applied.document;
+  const how = await treeHandle.update(treeDoc, { ops: applied.classification.rebuild ? null : ops });
+  return { ok: true, how: how.applied, klass: applied.classification.class,
+           unapplied: how.unapplied || [] };
+};
+
+/* U-74: a page somebody else wrote, mounted with the mark the store
+   produced.  The document handed in is already SCREENED -- the frame draws
+   the mark and never decides what to withhold. */
+const SHARED = validateApplication({
+  id: "shared", title: "Bob's page", uses: ["panel", "table"],
+  panels: [{ name: "sales", query: "SELECT ?region ?total WHERE { ?s :region ?region ; :total ?total }" }],
+  views: [{ name: "one", title: "One", html: '<div id="s1" data-bound="sales"></div>' },
+          { name: "two", title: "Two", html: '<p id="s2">second</p>' }],
+}).document;
+const sharedHandle = mountDashboard(document.getElementById("sharedhost"), SHARED, {
+  notice: "Written by bob. Its the page's script is not running.",
+  onEvent: () => {},
+});
+sharedHandle.post({ results: RESULTS, stale: [] });
+window.__shared = sharedHandle;
+window.__sharedDoc = SHARED;
+/* A rebuild rather than a patch: a change to "uses" is the one the runtime
+   cannot apply in place, so this is the path that throws the document away. */
+window.__sharedRebuild = () => sharedHandle.update(
+  { ...SHARED, uses: [...SHARED.uses, "metric"] }, { ops: null });
 
 window.__savedPage = () => handle.page(RESULTS);
 window.__size = () => window.__validation.size;
@@ -366,6 +426,118 @@ console.log("\nU-43: a saved copy degrades honestly");
     document.getElementById("dash-refusal") !== null
     && !document.getElementById("dash-refusal").hidden),
      "with the reason shown in the page, where the reader is looking");
+}
+
+/* ═══════ U-64: an element patch is applied in place, in the frame ═══════ */
+
+console.log("\nU-64: the element operations reach the frame as instructions");
+{
+  const treeFrame = async () =>
+    (await page.locator("#treehost iframe").elementHandle()).contentFrame();
+  await page.locator("#treehost iframe").waitFor({ timeout: 5000 });
+  await settle(400);
+  const tf = await treeFrame();
+
+  ok((await page.evaluate(() => window.__treeValidation)).length === 0,
+     "a document made of elements validates");
+  ok(await tf.evaluate(() => !!document.querySelector('[data-ui="e-panel"]')),
+     "and mounts with its identities in the page");
+  ok(await tf.evaluate(() => !!window.DydraDomPatch),
+     "the applier is inlined, because the frame can import nothing");
+  ok(await tf.evaluate(() =>
+       /grid-template-areas/.test(document.querySelector('[data-ui="e-panel"]')
+         .getAttribute("style") || "")),
+     "the layout is on the container");
+
+  // Mark the node, so that a relocation can be told from a rebuild.
+  await tf.evaluate(() => {
+    window.__mark = document.querySelector('[data-ui="e-tab"]');
+    window.__mark.__survived = "yes";
+  });
+
+  const moved = await page.evaluate(() => window.__treePatch(
+    [{ op: "move-element", element: "e-tab", parent: "e-panel", area: "right" }]));
+  ok(moved.ok, (moved.errors || []).join("; ") || "the patch applied");
+  ok(moved.how === "in-place",
+     `IN PLACE, not a rebuild — which is the whole claim (${moved.how})`);
+  ok(moved.klass === "presentational", "and it crossed no gate");
+  ok(await tf.evaluate(() => {
+       const el = document.querySelector('[data-ui="e-tab"]');
+       let up = el?.parentElement;
+       while (up && !up.getAttribute("data-ui")) up = up.parentElement;
+       return up?.getAttribute("data-ui") === "e-panel";
+     }), "it is in its new container");
+  ok(await tf.evaluate(() =>
+       document.querySelector('[data-ui="e-tab"]') === window.__mark
+       && window.__mark.__survived === "yes"),
+     "and it is the same node: the frame moved it rather than building it again");
+
+  const rearranged = await page.evaluate(() => window.__treePatch(
+    [{ op: "set-layout", element: "e-panel",
+       value: { columns: "1fr 1fr", gap: 12, areas: ["right left"] } }]));
+  ok(rearranged.how === "in-place", "rearranging is in place too");
+  ok(await tf.evaluate(() =>
+       /right left/.test(document.querySelector('[data-ui="e-panel"]').getAttribute("style"))),
+     "with the new template on the container");
+  ok(await tf.evaluate(() => document.querySelector('[data-ui="e-tab"]') === window.__mark),
+     "and still the same node — a rearrangement rebuilt nothing");
+
+  const inserted = await page.evaluate(() => window.__treePatch(
+    [{ op: "insert-element", parent: "e-left", name: "e-added", kind: "metric",
+       attributes: { label: "Added", value: "9" } }]));
+  ok(inserted.how === "in-place", "an insert is in place");
+  ok(await tf.evaluate(() => {
+       const el = document.querySelector('[data-ui="e-added"]');
+       return el && el.tagName.toLowerCase() === "dydra-metric"
+              && el.textContent.includes("9");
+     }), "and the component it names is upgraded and drawn, inside the frame");
+
+  const removed = await page.evaluate(() => window.__treePatch(
+    [{ op: "remove-element", element: "e-note" }]));
+  ok(removed.how === "in-place" && await tf.evaluate(() =>
+       !document.querySelector('[data-ui="e-note"]')), "a removal likewise");
+  ok(await tf.evaluate(() => document.querySelector('[data-ui="e-tab"]') === window.__mark),
+     "with the rest of the page still standing, node for node");
+}
+
+console.log("\nU-74: the mark a shared page carries, and what it survives");
+{
+  const sf = async () => (await page.locator("#sharedhost iframe").elementHandle()).contentFrame();
+  const f = await sf();
+  ok(await f.evaluate(() => !!document.querySelector('[data-notice="shared"]')),
+     "a page mounted with a notice draws it");
+  ok(await f.evaluate(() =>
+       document.querySelector('[data-notice="shared"]').textContent.includes("Written by bob")),
+     "saying who wrote it");
+  ok(await f.evaluate(() => {
+       const n = document.querySelector('[data-notice="shared"]');
+       return !n.closest(".dash-view");
+     }), "outside every view, so it is not something a view switch can hide");
+
+  await page.evaluate(() => window.__shared.setView("two"));
+  await page.waitForTimeout(150);
+  const after = await sf();
+  ok(await after.evaluate(() => !!document.querySelector("#s2")?.offsetParent),
+     "switching view works");
+  ok(await after.evaluate(() => {
+       const n = document.querySelector('[data-notice="shared"]');
+       return n && n.offsetParent !== null;
+     }), "and the mark is still on the screen");
+
+  // A rebuild is the path that would most plausibly drop it: it throws the
+  // document away and builds a new one from `current'.
+  const how = await page.evaluate(() => window.__sharedRebuild());
+  await page.waitForTimeout(250);
+  ok(how.applied === "rebuild", `the document was rebuilt, not patched (${how.applied})`);
+  const rebuilt = await sf();
+  ok(await rebuilt.evaluate(() => !!document.querySelector('[data-notice="shared"]')),
+     "and it survives a rebuild, which is where a mark passed per call would be lost");
+
+  ok(/data-notice="shared"/.test(await page.evaluate(() => window.__shared.page({}))),
+     "the downloadable copy carries it too — a saved page does not lose the warning");
+  await page.evaluate(() => window.__shared.setNotice(null));
+  ok(!/data-notice/.test(await page.evaluate(() => window.__shared.page({}))),
+     "and an admitted page can have the mark taken off without being remounted");
 }
 
 await browser.close();

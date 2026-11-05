@@ -136,6 +136,13 @@ window.fetch = async (url, init = {}) => {
     window.__records.push(String(init.body || ""));
     return new Response("ok", { status: 200 });
   }
+  // A view is written and deleted on the SYSTEM path and run on its own, and
+  // both carry "views" -- so the two are told apart by method, not by path.
+  if (/\\/playwright\\/test\\/views\\/tmp-/.test(u) && m === "GET") {
+    counts.view += 1;
+    return new Response(TSV, { status: 200,
+      headers: { "Content-Type": "text/tab-separated-values" } });
+  }
   if (u.includes("/views/")) {
     if (m === "PUT") counts.put += 1;
     if (m === "DELETE") counts.del += 1;
@@ -143,11 +150,6 @@ window.fetch = async (url, init = {}) => {
   }
   if (u.includes("/sparql")) {
     counts.sparql += 1;
-    return new Response(TSV, { status: 200,
-      headers: { "Content-Type": "text/tab-separated-values" } });
-  }
-  if (/\\/playwright\\/test\\/tmp-/.test(u)) {
-    counts.view += 1;
     return new Response(TSV, { status: 200,
       headers: { "Content-Type": "text/tab-separated-values" } });
   }
@@ -288,7 +290,7 @@ console.log("\nPhase 2 is the interface's own run");
        (r) => /\/views\/tmp-/.test(r.url) && r.method === "PUT")),
      "under a name that says which run it belongs to");
   ok(await page.evaluate(() => window.__requests.some(
-       (r) => /\/playwright\/test\/tmp-/.test(r.url) && r.accept === "text/csv")),
+       (r) => /\/playwright\/test\/views\/tmp-/.test(r.url) && r.accept === "text/csv")),
      "and it was executed BY NAME, in the notation chosen at the gate, not the one proposed");
   ok(await page.evaluate(() => window.__counts().llm) === 1,
      "then the model was asked once, to draw");
