@@ -29,8 +29,10 @@ const scratch = mkdtempSync(join(tmpdir(), "jsui-adapter-"));
 cpSync(join(root, "lib"), join(scratch, "lib"), { recursive: true });
 writeFileSync(join(scratch, "package.json"), JSON.stringify({ type: "module" }));
 
-const { createToolAdapter, selectTools, ALLOW_TOOLS, sessionFrom } = await import(
-  pathToFileURL(join(scratch, "lib", "llm", "tool-adapter.js")).href);
+const {
+  createToolAdapter, selectTools, ALLOW_TOOLS, sessionFrom,
+  normalizeStores, toolNameFor, repositoriesNote, storeOf,
+} = await import(pathToFileURL(join(scratch, "lib", "llm", "tool-adapter.js")).href);
 
 let pass = 0, fail = 0;
 const ok = (cond, what) => {
@@ -286,11 +288,15 @@ section("a provider that refuses");
 
 section("a model that will not stop calling tools");
 {
+  // Three rounds of calling, and then the closing turn: asked once more with
+  // the tools withheld, which is the only thing that turns a spent budget
+  // into an answer rather than into a discarded run (§35.5).
   const script = [() => jsonResponse(200, toolsList)];
-  for (let i = 0; i < 20; i += 1) {
+  for (let i = 0; i < 3; i += 1) {
     script.push(() => jsonResponse(200, wantsTool(`toolu_${i}`, { op: "catalog" })));
     script.push(() => jsonResponse(200, surveyReply("…")));
   }
+  script.push(() => jsonResponse(200, finishes("Written from three rounds of calls.")));
   const { calls, fetchImpl } = stub(script);
   const adapter = createToolAdapter({
     endpoint: LLM, apiKey: "sk-test", maxIterations: 3,
@@ -298,8 +304,63 @@ section("a model that will not stop calling tools");
   });
   const result = await adapter.run("loop forever");
   ok(result.iterations === 3, "the loop stops at maxIterations");
-  ok(/3 tool rounds/.test(result.error || ""), "and says why");
-  ok(calls.length === 1 + 3 * 2, "no further requests are made");
+  ok(result.roundsExhausted === true, "and says that the budget, not the model, ended it");
+  ok(calls.length === 1 + 3 * 2 + 1, "one further request is made: the closing turn");
+  const closing = calls[calls.length - 1];
+  ok(closing.body.tools === undefined,
+     "which offers no tools at all, so there is nothing left to call");
+  const lastMessage = closing.body.messages[closing.body.messages.length - 1];
+  ok(lastMessage.role === "user"
+     && JSON.stringify(lastMessage.content).includes("no tools are offered"),
+     "the notice joins the existing user turn rather than becoming a second one");
+  ok(/three rounds of calls/.test(result.finalText), "the answer is the closing turn's");
+  ok(result.ok === true, "and the run answered, so it is not reported as a failure");
+}
+
+section("a closing turn that itself fails");
+{
+  // The answer is gone either way; what must not happen is that the run
+  // reports success because the last call was never read.
+  const script = [() => jsonResponse(200, toolsList)];
+  for (let i = 0; i < 2; i += 1) {
+    script.push(() => jsonResponse(200, wantsTool(`toolu_${i}`, { op: "catalog" })));
+    script.push(() => jsonResponse(200, surveyReply("…")));
+  }
+  script.push(() => jsonResponse(500, { error: { message: "overloaded" } }));
+  const { fetchImpl } = stub(script);
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "sk-test", maxIterations: 2,
+    mcp: { endpoint: MCP, token: "t" }, fetchImpl, primeWith: [],
+  });
+  const result = await adapter.run("loop forever");
+  ok(result.ok === false, "the run is still a failure");
+  ok(/2 tool rounds/.test(result.error || ""), "and still says the budget ran out");
+  ok(result.events.some((e) => e.type === "error" && e.where === "closing"),
+     "with the closing turn's own failure recorded beside it");
+}
+
+section("a run the user stopped does not get a closing turn");
+{
+  const script = [() => jsonResponse(200, toolsList)];
+  for (let i = 0; i < 3; i += 1) {
+    script.push(() => jsonResponse(200, wantsTool(`toolu_${i}`, { op: "catalog" })));
+    script.push(() => jsonResponse(200, surveyReply("…")));
+  }
+  script.push(() => jsonResponse(200, finishes("should never be asked for")));
+  const { calls, fetchImpl } = stub(script);
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "sk-test", maxIterations: 3,
+    mcp: { endpoint: MCP, token: "t" }, fetchImpl, primeWith: [],
+    // Stopped exactly as the budget runs out -- the user's wish and the
+    // ceiling arrive together, and the user's is the one that governs.
+    // Counted in requests rather than in rounds because `stop' is consulted
+    // before each relayed call as well as between rounds (§35.3).
+    stop: () => (calls.length >= 1 + 3 * 2 ? "you stopped this" : null),
+  });
+  const result = await adapter.run("loop forever");
+  ok(calls.length === 1 + 3 * 2,
+     "no provider call is made after a stop — their money is not spent on it");
+  ok(result.ok === false, "and the run is reported as stopped, not as answered");
 }
 
 // ------------------------------------------------- no MCP: a plain completion
@@ -689,6 +750,330 @@ section("a run that simply finishes says so too");
                                       mcp: null, primeWith: [], fetchImpl }).run("ask");
   ok(r.truncated === false && r.stopReason === "end_turn" && r.textFromTurn === 1,
      "end_turn is reported as itself, so `truncated' means something");
+}
+
+/* ── one turn, several repositories (§34.3; A-16) ─────────────────────────── */
+
+section("the stores a turn carries");
+{
+  ok(normalizeStores(null).length === 0, "no mcp is no store");
+  const one = normalizeStores({ endpoint: MCP, token: "t" });
+  ok(one.length === 1 && one[0].id === null,
+     "the shape every existing caller passes is one unnamed store");
+  ok(toolNameFor("survey", one[0], { qualify: false }) === "survey",
+     "and its tools keep the names the server gave them");
+  const two = normalizeStores({ repositories: [
+    { account: "alice", repository: "sales", endpoint: "https://h/alice/sales/mcp", token: "t" },
+    { account: "bob", repository: "parts", endpoint: "https://h/bob/parts/mcp", token: "t" },
+  ] });
+  ok(two.length === 2 && two[0].id === "alice/sales" && two[1].id === "bob/parts",
+     "a set of repositories is a set of named stores");
+  ok(toolNameFor("survey", two[0]) === "survey__alice__sales",
+     "whose tool names say which repository the call goes to");
+  const long = storeOf({ account: "a".repeat(40), repository: "b".repeat(40),
+                         endpoint: "https://h/x/y/mcp" });
+  ok(toolNameFor("survey", long).length <= 64,
+     "a long name is cut to the provider's ceiling rather than refused");
+  ok(toolNameFor("survey", long).endsWith(long.slug.slice(-10)),
+     "and cut at the TOOL end, so two stores can never truncate into one another");
+  ok(repositoriesNote(one, []) === "",
+     "a single-store turn is told nothing about choosing a repository, because it has no choice");
+  const note = repositoriesNote(two, [
+    { name: "survey__alice__sales", store: two[0], tool: "survey" },
+    { name: "survey__bob__parts", store: two[1], tool: "survey" },
+  ]);
+  ok(/alice\/sales/.test(note) && /bob\/parts/.test(note)
+     && /survey__bob__parts/.test(note),
+     "and a two-store turn is told both, with the tool name that reaches each");
+}
+
+section("a question that crosses a repository boundary");
+{
+  const A = "https://example.test/alice/sales/mcp";
+  const B = "https://example.test/bob/parts/mcp";
+  const { calls, fetchImpl } = stub([
+    () => jsonResponse(200, toolsList),                       // tools/list — alice/sales
+    () => jsonResponse(200, toolsList),                       // tools/list — bob/parts
+    () => jsonResponse(200, resourceReply("operations")),     // primer, once
+    () => jsonResponse(200, resourceReply("grammar")),
+    () => jsonResponse(200, {                                 // the model asks both
+      id: "msg_1", type: "message", role: "assistant", stop_reason: "tool_use",
+      content: [
+        { type: "tool_use", id: "tu_a", name: "survey__alice__sales", input: { op: "catalog" } },
+        { type: "tool_use", id: "tu_b", name: "survey__bob__parts", input: { op: "catalog" } },
+      ],
+      usage: { input_tokens: 10, output_tokens: 20 },
+    }),
+    () => jsonResponse(200, surveyReply('session: "sess-alice"\ntypes: [Order]')),
+    () => jsonResponse(200, surveyReply('session: "sess-bob"\ntypes: [Part]')),
+    () => jsonResponse(200, finishes("Orders in alice/sales reference parts in bob/parts.")),
+  ]);
+
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl,
+    mcp: { repositories: [
+      { account: "alice", repository: "sales", endpoint: A, token: "ta" },
+      { account: "bob", repository: "parts", endpoint: B, token: "tb" },
+    ] },
+  });
+  const out = await adapter.run("compare orders in alice/sales with bob/parts");
+
+  const listed = calls.filter((c) => c.body?.method === "tools/list");
+  ok(listed.length === 2 && listed[0].url === A && listed[1].url === B,
+     "every store is asked what tools it offers — two repositories may not offer the same ones");
+  const primers = calls.filter((c) => c.body?.method === "resources/read");
+  ok(primers.length === 2 && primers.every((c) => c.url === A),
+     "the notation is read once, from the first store: it documents the grammar, not the data");
+
+  const relayed = calls.filter((c) => c.body?.method === "tools/call");
+  ok(relayed.length === 2 && relayed[0].url === A && relayed[1].url === B,
+     "each call goes to the endpoint its name named");
+  ok(relayed[0].headers.Authorization === "Bearer ta"
+     && relayed[1].headers.Authorization === "Bearer tb",
+     "with that store's own token, because authorization is per repository");
+  ok(relayed.every((c) => c.body.params.name === "survey"),
+     "and under the tool name the SERVER knows, not the one this side routes on");
+
+  const asked = calls.filter((c) => c.url === LLM);
+  const offered = (asked[0].body.tools || []).map((t) => t.name).sort();
+  ok(offered.join(",") === "survey__alice__sales,survey__bob__parts",
+     "the model is offered one tool per repository");
+  ok(/alice\/sales/.test(asked[0].body.system) && /bob\/parts/.test(asked[0].body.system),
+     "and told which repositories this turn may read");
+
+  const results = asked[1].body.messages.at(-1).content;
+  ok(results.every((r) => r.type === "tool_result"),
+     "both answers come back as tool results");
+  ok(out.events.filter((e) => e.type === "tool_result")
+       .map((e) => e.repository).join(",") === "alice/sales,bob/parts",
+     "and every record of a call says which repository it went to (REQ-34.3.5)");
+
+  ok(relayed[1].body.params.arguments.session === undefined,
+     "a session opened in one repository is not carried into another");
+  ok(out.sessions["alice/sales"] === "sess-alice" && out.sessions["bob/parts"] === "sess-bob",
+     "each store's exploration is held separately");
+  ok(out.repositories.join(",") === "alice/sales,bob/parts",
+     "and the run says which stores it carried");
+  ok(out.ok && /bob\/parts/.test(out.finalText), "the turn answers across both");
+}
+
+section("the model names a repository the turn does not carry");
+{
+  const A = "https://example.test/alice/sales/mcp";
+  const B = "https://example.test/bob/parts/mcp";
+  const { calls, fetchImpl } = stub([
+    () => jsonResponse(200, toolsList),
+    () => jsonResponse(200, toolsList),
+    () => jsonResponse(200, resourceReply("operations")),
+    () => jsonResponse(200, resourceReply("grammar")),
+    () => jsonResponse(200, {
+      id: "msg_1", type: "message", role: "assistant", stop_reason: "tool_use",
+      content: [{ type: "tool_use", id: "tu_x", name: "survey__carol__private",
+                  input: { op: "catalog" } }],
+      usage: { input_tokens: 10, output_tokens: 20 },
+    }),
+    () => jsonResponse(200, finishes("I cannot reach that one.")),
+  ]);
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl,
+    mcp: { repositories: [
+      { account: "alice", repository: "sales", endpoint: A, token: "ta" },
+      { account: "bob", repository: "parts", endpoint: B, token: "tb" },
+    ] },
+  });
+  const out = await adapter.run("what is in carol/private");
+  ok(!calls.some((c) => c.body?.method === "tools/call"),
+     "nothing is sent anywhere: an unrouted name reaches no store");
+  const refused = out.events.find((e) => e.type === "tool_result" && e.unrouted);
+  ok(Boolean(refused), "the call comes back as a tool result, not as a failed run");
+  ok(/survey__alice__sales/.test(refused.text) && /survey__bob__parts/.test(refused.text),
+     "and the model is told what it may call instead, so it can correct itself");
+  ok(out.ok, "the turn itself is not failed by it (REQ-34.3.3)");
+}
+
+section("one store still behaves exactly as it did");
+{
+  const { calls, fetchImpl } = stub([
+    () => jsonResponse(200, toolsList),
+    () => jsonResponse(200, resourceReply("operations")),
+    () => jsonResponse(200, resourceReply("grammar")),
+    () => jsonResponse(200, wantsTool("tu_1", { op: "catalog" })),
+    () => jsonResponse(200, surveyReply('session: "s1"\ntypes: [Order]')),
+    () => jsonResponse(200, wantsTool("tu_2", { op: "describe" })),
+    () => jsonResponse(200, surveyReply("ok")),
+    () => jsonResponse(200, finishes(ANSWER)),
+  ]);
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl,
+    mcp: { account: "alice", repository: "sales", endpoint: MCP, token: "t" },
+  });
+  const out = await adapter.run("what is in here");
+  const asked = calls.filter((c) => c.url === LLM);
+  ok((asked[0].body.tools || []).map((t) => t.name).join(",") === "survey",
+     "the tool is called `survey', as it always was");
+  ok(!/repositories this turn may read/.test(asked[0].body.system),
+     "and nothing is said about choosing between repositories");
+  const relayed = calls.filter((c) => c.body?.method === "tools/call");
+  ok(relayed[1].body.params.arguments.session === "s1",
+     "the one exploration is still carried from call to call");
+  ok(out.session === "s1" && out.sessions["alice/sales"] === "s1",
+     "and is reported both ways, so no caller has to change to read it");
+  ok(out.ok && Boolean(out.sparql), "the run is unchanged in what it produces");
+}
+
+// --------------------------------------- a handle the store will not honour
+
+/**
+ * The service's own words, verified live against nl4 on 2026-11-16: three
+ * stores, three handles issued by `op=connect\', and all three refused by the
+ * very next call -- seconds later, against a reply that had said
+ * `cached_for_minutes: 30\'.
+ */
+const STALE = "Unknown exploration session: S-OLD. It may have expired; "
+            + "call survey with op=connect for a new handle.";
+
+/** A tools/call reply the server marks as an error, as this one arrives: 200. */
+const surveyError = (text) => ({
+  jsonrpc: "2.0", id: 1,
+  result: { isError: true, content: [{ type: "text", text }] },
+});
+
+section("a handle the store issued and then refused");
+{
+  const { calls, fetchImpl } = stub([
+    () => jsonResponse(200, toolsList),
+    () => jsonResponse(200, wantsTool("t1", { op: "connect" })),
+    () => jsonResponse(200, surveyReply('{ session: "S-OLD" }')),
+    () => jsonResponse(200, wantsTool("t2", { op: "catalog", body: "{ scope: types }" })),
+    () => jsonResponse(200, surveyError(STALE)),          // the refusal
+    () => jsonResponse(200, surveyReply('{ session: "S-NEW" }')),  // the reconnect
+    () => jsonResponse(200, surveyReply("types: 86")),    // the call, again
+    () => jsonResponse(200, finishes(ANSWER)),
+  ]);
+  const seen = [];
+  const held = new Map();
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl, primeWith: [],
+    mcp: { account: "alice", repository: "sales", endpoint: MCP, token: "t" },
+    sessions: { get: (id) => held.get(id) || null, set: (id, v) => held.set(id, v) },
+    onEvent: (e) => seen.push(e),
+  });
+  const out = await adapter.run("what is in here");
+  const relayed = calls.filter((c) => c.body?.method === "tools/call");
+  ok(relayed.length === 4, "the refusal costs one reconnect and one repeat, and no more");
+  ok(relayed[2].body.params.arguments.op === "connect",
+     "the recovery is a connect, issued by the client rather than left to the model");
+  ok(relayed[3].body.params.arguments.op === "catalog"
+     && relayed[3].body.params.arguments.session === "S-NEW",
+     "and the call the model asked for is repeated under the new handle");
+  ok(seen.some((e) => e.type === "session_lost" && e.session === "S-OLD" && e.recovering),
+     "the transcript is told the handle was refused, not just that a call failed");
+  ok(seen.some((e) => e.type === "session" && e.reopened && e.session === "S-NEW"),
+     "and that a second exploration was opened in its place");
+  ok(seen.some((e) => e.type === "session_retry" && e.ok === true),
+     "the repeat is reported as a repeat, so the record is not a run that made one call");
+  const results = seen.filter((e) => e.type === "tool_result" && e.name === "survey"
+                                  && !e.reconnect);
+  ok(results[1].ok && /types: 86/.test(results[1].text),
+     "what the model is handed is the answer, not the refusal");
+  ok(held.get("alice/sales") === "S-NEW",
+     "and the handle that outlives the run is the live one");
+  ok(out.ok && out.calls === 4,
+     "the run counts what reached the store -- the recovery and the repeat included, "
+     + "because both were spent");
+}
+
+section("a handle that is refused twice is the store's answer, not a loop");
+{
+  const { calls, fetchImpl } = stub([
+    () => jsonResponse(200, toolsList),
+    () => jsonResponse(200, wantsTool("t1", { op: "catalog", session: "S-OLD" })),
+    () => jsonResponse(200, surveyError(STALE)),
+    () => jsonResponse(200, surveyReply('{ session: "S-NEW" }')),
+    () => jsonResponse(200, surveyError(STALE)),
+    () => jsonResponse(200, finishes("I could not hold a session.")),
+  ]);
+  const seen = [];
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl, primeWith: [],
+    mcp: { account: "alice", repository: "sales", endpoint: MCP, token: "t" },
+    onEvent: (e) => seen.push(e),
+  });
+  const out = await adapter.run("what is in here");
+  ok(calls.filter((c) => c.body?.method === "tools/call").length === 3,
+     "one reconnect, one repeat, and then it stops trying");
+  ok(seen.filter((e) => e.type === "session_lost").length === 1,
+     "and the second refusal is not treated as a fresh loss to recover from");
+  ok(seen.some((e) => e.type === "session_retry" && e.ok === false),
+     "the repeat is reported as having failed");
+  ok(out.ok, "a store that will not hold a session is not a failed RUN -- "
+           + "the model is told, and answers");
+  const refused = seen.filter((e) => e.type === "tool_result" && !e.reconnect).pop();
+  ok(/is not holding explorations at the moment/.test(refused.text)
+     && /Reconnecting again will not help/.test(refused.text),
+     "and what goes back to the model says so in words, not as a bare repetition");
+}
+
+section("a store that has proved it will not hold a handle is not asked again");
+{
+  const { calls, fetchImpl } = stub([
+    () => jsonResponse(200, toolsList),
+    () => jsonResponse(200, wantsTool("t1", { op: "catalog", session: "S-OLD" })),
+    () => jsonResponse(200, surveyError(STALE)),
+    () => jsonResponse(200, surveyReply('{ session: "S-NEW" }')),
+    () => jsonResponse(200, surveyError(STALE)),
+    () => jsonResponse(200, wantsTool("t2", { op: "profile", session: "S-NEW" })),
+    () => jsonResponse(200, surveyError(STALE)),
+    () => jsonResponse(200, finishes("I could not read it.")),
+  ]);
+  const seen = [];
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl, primeWith: [], maxIterations: 4,
+    mcp: { account: "alice", repository: "sales", endpoint: MCP, token: "t" },
+    onEvent: (e) => seen.push(e),
+  });
+  const out = await adapter.run("what is in here");
+  const connects = calls.filter((c) => c.body?.params?.arguments?.op === "connect");
+  ok(connects.length === 1,
+     "the second round's refusal costs no second reconnect: it was learned in the first");
+  ok(seen.filter((e) => e.type === "session_lost").pop().exhausted === true,
+     "and the transcript says the recovery was given up rather than not attempted");
+  ok(out.calls === 4, "four calls reached the store, and the count says four");
+}
+
+section("a turn with stores but no tools is not a turn");
+{
+  const empty = { jsonrpc: "2.0", id: 1, result: { tools: [] } };
+  const { calls, fetchImpl } = stub([() => jsonResponse(200, empty)]);
+  const seen = [];
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl, primeWith: [],
+    mcp: { account: "alice", repository: "sales", endpoint: MCP, token: "t" },
+    onEvent: (e) => seen.push(e),
+  });
+  const out = await adapter.run("compare these repositories");
+  ok(calls.every((c) => c.url !== LLM),
+     "the model is not asked at all: there is nothing it could call");
+  ok(!out.ok && /no store offered a usable tool/.test(out.error || ""),
+     "and the run says so, rather than presenting a plan as an answer");
+  ok(out.calls === 0 && out.iterations === 0, "nothing was spent on it");
+  ok(seen.some((e) => e.type === "error" && e.where === "tools"),
+     "the transcript names where it stopped");
+}
+
+section("a run that called nothing says so");
+{
+  const { fetchImpl } = stub([
+    () => jsonResponse(200, toolsList),
+    () => jsonResponse(200, finishes("I will start by inventorying each store.")),
+  ]);
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl, primeWith: [],
+    mcp: { account: "alice", repository: "sales", endpoint: MCP, token: "t" },
+  });
+  const out = await adapter.run("what is in here");
+  ok(out.ok && out.iterations === 1 && out.calls === 0,
+     "a turn that offered tools and called none is counted, not inferred from the turn count");
 }
 
 rmSync(scratch, { recursive: true, force: true });

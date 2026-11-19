@@ -114,6 +114,24 @@ window.fetch = async (url, init = {}) => {
     return new Response(text, { status: 200,
       headers: { "Content-Type": "text/tab-separated-values" } });
   }
+  /* The MCP endpoint. The model stubbed below answers out of its head, but the
+     adapter will not ask a model that has been offered no tool at all (§34.5),
+     so the store has to say what it offers -- which a real one does. */
+  if (u.includes("/mcp")) {
+    const call = JSON.parse(String(init.body || "{}"));
+    if (call.method === "tools/list") {
+      return json({ jsonrpc: "2.0", id: 1, result: { tools: [
+        { name: "survey", description: "Survey the repository.",
+          inputSchema: { type: "object", required: ["op"],
+                         properties: { op: { type: "string" } } } },
+        { name: "query", description: "Run one query.",
+          inputSchema: { type: "object", required: ["text"],
+                         properties: { text: { type: "string" } } } },
+      ] } });
+    }
+    return json({ jsonrpc: "2.0", id: 1,
+                  result: { content: [{ type: "text", text: "ok" }] } });
+  }
   if (u.includes("/v1/messages")) {
     counts.llm += 1;
     const say = (text) => json({ id: "m", type: "message", role: "assistant",

@@ -1,0 +1,201 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>arrange harness</title>
+<link rel="stylesheet" href="/stylesheets/style.css">
+<link rel="stylesheet" href="/stylesheets/jsui-overrides.css">
+<style>
+  /* Only what the FAKE route around the panes needs.  Everything the
+     figures are about — the chrome, the bar, the mount band, the pane — is
+     drawn by the build's own stylesheets. */
+  body { margin: 0; font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  .arrange-page { padding: 10px 16px 28px; }
+  .arrange-page h2 { margin: 0 0 2px; font-size: 18px; }
+  .arrange-sub { margin: 0 0 12px; color: #5b6670; }
+  #chrome { min-height: 100vh; }
+</style>
+<body>
+<div id="app"></div>
+<script type="module">
+/**
+ * The arrange harness: the real App, the real bar, the real panes, and a
+ * store that keeps what is written to it.
+ *
+ * What is stubbed is exactly two things, and both have to be: the PROVIDER,
+ * because a figure that depends on what a model answered on the day cannot
+ * be reproduced, and the STORE, because the alternative is a live account.
+ * Everything between them is the build — `App.arrange' routes, the pane
+ * performs, `ui-store' writes the triples, and `LayoutView' draws the band.
+ */
+import { App } from "/ui/app.js";
+import { openDashboardPane } from "/ui/components/dashboard-pane.js";
+import { paneState } from "/ui/components/mcp-pane-state.js";
+import { writePresentation } from "/lib/app/ui-store.js";
+import { uiStore } from "/tests/ui-store-stub.mjs";
+import { PARTS, ORDERS, INVENTORY, ON_HAND, OPEN_ORDERS, CONTENT }
+  from "/tests/ui-arrange.fixtures.mjs";
+
+const HOST = location.origin;
+const ACCOUNT = "alice";
+
+/* ── the store, and everything that was asked of one ───────────────────── */
+
+const store = uiStore();
+window.__store = store;
+window.__asked = [];          // every data request: which repository, and what
+window.__llm = 0;             // how many provider turns were spent
+window.__answer = null;       // which proposal the next turn answers with
+
+const PROPOSALS = { parts: PARTS, orders: ORDERS };
+
+const real = window.fetch.bind(window);
+window.fetch = async (url, init = {}) => {
+  const u = String(url);
+  const body = String(init?.body || "");
+
+  if (u.includes(`/${ACCOUNT}/ui/sparql`) || u.includes("/system/accounts/")) {
+    return store.fetchImpl(url, init);
+  }
+  if (u.includes(`/${ACCOUNT}/mcp/sparql`)) {
+    // The transcript.  Answered, counted nowhere: what this harness measures
+    // is what the PAGES cost, and the bookkeeping is not that.
+    return new Response(JSON.stringify({ head: {}, results: { bindings: [] } }),
+      { status: 200, headers: { "Content-Type": "application/sparql-results+json" } });
+  }
+  if (/\/mcp$/.test(u.split("?")[0])) {
+    // The store's tool list.  The model stubbed below answers out of its head,
+    // but the adapter will not ask a model that has been offered no tool at
+    // all (§34.5), so the store says what it offers -- as a real one does.
+    const call = JSON.parse(body || "{}");
+    const rpc = (result) => new Response(JSON.stringify({ jsonrpc: "2.0", id: 1, result }),
+      { status: 200, headers: { "Content-Type": "application/json" } });
+    if (call.method === "tools/list") {
+      return rpc({ tools: [
+        { name: "survey", description: "Survey the repository.",
+          inputSchema: { type: "object", required: ["op"],
+                         properties: { op: { type: "string" } } } },
+        { name: "query", description: "Run one query.",
+          inputSchema: { type: "object", required: ["text"],
+                         properties: { text: { type: "string" } } } },
+      ] });
+    }
+    return rpc({ content: [{ type: "text", text: "ok" }] });
+  }
+  if (u.includes("/v1/messages") || u.includes("/messages")) {
+    window.__llm += 1;
+    const proposal = PROPOSALS[window.__answer] || null;
+    const text = proposal
+      ? "Here is the page.\n\n```dashboard\n" + JSON.stringify(proposal) + "\n```"
+      : "nothing to say";
+    return new Response(JSON.stringify({
+      id: "m", type: "message", role: "assistant", stop_reason: "end_turn",
+      content: [{ type: "text", text }], usage: { input_tokens: 5, output_tokens: 5 },
+    }), { status: 200, headers: { "Content-Type": "application/json" } });
+  }
+  if (u.includes("/sparql")) {
+    const repository = /\/alice\/([a-z]+)\/sparql/.exec(u)?.[1] || "?";
+    window.__asked.push({ repository, query: body });
+    const text = /onHand/.test(body) ? ON_HAND : OPEN_ORDERS;
+    return new Response(text,
+      { status: 200, headers: { "Content-Type": "text/tab-separated-values" } });
+  }
+  if (u.startsWith("/") || u.startsWith(HOST)) return real(url, init);
+  return new Response("", { status: 404 });
+};
+
+/* ── the account, as the App reads it ──────────────────────────────────── */
+
+const state = {
+  session: { isLoggedIn: () => true, accountName: ACCOUNT },
+  getAuthContext: () => ({ host: HOST, token: "test-token" }),
+};
+
+for (const repository of ["parts", "orders"]) {
+  const st = paneState(ACCOUNT, repository, HOST);
+  st.llmKey = "test-key";
+  st.token = "test-token";
+  st.session = `session-${repository}`;
+}
+
+/* ── one routed page, which is all the App needs to draw the chrome ────── */
+
+const TABS = `<div class="pane-tabs-bar"><ul data-tab-list>
+  <li><a href="#t1" data-tab-link><span class="tab-label">alice</span></a></li>
+  <li><a href="#t2" data-tab-link><span class="tab-label">parts</span></a></li>
+  <li><a href="#t3" data-tab-link><span class="tab-label">orders</span></a></li>
+</ul></div>`;
+
+window.__panes = [];
+
+const page = {
+  getTitle: () => "alice",
+  getBodyClass: () => "",
+  setContext: () => {},
+  renderContent: async () => CONTENT,
+  renderSidebar: async () => "",
+  getPaneTabs: async () => ({ bar: TABS, defaultTab: "t1" }),
+  // A redraw of the chrome replaces the page, and the panes are LIVE DOM
+  // with the frames and listeners in them — so they are moved back rather
+  // than rebuilt.  In the running interface the route owns them the same
+  // way; here the route is this object.
+  afterRender: async () => {
+    const host = document.getElementById("panes");
+    if (!host) return;
+    for (const wrapper of window.__panes) host.appendChild(wrapper);
+  },
+};
+
+const app = new App({ state, router: null });
+app.setRouter({
+  currentPath: `/${ACCOUNT}`,
+  getCurrentPath: () => `/${ACCOUNT}`,
+  navigate: (path) => { window.__navigated = path; },
+  renderCurrent: () => app.renderPage(page),
+  canGoBack: () => false, canGoForward: () => false,
+});
+window.__app = app;
+
+/* ── a presentation to mount, written through the real writer ──────────── */
+
+await writePresentation({
+  host: HOST, account: ACCOUNT, token: "test-token",
+  name: "inventory", document: INVENTORY, scope: "document", creator: ACCOUNT,
+});
+
+await app.renderPage(page);
+
+/* ── the two pages ─────────────────────────────────────────────────────── */
+
+window.__openPane = (repository, prompt) => {
+  const api = openDashboardPane(app, {
+    container: document.getElementById("panes"),
+    accountName: ACCOUNT, repositoryName: repository, prompt,
+  });
+  window.__panes.push(api.wrapper);
+  return true;
+};
+
+/* ── what the runner drives the bar with ───────────────────────────────── */
+
+/** Open the input and put a line in it, WITHOUT pressing Enter. */
+window.__type = (line) => {
+  document.getElementById("location-display").click();
+  document.getElementById("location-input").value = line;
+  return true;
+};
+
+/**
+ * Press it.
+ *
+ * `submit' is what the bar's own Enter calls — the same function, reached
+ * directly so the runner can await the answer.  A dispatched key event
+ * would run the identical path and return before it finished, which is how
+ * a screenshot comes out one step behind what it says it shows.
+ */
+window.__submit = (line) => window.__app.locationBar.submit(line);
+
+window.__reply = () =>
+  document.querySelector('[data-testid="location-reply"]')?.textContent || "";
+
+window.__ready = true;
+</script>
+</body>

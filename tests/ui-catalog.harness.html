@@ -1,0 +1,140 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>catalog harness</title>
+<link rel="stylesheet" href="/stylesheets/style.css">
+<link rel="stylesheet" href="/stylesheets/jsui-overrides.css">
+<style>
+  body { margin: 0; font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  #sidebar { padding: 12px 16px 80px; max-width: 760px; }
+  #location-bar { position: fixed; bottom: 0; left: 0; right: 0;
+                  background: #f3f4f6; border-top: 1px solid #d1d5db; padding: 4px 10px; }
+</style>
+<body>
+<div id="sidebar">
+  <div class="account-catalog-content" data-account="alice"></div>
+  <div class="account-connection-content" data-account="alice"></div>
+</div>
+<div id="location-bar">
+  <span id="location-display">/ui/account/alice</span>
+  <input id="location-input" type="text" />
+</div>
+<script type="module">
+/**
+ * The two surfaces of §33.4 and §34.1, wired to the real bar.
+ *
+ * Stubbed: the STORE, because the alternative is a live account; and the
+ * bar's two channels, which are recorded rather than performed so that the
+ * test can assert what the catalog's buttons SENT.  Everything between --
+ * the catalog's reading, its markup, the verb it types, the bar's grammar
+ * and its reply -- is the build.
+ */
+import { mountLocationBar } from "/ui/components/location-bar.js";
+import { renderCatalogInto } from "/ui/components/presentation-catalog.js";
+import { renderConnectionInto } from "/ui/components/connection-panel.js";
+import { connectionFor, attachConnection } from "/lib/app/connection.js";
+import { rememberRepositories } from "/lib/app/repositories.js";
+import { target as makeTarget } from "/lib/app/instructions.js";
+
+const HOST = location.origin;
+const ACCOUNT = "alice";
+
+/* ── what `<alice>/ui' answers ─────────────────────────────────────────── */
+
+const row = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, { value: String(v) }]));
+const CONTENT = {
+  presentations: [
+    row({ presentation: "p1", name: "inventory", title: "Component inventory",
+          scope: "document", modified: "2026-11-05T09:00:00Z" }),
+    row({ presentation: "p2", name: "workspace", scope: "workspace",
+          modified: "2026-11-01T08:00:00Z" }),
+  ],
+  arrangements: [
+    row({ arrangement: "a1", name: "stock-card", title: "Stock card", of: "inventory",
+          anchor: "e-panel", modified: "2026-11-05T10:00:00Z",
+          source: `${HOST} alice/sales` }),
+  ],
+  mounts: [],
+};
+
+window.__reads = 0;
+const realFetch = window.fetch.bind(window);
+window.fetch = async (url, init) => {
+  const u = String(url);
+  if (/\/ui\/sparql$/.test(u)) {
+    window.__reads += 1;
+    const body = String(init?.body || "");
+    const which = /ui:Presentation/.test(body) ? "presentations"
+                : /ui:Arrangement/.test(body) ? "arrangements" : "mounts";
+    return new Response(JSON.stringify({ head: {}, results: { bindings: CONTENT[which] } }),
+                        { status: 200, headers: { "Content-Type": "application/json" } });
+  }
+  if (/\/v1\/models/.test(u)) {
+    return new Response(JSON.stringify({ data: [{ id: "claude-opus-5" }, { id: "claude-haiku-5-5" }] }),
+                        { status: 200, headers: { "Content-Type": "application/json" } });
+  }
+  return realFetch(url, init);
+};
+
+// The permitted set, as a session that has read it would hold it.
+rememberRepositories({ account: ACCOUNT, ok: true,
+  own: [{ id: "alice/sales", account: "alice", repository: "sales", own: true, mode: "own" }],
+  collaborated: [],
+  permitted: [{ id: "alice/sales", account: "alice", repository: "sales", own: true, mode: "own" }],
+  errors: [] });
+
+/* ── the bar, with both channels recorded ──────────────────────────────── */
+
+window.__arranged = [];
+window.__instructed = [];
+const workspace = makeTarget({
+  id: "workspace", label: "workspace", kind: "workspace",
+  arrange: (instruction) => {
+    window.__arranged.push(instruction);
+    CONTENT.mounts = instruction.verb === "mount"
+      ? [row({ mount: "m1", of: instruction.presentation, at: "workspace", name: "w-chrome" })]
+      : [];
+    return { ok: true, message: `${instruction.verb}ed \`${instruction.presentation || instruction.element}'` };
+  },
+  instruct: (text) => {
+    window.__instructed.push(text);
+    return { ok: true, message: "reads alice/sales — nothing has run yet",
+             detail: "the long answer, folded away" };
+  },
+});
+
+const app = {
+  state: { getAuthContext: () => ({ host: HOST, token: "t" }) },
+  locationBar: null,
+};
+app.locationBar = mountLocationBar(document.getElementById("location-bar"), {
+  targets: () => [workspace],
+  arrange: ({ instruction }) => workspace.arrange(instruction),
+  instruct: ({ text }) => workspace.instruct(text),
+  path: () => "/ui/account/alice",
+});
+
+window.__app = app;
+window.__render = async () => {
+  await renderCatalogInto(document.querySelector(".account-catalog-content"),
+                          { app, accountName: ACCOUNT });
+};
+window.__connect = () => renderConnectionInto(
+  document.querySelector(".account-connection-content"), { accountName: ACCOUNT });
+window.__key = () => connectionFor(ACCOUNT).llmKey;
+window.__paneSees = () => attachConnection({ account: ACCOUNT, repository: "sales" }, ACCOUNT).llmKey;
+window.__reply = () => {
+  const r = document.getElementById("location-reply");
+  return r && !r.hidden ? r.textContent : "";
+};
+window.__rebuildBar = () => {
+  // What a redraw of the chrome does: the bar's DOM is replaced, ids and all.
+  const bar = document.getElementById("location-bar");
+  bar.innerHTML = `<span id="location-display">/ui/account/alice</span>`
+                + `<input id="location-input" type="text" />`
+                + `<span id="location-reply" class="location-reply" hidden></span>`;
+};
+
+await window.__render();
+window.__connect();
+window.__ready = true;
+</script>

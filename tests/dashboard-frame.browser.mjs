@@ -464,7 +464,7 @@ console.log("\nevery stage discloses what produced it, and when");
      "including whether the identifier is the served one or only the requested one");
 
   const gate0 = `${pane} [data-testid="dashboard-provenance-gate0"]`;
-  ok(/Nothing on this stage was produced by a model/.test(
+  ok(/Nothing on this pane was produced by a model/.test(
        await page.locator(gate0).textContent()),
      "a stage nothing was generated on says so, rather than showing a mark with blanks "
    + "in it — over-marking is how a reader learns to ignore every mark");

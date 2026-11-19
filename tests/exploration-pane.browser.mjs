@@ -24,22 +24,58 @@ const TYPES = { ".js": "text/javascript", ".mjs": "text/javascript", ".html": "t
 
 const HARNESS = `<!doctype html><meta charset="utf-8"><title>harness</title>
 <body>
+<div class="account-pane" data-account="playwright">
+  <div class="account-pane-layout">
+    <div class="account-pane-content"></div>
+    <div class="account-sidebar">
+      <div class="manage-tabs">
+        <button type="button" class="manage-tab active" data-tab="profile">P</button>
+        <button type="button" class="manage-tab exploration-tab" data-account="playwright"
+                data-testid="account-tab-exploration"><img src="/images/explore.svg" alt="Exploration" width="16" height="16" /></button>
+      </div>
+      <div class="manage-tab-content">
+        <div class="tab-panel active" data-panel="profile">profile</div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="repository-pane" data-account="playwright" data-repository="test">
   <div class="query-catalog">
     <h2 style="display: flex; align-items: center;">Views
       <span style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
-        <button class="view-explore-btn" data-account="playwright" data-repository="test">Explore</button>
         <button class="view-new-btn">New</button>
       </span>
     </h2>
   </div>
   <div class="view-editors">
-    <h2>Editors</h2>
+    <div class="view-editors-head" style="display: flex; justify-content: space-between; align-items: center;">
+      <h2 style="margin: 0;">Editors</h2>
+      <div class="repository-operation-buttons" style="display: flex; gap: 8px;">
+        <button type="button" class="view-explore-btn" data-account="playwright" data-repository="test"
+                style="background: blue; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Explore</button>
+        <button type="button" class="repo-import-btn"
+                style="background: #6f42c1; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Import</button>
+        <button type="button" class="repo-export-btn"
+                style="background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Export</button>
+        <button type="button" class="repo-clear-btn"
+                style="background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Clear</button>
+      </div>
+    </div>
     <div class="view-editors-container"></div>
   </div>
 </div>
 <script type="module">
 import { openExplorationPane, installExplorationLauncher } from "/ui/components/exploration-pane.js";
+import { installAccountExplorationLauncher } from "/ui/components/account-exploration-pane.js";
+import { connectionFor } from "/lib/app/connection.js";
+import { connections } from "/lib/mcp/registry.js";
+
+/* The key is the ACCOUNT'S now, so the test sets it where it lives rather than
+   by typing into a pane -- which is the whole of the change being asserted. */
+window.__setKey = (k) => { connectionFor("playwright").llmKey = k; };
+window.__connection = () => ({ ...connectionFor("playwright") });
+window.__registry = () => connections().map((c) =>
+  ({ id: c.id, connected: c.connected, session: c.session, endpoint: c.mcpEndpoint }));
 
 /* ── fixtures ────────────────────────────────────────────────────────────── */
 const rpc = (result) => ({ jsonrpc: "2.0", id: 1, result });
@@ -169,6 +205,16 @@ window.fetch = async (url, init = {}) => {
     return reply(SESSION_ROWS(String(init.body || "")));
   }
 
+  // What the account may name (REQ-33.2.7).  Answered before the /mcp branch,
+  // because /system/accounts/x/repositories contains neither and would
+  // otherwise fall through to the provider and be counted as a model call.
+  if (String(url).includes("/system/accounts/")) {
+    if (String(url).includes("/collaboration")) return reply([]);
+    return reply({ repositories: [
+      { name: "test" }, { name: "other" }, { name: "ui" }, { name: "mcp" },
+    ] });
+  }
+
   if (String(url).includes("/mcp")) {
     mcpCalls += 1;
     if (body.method === "server/discover") return reply(rpc({ serverInfo: { name: "dydra" } }));
@@ -215,7 +261,12 @@ window.fetch = async (url, init = {}) => {
   }
 
   llmCalls += 1;
-  if (llmCalls === 1) {
+  /* The first turn of EVERY run calls a tool, not just the page's first run:
+     a run that calls nothing is now a reported condition, and a stub that
+     answered the account pane's run straight out of its head would be
+     exercising that condition rather than the one this section is about. */
+  const askedBody = init && init.body ? JSON.parse(init.body) : {};
+  if ((askedBody.tools || []).length && (askedBody.messages || []).length === 1) {
     return reply({
       id: "m1", stop_reason: "tool_use", usage: { input_tokens: 5300, output_tokens: 412 },
       content: [
@@ -234,8 +285,14 @@ window.fetch = async (url, init = {}) => {
 window.__mockFetch = window.fetch;
 
 /* ── mount ───────────────────────────────────────────────────────────────── */
-const app = { state: { getAuthContext: () => ({ host: location.origin, token: "TOKEN" }) } };
+const app = {
+  state: { getAuthContext: () => ({ host: location.origin, token: "TOKEN" }) },
+  // U-77: the account pane registers itself as an address, so the stub has to
+  // accept one.  What it does with it is the location bar's business.
+  registerTarget: (t) => { window.__targets = [...(window.__targets || []), t]; return () => {}; },
+};
 installExplorationLauncher(app);
+installAccountExplorationLauncher(app);
 window.__app = app;
 document.querySelector(".view-explore-btn").click();
 <\/script>
@@ -279,25 +336,25 @@ console.log("\nit opens where the view editors are, and connects by itself");
   ok(await pane.count() === 1, "the Explore button opens one pane");
   ok(await page.locator(".view-editors-container > .exploration-pane").count() === 1,
      "it is a child of the editor container -- a peer of the view editors");
-  ok(await page.locator(".query-catalog .view-explore-btn").count() === 1
-     && await page.locator(".view-editors .view-explore-btn").count() === 0,
-     "the button that opens it sits in the view catalog, with New");
+  ok(await page.locator(".repository-operation-buttons .view-explore-btn").count() === 1
+     && await page.locator(".query-catalog .view-explore-btn").count() === 0,
+     "the button that opens it stands with Import, Export and Clear");
   ok(await page.evaluate(() => {
        const explore = document.querySelector(".view-explore-btn");
-       return explore.nextElementSibling === document.querySelector(".view-new-btn");
+       return explore.nextElementSibling === document.querySelector(".repo-import-btn");
      }),
-     "immediately to the left of New");
+     "immediately to the left of Import");
   ok(await page.evaluate(() => {
-       const h2 = document.querySelector(".query-catalog h2");
-       const controls = document.querySelector(".view-explore-btn").parentElement;
-       // Floated right: the controls end where the header ends, and start well
-       // past its left edge -- not simply stacked after the word `Views'.
-       return Math.abs(controls.getBoundingClientRect().right
-                       - h2.getBoundingClientRect().right) < 2
-           && controls.getBoundingClientRect().left
-                - h2.getBoundingClientRect().left > 40;
+       const style = (el) => getComputedStyle(el);
+       const explore = style(document.querySelector(".view-explore-btn"));
+       const imp = style(document.querySelector(".repo-import-btn"));
+       // The same font as the operations it now stands with -- it is one of
+       // them -- and its own colour, which is blue.
+       return explore.fontSize === imp.fontSize
+           && explore.fontFamily === imp.fontFamily
+           && explore.backgroundColor === "rgb(0, 0, 255)";
      }),
-     "and the pair is pushed to the right edge of the panel");
+     "in their font, on blue");
   await page.waitForFunction(
     () => document.querySelector('[data-testid="exploration-chip"]').textContent.trim() === "connected",
     null, { timeout: 5000 });
@@ -305,11 +362,20 @@ console.log("\nit opens where the view editors are, and connects by itself");
   const out = await page.locator('[data-testid="exploration-connect-output"]').textContent();
   ok(out.includes("server/discover") && out.includes("survey op=connect"),
      "the connect output is kept, in the collapsible at the top");
-  for (const f of ["llm-endpoint", "llm-key", "llm-workspace", "llm-model", "mcp-endpoint"]) {
-    ok(await page.locator(`[data-testid="exploration-${f}"]`).count() === 1, `${f} is in that same block`);
+  ok(await page.locator('[data-testid="exploration-mcp-endpoint"]').count() === 1,
+     "the MCP endpoint is in that same block, because it is this repository's");
+  for (const f of ["llm-endpoint", "llm-key", "llm-workspace", "llm-model"]) {
+    ok(await page.locator(`[data-testid="exploration-${f}"]`).count() === 0,
+       `${f} is NOT: the model is connected once, for the account (§34.4)`);
   }
-  ok(await page.locator('[data-testid="exploration-connection"]').evaluate((d) => d.open) === true,
-     "and it is open to begin with, because no key has been given yet");
+  ok((await page.locator('[data-testid="exploration-conn-note"]').textContent())
+       .includes("account's Connection settings"),
+     "and the pane says where it is instead, in the one wording");
+  ok(await page.locator('[data-testid="exploration-connection"]').evaluate((d) => d.open) === false,
+     "the panel stays shut: a successful handshake is not something to attend to");
+  ok(await page.evaluate(() => window.__registry().some(
+       (c) => c.id === "playwright/test" && c.connected === true)),
+     "and the connection it made is the registry's, not the pane's");
 }
 
 console.log("\nopening it twice does not make two");
@@ -322,15 +388,16 @@ console.log("\nrun needs a key, and says so where the key goes");
 {
   await page.locator('[data-testid="exploration-prompt"]').fill("collect statistics on the subjects");
   await page.locator('[data-testid="exploration-run"]').click();
-  ok((await page.locator('[data-testid="exploration-status"]').textContent()).includes("key"),
-     "with no key it asks for one rather than failing at the provider");
+  const refusal = await page.locator('[data-testid="exploration-status"]').textContent();
+  ok(refusal.includes("key"), "with no key it asks for one rather than failing at the provider");
+  ok(refusal.includes("account's Connection settings"),
+     "and names the one place it is set, rather than a field it no longer draws");
   ok(await page.evaluate(() => window.__calls().llmCalls) === 0, "and nothing was sent");
 }
 
 console.log("\na run, end to end");
 {
-  await page.locator('[data-testid="exploration-llm-key"]').fill("sk-test");
-  await page.locator('[data-testid="exploration-llm-key"]').dispatchEvent("change");
+  await page.evaluate(() => window.__setKey("sk-test"));
   await page.locator('[data-testid="exploration-run"]').click();
   await page.waitForFunction(
     () => /done/.test(document.querySelector('[data-testid="exploration-status"]').textContent),
@@ -443,6 +510,42 @@ console.log("\nthe run is recorded, not just run");
   const note = page.locator(".exp-exchanges .exp-row-note").last();
   ok((await note.textContent()).includes("transcript"),
      "the pane says the record was kept, where it says everything else");
+}
+
+console.log("\nthis repository's report can be kept too");
+{
+  // The same two controls as the account's pane, for the same reason: the
+  // pane is memory and a file is not.  What differs is what goes in -- one
+  // store, one record line, this run's exchanges (§34.8).
+  ok(await page.locator('[data-testid="exploration-save-controls"]').count() === 1
+     && await page.locator('[data-testid="exploration-open-page"]').count() === 1
+     && await page.locator('[data-testid="exploration-save-page"]').count() === 1,
+     "the pane offers Open as a page and Save, once a run has produced something");
+
+  const pending = page.context().waitForEvent("page", { timeout: 10000 });
+  await page.locator('[data-testid="exploration-open-page"]').click();
+  const report = await pending;
+  await report.waitForLoadState("domcontentloaded").catch(() => {});
+  const html = await report.content();
+  ok(/playwright\/test/.test(await report.title()),
+     "the page is titled for the repository it reports on");
+  ok(/collect statistics on the subjects/.test(html),
+     "and carries the question that was asked");
+  ok(await report.locator("style").count() === 1
+     && await report.locator("script").count() === 0,
+     "with its styles inside it and no script at all");
+  ok(/recorded: playwright\/test/.test(html),
+     "the record it can be checked against is named");
+  ok(await report.locator("footer .stage").count() === 1
+     && /call\(s\)/.test(await report.locator("footer .stage").textContent()),
+     "and the Article 50 line says what was asked of the store");
+  await report.close();
+
+  const save = page.waitForEvent("download", { timeout: 10000 });
+  await page.locator('[data-testid="exploration-save-page"]').click();
+  const file = await save;
+  ok(/^exploration-playwright-test-\d{8}T\d{6}Z\.html$/.test(file.suggestedFilename()),
+     `saved as ${file.suggestedFilename()} — the repository is in the name`);
 }
 
 console.log("\na failure opens itself");
@@ -574,18 +677,121 @@ console.log("\nthe session button, and the log it opens");
   ok(await panel.isHidden(), "and hides it again");
 }
 
-console.log("\nthe location and the model are linked menus");
+console.log("\nthe account's exploration pane, opened from the left margin");
 {
-  const loc = page.locator('[data-testid="exploration-llm-endpoint"]');
-  const model = page.locator('[data-testid="exploration-llm-model"]');
-  const state = () => page.evaluate(() => {
-    const st = document.querySelector(".exploration-pane")._explorationApi.state;
-    return { endpoint: st.llmEndpoint, provider: st.llmProvider, model: st.llmModel };
-  });
-  const options = (sel) => sel.evaluate((el) => [...el.options].map((o) => o.value));
   // the failure section above left a provider that refuses; restore the fixtures
   await page.evaluate(() => { window.fetch = window.__mockFetch; });
-  await page.locator('[data-testid="exploration-connection"] > summary').evaluate((s) => {
+  await page.locator('[data-testid="account-tab-exploration"]').click();
+  const acc = page.locator('[data-testid="account-exploration-pane"]');
+  await acc.waitFor({ timeout: 5000 });
+  ok(await acc.count() === 1, "the tab opens one pane");
+  ok(await page.locator(".account-pane-content > .account-exploration-pane").count() === 1,
+     "in the account's own column, not in the sidebar the tab sits in");
+  ok(await page.evaluate(() => document.querySelector('[data-testid="account-tab-exploration"] img')
+       .getAttribute("src").includes("explore.svg")),
+     "the tab's image is the triple: three nodes and the edges between them");
+  ok(await page.evaluate(() =>
+       document.querySelector('.account-sidebar .tab-panel[data-panel="profile"]')
+         .classList.contains("active")),
+     "and the sidebar it sits beside is left alone -- it selects no panel there");
+
+  ok(await page.locator('[data-testid="account-exploration-connection"]').count() === 1,
+     "the model is connected here: location, key, workspace and model in one panel");
+  ok(await page.locator('[data-testid="connection-key"]').count() === 1,
+     "the same controls the account's Connection tab draws, bound to the same object");
+
+  const store = page.locator('[data-testid="account-exploration-store-playwright-test"]');
+  await store.waitFor({ timeout: 5000 });
+  ok(await store.count() === 1,
+     "a store connected in a repository's pane is offered here, without being connected again");
+  ok((await page.locator('[data-testid="account-exploration-state-playwright-test"]')
+        .textContent()) === "connected",
+     "with the state of the handshake that pane made");
+  const addable = await page.locator('[data-testid="account-exploration-add-store"]')
+    .evaluate((el) => [...el.options].map((o) => o.value));
+  ok(addable.includes("playwright/other") && !addable.includes("playwright/test"),
+     "and every other repository the account may read is offered to be added");
+
+  ok((await page.locator('[data-testid="account-exploration-authorises"]').textContent())
+       .includes("Choose at least one store"),
+     "nothing is chosen to begin with, and the pane says what a press would need");
+  await page.locator('[data-testid="account-exploration-choose-playwright-test"]').check();
+  const said = await page.locator('[data-testid="account-exploration-authorises"]').textContent();
+  ok(said.includes("playwright/test") && /\d+ rounds/.test(said) && said.includes("read-only"),
+     "choosing one says what the press would authorise, before it is pressed (§35.2)");
+  ok((await page.locator('[data-testid="account-exploration-ask"]').textContent()).trim() === "Ask",
+     "one store is still an Ask");
+}
+
+console.log("\nasking across the stores that were chosen");
+{
+  const before = await page.evaluate(() => window.__calls().llmCalls);
+  await page.locator('[data-testid="account-exploration-prompt"]')
+    .fill("compare what the two repositories are about");
+  await page.locator('[data-testid="account-exploration-ask"]').click();
+  await page.waitForFunction(
+    () => /done|failed/.test(
+      document.querySelector('[data-testid="account-exploration-status"]').textContent),
+    null, { timeout: 15000 });
+  ok(await page.evaluate(() => window.__calls().llmCalls) > before,
+     "the model is asked with the account's key, which no pane holds");
+  ok(await page.locator('[data-testid="account-exploration-answer"]').count() === 1,
+     "the answer is placed in the pane, where a report can be read");
+  ok((await page.locator('[data-testid="account-exploration-answer"]').textContent())
+       .includes("Eight types"),
+     "as prose, not as a line in a transcript entry that collapses");
+  const titles = await page.locator('[data-testid="account-exploration-exchanges"] .exp-x-title')
+    .allTextContents();
+  ok(titles.includes("tools/list") && titles.some((t) => /turn 1/.test(t)),
+     "and the transcript beside it is the one the repository pane draws");
+  ok(await page.evaluate(() => (window.__targets || [])
+       .some((t) => t.id === "exploration/playwright")),
+     "the pane registers itself as an address, so the location bar can reach it (U-77)");
+  ok(await page.evaluate(() => window.__registry()
+       .some((c) => c.id === "playwright/test" && c.session === "AAAA-1111")),
+     "and the exploration handle is the registry's, so the next run continues this one");
+}
+
+console.log("\nthe report can be kept");
+{
+  ok(await page.locator('[data-testid="account-exploration-open-page"]').count() === 1
+     && await page.locator('[data-testid="account-exploration-save-page"]').count() === 1,
+     "the answer carries a control to open it as a page, and one to save it");
+
+  // Opening writes a whole document into a window of its own.  Asserted
+  // through the window rather than through the HTML, because what matters is
+  // that a browser renders it, not that a string was built.
+  const pending = page.context().waitForEvent("page", { timeout: 10000 });
+  await page.locator('[data-testid="account-exploration-open-page"]').click();
+  const report = await pending;
+  await report.waitForLoadState("domcontentloaded").catch(() => {});
+  ok(await report.title() !== "", "the page has a title of its own");
+  ok(/Eight types/.test(await report.content()), "and carries the answer");
+  ok(await report.locator("style").count() === 1
+     && await report.locator("script").count() === 0,
+     "with its styles inside it and no script at all");
+  ok(await report.locator("footer .stage").count() === 1,
+     "and the Article 50 line, which is the part a copy must not lose");
+  await report.close();
+
+  // Saving writes a file.  Playwright reports the download the anchor starts.
+  const save = page.waitForEvent("download", { timeout: 10000 });
+  await page.locator('[data-testid="account-exploration-save-page"]').click();
+  const file = await save;
+  ok(/^exploration-playwright-\d{8}T\d{6}Z\.html$/.test(file.suggestedFilename()),
+     `saved as ${file.suggestedFilename()} — dated, named for the account, .html`);
+}
+
+console.log("\nthe location and the model are linked menus");
+{
+  const loc = page.locator('[data-testid="connection-location"]');
+  const model = page.locator('[data-testid="connection-model"]');
+  const state = () => page.evaluate(() => {
+    const c = window.__connection();
+    return { endpoint: c.llmEndpoint, provider: c.llmProvider, model: c.llmModel };
+  });
+  const options = (sel) => sel.evaluate((el) => [...el.options].map((o) => o.value));
+  await page.locator('[data-testid="account-exploration-connection"] > summary').evaluate((s) => {
     const d = s.parentElement; if (!d.open) d.open = true; });
 
   ok(await loc.evaluate((el) => el.tagName) === "SELECT", "the location is a menu");
@@ -594,7 +800,7 @@ console.log("\nthe location and the model are linked menus");
      "of Anthropic, OpenAI, and other");
   ok(await model.evaluate((el) => el.tagName) === "SELECT", "the model is a menu too");
   await page.waitForFunction(() => /2 models/.test(
-    document.querySelector('[data-testid="exploration-llm-model-note"]').textContent), null, { timeout: 5000 });
+    document.querySelector('[data-testid="connection-model-note"]').textContent), null, { timeout: 5000 });
   ok((await options(model)).join(",") === "claude-opus-5,claude-sonnet-5,__other__",
      "filled from the location's own list, which the key made readable");
   ok(await page.evaluate(() => window.__calls().modelListCalls
@@ -603,8 +809,8 @@ console.log("\nthe location and the model are linked menus");
 
   await loc.selectOption("openai");
   await page.waitForFunction(() => /2 models/.test(
-    document.querySelector('[data-testid="exploration-llm-model-note"]').textContent)
-    && document.querySelector('[data-testid="exploration-llm-model"]').options[0].value.startsWith("gpt"),
+    document.querySelector('[data-testid="connection-model-note"]').textContent)
+    && document.querySelector('[data-testid="connection-model"]').options[0].value.startsWith("gpt"),
     null, { timeout: 5000 });
   let s = await state();
   ok(s.provider === "openai" && s.endpoint === "https://api.openai.com/v1/chat/completions",
@@ -616,7 +822,7 @@ console.log("\nthe location and the model are linked menus");
   ok(auth.Authorization === "Bearer sk-test", "the OpenAI list is read with the key as a bearer token");
 
   await loc.selectOption("__other__");
-  const locOther = page.locator('[data-testid="exploration-llm-endpoint-other"]');
+  const locOther = page.locator('[data-testid="connection-location-other"]');
   ok(await locOther.isVisible(), "other… opens a field for the location");
   await locOther.fill("http://127.0.0.1:9/v1/chat/completions");
   await locOther.dispatchEvent("change");
@@ -628,7 +834,7 @@ console.log("\nthe location and the model are linked menus");
   ok(true, "and its models are read from the sibling /v1/models");
 
   await model.selectOption("__other__");
-  const modelOther = page.locator('[data-testid="exploration-llm-model-other"]');
+  const modelOther = page.locator('[data-testid="connection-model-other"]');
   ok(await modelOther.isVisible(), "other… opens a field for the model");
   await modelOther.fill("my-local-model");
   await modelOther.dispatchEvent("change");
@@ -636,7 +842,7 @@ console.log("\nthe location and the model are linked menus");
 
   await loc.selectOption("anthropic");
   await page.waitForFunction(() => /2 models/.test(
-    document.querySelector('[data-testid="exploration-llm-model-note"]').textContent), null, { timeout: 5000 });
+    document.querySelector('[data-testid="connection-model-note"]').textContent), null, { timeout: 5000 });
   s = await state();
   ok(!await locOther.isVisible() && s.provider === "anthropic", "choosing a preset closes the field");
   ok(s.model === "my-local-model", "and a model typed by hand is kept until it is changed");

@@ -210,6 +210,105 @@ console.log("\nreading it back");
      "and the header says which model, against which exploration");
 }
 
+console.log("\na record too large for one request");
+{
+  /* The measured ceiling is the service's: a body over 64 KiB is answered 400
+     and the connection closed before the client has finished sending, which a
+     browser can only report as a bare TypeError.  So the record is written in
+     as many requests as it takes. */
+  const big = "x".repeat(50000) + '"quoted" and a backslash \\ and a \ttab\n';
+  const many = [
+    { type: "prompt", at: "2026-11-17T09:00:00.000Z", text: "inventory everything" },
+  ];
+  for (let i = 0; i < 6; i += 1) {
+    many.push({ type: "tool_call", at: "2026-11-17T09:00:01.000Z", name: "survey",
+                input: { op: "catalog" }, iteration: i + 1 });
+    many.push({ type: "tool_result", at: "2026-11-17T09:00:02.000Z", name: "survey",
+                ok: true, status: 200, ms: 40, text: `${i}:${big}` });
+  }
+  const bodies = [];
+  const fetchImpl = async (url, init) => {
+    bodies.push(init.body);
+    return { ok: true, status: 200, text: async () => "" };
+  };
+  const r = await T.recordRun({
+    host: "https://h", account: "test", token: "T", repository: "test/foaf",
+    session: SESSION, result: { ...result, events: many },
+    prompt: "inventory everything", fetchImpl,
+  });
+  ok(r.ok, "it is written");
+  ok(bodies.length > 1 && r.parts === bodies.length && r.wrote === bodies.length,
+     `in ${bodies.length} requests, and the record says how many`);
+  ok(bodies.every((b) => b.length <= T.MAX_UPDATE),
+     "none of which is larger than the service will read");
+  ok(bodies.every((b) => /^PREFIX mcp:/.test(b) && /INSERT DATA \{/.test(b)),
+     "each one an update in its own right, not a fragment of one");
+  ok(bodies[0].includes("mcp:Run") && bodies[0].includes("mcp:prompt"),
+     "the first carries what describes the run, so a partial record still says whose it is");
+
+  /* And it reads back as one payload, not as the pieces it travelled in. */
+  const rows = [];
+  for (const body of bodies) {
+    for (const m of body.matchAll(/^ {4}<([^>]+)> (?:a mcp:(\w+)|mcp:(\w+) (.*)) \.$/gm)) {
+      const [, subject, type, pred, obj] = m;
+      if (type) { rows.push({ s: subject, p: "type", o: type }); continue; }
+      let o = obj;
+      if (o.startsWith("<")) o = o.slice(1, -1);
+      else if (o.startsWith('"')) {
+        const end = o.lastIndexOf('"');
+        o = JSON.parse(o.slice(0, end + 1));
+      }
+      rows.push({ s: subject, p: pred, o });
+    }
+  }
+  const graph = r.graph;
+  const read = await T.readTranscript({
+    host: "https://h", account: "test", token: "T", graph,
+    fetchImpl: async () => ({ status: 200, ok: true, text: async () => JSON.stringify({
+      head: { vars: ["s", "p", "o"] },
+      results: { bindings: rows.map(({ s, p, o }) => ({
+        s: { type: "uri", value: s },
+        p: { type: "uri", value: `http://dydra.com/ns/mcp#${p === "type" ? "type" : p}` },
+        o: /^https?:/.test(o) ? { type: "uri", value: o } : { type: "literal", value: o },
+      })) },
+    }) }),
+  });
+  const payloads = read.runs[0].exchanges.filter((x) => x.kind === "tool_result");
+  ok(payloads.length === 6, "every exchange is there");
+  ok(payloads.every((x) => x.content.length === big.length + 2),
+     "and each payload reads back whole, joined from the pieces it was written in");
+  ok(payloads[3].content.endsWith("\ttab\n") && payloads[3].content.startsWith("3:"),
+     "byte for byte, across a join as across an escape");
+}
+
+console.log("\nwhen the service closes on it instead of answering");
+{
+  // What a browser is handed when the body is refused at the transport: no
+  // status, no text, and a message naming neither.  The record has to supply
+  // the facts the exception does not carry.
+  let n = 0;
+  const fetchImpl = async () => {
+    n += 1;
+    if (n === 1) return { ok: true, status: 200, text: async () => "" };
+    throw new TypeError("Load failed");
+  };
+  const big = "y".repeat(50000);
+  const many = [{ type: "prompt", at: "2026-11-17T09:00:00.000Z", text: "everything" }];
+  for (let i = 0; i < 4; i += 1) {
+    many.push({ type: "tool_result", at: "2026-11-17T09:00:02.000Z", name: "survey",
+                ok: true, status: 200, ms: 40, text: `${i}:${big}` });
+  }
+  const r = await T.recordRun({
+    host: "https://h", account: "test", token: "T", repository: "test/foaf",
+    session: SESSION, result: { ...result, events: many }, prompt: "everything", fetchImpl,
+  });
+  ok(!r.ok && /TypeError: Load failed/.test(r.error), "the exception is kept verbatim");
+  ok(/on part 2 of \d+/.test(r.error) && /\d+ bytes/.test(r.error),
+     "with which request it was and how large, which is what names the cause");
+  ok(r.wrote === 1 && r.parts > 1,
+     "and the part that did land is reported as landed, not discarded");
+}
+
 rmSync(scratch, { recursive: true, force: true });
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail === 0 ? 0 : 1);
