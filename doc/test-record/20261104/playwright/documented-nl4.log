@@ -1,0 +1,258 @@
+
+Running 74 tests using 1 worker
+
+[DocCapture] Manifest written: tests/pdfs/account/manifest.json (4 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/account/index.html
+  ✓   1 [chromium] › tests/account-documented.spec.js:48:7 › Account › display account information [REQ-2.1.1, REQ-2.1.2] (5.3s)
+  -   2 [chromium] › tests/account-documented.spec.js:83:7 › Account › edit account profile fields [REQ-2.2.1, REQ-2.2.3]
+[DocCapture] Manifest written: tests/pdfs/account/manifest.json (4 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/account/index.html
+  ✓   3 [chromium] › tests/account-documented.spec.js:134:7 › Account › view authentication token [REQ-2.2.4] (5.8s)
+[DocCapture] Manifest written: tests/pdfs/admin-accounts/manifest.json (8 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin-accounts/index.html
+  ✓   4 [chromium] › tests/accounts-pane-documented.spec.js:322:7 › Accounts Pane › account listing [REQ-2.4.1, REQ-2.4.2] (7.3s)
+  -   5 [chromium] › tests/accounts-pane-documented.spec.js:334:7 › Accounts Pane › order the listing by any column [REQ-2.4.3]
+[DocCapture] Manifest written: tests/pdfs/admin-accounts/manifest.json (8 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin-accounts/index.html
+  ✓   6 [chromium] › tests/accounts-pane-documented.spec.js:346:7 › Accounts Pane › listing scope and delete control [REQ-2.4.4, REQ-2.6.1] (1.6s)
+[ManualImage] admin-login-form.png
+[ManualImage] admin-login-success.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓   7 [chromium] › tests/admin-documented.spec.js:528:7 › Admin Console › login as administrator [REQ-A.1.1] (1.9s)
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓   8 [chromium] › tests/admin-documented.spec.js:544:7 › Admin Console › logout [REQ-A.1.3] (1.6s)
+[ManualImage] admin-dashboard-overview.png
+[ManualImage] admin-dashboard-tabs.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓   9 [chromium] › tests/admin-documented.spec.js:555:7 › Admin Console › dashboard tab navigation [REQ-A.2.1] (4.3s)
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  10 [chromium] › tests/admin-documented.spec.js:567:7 › Admin Console › location bar navigation [REQ-A.2.2] (3.3s)
+[ManualImage] admin-accounts-list.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  11 [chromium] › tests/admin-documented.spec.js:579:7 › Admin Console › view system accounts [REQ-A.3.1] (1.7s)
+[ManualImage] admin-account-details-dialog.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  12 [chromium] › tests/admin-documented.spec.js:590:7 › Admin Console › account details dialog [REQ-A.3.2] (3.0s)
+  -  13 [chromium] › tests/admin-documented.spec.js:603:7 › Admin Console › create and delete account [REQ-A.3.3, REQ-A.3.4]
+[ManualImage] admin-repositories-list.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  14 [chromium] › tests/admin-documented.spec.js:628:7 › Admin Console › view repositories for selected account [REQ-A.4.1] (3.0s)
+  -  15 [chromium] › tests/admin-documented.spec.js:640:7 › Admin Console › create and delete repository [REQ-A.4.2, REQ-A.4.3]
+[ManualImage] admin-invitations-list.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  16 [chromium] › tests/admin-documented.spec.js:672:7 › Admin Console › view invitations [REQ-A.5.1] (2.6s)
+  -  17 [chromium] › tests/admin-documented.spec.js:683:7 › Admin Console › create and delete invitation [REQ-A.5.2, REQ-A.5.3]
+[ManualImage] admin-query-history-table.png
+[ManualImage] admin-query-history-graph.png
+[DocCapture] Manifest written: tests/pdfs/admin/manifest.json (21 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/admin/index.html
+  ✓  18 [chromium] › tests/admin-documented.spec.js:708:7 › Admin Console › query history table and graph [REQ-A.6.1, REQ-A.6.2] (5.7s)
+  -  19 [chromium] › tests/admin-documented.spec.js:734:7 › Admin Console › transaction history [REQ-A.6.3]
+  -  20 [chromium] › tests/admin-documented.spec.js:773:7 › Admin Console › import history table and graph [REQ-A.6.4, REQ-A.6.5]
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  21 [chromium] › tests/authentication-documented.spec.js:37:7 › Authentication › login with valid credentials [REQ-1.1.1, REQ-1.1.2] (3.4s)
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  22 [chromium] › tests/authentication-documented.spec.js:59:7 › Authentication › login with invalid credentials [REQ-9.1.1] (3.2s)
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  23 [chromium] › tests/authentication-documented.spec.js:85:7 › Authentication › logout functionality [REQ-1.2.2] (3.3s)
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  24 [chromium] › tests/authentication-documented.spec.js:103:7 › Authentication › navigation links based on auth status [REQ-1.2.3] (3.4s)
+[DocCapture] Manifest written: tests/pdfs/authentication/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/authentication/index.html
+  ✓  25 [chromium] › tests/authentication-documented.spec.js:126:7 › Authentication › session persistence of account name [REQ-1.2.1] (5.9s)
+[DocCapture] Manifest written: tests/pdfs/collaboration/manifest.json (14 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/collaboration/index.html
+  ✓  26 [chromium] › tests/collaboration-documented.spec.js:467:7 › Collaboration › read collaborators [REQ-3.7.1] (3.7s)
+  -  27 [chromium] › tests/collaboration-documented.spec.js:479:7 › Collaboration › add, modify and remove a collaborator [REQ-3.7.2, REQ-3.7.3, REQ-3.7.4, REQ-3.7.5]
+[DocCapture] Manifest written: tests/pdfs/collaboration/manifest.json (14 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/collaboration/index.html
+  ✓  28 [chromium] › tests/collaboration-documented.spec.js:517:7 › Collaboration › unknown account refused [REQ-3.7.6] (3.7s)
+[DocCapture] Manifest written: tests/pdfs/collaboration/manifest.json (14 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/collaboration/index.html
+  ✓  29 [chromium] › tests/collaboration-documented.spec.js:529:7 › Collaboration › collaborations an account reaches [REQ-2.1.2] (3.4s)
+[DocCapture] Manifest written: tests/pdfs/account-history/manifest.json (4 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/account-history/index.html
+  ✓  30 [chromium] › tests/events-documented.spec.js:271:7 › Lifecycle Events › events offered and fetched per account [REQ-2.5.1, REQ-2.5.2] (1.5s)
+  -  31 [chromium] › tests/events-documented.spec.js:282:7 › Lifecycle Events › event table columns and agent [REQ-2.5.3, REQ-3.8.3]
+  -  32 [chromium] › tests/events-documented.spec.js:293:7 › Lifecycle Events › event type names [REQ-3.8.1, REQ-3.8.7]
+[DocCapture] Manifest written: tests/pdfs/account-history/manifest.json (4 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/account-history/index.html
+  ✓  33 [chromium] › tests/events-documented.spec.js:304:7 › Lifecycle Events › history filters [REQ-2.5.4] (1.5s)
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓  34 [chromium] › tests/import-export-documented.spec.js:238:7 › Import/Export › import Turtle file [REQ-3.4.4, REQ-3.4.7] (6.9s)
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓  35 [chromium] › tests/import-export-documented.spec.js:256:7 › Import/Export › import N-Triples file [REQ-3.4.4, REQ-3.4.7] (5.0s)
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓  36 [chromium] › tests/import-export-documented.spec.js:279:7 › Import/Export › import N-Quads file [REQ-3.4.4, REQ-3.4.7] (4.9s)
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓  37 [chromium] › tests/import-export-documented.spec.js:296:7 › Import/Export › import from URL [REQ-3.4.3] (34.6s)
+[DocCapture] Manifest written: tests/pdfs/import/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/import/index.html
+  ✓  38 [chromium] › tests/import-export-documented.spec.js:306:7 › Import/Export › import progress display [REQ-3.4.6] (5.2s)
+[DocCapture] Manifest written: tests/pdfs/export/manifest.json (5 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/export/index.html
+  ✓  39 [chromium] › tests/import-export-documented.spec.js:327:7 › Import/Export › export Turtle format [REQ-3.5.1] (4.1s)
+[DocCapture] Manifest written: tests/pdfs/export/manifest.json (5 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/export/index.html
+  ✓  40 [chromium] › tests/import-export-documented.spec.js:337:7 › Import/Export › export N-Triples format [REQ-3.5.1, REQ-3.5.2] (4.8s)
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  41 [chromium] › tests/navigation-documented.spec.js:39:7 › Navigation › client-side routing [REQ-5.1.1] (3.4s)
+  ✘  42 [chromium] › tests/navigation-documented.spec.js:82:7 › Navigation › browser back/forward [REQ-5.1.2] (18.5s)
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  43 [chromium] › tests/navigation-documented.spec.js:115:7 › Navigation › tab management [REQ-6.3.1, REQ-6.3.2] (3.5s)
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  44 [chromium] › tests/navigation-documented.spec.js:143:7 › Navigation › location bar display [REQ-5.2.4] (3.4s)
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  45 [chromium] › tests/navigation-documented.spec.js:163:7 › Navigation › tabbed interface [REQ-5.2.5] (3.4s)
+[DocCapture] Manifest written: tests/pdfs/navigation/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/navigation/index.html
+  ✓  46 [chromium] › tests/navigation-documented.spec.js:184:7 › Navigation › direct URL navigation [REQ-5.1.1] (7.4s)
+  ✘  47 [chromium] › tests/navigation-documented.spec.js:211:7 › Navigation › navigation between account and repositories [REQ-5.2.5] (18.5s)
+  ✘  48 [chromium] › tests/repository-documented.spec.js:46:7 › Repository › repository profile properties [REQ-3.2.1, REQ-3.2.3] (3.7s)
+[DocCapture] Manifest written: tests/pdfs/repository/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/repository/index.html
+  ✓  49 [chromium] › tests/repository-documented.spec.js:78:7 › Repository › repository collaboration [REQ-3.7.1, REQ-3.7.2, REQ-3.7.3] (4.8s)
+[DocCapture] Manifest written: tests/pdfs/repository/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/repository/index.html
+  ✓  50 [chromium] › tests/repository-documented.spec.js:104:7 › Repository › repository creation [REQ-3.3.1] (6.0s)
+[DocCapture] Manifest written: tests/pdfs/repository/manifest.json (11 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/repository/index.html
+  ✓  51 [chromium] › tests/repository-documented.spec.js:139:7 › Repository › repository clear [REQ-3.6.1] (5.6s)
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  52 [chromium] › tests/sparql-documented.spec.js:89:7 › SPARQL Editor › execute SPARQL query [REQ-4.1.1, REQ-4.1.2, REQ-4.1.4] (4.5s)
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  53 [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - JSON [REQ-4.1.3] (4.7s)
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  54 [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - CSV [REQ-4.1.3] (4.5s)
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  55 [chromium] › tests/sparql-documented.spec.js:127:9 › SPARQL Editor › query result formats - XML [REQ-4.1.3] (4.5s)
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  56 [chromium] › tests/sparql-documented.spec.js:150:7 › SPARQL Editor › query execution time display [REQ-4.3.4] (4.3s)
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  57 [chromium] › tests/sparql-documented.spec.js:173:7 › SPARQL Editor › query keyboard shortcut [REQ-4.3.2] (4.3s)
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  58 [chromium] › tests/sparql-documented.spec.js:195:7 › SPARQL Editor › query reset functionality [REQ-4.3.3] (5.8s)
+[DocCapture] Manifest written: tests/pdfs/sparql/manifest.json (16 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/sparql/index.html
+  ✓  59 [chromium] › tests/sparql-documented.spec.js:216:7 › SPARQL Editor › multiple query tabs [REQ-4.3.6] (4.8s)
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  60 [chromium] › tests/ui-components-documented.spec.js:38:7 › UI Components › flash message display [REQ-6.2.1] (5.2s)
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  61 [chromium] › tests/ui-components-documented.spec.js:66:7 › UI Components › loading indicator [REQ-6.2.2] (12.5s)
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  62 [chromium] › tests/ui-components-documented.spec.js:98:7 › UI Components › error message display [REQ-9.1.2] (343ms)
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  63 [chromium] › tests/ui-components-documented.spec.js:122:7 › UI Components › 404 page [REQ-9.1.3] (3.4s)
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  64 [chromium] › tests/ui-components-documented.spec.js:140:7 › UI Components › modal dialog behavior [REQ-6.2.3] (3.4s)
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  65 [chromium] › tests/ui-components-documented.spec.js:161:7 › UI Components › confirmation dialog [REQ-6.2.3] (5.5s)
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  66 [chromium] › tests/ui-components-documented.spec.js:182:7 › UI Components › responsive layout elements (4.2s)
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  67 [chromium] › tests/ui-components-documented.spec.js:205:7 › UI Components › keyboard navigation (184ms)
+[DocCapture] Manifest written: tests/pdfs/ui-components/manifest.json (13 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/ui-components/index.html
+  ✓  68 [chromium] › tests/ui-components-documented.spec.js:226:7 › UI Components › tooltip display (3.4s)
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  69 [chromium] › tests/view-documented.spec.js:116:7 › View Management › create view [REQ-4.2.1] (5.5s)
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  70 [chromium] › tests/view-documented.spec.js:136:7 › View Management › edit view [REQ-4.2.2, REQ-4.2.3, REQ-4.2.5] (5.7s)
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  71 [chromium] › tests/view-documented.spec.js:190:7 › View Management › delete view [REQ-4.2.1] (5.1s)
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  72 [chromium] › tests/view-documented.spec.js:208:7 › View Management › open view in pane editor [REQ-4.2.5, REQ-4.2.6] (5.6s)
+[DocCapture] Manifest written: tests/pdfs/view/manifest.json (10 entries, 0 from this test)
+[DocCapture] Index written: tests/pdfs/view/index.html
+  ✓  73 [chromium] › tests/view-documented.spec.js:246:7 › View Management › execute view [REQ-4.2.2] (5.3s)
+logged in: true
+explore button: 1
+pane visible: true
+connection: connecting…
+errors: []
+  ✓  74 [chromium] › tests/zz-shot-documented.spec.js:14:5 › open the exploration pane (10.0s)
+
+
+  1) [chromium] › tests/repository-documented.spec.js:46:7 › Repository › repository profile properties [REQ-3.2.1, REQ-3.2.3] 
+
+    Error: locator.fill: Error: Element is not an <input>, <textarea>, <select> or [contenteditable] and does not have a role allowing [aria-readonly]
+    Call log:
+    [2m  - waiting for getByTestId('repo-field-abstract')[22m
+    [2m    - locator resolved to <span class="value empty" data-editable="true" data-field-type="text" data-repo-field="abstract" data-pane-handler-bound="true" data-testid="repo-field-abstract">-</span>[22m
+    [2m    - fill("Test summary 1793750625394")[22m
+    [2m  - attempting fill action[22m
+    [2m    - waiting for element to be visible, enabled and editable[22m
+
+
+      53 |       const summary = await activateRepoField(page, 'repo-field-abstract');
+      54 |       await expect(summary, 'the summary field should become editable').toBeVisible({ timeout: 10000 });
+    > 55 |       await summary.fill(`Test summary ${stamp}`);
+         |                     ^
+      56 |       await expect(summary).toHaveValue(`Test summary ${stamp}`);
+      57 |       await cap.after('Profile fields populated with new values');
+      58 |     });
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:55:21
+        at DocCapture.requirement (/Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/doc-capture.js:221:5)
+        at /Users/Shared/Development/Source/Library/org/datagraph/jsui/tests/repository-documented.spec.js:51:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/error-context.md
+
+    attachment #3: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/repository-documented-Repo-11759-erties-REQ-3-2-1-REQ-3-2-3--chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/repository-documented.spec.js:46:7 › Repository › repository profile properties [REQ-3.2.1, REQ-3.2.3] 
+  10 skipped
+  63 passed (6.1m)

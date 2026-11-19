@@ -1,0 +1,158 @@
+[
+  {
+    "file": "01-the-interface.png",
+    "note": "the chrome, with the location bar as the only prompt on the screen"
+  },
+  {
+    "file": "02-the-question-typed.png",
+    "note": "a line that names two repositories — read as a question about data, not an instruction about the interface"
+  },
+  {
+    "file": "03-disclosed-before-it-runs.png",
+    "note": "nothing has run: the stores are named and one press is offered"
+  },
+  {
+    "file": "04-what-the-press-authorises.png",
+    "note": "the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept"
+  },
+  {
+    "file": "05-the-run-begins.png",
+    "note": "each store's own tools and the server's operation catalogue are read before the model is asked anything"
+  },
+  {
+    "file": "06-turn-01-survey-james-finto-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"connect\"} | survey__james__fibo {\"op\":\"connect\"}"
+  },
+  {
+    "file": "07-turn-02-survey-james-finto-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"catalog\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ scope: types }\"} | survey__james__fibo {\"op\":\"catalog\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ scope: types }\"}"
+  },
+  {
+    "file": "08-turn-03-survey-james-fibo-survey-james-fibo-survey-jam.png",
+    "note": "the model asks for: survey__james__fibo {\"op\":\"catalog\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ scope: predicates }\"} | survey__james__fibo {\"op\":\"profile\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"owl:Class\"} | survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:ConceptScheme, @shape: [skos:prefL"
+  },
+  {
+    "file": "09-turn-04-survey-james-fibo-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Class, @shape: [rdfs:label, skos:de | survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Ontology, @shape: [rdfs:label, dcte"
+  },
+  {
+    "file": "10-turn-05-survey-james-fibo-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Class, @shape: [rdfs:label, rdfs:su | survey__james__fibo {\"op\":\"materialize\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"sparql\",\"node\":\"n4\"}"
+  },
+  {
+    "file": "11-turn-06-survey-james-fibo-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Restriction, @shape: [owl:onPropert | survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:DatatypeProperty, @shape: [rdfs:lab"
+  },
+  {
+    "file": "12-turn-07-survey-james-fibo-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Restriction, @shape: [owl:onPropert | survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Restriction, @shape: [owl:onPropert"
+  },
+  {
+    "file": "13-turn-08-survey-james-finto-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"profile\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"skos:Concept\"} | survey__james__finto {\"op\":\"catalog\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ scope: graphs }\"}"
+  },
+  {
+    "file": "14-turn-09-result-full.png",
+    "note": "the model asks for: result_full {\"of\":\"r1\"}"
+  },
+  {
+    "file": "15-turn-10-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel, "
+  },
+  {
+    "file": "16-turn-11-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n5\",\"body\":\"{ where: { skos:prefLabel: { $regex:"
+  },
+  {
+    "file": "17-turn-12-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n5\",\"body\":\"{ where: { skos:prefLabel: { $regex:"
+  },
+  {
+    "file": "18-turn-13-result-full.png",
+    "note": "the model asks for: result_full {\"of\":\"r4\"}"
+  },
+  {
+    "file": "19-turn-14-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n5\",\"body\":\"{ where: { skos:prefLabel: { $regex:"
+  },
+  {
+    "file": "20-turn-15-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel],"
+  },
+  {
+    "file": "21-turn-16-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n9\",\"body\":\"{ where: { skos:prefLabel: { $regex:"
+  },
+  {
+    "file": "22-turn-17-result-full.png",
+    "note": "the model asks for: result_full {\"of\":\"r7\"}"
+  },
+  {
+    "file": "23-turn-18-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel, "
+  },
+  {
+    "file": "24-turn-19-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n11\",\"body\":\"{ where: { skos:prefLabel: { $in: ["
+  },
+  {
+    "file": "25-turn-20-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n11\",\"body\":\"{ where: { skos:prefLabel: { $regex"
+  },
+  {
+    "file": "26-turn-21-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel, "
+  },
+  {
+    "file": "27-turn-22-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n14\",\"body\":\"{ where: { skos:prefLabel: { $regex"
+  },
+  {
+    "file": "28-turn-23-result-full.png",
+    "note": "the model asks for: result_full {\"of\":\"r10\"}"
+  },
+  {
+    "file": "29-turn-24-survey-james-finto-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"materialize\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n13\",\"body\":\"sparql\"} | survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:inScheme], "
+  },
+  {
+    "file": "30-turn-25-survey-james-finto-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel,  | survey__james__fibo {\"op\":\"materialize\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"node\":\"n6\",\"body\":\"sparql\"}"
+  },
+  {
+    "file": "31-turn-26-prose.png",
+    "note": "the model writes rather than calls: # Concepts in james/finto and james/fibo: a SKOS thesaurus collection set against a FIBO ontology fragment\n\n## Summary\nThe two stores do not hold the same kind "
+  },
+  {
+    "file": "32-answered.png",
+    "note": "the reply line: the first sentence of the answer, with the rest folded"
+  },
+  {
+    "file": "33-the-report.png",
+    "note": "the answer, folded under the bar rather than truncated into it"
+  },
+  {
+    "file": "34-the-report-2.png",
+    "note": "the report, screenful 2 of 6"
+  },
+  {
+    "file": "35-the-report-3.png",
+    "note": "the report, screenful 3 of 6"
+  },
+  {
+    "file": "36-the-report-4.png",
+    "note": "the report, screenful 4 of 6"
+  },
+  {
+    "file": "37-the-report-5.png",
+    "note": "the report, screenful 5 of 6"
+  },
+  {
+    "file": "38-the-report-6.png",
+    "note": "the report, screenful 6 of 6"
+  },
+  {
+    "file": "39-provenance.png",
+    "note": "the end of the report and the provenance the interface adds: model as served, calls, date, where it was recorded"
+  }
+]

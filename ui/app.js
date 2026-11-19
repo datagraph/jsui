@@ -8,7 +8,7 @@ import {
   WORKSPACE_NAME, CHROME_ELEMENT,
 } from "../lib/app/workspace.js";
 import {
-  ensureRepository, listPresentations, listMounts, claimMount, releaseMount,
+  ensureRepository, listPresentations, listArrangements, listMounts, claimMount, releaseMount,
   writeArrangement, readArrangement, recordApplication, readPresentation,
 } from "../lib/app/ui-store.js";
 import {
@@ -18,8 +18,15 @@ import {
 import { installExpanders, expandInto } from "./components/mount-band.js";
 import { runWorkspaceInstruction } from "../lib/app/workspace-instruction.js";
 import { instructionSystem } from "../lib/llm/instruction-prompt.js";
-import { createToolAdapter, DEFAULT_SYSTEM } from "../lib/llm/tool-adapter.js";
-import { anyConnectedPane } from "./components/mcp-pane-state.js";
+import { createToolAdapter, DEFAULT_SYSTEM, ALLOW_TOOLS } from "../lib/llm/tool-adapter.js";
+import { connectionFor, connectionRefusal } from "../lib/app/connection.js";
+import { ensureRepositories } from "../lib/app/repositories.js";
+import { classifyPrompt, contextRefusal, describeContext } from "../lib/app/prompt-context.js";
+import { catalogRefusal, mountable } from "../lib/app/catalog.js";
+import { mcpConnectionFor, storeFor, sessionStore } from "../lib/mcp/registry.js";
+import { analysisSystem, analysisBudget, analysisProgress } from "../lib/llm/analysis-prompt.js";
+import { createGrant } from "../lib/llm/grant.js";
+import { recordRun } from "../lib/mcp/transcript-store.js";
 
 /** The ceiling on an arrangement turn.  A patch against the chrome is small. */
 export const INSTRUCTION_TOKENS = 8000;
@@ -151,8 +158,18 @@ export class App {
       const listed = await listPresentations({ ...where, limit: 200 });
       const entry = (listed.presentations || []).find((p) => p.name === instruction.presentation);
       if (!entry) {
-        return { ok: false, message: `there is no presentation named \`${instruction.presentation}'` };
+        // The listing is in hand at the moment of the refusal (REQ-33.4.4).
+        // It used to be read, searched and dropped, so the one thing the user
+        // needed -- what the names ARE -- was the one thing not said.
+        return { ok: false,
+                 message: listed.ok
+                   ? catalogRefusal("presentation", instruction.presentation, listed.presentations)
+                   : `the presentations in \`${accountName}/ui' could not be read: ${listed.error}` };
       }
+      // A scope that cannot be mounted is refused here rather than deeper
+      // down, so that the sentence names the scope (REQ-33.4.5).
+      const allowed = mountable({ ...entry, owner: accountName, foreign: false });
+      if (!allowed.ok) return { ok: false, message: `\`${entry.name}': ${allowed.reason}` };
       const loaded = await listMounts({ ...where });
       if (!loaded.ok) return { ok: false, message: `the mount registry could not be read: ${loaded.error}` };
       // Into the chrome's root unless the user named somewhere: a band
@@ -206,7 +223,16 @@ export class App {
 
     if (instruction.verb === "apply") {
       const got = await readArrangement({ ...where, name: instruction.arrangement });
-      if (!got.ok) return { ok: false, message: got.error };
+      if (!got.ok) {
+        // `readArrangement' answers *there is no arrangement named X*, which
+        // is true and leaves the user with nothing to try.  The catalog is
+        // one request away and the names are what they need (REQ-33.4.4).
+        const held = await listArrangements({ ...where, limit: 200 });
+        return { ok: false,
+                 message: held.ok
+                   ? catalogRefusal("arrangement", instruction.arrangement, held.arrangements)
+                   : got.error };
+      }
       const out = applyArrangement({ document: document0, template: got.template,
                                      parent: instruction.into });
       if (!out.ok) return { ok: false, message: out.errors[0] };
@@ -259,29 +285,49 @@ export class App {
   forgetWorkspace() { this.workspace = null; }
 
   /**
-   * One arrangement instruction, asked and applied.
+   * One line typed into the bar against the chrome: an instruction, or a
+   * question about data (§34.2).
    *
-   * The credential is the exploration pane's, borrowed rather than asked for
-   * again (`anyConnectedPane'), and no tools are allowed: the chrome holds
-   * no data, so a turn that reached the store would be reaching it for
-   * something the arrangement cannot show.
+   * The bar used to send everything here to a model with `allowTools: []'
+   * and no MCP endpoint, so a question about a repository could not be asked
+   * from the one affordance that is always on the screen.  It can now, and
+   * which of the two a line is, is decided WITHOUT a model: a line that names
+   * a repository is about data, and everything else is about the interface,
+   * as before.  `lib/app/prompt-context.js' is the whole of that decision and
+   * the reason it is a module: reading an instruction as a question costs a
+   * turn, and reading a question as an instruction edits the page instead of
+   * answering it.
+   *
+   * The credential is the ACCOUNT'S (§34.1; A-15).  It used to be borrowed
+   * from whichever exploration pane had one, which made a key typed about one
+   * repository the credential for rearranging furniture that concerns none.
    */
   async instructWorkspace(text) {
     const accountName = this.state.session?.accountName || null;
     if (!accountName) return { ok: false, message: "sign in before rearranging the interface" };
-    const pane = anyConnectedPane(accountName);
-    if (!pane?.llmKey) {
-      return { ok: false,
-               message: "no model is connected — set a provider key in an exploration pane's Connection" };
+    const connection = connectionFor(accountName);
+    if (!connection.llmKey) {
+      return { ok: false, message: connectionRefusal("nothing was asked") };
     }
     const auth = this.state.getAuthContext?.(accountName) || {};
+
+    // What this account may name, read once for the session (REQ-33.2.7).
+    const sets = await ensureRepositories({ host: auth.host, account: accountName,
+                                            token: auth.token });
+    const reading = classifyPrompt(text, { permitted: sets.permitted,
+                                           address: { kind: "workspace" } });
+    // A repository that was unmistakably named and is not one this account
+    // may read refuses the line before anything runs (REQ-34.2.6).
+    if (reading.kind === "refusal") return { ok: false, message: contextRefusal(reading) };
+    if (reading.kind === "data") return this.offerDataTurn(reading, { accountName, auth, connection });
     const held = await this.workspaceFor(this.workspace?.page || "main");
     const page = held.page;
 
     const ask = async ({ text: asked, document: doc }) => {
       const adapter = createToolAdapter({
-        provider: pane.llmProvider, endpoint: pane.llmEndpoint, apiKey: pane.llmKey,
-        workspaceId: pane.llmWorkspace, model: pane.llmModel,
+        provider: connection.llmProvider, endpoint: connection.llmEndpoint,
+        apiKey: connection.llmKey,
+        workspaceId: connection.llmWorkspace, model: connection.llmModel,
         allowTools: [], maxTokens: INSTRUCTION_TOKENS, maxIterations: 1,
         system: instructionSystem(DEFAULT_SYSTEM, {
           target: { kind: "workspace" }, document: doc, page,
@@ -330,6 +376,178 @@ export class App {
       };
     }
     return out;
+  }
+
+  /**
+   * A question about data, disclosed before it is asked (REQ-34.2.5).
+   *
+   * Nothing runs here.  The reply names the stores the turn would read and
+   * offers one press, because a turn that reaches two repositories authorises
+   * more than one that reaches one -- and the bar, unlike a pane, has no gate
+   * of its own to put that in.  The press is the gate.
+   */
+  offerDataTurn(reading, { accountName, auth, connection }) {
+    if (reading.empty) {
+      return { ok: false,
+               message: "the workspace names no repository, so there is nothing to read — "
+                      + "name one in the line, as `in alice/sales'" };
+    }
+    const where = describeContext(reading.repositories);
+    const n = reading.repositories.length;
+    const budget = analysisBudget(reading.repositories);
+    return {
+      ok: true,
+      message: `${where} — under your credentials, nothing has run yet`,
+      // What the press authorises, in the terms the grant itself holds
+      // (§35.2).  "It will read two repositories" is the part the user
+      // already knows from the line; what they cannot know unless it is said
+      // is how long it may go on for and how much it may read.
+      detail: `This would run an analysis across ${n} repositor${n === 1 ? "y" : "ies"}:\n`
+            + `${reading.repositories.map((r) => `  · ${r.id}`).join("\n")}\n\n`
+            + `Up to ${budget.rounds} rounds of tool calls, ${budget.grant.maxQueries} calls in all, `
+            + `read-only, for this run.\nLarge results are read as their shape first; `
+            + `the answer is recorded in \`${accountName}/mcp\` and can be stopped while it runs.`,
+      confirm: {
+        label: n === 1 ? "Ask" : `Ask across ${n}`,
+        working: `asking ${reading.repositories.map((r) => r.id).join(", ")}…`,
+        run: (controls) => this.askRepositories(reading, { accountName, auth, connection }, controls),
+      },
+    };
+  }
+
+  /**
+   * The turn itself: one model, several stores (§34.3).
+   *
+   * Each named repository is carried as its own MCP endpoint with its own
+   * token, because the service has one resource per repository and authorizes
+   * it there; the adapter offers the model one tool per store and routes each
+   * call by the name it was called under.  Nothing is written: the tools are
+   * the default read-only set, and the chrome is not touched by the answer.
+   */
+  async askRepositories(reading, { accountName, auth, connection },
+                        { progress = () => {}, stopped = () => null } = {}) {
+    // Through the registry (§34.4), not derived here.  The bar used to build
+    // each endpoint from the host and so could not be told otherwise: an
+    // endpoint corrected in a repository's pane -- a proxy, a second host --
+    // was that pane's private opinion and this turn went somewhere else.  Now
+    // both read the one connection, and the handshake either has already
+    // happened or will happen on the first call.
+    const stores = reading.repositories.map((r) => {
+      const conn = mcpConnectionFor(r.account, r.repository, auth.host);
+      // The signed-in session's token, for every store: authorization is the
+      // service's to make, per resource, and a collaboration is exactly the
+      // case where this token may read a repository of another account.
+      conn.token = auth.token ?? conn.token;
+      return storeFor(conn);
+    }).filter(Boolean);
+    const ids = reading.repositories.map((r) => r.id);
+    // What the turn may spend, and the brief it works under (§35.1, §35.2).
+    const budget = analysisBudget(reading.repositories);
+    const grant = createGrant(budget.grant);
+    const watch = analysisProgress(progress, { rounds: budget.rounds });
+    const started = new Date();
+    const adapter = createToolAdapter({
+      provider: connection.llmProvider, endpoint: connection.llmEndpoint,
+      apiKey: connection.llmKey, workspaceId: connection.llmWorkspace,
+      model: connection.llmModel,
+      mcp: { repositories: stores },
+      allowTools: ALLOW_TOOLS,
+      // Not `DEFAULT_SYSTEM'.  That brief ends by asking for one SPARQL query
+      // for the user to run in the view editor, which is operation 3 of the
+      // design and the wrong deliverable here: no query spans two endpoints,
+      // and what the question asks for is a comparison, not a query.
+      system: analysisSystem({ stores: reading.repositories, asked: reading.text,
+                               rounds: budget.rounds, answerTokens: budget.answerTokens }),
+      maxIterations: budget.rounds,
+      maxTokens: budget.answerTokens,
+      digestOver: budget.digestOver,
+      grant,
+      // The exploration handles are the session's, not the run's (§34.4.3):
+      // a second question about the same repository continues the first
+      // one's exploration rather than opening a second beside it.
+      sessions: sessionStore(),
+      stop: stopped,
+      onEvent: watch.onEvent,
+    });
+    let out;
+    try { out = await adapter.run(reading.text); }
+    catch (e) { return { ok: false, message: `the model could not be asked: ${e}` }; }
+
+    const kept = await this.keepAnalysis({ out, stores, auth, accountName,
+                                           prompt: reading.text, started });
+    // Article 50 (§2.6): the model as SERVED, the stores it read, and the
+    // date -- stated by the interface, never by the model.
+    const served = out.servedModel || out.model;
+    const spent = watch.calls.map(([id, n]) => `${id} ${n}`).join(", ")
+               || `${watch.total()} calls`;
+    // A run that answered only after its rounds ran out answered from fewer
+    // calls than it wanted, and the reader is entitled to know that before
+    // they act on the report rather than after.
+    const cutShort = out.roundsExhausted
+      ? ` · the exploration was stopped at the ${out.iterations}-round limit`
+      : "";
+    const footer = `— ${served}${out.served ? "" : " (requested, not confirmed)"}`
+                 + ` · ${spent} · ${new Date().toISOString().slice(0, 10)}${cutShort}`
+                 + `\n${kept.join("\n")}`;
+    if (!out.ok) {
+      // A run that was stopped, or that ran out of rounds, has usually said
+      // something worth keeping -- the prose of its last complete turn -- and
+      // it is handed over rather than discarded, labelled as partial.
+      return { ok: false, message: `${out.error} — ${ids.join(", ")}`,
+               detail: out.finalText ? `${out.finalText}\n\n${footer}` : footer };
+    }
+    const head = out.finalText.split("\n").find((l) => l.trim()) || "answered";
+    const cut = out.truncated ? " — cut off at the answer ceiling" : "";
+    return {
+      ok: true,
+      message: `${head.slice(0, 140)}${head.length > 140 ? "…" : ""}${cut}`,
+      detail: `${out.finalText}\n\n${footer}`,
+    };
+  }
+
+  /**
+   * Keep the analysis (§35.4).
+   *
+   * A report of several thousand words that exists only in a panel the next
+   * instruction replaces is not a deliverable, and the machinery for keeping
+   * one already exists: `recordRun' writes a run and its exchanges as RDF
+   * into `<account>/mcp', which is where the exploration panes have been
+   * filing theirs all along.
+   *
+   * One record per store, not one for the turn.  Each repository is its own
+   * exploration with its own handle, and the events now say which store they
+   * belong to (§34.3), so each graph can hold that store's calls together
+   * with the question that was asked and the answer that came of it.  A
+   * reader of one repository's record therefore sees a complete exploration
+   * rather than half of a turn; the prose appears in both because it is about
+   * both.
+   *
+   * A failure to record is reported and nothing else: the analysis happened,
+   * and losing the answer because the filing cabinet was shut would be the
+   * worse outcome.
+   */
+  async keepAnalysis({ out, stores, auth, accountName, prompt, started }) {
+    const notes = [];
+    for (const store of stores) {
+      const id = `${store.account}/${store.repository}`;
+      const session = (out.sessions && out.sessions[id]) || null;
+      // The turn's own events (prompt, assistant prose, done) carry no
+      // repository and belong in every store's record; a call's events carry
+      // one and belong only in that store's.
+      const events = (out.events || []).filter((e) => !e.repository || e.repository === id);
+      let kept;
+      try {
+        kept = await recordRun({ host: auth.host, account: accountName, token: auth.token,
+                                 repository: id, session, prompt, started,
+                                 result: { ...out, events } });
+      } catch (e) { kept = { ok: false, error: String(e) }; }
+      notes.push(kept?.ok ? `recorded: ${id} → ${kept.graph}`
+                          : (kept?.wrote
+                              ? `partly recorded: ${id} (${kept.wrote} of ${kept.parts} `
+                              + `parts; ${kept.error})`
+                              : `not recorded: ${id} (${kept?.error || "unknown"})`));
+    }
+    return notes;
   }
 
   /**

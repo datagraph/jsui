@@ -5,10 +5,13 @@ import { APP_CONFIG } from "../../lib/config.js";
 import { authenticateAccount } from "../../lib/auth.js";
 import { buildLoginFormHtml, readLastUsername } from "../components/login-form.js";
 import { installExplorationLauncher } from "../components/exploration-pane.js";
+import { installAccountExplorationLauncher } from "../components/account-exploration-pane.js";
 import { attachNameControl, installNamePolicy } from "../components/name-input.js";
 import { makeDragHandleOnly } from "../components/drag-handle.js";
 import { historyPath, historyQuery } from "../../lib/models/history.js";
 import { collaborationPath } from "../../lib/models/collaboration.js";
+import { renderCatalogInto } from "../components/presentation-catalog.js";
+import { renderConnectionInto } from "../components/connection-panel.js";
 import { renderHistoryTable, renderCollaborationTable }
   from "../components/history-table.js";
 import { applyDeletionPermissions as stripDeletionControls }
@@ -2101,10 +2104,6 @@ const renderRepositoryPane = async (state, accountName, repositoryName) => {
                 <div class="query-catalog">
                   <h2 style="display: flex; align-items: center;">Views
                     <span style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
-                      <button type="button" class="view-explore-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-testid="view-explore-btn" title="Open an exploration pane: prompt an LLM, which surveys this repository over MCP" style="
-                        font-size: 13px; padding: 2px 8px; cursor: pointer;
-                        display: inline-flex; align-items: center; gap: 4px;
-                      "><img src="${BASE_PATH}/images/explore.svg" alt="" width="14" height="14" />Explore</button>
                       <button type="button" class="view-new-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-testid="view-new-btn" style="
                         font-size: 13px; padding: 2px 8px; cursor: pointer;
                       ">New</button>
@@ -2161,6 +2160,19 @@ const renderRepositoryPane = async (state, accountName, repositoryName) => {
                       ` : ''}
                     </div>
                     <div class="repository-operation-buttons" style="display: flex; gap: 8px;">
+                      <!-- Explore stands with Import, Export and Clear because it
+                           is the same kind of thing: an operation on this
+                           repository as a whole, not an operation on the view
+                           list it used to sit above. -->
+                      <button type="button" class="view-explore-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-testid="view-explore-btn" style="
+                        background: blue;
+                        color: white;
+                        border: none;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 12px;
+                      " title="Open an exploration pane: prompt an LLM, which surveys this repository over MCP">Explore</button>
                       <button type="button" class="repo-import-btn" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-testid="repo-import-btn" style="
                         background: #6f42c1;
                         color: white;
@@ -3193,6 +3205,9 @@ const initializePaneEditing = (app) => {
   // editor column.  Delegated once at the document, because the repository pane
   // is rendered from more than one place and re-rendered on tab changes.
   installExplorationLauncher(app);
+  // And the exploration tab in the account's left margin, which opens the
+  // account-level pane: one model connection, a choice of connected stores.
+  installAccountExplorationLauncher(app);
   document.querySelectorAll(".account-pane .foaf-value[data-editable='true']:not([data-pane-handler-bound])").forEach((field) => {
     field.dataset.paneHandlerBound = "true";
     field.addEventListener("dblclick", () => {
@@ -4843,7 +4858,14 @@ const renderAccountSidebar = ({ account, accountName, containerId = "", config =
           <button type="button" class="manage-tab" data-tab="authentication" title="Authentication"><img src="./images/lock.svg" alt="Authentication" width="16" height="16" /></button>
           <button type="button" class="manage-tab" data-tab="prefixes" title="Prefixes"><img src="./images/puzzle.svg" alt="Prefixes" width="16" height="16" /></button>
           <button type="button" class="manage-tab" data-tab="collaboration" data-testid="account-tab-collaboration" title="Collaborations"><img src="./images/users.svg" alt="Collaborations" width="16" height="16" /></button>
+          <button type="button" class="manage-tab" data-tab="catalog" data-testid="account-tab-catalog" title="Presentations"><img src="./images/puzzle.svg" alt="Presentations" width="16" height="16" /></button>
+          <button type="button" class="manage-tab" data-tab="connection" data-testid="account-tab-connection" title="Connection"><img src="./images/settings.svg" alt="Connection" width="16" height="16" /></button>
           <button type="button" class="manage-tab" data-tab="history" title="History"><img src="./images/logs.svg" alt="History" width="16" height="16" /></button>
+          <!-- Set apart from the rest, because it does not select a panel in this
+               sidebar: it opens the account's exploration pane in the column beside
+               it (§34.4).  The triple is the mark: three nodes and the edges
+               between them, which is what is being explored. -->
+          <button type="button" class="manage-tab exploration-tab" data-account="${escapeHtml(accountName)}" data-testid="account-tab-exploration" title="Exploration — ask a model across your repositories"><img src="./images/explore.svg" alt="Exploration" width="16" height="16" /></button>
         </div>
         <div class="manage-tab-content">
           <div class="tab-panel active" data-panel="profile">
@@ -4920,6 +4942,16 @@ const renderAccountSidebar = ({ account, accountName, containerId = "", config =
           <div class="tab-panel" data-panel="collaboration">
             <div class="account-collaboration-content" data-account="${escapeHtml(accountName)}" data-testid="account-collaboration" style="font-size: 12px;">
               <p style="color: #666; font-style: italic;">Click to load collaborations...</p>
+            </div>
+          </div>
+          <div class="tab-panel" data-panel="catalog">
+            <div class="account-catalog-content" data-account="${escapeHtml(accountName)}" data-testid="account-catalog" style="font-size: 12px;">
+              <p style="color: #666; font-style: italic;">Click to load the presentation catalog...</p>
+            </div>
+          </div>
+          <div class="tab-panel" data-panel="connection">
+            <div class="account-connection-content" data-account="${escapeHtml(accountName)}" style="font-size: 12px;">
+              <p style="color: #666; font-style: italic;">Click to open the model connection...</p>
             </div>
           </div>
           <div class="tab-panel" data-panel="history">
@@ -5137,7 +5169,10 @@ const attachAccountSidebarHandlers = (app) => {
   });
 
   document.querySelectorAll(".account-pane").forEach((pane) => {
-    pane.querySelectorAll(".account-sidebar .manage-tab:not([data-handler-bound])").forEach((tab) => {
+    // `.exploration-tab' is excluded: it selects no panel in this sidebar, it
+    // opens a pane in the column beside it, and letting the panel switcher see
+    // it would blank the sidebar every time it was pressed.
+    pane.querySelectorAll(".account-sidebar .manage-tab:not(.exploration-tab):not([data-handler-bound])").forEach((tab) => {
       tab.dataset.handlerBound = "true";
       tab.addEventListener("click", async () => {
         const target = tab.getAttribute("data-tab");
@@ -5171,6 +5206,26 @@ const attachAccountSidebarHandlers = (app) => {
                 { accountName, basePath: BASE_PATH });
               box.dataset.loaded = "true";
             }
+          }
+        }
+        // The catalog is read every time the tab is opened, not once: a
+        // presentation mounted from the bar between two openings would
+        // otherwise still be shown as free (REQ-33.4.6).
+        if (target === "catalog") {
+          const box = pane.querySelector(".account-catalog-content");
+          const accountName = pane.dataset.account;
+          if (box && accountName && app?.state) {
+            await renderCatalogInto(box, { app, accountName });
+          }
+        }
+        if (target === "connection") {
+          const box = pane.querySelector(".account-connection-content");
+          const accountName = pane.dataset.account;
+          // Drawn once: the controls hold live references to the account's
+          // connection, so redrawing would discard a half-typed key.
+          if (box && accountName && !box.dataset.loaded) {
+            renderConnectionInto(box, { accountName });
+            box.dataset.loaded = "true";
           }
         }
       });

@@ -1,0 +1,112 @@
+/*
+ * jsui — the authorization domains.                        2026-11-02
+ *
+ * One rule for reading this: every request is a TEXT combined with a
+ * CREDENTIAL at a `+', and only the combination reaches a processor.
+ *
+ *   ORANGE  the model credential — the provider key, typed into the page and
+ *           held in memory.  It grants nothing in the dydra domain.
+ *   BLUE    the service credential — the dydra token.  What it reaches is
+ *           settled by the service, per resource and per agent.
+ *
+ * The shape of the chain is the argument.  The model is an intermediate
+ * request source and nothing more: it is reached only through the orange `+',
+ * and what it asks for is reached only through the blue one.  There is no
+ * edge from the provider to the service, so a model cannot address the store
+ * however it is persuaded to try — the browser re-credentials every request
+ * under the user's own token, and the service decides what that token may do.
+ *
+ * The single dashed edge returning to the orange `+' is the one place where
+ * repository content crosses into the model's domain.
+ *
+ *   dot -Tsvg authorization-domains.dot -o authorization-domains.svg
+ */
+digraph domains {
+  rankdir = TB;
+  compound = true;
+  newrank = true;
+  fontname = "Helvetica";
+  ranksep = 0.75;
+  nodesep = 0.4;
+  node [fontname = "Helvetica", fontsize = 11, shape = box, style = "rounded,filled",
+        fillcolor = white, color = "#555555", margin = "0.14,0.08"];
+  edge [fontname = "Helvetica", fontsize = 9, color = "#555555", arrowsize = 0.8];
+
+  /* ─────────────────────────── the browser ─────────────────────────── */
+  subgraph cluster_main {
+    label = "the main document\nthe only place both credentials are held";
+    labelloc = t; labeljust = l; fontsize = 13; style = "rounded";
+    color = "#555555"; bgcolor = "#fbfbf9";
+
+    prompt  [label = "prompt", shape = parallelogram, style = filled, fillcolor = "#f3f0e8"];
+    instr   [label = "instruction", shape = parallelogram, style = filled, fillcolor = "#f3f0e8"];
+
+    llmcred [label = "MODEL CREDENTIAL\nprovider key", shape = note,
+             fillcolor = "#f6ece8", color = "#8a4b2a", fontsize = 10];
+    svccred [label = "SERVICE CREDENTIAL\ndydra token", shape = note,
+             fillcolor = "#dce6f1", color = "#1f4e79", fontsize = 10];
+
+    jm [label = "+", shape = circle, width = 0.38, fixedsize = true, fontsize = 15,
+        style = filled, fillcolor = "#f6ece8", color = "#8a4b2a"];
+    js [label = "+", shape = circle, width = 0.38, fixedsize = true, fontsize = 15,
+        style = filled, fillcolor = "#dce6f1", color = "#1f4e79"];
+
+    result [label = "results", shape = parallelogram, style = filled, fillcolor = "#f3f0e8"];
+    iface  [label = "the interface", shape = folder, style = filled, fillcolor = "#eef3ee"];
+  }
+
+  /* ─────────────────────────── the provider ────────────────────────── */
+  subgraph cluster_provider {
+    label = "the model provider\nholds the conversation, holds no dydra authority";
+    labelloc = t; fontsize = 13; style = "rounded"; color = "#8a4b2a"; bgcolor = "#fbf7f2";
+    llm [label = "the model", shape = ellipse, style = filled, fillcolor = "#ffffff"];
+  }
+
+  /* ─────────────────────────── the service ─────────────────────────── */
+  subgraph cluster_service {
+    label = "the dydra service\nauthorization enforced by resource and agent";
+    labelloc = t; fontsize = 13; style = "rounded"; color = "#1f4e79"; bgcolor = "#f7f9fc";
+    mcp    [label = "MCP", shape = ellipse, style = filled, fillcolor = "#e8eef6", color = "#1f4e79"];
+    sparql [label = "SPARQL / RDF", shape = ellipse, style = filled, fillcolor = "#e8eef6", color = "#1f4e79"];
+  }
+
+  /* ─────────────────────────── the frame ───────────────────────────── */
+  subgraph cluster_frame {
+    label = "the page frame\nopaque origin · no credential · no network";
+    labelloc = t; fontsize = 13; style = "rounded"; color = "#8a4b2a"; bgcolor = "#fdf6f2";
+    render [label = "render", shape = ellipse, style = filled, fillcolor = "#ffffff"];
+    page   [label = "the page", shape = folder, style = filled, fillcolor = "#ffffff"];
+  }
+
+  /* ───────────────── a text, combined with an authority ────────────── */
+  prompt  -> jm  [color = "#8a4b2a"];
+  instr   -> jm  [color = "#8a4b2a"];
+  llmcred -> jm  [color = "#8a4b2a"];
+  jm -> llm      [color = "#8a4b2a", fontcolor = "#8a4b2a", label = "  text + key\n  JSON"];
+
+  llm -> js      [color = "#1f4e79", fontcolor = "#1f4e79",
+                  label = "  what the model asks for:\n  tool call · query · patch"];
+  iface -> js    [color = "#1f4e79", fontcolor = "#1f4e79", style = dashed, constraint = false,
+                  label = "  the interface's own runs:\n  refresh · read · save  "];
+  svccred -> js  [color = "#1f4e79"];
+
+  js -> mcp      [color = "#1f4e79", fontcolor = "#1f4e79", label = "  JSON-RPC + token"];
+  js -> sparql   [color = "#1f4e79", fontcolor = "#1f4e79", label = "  SPARQL + token"];
+  mcp -> sparql  [color = "#1f4e79"];
+
+  /* ───────────────────── what is yielded, and where ────────────────── */
+  mcp    -> result [color = "#1f4e79"];
+  sparql -> result [color = "#1f4e79"];
+
+  result -> jm     [color = "#8a4b2a", fontcolor = "#8a4b2a", style = dashed, constraint = false,
+                    taillabel = "digested — the only content\nthat crosses into the model's domain  ",
+                    labeldistance = 7.5, labelangle = 18, labelfontsize = 9,
+                    labelfontcolor = "#8a4b2a", labelfontname = "Helvetica"];
+
+  result -> render [label = "  data only,\n  no credential"];
+  render -> page;
+  page -> iface    [style = dashed, label = "  postMessage"];
+  result -> iface;
+
+  { rank = same; prompt; instr; llmcred; }
+}

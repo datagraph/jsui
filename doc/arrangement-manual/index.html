@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="date" content="2026-11-08">
+    <title>Arrangement - Dydra Studio</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Arrangement</h1>
+            <p>Changing the interface by asking for it</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="../user-manual/index.html">← Dydra Studio User Manual</a>
+        </nav>
+
+        <div class="content">
+
+            <h2>Contents</h2>
+            <ol>
+                <li><a href="#what">What arrangement is</a></li>
+                <li><a href="#before">Before you begin</a></li>
+                <li><a href="#grammar">The bar: five things a line can be</a></li>
+                <li><a href="#address">Addressing: what a sentence will change</a></li>
+                <li><a href="#asking">Asking for an arrangement</a></li>
+                <li><a href="#reply">What comes back</a></li>
+                <li><a href="#verbs">The four arrangement verbs</a></li>
+                <li><a href="#bands">The bands</a></li>
+                <li><a href="#operations">Vocabulary: the operations</a></li>
+                <li><a href="#components">Vocabulary: the components</a></li>
+                <li><a href="#refused">What is refused, and why</a></li>
+                <li><a href="#back">Getting back</a></li>
+                <li><a href="#try">Sentences to try</a></li>
+                <li><a href="#appendix-a">Appendix A — every operation</a></li>
+                <li><a href="#appendix-b">Appendix B — the messages</a></li>
+                <li><a href="#appendix-c">Appendix C — how the figures were made</a></li>
+            </ol>
+
+            <h2 id="what">1. What arrangement is</h2>
+
+            <p>The interface's own layout is a document, held in your account like any
+            other. <strong>Arrangement</strong> is changing that document by typing a
+            sentence into the location bar. A model turns the sentence into a patch; the
+            interface applies the patch, or refuses it, and saves the result for your
+            account.</p>
+
+            <p>There is a second way in, and it does not go through a model.
+            <strong>Four verbs</strong> — <code>lift</code>, <code>apply</code>,
+            <code>mount</code> and <code>unmount</code> — are read by the bar itself and
+            carried out exactly. They are how a component is kept under a name and put
+            somewhere else, and how a whole presentation is included in another. They are
+            <a href="#verbs">§7</a>.</p>
+
+            <p>Two things follow from the layout being a document, and they are what make
+            this safe enough to experiment with:</p>
+
+            <ul>
+                <li><strong>Nothing is overwritten.</strong> Every change is a new
+                revision. Putting an arrangement back is a write of the old one, not a
+                rewind.</li>
+                <li><strong>There is a way out that does not go through the
+                interface.</strong> <code>?workspace=default</code> on the URL renders the
+                arrangement this build shipped with, without reading yours.</li>
+            </ul>
+
+            <div class="note">
+                <strong>What arrangement is not.</strong> It does not query anything, and
+                it cannot. The interface's layout holds no panels, no parameters and no
+                grant, so an instruction against it has nothing to run. Asking for
+                <em>the open orders down the left-hand side</em> gets a refusal and not a
+                query — see <a href="#refused">§11</a>.
+            </div>
+
+            <h2 id="before">2. Before you begin</h2>
+
+            <div class="step"><span class="step-number">1.</span>
+            <strong>Sign in.</strong> An arrangement belongs to an account. Without one
+            the bar answers <em>sign in before rearranging the interface</em>.</div>
+
+            <div class="step"><span class="step-number">2.</span>
+            <strong>Connect a model.</strong> Open your account page and set a provider
+            key under <em>Connection</em>, beside Profile and Collaborations. There is one
+            connection per account and every surface uses it — the bar, the exploration
+            panes, the prompt tab, the dashboards — so it is set once. Without one you get
+            <em>no model is connected — set a provider key in the account's Connection
+            settings</em>.
+            <br><br>
+            The key is held in this browser for the life of the page, exactly as your host
+            token is. It is never written to a repository, and a reload asks again.
+            <br><br>
+            <em>Changed 8 November 2026.</em> The connection used to belong to a repository:
+            it was set in an exploration pane, held per repository, and the bar had no key
+            of its own but borrowed whichever pane had one. A credential is a property of
+            you and your provider, not of the thing you are looking at.
+            <br><br>
+            This step is for <em>sentences</em>. The four verbs of <a href="#verbs">§7</a>
+            need no model and no key, and work in a session that has neither.</div>
+
+            <div class="step"><span class="step-number">3.</span>
+            <strong>Nothing else.</strong> The repository that stores the arrangement,
+            <code>&lt;account&gt;/ui</code>, is created on the first save and not before.
+            A reader who never rearranges anything never acquires one.</div>
+
+            <div class="note">
+                The model is asked for a patch and is given <strong>no tools</strong> and
+                one turn. It cannot read your repositories while rearranging your
+                interface, because the interface it is rearranging has nothing to read.
+            </div>
+
+            <h2 id="grammar">3. The bar: five things a line can be</h2>
+
+            <p>The bar is at the foot of the window. It shows where you are; clicking it
+            turns it into an input.</p>
+
+            <img class="bar-figure" src="images/bar-at-rest.png"
+                 alt="The location bar showing a path">
+            <p class="image-caption">Figure 1: the bar at rest. It shows the path, not an
+            input.</p>
+
+            <img class="bar-figure" src="images/bar-typing.png"
+                 alt="The location bar with text typed into it">
+            <p class="image-caption">Figure 2: clicking the path opens the input, with the
+            caret already in it.</p>
+
+            <p>What you type is read without asking a model, by a grammar with five cases:</p>
+
+            <table>
+                <tr><th>You type</th><th>It means</th><th>Example</th></tr>
+                <tr><td>a path, a URL, <code>?</code> or <code>#</code></td>
+                    <td>navigate</td><td><code>/account/alice</code></td></tr>
+                <tr><td><code>goto</code> + a path</td>
+                    <td>navigate — the same thing, said out loud</td>
+                    <td><code>goto /account/alice</code></td></tr>
+                <tr><td><code>goto</code> + a name</td>
+                    <td>re-address: choose what instructions act on</td>
+                    <td><code>goto workspace</code></td></tr>
+                <tr><td>one of four <a href="#verbs">arrangement verbs</a></td>
+                    <td>arrange, exactly — carried out by code, no model asked</td>
+                    <td><code>mount inventory</code></td></tr>
+                <tr><td>anything else</td>
+                    <td>instruct the thing being addressed</td>
+                    <td><code>put the tabs down the left</code></td></tr>
+                <tr><td>anything else <strong>that names a repository</strong></td>
+                    <td>ask about the data in it — see <a href="#asking-data">§5.1</a></td>
+                    <td><code>how many open orders in sales</code></td></tr>
+            </table>
+
+            <div class="note">
+                A bare word is <em>not</em> a path. <code>workspace</code> on its own is
+                an instruction; <code>goto workspace</code> is how you address it. And a
+                sentence with a slash in it is still a sentence — <em>put the chart 2/3 of
+                the way across</em> is not a URL. A verb must match the whole line, so
+                <code>mount inventory</code> is a verb and <em>mount the chart beside the
+                table</em> is prose.
+            </div>
+
+            <div class="note">
+                The last two cases are the same case, read twice: a sentence that names a
+                repository is a question about data, and a sentence that does not is an
+                instruction about the interface. Nothing is guessed — <em>how many open
+                orders are there?</em>, with no repository named, is an instruction, and
+                will be answered as one. Naming the store is how you ask.
+            </div>
+
+            <h2 id="address">4. Addressing: what a sentence will change</h2>
+
+            <p>An unprefaced line acts on whatever the bar says it is addressing, and the
+            bar says so before you press Enter rather than after.</p>
+
+            <img class="bar-figure" src="images/bar-addressed.png" alt="The location bar showing the workspace as its address">
+            <p class="image-caption">Figure 3: after <code>goto workspace</code>. The chip
+            on the left is what the next sentence will change.</p>
+
+            <p>There are two kinds of thing to address:</p>
+
+            <table>
+                <tr><th>Kind</th><th>What it is</th><th>How it gets there</th></tr>
+                <tr><td><strong>workspace</strong></td>
+                    <td>the interface's own layout — the subject of this manual</td>
+                    <td>always available, always first in the list</td></tr>
+                <tr><td><strong>presentation</strong></td>
+                    <td>a generated page open in a pane</td>
+                    <td>registered when the pane has a document; clicking into a pane
+                        addresses it</td></tr>
+            </table>
+
+            <p>Names are matched exact first, then by prefix, then by substring. An
+            <em>ambiguous</em> name is refused rather than guessed, because re-addressing
+            to the wrong thing silently would make the <em>next</em> sentence act on
+            something you did not mean.</p>
+
+            <img class="bar-figure" src="images/bar-refusal.png" alt="A refusal: nothing is addressed by that name">
+            <p class="image-caption">Figure 4: a name that matches nothing. The refusal
+            lists what there is, and the previous address is kept.</p>
+
+            <h2 id="asking">5. Asking for an arrangement</h2>
+
+            <p>Address the workspace and type what you want in your own words:</p>
+
+            <pre><code>goto workspace
+put the tabs down the left-hand side</code></pre>
+
+            <p>The interface asks the model for a patch, applies it, checks it, and saves
+            it. Below is the chrome before and after exactly that instruction. Both
+            figures are rendered by the interface's own layout code; the second is the
+            result of the operation the model returned, applied by the real patch
+            engine.</p>
+
+            <img src="images/chrome-default.png" alt="The default arrangement: bands stacked in one column">
+            <p class="image-caption">Figure 5: the arrangement this build ships with — one
+            column, bands in reading order, the bar at the foot.</p>
+
+            <img src="images/chrome-rearranged.png" alt="The rearranged chrome: tabs in a left column beside the content">
+            <p class="image-caption">Figure 6: after the instruction. One operation moved
+            the tabs into a 220px left-hand column; the content, footer and bar follow the
+            new template.</p>
+
+            <p>The whole change is one operation on one element:</p>
+
+            <pre><code>[{"op": "set-layout", "element": "w-chrome",
+  "value": {"columns": "220px 1fr",
+            "rows": "auto auto 1fr auto",
+            "areas": ["flashes flashes",
+                      "header  header",
+                      "tabs    content",
+                      "footer  location"]}}]</code></pre>
+
+            <p>That is the shape of nearly every arrangement: the bands already know which
+            <em>area</em> they occupy, so rewriting the template moves all of them at
+            once. A patch that moves each band separately is a patch that has misunderstood
+            the problem.</p>
+
+            <div class="note">
+                Figure 6 also shows what the interface will <em>not</em> protect you from:
+                the footer is now in a 220px column and its text is clipped. The
+                arrangement does what you asked. <a href="#back">§12</a> is how you get
+                back.
+            </div>
+
+            <h3 id="asking-data">5.1 Asking about data, in the same bar</h3>
+
+            <p>The bar takes a question about a repository as readily as an instruction
+            about the interface. Name the repository and ask:</p>
+
+            <pre><code>how many open orders are there in sales
+compare revenue across sales, orders and bob/parts</code></pre>
+
+            <p>A repository can be named three ways, and all three are things already on
+            your screen: a bare name after one of a few words — <em>in</em>, <em>from</em>,
+            <em>across</em>, <em>against</em>, <em>on</em>, <em>within</em>, <em>about</em>,
+            <em>of</em> — an <code>account/repository</code> pair, or a URL of either form
+            the interface links to. You may name as many as the question needs; they do
+            not have to belong to the same account, and a repository you reach through
+            collaboration counts.</p>
+
+            <p>Nothing runs when you press Enter. The bar answers with the stores the
+            question would read and waits for one press:</p>
+
+            <pre><code>reads alice/sales, alice/orders and bob/parts — 3 repositories
+          — under your credentials, nothing has run yet   [Ask across 3]</code></pre>
+
+            <p>Press it and the model is asked, with one tool per repository: it chooses
+            which store each call goes to, each call is sent to that repository's own
+            endpoint under your own credentials, and each repository keeps its own
+            exploration. The answer appears under the bar, folded away behind
+            <em>show</em>, with the model that produced it, the stores it read and the
+            date beneath it.</p>
+
+            <p>Before you press, <em>show</em> tells you what the press authorises — not
+            only which repositories, but how long it may go on for and how much it may
+            read:</p>
+
+            <pre><code>This would run an analysis across 2 repositories:
+  · james/finto
+  · james/fibo
+
+Up to 26 rounds of tool calls, 78 calls in all, read-only, for this run.
+Large results are read as their shape first; the answer is recorded in
+`james/mcp` and can be stopped while it runs.</code></pre>
+
+            <h3 id="analysis">5.2 A question that takes minutes</h3>
+
+            <p>A question about one repository answers in seconds. A comparison across
+            two is a different animal: each store has to be inventoried before anything
+            can be compared, so the turn is tens of calls and may run for minutes. Three
+            things follow, and you will see all three.</p>
+
+            <p><strong>It says what it is doing.</strong> The reply line keeps changing
+            while the run goes on — which store it is asking, which operation, and how
+            far into its rounds it is:</p>
+
+            <pre><code>james/finto · catalog… (round 2 of 26)
+james/fibo · 3 calls answered (round 4 of 26)
+james/finto · 65016 rows — reading its shape (round 5 of 26)
+writing it up…</code></pre>
+
+            <p>That third line is worth knowing about. A result too large to read whole
+            reaches the model as its <em>shape</em> — how many rows, of what form — and it
+            asks for the whole of the one or two whose values its argument actually turns
+            on. Without that, one listing from a large vocabulary would be the entire
+            conversation.</p>
+
+            <p><strong>You can stop it.</strong> A <em>stop</em> sits beside the line.
+            Pressing it does not cancel the call that is already out: that one is allowed
+            to come back and be recorded, because the store has already done the work.
+            Nothing further is sent. A stopped run says it was stopped — it does not
+            present what it had as an answer — and hands you the prose it had reached.</p>
+
+            <p><strong>It is kept.</strong> The run is written into your own
+            <code>&lt;account&gt;/mcp</code> repository as RDF, one record per store, each
+            holding that store's own calls together with the question and the answer. The
+            panel under the bar is transient; that record is not. There is a
+            <em>copy</em> beside <em>show</em> for the version you want in your own
+            document.</p>
+
+            <div class="note">
+                <strong>What a comparison is asked for.</strong> A question about one
+                repository ends in a query you can run in the view editor. A question
+                across several cannot: no query reaches two repositories at once. So the
+                model is asked for a report instead — what each store holds, what the
+                differences are, and three lists at the end that separate what it
+                <em>observed</em> from what it <em>interpreted</em> from what it did
+                <em>not establish</em>. The last of those is the point of the exercise:
+                an analysis that cannot say what it failed to settle has not separated
+                its evidence from its reading of it.
+            </div>
+
+            <p>A worked example, captured against two live repositories, is in
+            <a href="../analysis-demonstration/index.html">An analysis across two
+            repositories</a>.</p>
+
+            <div class="note">
+                A name you may not read is refused before anything runs, by name:
+                <em>`carol/private' is not a repository this account may read — it may
+                name alice/sales, alice/orders, bob/parts</em>. The permitted set is your
+                own repositories together with the ones you collaborate on, both read
+                when the session needs them.
+            </div>
+
+            <h2 id="reply">6. What comes back</h2>
+
+            <p>The bar answers in place, under the path. A change that was applied names
+            the operations and offers an undo beside them.</p>
+
+            <img class="bar-figure" src="images/bar-reply-undo.png" alt="The bar showing an applied change with an undo button">
+            <p class="image-caption">Figure 7: a change applied to a presentation, with the
+            undo the bar offers beside it.</p>
+
+            <div class="note">
+                <strong>Fixed 8 November 2026: a successful arrangement of the workspace
+                used to say nothing.</strong> Applying a change to the workspace redraws
+                the chrome, and the redraw replaces the bar — including the element the
+                reply was about to be written into. Every successful mount, apply, unmount
+                and sentence against the workspace therefore answered into a line nobody
+                could see, while refusals, which redraw nothing, reported normally:
+                successes silent and refusals visible, which is the wrong way round. The
+                bar now finds its reply line when it writes rather than when it was built.
+                Figure 8 records what it did before.
+            </div>
+
+            <img class="bar-figure" src="images/bar-silent.png" alt="The bar after a successful arrangement: the address is shown but no reply">
+            <p class="image-caption">Figure 8: the defect as it was — the bar immediately
+            after the instruction in §5 succeeded, address kept, reply and undo lost. Kept
+            as the record of a fixed fault; today the reply is there.</p>
+
+            <h2 id="verbs">7. The four arrangement verbs</h2>
+
+            <p>Everything so far goes through a model. Four lines do not. They are read by
+            the bar itself, matched exactly, and carried out by code — no turn, no key, no
+            budget, nothing to interpret:</p>
+
+            <table>
+                <tr><th>Type this</th><th>It means</th></tr>
+                <tr><td><code>lift <em>presentation</em>#<em>element</em> as <em>name</em></code></td>
+                    <td>keep one component of a page, with the requests behind it, under a
+                        name</td></tr>
+                <tr><td><code>apply <em>name</em></code><br>
+                        <code>apply <em>name</em> into <em>element</em></code></td>
+                    <td>put a kept component into the thing being addressed</td></tr>
+                <tr><td><code>mount <em>presentation</em></code><br>
+                        <code>mount <em>presentation</em> into <em>element</em></code></td>
+                    <td>include a whole presentation, as itself</td></tr>
+                <tr><td><code>unmount <em>element</em></code></td>
+                    <td>take an included presentation out again</td></tr>
+            </table>
+
+            <p>They act on whatever the bar is addressing (§4), exactly as a sentence does.
+            Each matches the <strong>whole line</strong> and each name is checked against a
+            shape: a presentation or arrangement name is a letter followed by up to 63
+            letters, digits, <code>-</code> or <code>_</code>; an element anchor is a
+            lower-case letter followed by one to 63 lower-case letters, digits or
+            <code>-</code>. In a <code>lift</code> the element after the <code>#</code> may also
+            be written the long way, as <code>//*[@data-ui='e-7k2m']</code>;
+            <code>apply</code> and <code>unmount</code> take the short form only.</p>
+
+            <div class="note">
+                <strong>A verb is a sentence taken away from the model, so the match is
+                strict.</strong> <code>mount inventory</code> is a verb;
+                <em>mount the chart beside the table</em> is prose and goes to the model,
+                because the text after the name is not consumed and the line therefore
+                fails to match. If you meant the verb and got a turn, the name had a
+                character the shape does not allow — or there was something after it.
+            </div>
+
+            <h3>Which verbs a target takes</h3>
+
+            <p>Not every target offers both channels, and the two absences read
+            differently:</p>
+
+            <table>
+                <tr><th>Addressed</th><th>Takes</th><th>Does not</th></tr>
+                <tr><td>the <strong>workspace</strong> (the chrome)</td>
+                    <td><code>mount</code>, <code>unmount</code>, <code>apply</code></td>
+                    <td><code>lift</code> is accepted and then refused by whatever it
+                        names: the six bands are <code>host</code> elements and a host is
+                        opaque — <code>`w-tabs' is a `host' element: it is opaque, and an
+                        arrangement cannot be lifted from inside one</code></td></tr>
+                <tr><td>a <strong>presentation</strong> (a page in a pane)</td>
+                    <td><code>lift</code>, <code>apply</code></td>
+                    <td><code>mount</code> and <code>unmount</code>, and the refusal says
+                        where to go: <code>a presentation is mounted in the workspace, not
+                        in a page: the band is drawn and opened by the chrome, and this
+                        page is in a frame with nothing to register a renderer in —
+                        `goto workspace' and mount there</code></td></tr>
+            </table>
+
+            <p>A target that offers neither says so in its own words:
+            <em>… cannot be rearranged from here</em>. A pane with nothing open in it
+            answers <em>there is no page in this pane yet</em>.</p>
+
+            <h3>lift — keeping a component</h3>
+
+            <p>A lift names one element of one page and writes it into
+            <code>&lt;account&gt;/ui</code> under a name you choose. What is kept is not a
+            picture: it is the element's subtree with every minted name replaced by a
+            placeholder and every order key dropped, <em>plus</em> every request,
+            transform, assertion and parameter that subtree referred to, <em>plus</em> the
+            account and repository each request will be repeated against.</p>
+
+            <p>So <code>lift parts#e-7k2m as stock-card</code> answers
+            <em>lifted as `stock-card' — 2 request(s) it will repeat, against
+            alice/parts</em>. The presentation half of the name is not decoration: an
+            element name is unique within a presentation and not within a rendered page,
+            which composes several. Naming the wrong page is refused with the right form
+            spelled out.</p>
+
+            <p>Two refusals are worth knowing before you meet them. <strong>A whole
+            presentation cannot be lifted</strong> — <code>`inventory' names a whole
+            presentation; a whole presentation is mounted, not lifted</code> — and an
+            <strong>opaque element cannot be lifted from</strong>: <code>html</code> and
+            <code>host</code> elements have no inside the arrangement machinery can read.
+            Undoing a lift is forgetting it; nothing on the page changed, because a lift
+            is a read.</p>
+
+            <h3>apply — putting it somewhere</h3>
+
+            <p>An apply re-mints every element name, merges the kept definitions into the
+            destination, and writes it as one patch: one revision, one undo. Two details
+            decide what you actually get:</p>
+
+            <ul>
+                <li><strong>A parameter the destination already defines the same way is
+                shared, not copied.</strong> Two components bound to one parameter are two
+                views of one value — which is what moving a slider is expected to do. A
+                parameter that collides but differs is a refusal, not a merge —
+                <code>`…' is a <em>kind</em> here and a <em>kind</em> in the arrangement;
+                applying it would bind the request to a different parameter</code>.</li>
+                <li><strong>A request name that is already taken is minted afresh, not
+                reused.</strong> Reusing it would quietly point the applied component at
+                this page's data, and an arrangement is a recipe — a recipe that changes
+                ingredients is a different dish.</li>
+            </ul>
+
+            <p><strong>An applied component arrives with definitions and no content.</strong>
+            It repeats its requests, against the sources the lift recorded, under
+            <em>your</em> credentials. That is why applying to a page does not apply
+            anything at first: the pane shows a disclosure — every request, the
+            <code>account/repository</code> it goes to, the query text, what it is bound
+            to, and the sentence <em>These run under YOUR credentials, against the
+            addresses above. The author chose where; you supply the token.</em> Nothing
+            runs until you press <em>Apply and run N requests</em>. The bar's reply says
+            where it went: <em>`stock-card' — 2 requests to repeat, waiting for you in
+            the pane</em>.</p>
+
+            <div class="warning">
+                <strong>Applying to the workspace shows no disclosure.</strong> The pane
+                asks first; the chrome does not — it writes and redraws. The chrome is
+                presentational and holds no data of its own, so there is normally nothing
+                to disclose, but an arrangement carrying requests is better applied to a
+                page, where you can see what it will ask for before it asks.
+            </div>
+
+            <h3>mount — including a whole presentation</h3>
+
+            <p>A mount is the other kind of inclusion, and it is the one that keeps
+            identity. No lift, no template, no re-minting: the mounted presentation keeps
+            its own graph and its own element names, and <strong>an edit through the mount
+            is a new revision of the source</strong>. That is the difference from apply in
+            one sentence — an applied component's edits belong to the page that applied it;
+            a mounted presentation's edits belong to the presentation.</p>
+
+            <p>Three rules follow from that, and each is a message you will see:</p>
+
+            <ul>
+                <li><strong>One place at a time.</strong> Two mounts of one presentation
+                would put identical element names into one page, which is a certain
+                collision rather than a risk. The second is refused and tells you where the
+                first is.</li>
+                <li><strong>A workspace is never mounted</strong> — <code>a workspace
+                arranges the interface's own bands and there is one of it</code>. A page
+                may be mounted in the chrome. The rule also permits a page inside
+                another page — the shape a component library would take — but this
+                interface does not offer it: a pane renders its page in a sandboxed frame
+                with nothing to register a renderer in, so it refuses the verb and says
+                where to go instead.</li>
+                <li><strong>One element is not mounted</strong> — <code>names one element;
+                a mount takes a whole presentation, and one element is lifted and applied
+                instead</code>.</li>
+            </ul>
+
+            <img class="bar-figure" src="images/bar-mount-refused.png"
+                 alt="The bar refusing a second mount of the same presentation">
+            <p class="image-caption">Figure 9: the second <code>mount</code> of one
+            presentation. A refusal is returned before the chrome is redrawn, which is why
+            this reply survives when a successful one does not (§6).</p>
+
+            <p><strong>A mounted presentation is drawn, not run.</strong> It arrives as an
+            inert band carrying one button, <em>Open ‘<em>name</em>’</em>, and nothing
+            draws it until you press that button. The press is the whole design: a mount
+            opens only by a person pressing it, so a page that mounts a page that mounts a
+            page is as deep as you have pressed and not one band deeper. Its elements are
+            drawn by this build's toolbox; its panels are <em>not</em> executed, so
+            anything bound to data draws empty. Filling it would mean spending your grant
+            on a page you have only just opened. <code>apply</code> is the verb that brings
+            a request with it, and it says so at a gate first.</p>
+
+            <h3>unmount — and how a mount takes up a change</h3>
+
+            <p><code>unmount <em>element</em></code> takes the band out and releases the
+            registry entry. It has its own verb for one reason: <strong>there is no
+            refresh.</strong> A mounted presentation that has since been revised reaches
+            its container only by being unmounted and mounted again. Nothing re-resolves
+            quietly in the background, and that is deliberate — a page whose contents
+            changed because somebody else edited something is a page nobody can reason
+            about.</p>
+
+            <div class="note">
+                <strong>The silent reply applied to the verbs too, and is fixed.</strong>
+                <code>mount</code>, <code>unmount</code> and <code>apply</code> against the
+                <strong>workspace</strong> redraw the chrome before the bar writes its
+                reply, and until 8 November 2026 the reply — and the undo beside it — went
+                into the bar the redraw had thrown away. <code>lift</code> redraws nothing
+                and always reported. All four now report against either target.
+            </div>
+
+            <h3 id="names">Where the names come from</h3>
+
+            <p>Every verb takes a name you have to know. Open your account page and choose
+            <strong>Presentations</strong>, beside Repositories: it lists what
+            <code>&lt;account&gt;/ui</code> holds — every presentation with its scope and
+            where it is mounted, every arrangement with what it was lifted from and which
+            repositories applying it would read, and the component toolbox a generated page
+            may use. The buttons beside each row do not do anything of their own: they type
+            the verb into the bar and submit it, so a mount from the catalog and a mount
+            you typed are the same act, with the same reply and the same undo.</p>
+
+            <p>The listing says what <em>cannot</em> be done as well as what can. The
+            <code>workspace</code> presentation is offered no mount, because the chrome is
+            never mounted inside anything; a presentation already mounted somewhere is
+            offered <code>unmount</code> instead, because a presentation is mounted in one
+            place at a time; and a presentation belonging to another account is listed,
+            marked as theirs, and not offered a verb — the verbs take one token and resolve
+            it in your own interface repository.</p>
+
+            <div class="note">
+                Nothing in the catalog is the thing itself. A listing is read before any
+                admission has been made, so it carries no query, no script, no style and no
+                template — only names, scopes, dates, and the addresses an arrangement
+                would send a request to. Those you see before you apply it, in the
+                disclosure, not in the list.
+            </div>
+
+            <p>A name that is not there is answered with the names that are. <em>there is
+            no presentation named `inventorie' — it may name `inventory', `orders'</em>:
+            the refusal is issued by code that has just read the whole catalog, and since
+            8 November it says so.</p>
+
+            <h2 id="bands">8. The bands</h2>
+
+            <p>The interface is six bands. Each is a <code>host</code>: it names a view the
+            build already draws. Arrangement decides <em>where a band goes</em> and never
+            what is inside it.</p>
+
+            <table>
+                <tr><th>Host</th><th>What it draws</th><th>Immutable</th><th>Required</th></tr>
+                <tr><td><code>flashes</code></td><td>transient messages</td><td>no</td><td>no</td></tr>
+                <tr><td><code>header</code></td><td>the logo and the top links</td><td><strong>yes</strong></td><td>no</td></tr>
+                <tr><td><code>tabs</code></td><td>the pane tab strip</td><td>no</td><td>no</td></tr>
+                <tr><td><code>content</code></td><td>the page you are on</td><td><strong>yes</strong></td><td><strong>yes</strong></td></tr>
+                <tr><td><code>footer</code></td><td>the product links</td><td><strong>yes</strong></td><td>no</td></tr>
+                <tr><td><code>location</code></td><td>this bar</td><td><strong>yes</strong></td><td><strong>yes</strong></td></tr>
+            </table>
+
+            <p><strong>Immutable</strong> bands may not be removed, moved out of the
+            chrome, hidden, changed into something else, or left without an area in the
+            template. <strong>Required</strong> bands are the two the interface cannot be
+            repaired without: <code>content</code>, because otherwise there is nothing on
+            the screen, and <code>location</code>, because the bar is how you change the
+            arrangement back. An arrangement that somehow loses one of them is not used —
+            the build's default is drawn instead, with the reason on it.</p>
+
+            <h3>Three things about bands that surprise people</h3>
+
+            <div class="note">
+                <strong>You cannot delete a band.</strong> Removing one from the
+                arrangement does not remove it from the screen: it is emitted at the end,
+                without an area. This is deliberate — an arrangement saved before a band
+                existed would otherwise lose it silently. If you want a band out of the
+                way, place it somewhere small; you cannot make it go away.
+            </div>
+
+            <div class="note">
+                <strong>You cannot invent a band.</strong> You may add a host naming
+                anything you like, and the patch will be accepted — but nothing is
+                registered to draw it, so it renders as an empty box reading
+                <em>no view is registered as `sidebar'</em>. A visible fault rather than a
+                silent one, but still a fault.
+            </div>
+
+            <div class="note">
+                <strong>Only hosts are drawn.</strong> You may insert a heading or a line
+                of text into the chrome and the patch will be accepted and saved, but the
+                chrome renders bands and nothing else, so it will not appear. The
+                components in <a href="#components">§10</a> are part of the vocabulary the
+                model is given; in the workspace they have no effect.
+            </div>
+
+            <h2 id="operations">9. Vocabulary: the operations</h2>
+
+            <p>These are the six operations that address a part of a view. They are what an
+            arrangement is made of. You never type them — the model writes them — but
+            knowing them is how you phrase a request it can satisfy in one operation
+            instead of six.</p>
+
+            <table>
+                <tr><th>Operation</th><th>What it changes</th><th>Use in the chrome</th></tr>
+                <tr><td><code>set-layout</code></td>
+                    <td>an element's grid: <code>columns</code>, <code>rows</code>,
+                        <code>areas</code>, <code>gap</code></td>
+                    <td><strong>the main one.</strong> Rearranging the whole interface is
+                        one <code>set-layout</code> on <code>w-chrome</code></td></tr>
+                <tr><td><code>set-placement</code></td>
+                    <td>which area, column or row one element occupies</td>
+                    <td>moving one band without disturbing the others</td></tr>
+                <tr><td><code>set-attribute</code></td>
+                    <td>one attribute, or one of the element's own fields</td>
+                    <td><code>style</code> on a band takes effect; see the note below</td></tr>
+                <tr><td><code>insert-element</code></td>
+                    <td>adds a child under a parent</td>
+                    <td>accepted, but only a <code>host</code> is ever drawn</td></tr>
+                <tr><td><code>remove-element</code></td>
+                    <td>deletes an element</td>
+                    <td>accepted for a mutable band, but the band is still drawn,
+                        unplaced</td></tr>
+                <tr><td><code>move-element</code></td>
+                    <td>moves an element to another parent</td>
+                    <td>refused in practice — a host mounts a view and so may not take
+                        children, and an immutable band may not leave
+                        <code>w-chrome</code></td></tr>
+            </table>
+
+            <p>The fields <code>set-attribute</code> can set, besides a component's own
+            attributes, are <code>text</code>, <code>style</code>, <code>kind</code>,
+            <code>html</code>, <code>host</code>, <code>behavior</code>,
+            <code>default</code> — and four that are refused in the workspace:
+            <code>bound</code>, <code>derived</code>, <code>asserted</code>,
+            <code>binds</code>. Those four are how an element shows data, and the chrome
+            has none to show.</p>
+
+            <h2 id="components">10. Vocabulary: the components</h2>
+
+            <p>The model is shown a catalogue of components it may put in a page. For the
+            workspace the catalogue is <strong>capped at tier 1</strong> — layout and text,
+            nothing with a data contract — because a component bound to a panel in a
+            document that declares no panels is a refusal waiting to happen.</p>
+
+            <table>
+                <tr><th>Component</th><th>Element</th><th>What it is</th><th>Properties</th></tr>
+                <tr><td><code>grid</code></td><td><code>&lt;dydra-grid&gt;</code></td>
+                    <td>responsive columns for a page's own regions</td>
+                    <td><code>columns</code> (default <code>auto</code>), <code>gap</code> (12)</td></tr>
+                <tr><td><code>stack</code></td><td><code>&lt;dydra-stack&gt;</code></td>
+                    <td>a row or a column with a gap</td>
+                    <td><code>direction</code> (row|column), <code>gap</code> (8),
+                        <code>align</code> (start|center|end|stretch)</td></tr>
+                <tr><td><code>split-pane</code></td><td><code>&lt;dydra-split-pane&gt;</code></td>
+                    <td>two regions and a divider the reader can drag</td>
+                    <td><code>direction</code>, <code>ratio</code> (0.5)</td></tr>
+                <tr><td><code>panel</code></td><td><code>&lt;dydra-panel&gt;</code></td>
+                    <td>a bordered region with a heading</td>
+                    <td><code>label</code>, <code>caption</code></td></tr>
+                <tr><td><code>card</code></td><td><code>&lt;dydra-card&gt;</code></td>
+                    <td>a raised box that groups a region</td>
+                    <td>— (a <code>title</code> slot)</td></tr>
+                <tr><td><code>tabs</code></td><td><code>&lt;dydra-tabs&gt;</code></td>
+                    <td>local tabs inside one view</td>
+                    <td>— (children carry <code>label</code>)</td></tr>
+                <tr><td><code>text</code></td><td><code>&lt;dydra-text&gt;</code></td>
+                    <td>a paragraph of the page's own prose</td>
+                    <td><code>emphasis</code> (normal|muted|warn), <code>size</code> (small|normal|large)</td></tr>
+                <tr><td><code>heading</code></td><td><code>&lt;dydra-heading&gt;</code></td>
+                    <td>a heading whose level is a property</td>
+                    <td><code>level</code> (2)</td></tr>
+                <tr><td><code>metric</code></td><td><code>&lt;dydra-metric&gt;</code></td>
+                    <td>one figure shown large, with a label</td>
+                    <td><code>label</code>, <code>value</code>, <code>unit</code>,
+                        <code>digits</code>, <code>trend</code></td></tr>
+                <tr><td><code>badge</code></td><td><code>&lt;dydra-badge&gt;</code></td>
+                    <td>a small coloured label</td>
+                    <td><code>tone</code> (neutral|good|warn|bad)</td></tr>
+                <tr><td><code>key-value</code></td><td><code>&lt;dydra-key-value&gt;</code></td>
+                    <td>a list of properties</td>
+                    <td><code>pairs</code> — a property, never an attribute</td></tr>
+            </table>
+
+            <div class="note">
+                <strong>The catalogue is chosen by your words.</strong> It always carries
+                <code>grid</code>, <code>panel</code>, <code>card</code> and
+                <code>metric</code>; the rest are added when the request mentions them.
+                <code>tabs</code>, <code>badge</code>, <code>key-value</code> and
+                <code>metric</code> have trigger words — <em>tab</em>, <em>side by
+                side</em>, <em>badge</em>, <em>status</em>, <em>properties</em>,
+                <em>total</em>, <em>count</em>. <code>stack</code>,
+                <code>split-pane</code>, <code>text</code> and <code>heading</code> have
+                none, so the model is working from memory rather than from a manifest when
+                you ask for them. If one comes out wrong, name the component itself in
+                your sentence.
+            </div>
+
+            <p>The remaining components — <code>table</code>, <code>bar-chart</code>,
+            <code>line-chart</code>, <code>term</code>, <code>graph</code>,
+            <code>select</code>, <code>radio-group</code>, <code>checkbox</code>,
+            <code>button</code>, <code>text-input</code>, <code>text-area</code>,
+            <code>number-input</code>, <code>slider</code>, <code>date-input</code> — are
+            tier 2. They exist for generated pages, which have data and parameters. They
+            are not offered for the workspace and an element that binds one is refused.</p>
+
+            <h2 id="refused">11. What is refused, and why</h2>
+
+            <p>Every patch is sorted into one of four classes by what it changes. For a
+            generated page, the stronger classes raise a gate and ask you. For the
+            workspace there is no gate to raise, so anything but the weakest class is
+            <strong>refused outright</strong>: a gate here would be asking you to
+            authorise a query against a repository the interface never named.</p>
+
+            <table>
+                <tr><th>Class</th><th>What puts a change in it</th><th>In the workspace</th></tr>
+                <tr><td>presentational</td>
+                    <td>layout, placement, style, text, titles, views</td>
+                    <td><strong>applied</strong>, no gate</td></tr>
+                <tr><td>computational</td>
+                    <td>transforms, assertions, an element gaining
+                        <code>derived</code>/<code>asserted</code></td>
+                    <td>refused</td></tr>
+                <tr><td>data</td>
+                    <td>panels, parameters, an element gaining
+                        <code>bound</code>/<code>binds</code>, an unknown operation</td>
+                    <td>refused</td></tr>
+                <tr><td>authority</td>
+                    <td><code>set-grant</code>, <code>set-repository</code>,
+                        <code>set-budget</code>, <code>set-writable</code></td>
+                    <td>refused</td></tr>
+            </table>
+
+            <p>These are the refusals you will actually meet, each verified against the
+            running code:</p>
+
+            <table>
+                <tr><th>What you asked for</th><th>What the bar says</th></tr>
+                <tr><td>remove the footer</td>
+                    <td><code>refused whole: `w-footer' may not be removed</code></td></tr>
+                <tr><td>a template that leaves out <code>content</code></td>
+                    <td><code>refused whole: `w-content' sits in area `content', which `w-chrome' no longer declares — an element can be hidden by rewriting its container's template</code></td></tr>
+                <tr><td>hide the location bar</td>
+                    <td><code>refused whole: `w-location' may not be hidden</code></td></tr>
+                <tr><td>show the open orders in the header</td>
+                    <td><code>refused whole: the page binds `orders', which is not a panel</code></td></tr>
+                <tr><td>add a panel / a parameter / a transform</td>
+                    <td><code>refused: the interface itself holds no data, and this would …</code></td></tr>
+                <tr><td>a wider grant</td>
+                    <td><code>refused whole: `set-grant' asks for authority, which a patch cannot grant; it is a proposal for Gate 0, not an operation</code></td></tr>
+                <tr><td>put the tabs inside the flashes band</td>
+                    <td><code>refused whole: view `main': element `w-flashes' mounts a view, so it cannot also have children; the proposal carries no html</code></td></tr>
+                <tr><td>move the footer out of the chrome</td>
+                    <td><code>refused whole: `w-footer' may not be moved out of w-chrome</code></td></tr>
+            </table>
+
+            <p>Note the last line of defence in the second row. Rewriting the area template
+            so that a required band has nowhere to go is a deletion wearing the costume of
+            a layout change, and it is refused as a deletion.</p>
+
+            <h2 id="back">12. Getting back</h2>
+
+            <p>In order of how much you want to undo:</p>
+
+            <div class="step"><span class="step-number">1.</span>
+            <strong>The undo beside the reply.</strong> Works for a presentation. Does not
+            currently appear for the workspace — see the warning in
+            <a href="#reply">§6</a>.</div>
+
+            <div class="step"><span class="step-number">2.</span>
+            <strong>Ask for the opposite.</strong> <em>put the tabs back across the
+            top</em> is an ordinary instruction and costs one more revision.</div>
+
+            <div class="step"><span class="step-number">3.</span>
+            <strong><code>?workspace=default</code>.</strong> Add it to the URL. The
+            interface renders the arrangement this build shipped with, without reading
+            yours. This is a query parameter and not a setting, deliberately: a setting
+            would live in the thing that may be broken, and a URL can be typed into a
+            browser that is showing nothing useful.</div>
+
+            <div class="warning">
+                <code>?workspace=default</code> <strong>shows</strong> you the default; it
+                does not <strong>save</strong> it. Your arrangement is still what loads
+                next time. To keep the default, rearrange from there and let the next
+                instruction save it.
+            </div>
+
+            <h2 id="try">13. Sentences to try</h2>
+
+            <table>
+                <tr><th>Type this</th><th>Expect</th></tr>
+                <tr><td><code>goto workspace</code></td>
+                    <td>the chip reads <em>workspace (the arrangement)</em></td></tr>
+                <tr><td><code>put the tabs down the left-hand side</code></td>
+                    <td>one <code>set-layout</code>; Figure 6</td></tr>
+                <tr><td><code>move the location bar to the top of the window</code></td>
+                    <td>applied — the bar is in flow, not fixed, so this really moves
+                        it</td></tr>
+                <tr><td><code>make the content area wider and the tabs narrower</code></td>
+                    <td>one <code>set-layout</code> changing <code>columns</code></td></tr>
+                <tr><td><code>get rid of the footer</code></td>
+                    <td>refused: <code>`w-footer' may not be removed</code></td></tr>
+                <tr><td><code>hide the tabs</code></td>
+                    <td>accepted, and the tabs are still drawn — unplaced, at the end
+                        (<a href="#bands">§8</a>)</td></tr>
+                <tr><td><code>show me the open orders beside the content</code></td>
+                    <td>refused: the interface holds no data</td></tr>
+                <tr><td><code>goto /account/alice</code></td>
+                    <td>navigation, not an instruction — the address is kept</td></tr>
+                <tr><td><code>mount inventory</code></td>
+                    <td>a band appears with one button, <em>Open ‘inventory’</em>; nothing
+                        is drawn until it is pressed (<a href="#verbs">§7</a>)</td></tr>
+                <tr><td><code>mount inventory</code> again</td>
+                    <td>refused: <code>already loaded in `workspace'</code> — Figure 9</td></tr>
+                <tr><td><code>mount the chart beside the table</code></td>
+                    <td><em>not</em> a verb: it goes to the model as prose</td></tr>
+                <tr><td><code>unmount e-7k2m</code></td>
+                    <td>the band goes; there is no refresh, so this is also how a revised
+                        source is taken up</td></tr>
+                <tr><td><code>lift workspace#w-tabs as strip</code></td>
+                    <td>refused: a band is a <code>host</code> and a host is opaque</td></tr>
+            </table>
+
+            <h2 id="appendix-a">Appendix A — every operation</h2>
+
+            <p>The patch protocol has twenty-three operations. Six address elements and are
+            what arrangement uses; the rest address named parts of a document and are
+            listed here so that a refusal naming one is legible.</p>
+
+            <p>The four verbs of <a href="#verbs">§7</a> are not in this table and are not
+            patch operations. They are read by the bar, not written by a model, and what
+            they produce is a patch — an <code>apply</code> is one patch and one
+            revision, and a <code>mount</code> is a single <code>insert-element</code> of
+            a <code>host</code>.</p>
+
+            <table>
+                <tr><th>Operation</th><th>Class</th><th>Workspace</th></tr>
+                <tr><td><code>set-layout</code>, <code>set-placement</code>,
+                        <code>set-attribute</code>, <code>insert-element</code>,
+                        <code>remove-element</code>, <code>move-element</code></td>
+                    <td>presentational, unless it adds a binding</td>
+                    <td>accepted</td></tr>
+                <tr><td><code>set-title</code>, <code>set-styles</code>,
+                        <code>set-script</code>, <code>use</code></td>
+                    <td>presentational</td>
+                    <td>accepted and stored — but the chrome renders bands only, so
+                        <code>styles</code> and <code>script</code> on the workspace are
+                        never read</td></tr>
+                <tr><td><code>set-view</code>, <code>set-state</code></td>
+                    <td>presentational</td>
+                    <td>accepted; little use — the chrome has one view per routed
+                        page</td></tr>
+                <tr><td><code>set-slot</code>, <code>append-slot</code></td>
+                    <td>presentational</td>
+                    <td>refused: <code>`set-slot' addresses view `main' as markup, but its
+                        markup is generated from its elements; address the element
+                        instead</code></td></tr>
+                <tr><td><code>remove-view</code></td>
+                    <td>presentational</td>
+                    <td>refused when it would leave the page with no views, which in the
+                        chrome it always would</td></tr>
+                <tr><td><code>set-panel</code>, <code>remove-panel</code>,
+                        <code>set-parameter</code>, <code>remove-parameter</code></td>
+                    <td>data</td><td>refused</td></tr>
+                <tr><td><code>set-transform</code>, <code>remove-transform</code>,
+                        <code>set-assertion</code>, <code>remove-assertion</code></td>
+                    <td>computational</td><td>refused</td></tr>
+                <tr><td><code>set-grant</code>, <code>set-repository</code>,
+                        <code>set-budget</code>, <code>set-writable</code></td>
+                    <td>authority</td><td>refused — recognised only so that asking for
+                        authority reads as a proposal and not as a malformed
+                        answer</td></tr>
+            </table>
+
+            <h2 id="appendix-b">Appendix B — the messages</h2>
+
+            <table>
+                <tr><th>Message</th><th>What happened</th></tr>
+                <tr><td><code>sign in before rearranging the interface</code></td>
+                    <td>no account is signed in</td></tr>
+                <tr><td><code>no model is connected — set a provider key in the account's Connection settings; nothing was asked</code></td>
+                    <td>the account has no connection; every surface says this, in these words</td></tr>
+                <tr><td><code>there is no presentation named `…' — it may name `…', `…'</code></td>
+                    <td>the name was not in the catalog, which the refusal then lists</td></tr>
+                <tr><td><code>there is no arrangement named `…' — it may name `…'</code></td>
+                    <td>the same, for <code>apply</code></td></tr>
+                <tr><td><code>`…': a workspace presentation is the chrome itself; it is never mounted</code></td>
+                    <td>a mount of something whose scope forbids it</td></tr>
+                <tr><td><code>`…' is not a repository this account may read — it may name …</code></td>
+                    <td>a prompt named a repository outside your own and your collaborations</td></tr>
+                <tr><td><code>reads … — under your credentials, nothing has run yet</code></td>
+                    <td>a question about data, disclosed and waiting for the press</td></tr>
+                <tr><td><code>the workspace names no repository, so there is nothing to read — name one in the line, as `in alice/sales'</code></td>
+                    <td>a question with nothing to ask it of</td></tr>
+                <tr><td><code>addressing … — type a change, or `goto` somewhere</code></td>
+                    <td>the address was taken</td></tr>
+                <tr><td><code>nothing is addressed — `goto …' first, or click into it</code></td>
+                    <td>a sentence with no target</td></tr>
+                <tr><td><code>there is nothing addressed as `…' — try …</code></td>
+                    <td>the name matched nothing; the candidates are listed</td></tr>
+                <tr><td><code>`…' names more than one thing: …</code></td>
+                    <td>ambiguous, and refused rather than guessed</td></tr>
+                <tr><td><code>asking — …</code></td>
+                    <td>the turn is running; the input is disabled until it answers</td></tr>
+                <tr><td><code>set-layout — saved</code></td>
+                    <td>applied and written. <em>Not currently shown for the workspace
+                        (<a href="#reply">§6</a>).</em></td></tr>
+                <tr><td><code>the answer carried no patch, so nothing has been changed</code></td>
+                    <td>the model replied in prose; ask again, more concretely</td></tr>
+                <tr><td><code>the answer ran out of room with the patch block still open — ask for a smaller change</code></td>
+                    <td>the answer hit its token ceiling mid-patch</td></tr>
+                <tr><td><code>refused whole: …</code></td>
+                    <td>the patch did not survive validation; nothing was applied</td></tr>
+                <tr><td><code>refused: the interface itself holds no data, and this would …</code></td>
+                    <td>the patch was valid but not presentational</td></tr>
+                <tr><td><code>changed, but not saved: …</code></td>
+                    <td>applied on screen, the write failed; it will not survive a
+                        reload</td></tr>
+                <tr><td><code>`…/ui' is not available: …</code></td>
+                    <td>the repository that holds arrangements could not be made or
+                        reached</td></tr>
+            </table>
+
+            <p>And the four verbs (<a href="#verbs">§7</a>):</p>
+
+            <table>
+                <tr><th>Message</th><th>What happened</th></tr>
+                <tr><td><code>this interface cannot arrange anything here</code></td>
+                    <td>the addressed target offers no arrangement channel</td></tr>
+                <tr><td><code>… cannot be rearranged from here</code></td>
+                    <td>the same, named: the target takes sentences but not verbs</td></tr>
+                <tr><td><code>lifted as `…' — N request(s) it will repeat, against
+                        <em>account</em>/<em>repository</em></code></td>
+                    <td>the component was kept, with the requests behind it</td></tr>
+                <tr><td><code>`…' names a whole presentation; a whole presentation is
+                        mounted, not lifted</code></td>
+                    <td>the name carried no <code>#element</code></td></tr>
+                <tr><td><code>`…' is a `host' element: it is opaque, and an arrangement
+                        cannot be lifted from inside one</code></td>
+                    <td>an <code>html</code> or <code>host</code> element has no inside to
+                        lift from</td></tr>
+                <tr><td><code>this page is `…'; `…' is something else — lift …</code></td>
+                    <td>the presentation half of the name is not the page you are on; the
+                        right form is spelled out</td></tr>
+                <tr><td><code>`…' — N requests to repeat, waiting for you in the pane</code></td>
+                    <td>the apply was read and disclosed; nothing has run yet</td></tr>
+                <tr><td><code>the arrangement names a … `…' that its source did not define,
+                        so the component cannot be recreated here</code></td>
+                    <td>the lift could not resolve something the element referred to</td></tr>
+                <tr><td><code>`…' is a <em>kind</em> here and a <em>kind</em> in the
+                        arrangement; applying it would bind the request to a different
+                        parameter</code></td>
+                    <td>a parameter name collides and the two are not the same
+                        parameter</td></tr>
+                <tr><td><code>no source is recorded for `…', so there is nothing to repeat
+                        the request against</code></td>
+                    <td>the lift recorded no repository for that request</td></tr>
+                <tr><td><code>this arrangement is written against template form N; this
+                        interface reads M</code></td>
+                    <td>the kept arrangement is from another build</td></tr>
+                <tr><td><code>`…' is mounted — press Open in the band to draw it, which is
+                        the only thing that can</code></td>
+                    <td>the mount was written. <em>Not currently shown for the workspace
+                        (<a href="#reply">§6</a>).</em></td></tr>
+                <tr><td><code>`…' is already loaded in `…'; a presentation is mounted in one
+                        place at a time, so this resolves to where it is</code></td>
+                    <td>the second mount of one presentation — Figure 9</td></tr>
+                <tr><td><code>a workspace cannot be mounted in a …: a workspace arranges the
+                        interface's own bands and there is one of it</code></td>
+                    <td>the named presentation is the chrome's own</td></tr>
+                <tr><td><code>`…' names one element; a mount takes a whole presentation, and
+                        one element is lifted and applied instead</code></td>
+                    <td>a <code>#element</code> was given to <code>mount</code></td></tr>
+                <tr><td><code>there is no mount `…' here</code></td>
+                    <td><code>unmount</code> named an element that is not a mount</td></tr>
+                <tr><td><code>`…' is mounted here, but the registry says it is also in `…' —
+                        one of the two is stale</code></td>
+                    <td>the mount was written but the claim was already held</td></tr>
+            </table>
+
+            <h2 id="appendix-c">Appendix C — how the figures were made</h2>
+
+            <p>Every figure in this manual is a screenshot of the interface's own code, not
+            a drawing. <code>capture.mjs</code> beside this file serves the repository to a
+            headless browser, renders the chrome with <code>LayoutView</code> from an
+            arrangement computed by <code>arrangementOf</code>, mounts the real location
+            bar, and applies the worked example with the real patch engine. To rebuild
+            them:</p>
+
+            <pre><code>node doc/arrangement-manual/capture.mjs</code></pre>
+
+            <p>The model is the one thing stubbed, and it has to be: a manual whose pictures
+            depend on what a provider answered on the day is a manual that cannot be
+            rebuilt. The stub stands exactly where the provider stands — the patch it
+            returns is applied by the same code that applies a real one.</p>
+
+            <p>Figure 9 is the real <code>mount</code> from
+            <code>lib/app/arrangement.js</code> refusing a second mount: the harness
+            supplies the registry and the save, and the sentence in the picture is the
+            code's own. It is the one verb reply that can be photographed as it appears —
+            the successful ones against the chrome are swallowed by the defect in
+            <a href="#reply">§6</a>, and a figure of a reply that nobody can see today
+            would be a figure of something that does not happen.</p>
+
+            <p>The tables in <a href="#operations">§9</a>, <a href="#refused">§11</a> and
+            <a href="#appendix-a">Appendix A</a> were produced by running candidate patches
+            through <code>runWorkspaceInstruction</code> and recording what came back,
+            rather than by reading the source and inferring.</p>
+
+        </div>
+
+        <footer>
+            <div class="container">
+                <p>Dydra Studio — arrangement. Revised 8 November 2026.</p>
+            </div>
+        </footer>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

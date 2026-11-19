@@ -9,36 +9,48 @@
  *
  * The pane is four things stacked, in the order they are needed:
  *
- *   1. Connection -- collapsed once it is working, and carrying both sets of
- *      credentials.  The MCP endpoint and this account's token come from the
- *      session; the LLM endpoint, key, workspace and model are typed here.  It
- *      connects on open, so the pane is usable without a first ritual click,
- *      and it opens itself when there is something to attend to.
+ *   1. Connection -- this repository's MCP resource, and nothing else.  The
+ *      endpoint and the token come from the session; it connects on open, so
+ *      the pane is usable without a first ritual click, and it opens itself
+ *      when there is something to attend to.
  *   2. The prompt, with Run and Session beside it.
- *   3. The transcript: one collapsible entry per exchange, the indicator line
- *      and the text it belongs to in the same element rather than in two
- *      places.  Formatting is lib/format/transcript.js's business.
+ *   3. The transcript, drawn by `exchange-list.js'.
  *   4. The session log, when asked for -- the durable half of the same record.
+ *
+ * **Changed 2026-11-15 (§34.4).**  The model's endpoint, key, workspace and
+ * model used to be typed HERE, which is how a credential that belongs to the
+ * user came to be presented as a property of the repository being examined.
+ * They moved to the account's connection in 2026-11-08 but the FORM stayed,
+ * and a form is where a user thinks a thing lives: with no key set this pane
+ * sprang its panel open, so the first place anyone met the key field was
+ * inside one repository's surface.  The form is gone.  What is presented here
+ * is what is genuinely this repository's -- the button, the handshake, and
+ * the calls that follow -- and the connection it presents is held centrally
+ * in `lib/mcp/registry.js', so the account's exploration pane can offer this
+ * repository as a store and continue the exploration this pane opened.
  *
  * Entries are appended, never re-rendered, so an entry opened for reading stays
  * open while the run continues underneath it.
  */
 
-import { connect as mcpConnect, sparqlFrom } from "../../lib/mcp/mcp-client.js";
+import { sparqlFrom } from "../../lib/mcp/mcp-client.js";
 import { createToolAdapter, FIGURE_TOOLS, DEFAULT_SYSTEM } from "../../lib/llm/tool-adapter.js";
 import { figureSystem } from "../../lib/llm/figure-prompt.js";
 import { openFigureGate } from "./figure-gate.js";
 import { queriesRan } from "../../lib/figure/provenance.js";
-import { setCaret } from "./disclosure.js";
 import { markStage } from "./provenance-note.js";
 import { renderSessionLog } from "./session-log.js";
 import { recordRun } from "../../lib/mcp/transcript-store.js";
-import { paneState } from "./mcp-pane-state.js";
+import { reportPage } from "../../lib/format/report.js";
+import { saveControls } from "./report-controls.js";
+import { paneState, paneStore } from "./mcp-pane-state.js";
+import { connectionRefusal, CONNECTION_PLACE } from "../../lib/app/connection.js";
 import { openDashboardPane } from "./dashboard-pane.js";
-import { locationControl, modelControl, bindLlmSettings } from "./llm-settings.js";
 import {
-  formatBlock, fences, summarize, duration, MARK, clip, rowsIn, digestRequest, prettyJson,
-} from "../../lib/format/transcript.js";
+  createExchangeList, ensureExplorationStyle, duration, clip, prettyJson,
+} from "./exchange-list.js";
+import { mcpConnectionFor, connectMcp, sessionStore } from "../../lib/mcp/registry.js";
+import { rowsIn, digestRequest } from "../../lib/format/transcript.js";
 
 const BASE_PATH = (typeof window !== "undefined" && window.APP_BASE_PATH) || "/ui";
 
@@ -49,203 +61,12 @@ const clock = (d) => d.toTimeString().slice(0, 8);
 
 const slug = (s) => String(s || "").replace(/[^a-z0-9_-]/gi, "-");
 
-/* ─────────────────────────── styling ─────────────────────────── */
-
-const STYLE = `
-.exploration-pane { font-size: 12px; }
-.exploration-pane .exp-head {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 6px 10px; font-weight: bold; background: #eef2f7;
-  border-bottom: 1px solid #d7e0ea; }
-.exploration-pane .exp-head .exp-close {
-  background: transparent; border: none; cursor: pointer; font-size: 15px;
-  line-height: 1; color: #666; padding: 0 2px; }
-.exploration-pane .exp-body { padding: 8px 10px 10px; }
-
-.exploration-pane .exp-conn,
-.exploration-pane .exp-x,
-.exploration-pane .exp-raw { border: 1px solid #e2e6ea; border-radius: 4px;
-  background: #fff; margin-bottom: 6px; }
-.exploration-pane .exp-conn > summary,
-.exploration-pane .exp-x > summary,
-.exploration-pane .exp-raw > summary {
-  cursor: pointer; padding: 4px 8px; list-style: none; display: flex;
-  align-items: baseline; gap: 8px; user-select: none; }
-.exploration-pane .exp-conn > summary::-webkit-details-marker,
-.exploration-pane .exp-x > summary::-webkit-details-marker,
-.exploration-pane .exp-raw > summary::-webkit-details-marker { display: none; }
-.exploration-pane .exp-conn > summary::before,
-.exploration-pane .exp-raw > summary::before {
-  content: "\\25B8"; color: #999; font-size: 10px; width: 9px; flex: none; }
-.exploration-pane .exp-conn[open] > summary::before,
-.exploration-pane .exp-raw[open] > summary::before { content: "\\25BE"; }
-.exploration-pane .exp-conn > summary:hover,
-.exploration-pane .exp-x > summary:hover,
-.exploration-pane .exp-raw > summary:hover { background: #f7f9fb; }
-
-/* The exchange as a conversation: the model on the left, the service on the
-   right, the pane's own notices down the middle.  Which side a thing is on is
-   the fastest way to read who said it, so nothing else has to carry that. */
-.exploration-pane .exp-row {
-  display: flex; align-items: flex-start; gap: 5px; margin-bottom: 6px; }
-.exploration-pane .exp-row-llm  { justify-content: flex-start; }
-.exploration-pane .exp-row-mcp  { justify-content: flex-end; }
-.exploration-pane .exp-row-note { justify-content: center; }
-.exploration-pane .exp-row > .exp-x { margin-bottom: 0; max-width: 78%; min-width: 0; flex: 0 1 auto; }
-.exploration-pane .exp-row-note > .exp-x { max-width: 90%; }
-.exploration-pane .exp-row-llm  > .exp-x {
-  border-radius: 10px 10px 10px 2px; background: #fdf8f2; border-color: #ecdcc8; }
-.exploration-pane .exp-row-mcp  > .exp-x {
-  border-radius: 10px 10px 2px 10px; background: #f4f8fc; border-color: #d3e0ec; }
-.exploration-pane .exp-row-note > .exp-x {
-  border-radius: 10px; background: #fafafa; border-color: #e6e6e6; }
-.exploration-pane .exp-x-fail > summary { background: transparent; }
-.exploration-pane .exp-row > .exp-x.exp-x-fail { border-color: #e2b6b6; background: #fdf6f6; }
-
-/* The show/hide control sits on the outer margin -- the side the bubble is
-   against -- so the controls form their own column and never move. */
-.exploration-pane .exp-toggle {
-  flex: none; margin-top: 3px; width: 16px; height: 16px; padding: 1px;
-  display: flex; align-items: center; justify-content: center;
-  border: 1px solid #e5e7eb; border-radius: 4px; background: #f9fafb;
-  color: #111827; cursor: pointer; }
-.exploration-pane .exp-toggle:hover { background: #eef1f4; }
-
-.exploration-pane .exp-conn-grid {
-  display: grid; grid-template-columns: auto 1fr; gap: 4px 8px;
-  align-items: center; padding: 6px 10px 8px; }
-.exploration-pane .exp-conn-grid label { color: #555; }
-.exploration-pane .exp-conn-grid input {
-  width: 100%; font-size: 12px; padding: 2px 4px; box-sizing: border-box;
-  border: 1px solid #ccd3da; border-radius: 3px; }
-.exploration-pane .exp-conn-out {
-  margin: 0 10px 8px; padding: 6px; background: #fbfcfd; border: 1px solid #eef1f4;
-  border-radius: 3px; font-family: ui-monospace, Menlo, monospace; font-size: 11px;
-  white-space: pre-wrap; max-height: 150px; overflow: auto; color: #444; }
-
-.exploration-pane .exp-chip {
-  font-weight: normal; font-size: 11px; padding: 1px 6px; border-radius: 9px; }
-.exploration-pane .exp-chip-ok   { background: #e8f4e8; color: #2d662d; }
-.exploration-pane .exp-chip-fail { background: #fbeaea; color: #8a2b2b; }
-.exploration-pane .exp-chip-wait { background: #f1f1f1; color: #666; }
-
-.exploration-pane .exp-prompt {
-  min-height: 56px; border: 1px solid #ccd3da; border-radius: 4px; padding: 7px 8px;
-  background: #fff; font-size: 13px; line-height: 1.45; }
-.exploration-pane .exp-prompt:empty::before {
-  content: attr(data-placeholder); color: #aaa; }
-.exploration-pane .exp-actions {
-  display: flex; gap: 8px; align-items: center; margin: 7px 0 10px; }
-.exploration-pane .exp-actions button { padding: 4px 14px; cursor: pointer; }
-.exploration-pane .exp-status { color: #666; }
-
-.exploration-pane .exp-x > summary { font-family: ui-monospace, Menlo, monospace; }
-.exploration-pane .exp-x-time  { color: #999; flex: none; }
-.exploration-pane .exp-x-side  { flex: none; width: 30px; font-weight: 600; }
-.exploration-pane .exp-x-llm  .exp-x-side { color: #a2672a; }
-.exploration-pane .exp-x-mcp  .exp-x-side { color: #1f4e79; }
-.exploration-pane .exp-x-note .exp-x-side { color: #888; }
-.exploration-pane .exp-x-title { flex: 1 1 auto; font-family: Helvetica, sans-serif;
-  font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.exploration-pane .exp-x-mark  { flex: none; }
-.exploration-pane .exp-x-meta  { flex: none; color: #777; font-size: 11px; }
-.exploration-pane .exp-x-fail > summary { background: #fdf6f6; }
-
-.exploration-pane .exp-block { border-top: 1px solid #f0f2f4; padding: 6px 10px 8px; }
-.exploration-pane .exp-block-label {
-  font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
-  color: #8a94a0; margin-bottom: 3px; }
-.exploration-pane pre.exp-pre {
-  margin: 0; padding: 6px 8px; background: #fbfcfd; border: 1px solid #eef1f4;
-  border-radius: 3px; font-family: ui-monospace, Menlo, monospace; font-size: 11px;
-  line-height: 1.45; white-space: pre-wrap; word-break: break-word;
-  max-height: 260px; overflow: auto; }
-.exploration-pane pre.exp-kind-sparql { background: #f6faf6; border-color: #dfeadf; }
-.exploration-pane pre.exp-kind-json   { background: #fafbfd; }
-.exploration-pane pre.exp-kind-score  { background: #fdfaf5; border-color: #f0e6d8; }
-.exploration-pane p.exp-prose {
-  margin: 0 0 7px; font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; }
-.exploration-pane .exp-raw > summary { font-size: 11px; color: #888; }
-.exploration-pane .exp-empty { color: #999; padding: 6px 2px; }
-.exploration-pane .exp-addview {
-  margin-top: 6px; padding: 3px 10px; cursor: pointer; font-size: 11px; }
-.exploration-pane .exp-mode { display: inline-flex; align-items: center; gap: 4px;
-  color: #555; cursor: pointer; }
-.exploration-pane .exp-gate-holder:empty { display: none; }
-`;
-
-function ensureStyle(doc) {
-  if (doc.getElementById("exploration-pane-style")) return;
-  const s = doc.createElement("style");
-  s.id = "exploration-pane-style";
-  s.textContent = STYLE;
-  doc.head.appendChild(s);
-}
-
-/* ─────────────────────────── blocks ─────────────────────────── */
-
-/** A labelled block of text, styled by what the text turns out to be. */
-function blockEl(label, text, { prose = false } = {}) {
-  const wrap = document.createElement("div");
-  wrap.className = "exp-block";
-  const lab = document.createElement("div");
-  lab.className = "exp-block-label";
-  lab.textContent = label;
-  wrap.appendChild(lab);
-
-  if (prose) {
-    // The model answers in prose with queries fenced inside it.  Reflowing the
-    // prose and leaving the fences alone is the whole difference between a wall
-    // of monospace and something that can be read.
-    const parts = fences(text);
-    if (!parts.length) {
-      const p = document.createElement("p");
-      p.className = "exp-prose";
-      p.textContent = "(no text)";
-      wrap.appendChild(p);
-    }
-    for (const part of parts) {
-      if (part.kind === "code") {
-        const pre = document.createElement("pre");
-        const kind = part.lang === "sparql" || part.lang === "sq" ? "sparql" : (part.lang || "text");
-        pre.className = `exp-pre exp-kind-${kind}`;
-        pre.textContent = clip(part.body);
-        wrap.appendChild(pre);
-      } else {
-        const p = document.createElement("p");
-        p.className = "exp-prose";
-        p.textContent = part.body.trim();
-        wrap.appendChild(p);
-      }
-    }
-    return wrap;
-  }
-
-  const { kind, body } = formatBlock(text);
-  const pre = document.createElement("pre");
-  pre.className = `exp-pre exp-kind-${kind}`;
-  pre.textContent = body || "(empty)";
-  wrap.appendChild(pre);
-  return wrap;
-}
-
-/** A collapsed-by-default block, for the envelope nobody reads until they must. */
-function rawEl(label, text) {
-  const d = document.createElement("details");
-  d.className = "exp-raw";
-  const s = document.createElement("summary");
-  s.textContent = label;
-  d.appendChild(s);
-  d.appendChild(blockEl(label, text));
-  return d;
-}
-
 /* ─────────────────────────── the pane ─────────────────────────── */
 
 export function openExplorationPane(app, { container, accountName, repositoryName }) {
   if (!container) return null;
   const doc = container.ownerDocument || document;
-  ensureStyle(doc);
+  ensureExplorationStyle(doc);
 
   const id = `exploration-${slug(accountName)}-${slug(repositoryName)}`;
   const existing = container.querySelector(`#${id}`);
@@ -259,6 +80,10 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
   const auth = app?.state?.getAuthContext?.(accountName) || {};
   const host = auth.host || window.location.origin;
   const st = paneState(accountName, repositoryName, host);
+  // The same object the registry holds; `st' is a window onto it, and the
+  // handshake is performed against the connection rather than against the
+  // pane, so a second surface sees it happen.
+  const conn = mcpConnectionFor(accountName, repositoryName, host);
 
   // Every query this exploration actually sent, across all of its runs.  The
   // figure gate compares its proposal against these: the query in a turn's
@@ -286,22 +111,18 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
           <span>Connection</span>
           <span class="exp-chip exp-chip-wait" data-testid="exploration-chip">connecting…</span>
         </summary>
+        <div class="exp-conn-note" data-testid="exploration-conn-note"
+             style="font-size:11px;color:#666;padding:2px 0 4px;">
+          This is the connection to <b>this repository's</b> MCP resource, and it is
+          shared: the account's exploration pane offers it as a store once it is
+          connected, and a run started there continues the exploration started here
+          (§34.4). The model is connected once, for the account, in
+          ${esc(CONNECTION_PLACE)}.
+        </div>
         <div class="exp-conn-grid">
           <label for="${id}-mcp">MCP</label>
           <input id="${id}-mcp" type="text" class="exp-mcp-endpoint"
                  data-testid="exploration-mcp-endpoint" value="${esc(st.mcpEndpoint)}" />
-          <label for="${id}-llm">LLM</label>
-          ${locationControl(st, { id: `${id}-llm`, testid: "exploration-llm-endpoint" })}
-          <label for="${id}-key">key</label>
-          <input id="${id}-key" type="password" class="exp-llm-key"
-                 data-testid="exploration-llm-key" placeholder="provider api key"
-                 value="${esc(st.llmKey)}" />
-          <label for="${id}-ws">workspace</label>
-          <input id="${id}-ws" type="text" class="exp-llm-workspace"
-                 data-testid="exploration-llm-workspace"
-                 placeholder="wrkspc_… (org-scoped keys only)" value="${esc(st.llmWorkspace)}" />
-          <label for="${id}-model">model</label>
-          ${modelControl(st, { id: `${id}-model`, testid: "exploration-llm-model" })}
           <span></span>
           <span><button type="button" class="exp-reconnect" data-testid="exploration-reconnect"
                         style="padding:3px 10px;cursor:pointer;font-size:11px;">Reconnect</button></span>
@@ -324,6 +145,8 @@ explore, propose a query, then draw from what the interface fetched">
         <span class="exp-status" data-testid="exploration-status"></span>
       </div>
 
+      <div class="exp-save-slot" data-testid="exploration-save-slot"></div>
+
       <div class="exp-session-panel" data-testid="exploration-session-panel" hidden
            style="border:1px solid #e2e6ea;border-radius:4px;padding:8px;margin-bottom:10px;"></div>
 
@@ -345,6 +168,7 @@ explore, propose a query, then draw from what the interface fetched">
   const statusEl = q(".exp-status");
   const list = q(".exp-exchanges");
   const sessionPanel = q(".exp-session-panel");
+  const saveSlot = q(".exp-save-slot");
   const figureMode = q(".exp-figure-mode");
 
   const setStatus = (s) => { statusEl.textContent = s || ""; };
@@ -353,176 +177,69 @@ explore, propose a query, then draw from what the interface fetched">
     chip.textContent = text;
   };
 
-  // Open when there is something to attend to: no key yet, or a failure.
-  if (!st.llmKey) connDetails.open = true;
-
-  /* settings are kept in the shared state, so the prompt tab sees them too */
-  const bind = (sel, key) => {
-    const el = q(sel);
-    if (el) el.addEventListener("change", () => { st[key] = el.value.trim(); });
-  };
-  bind(".exp-mcp-endpoint", "mcpEndpoint");
-  // location and model are linked menus; a new key re-reads the model list
-  bindLlmSettings(wrapper, st, {
-    keyInput: q(".exp-llm-key"),
-    workspaceInput: q(".exp-llm-workspace"),
+  // The endpoint is the registry's, so a correction typed here is the
+  // correction everywhere -- including in a run started from the account's
+  // pane, which used to derive its own and could not be told otherwise.
+  q(".exp-mcp-endpoint").addEventListener("change", (e) => {
+    st.mcpEndpoint = e.target.value.trim();
   });
 
   /* ── the transcript ── */
 
-  let n = 0;
-  const empty = doc.createElement("div");
-  empty.className = "exp-empty";
-  empty.textContent = "Nothing run yet.";
-  list.appendChild(empty);
-
-  function add(x) {
-    if (empty.parentNode) empty.remove();
-    n += 1;
-    const entry = { n, at: new Date(), ...x };
-    st.exchanges.push(entry);
-
-    const d = doc.createElement("details");
-    d.className = `exp-x exp-x-${entry.kind}${entry.status === "fail" ? " exp-x-fail" : ""}`;
-    d.dataset.testid = `exploration-exchange-${n}`;
-    const side = entry.kind === "llm" ? "LLM" : entry.kind === "mcp" ? "MCP" : "·";
-    const mark = MARK[entry.status] || MARK.note;
-    const sum = doc.createElement("summary");
-    sum.innerHTML = `
-      <span class="exp-x-time">${esc(clock(entry.at))}</span>
-      <span class="exp-x-side">${esc(side)}</span>
-      <span class="exp-x-title">${esc(entry.title)}</span>
-      <span class="exp-x-mark">${mark}</span>
-      <span class="exp-x-meta">${esc(summarize(entry))}</span>`;
-    d.appendChild(sum);
-
-    if (entry.request != null) d.appendChild(blockEl(entry.requestLabel || "request", entry.request));
-    if (entry.response != null) {
-      d.appendChild(blockEl(entry.responseLabel || "response", entry.response,
-                            { prose: Boolean(entry.prose) }));
-    }
-    for (const r of [].concat(entry.raw || [])) {
-      if (r && r.text) d.appendChild(rawEl(r.label, r.text));
-    }
-
-    if (entry.sparql) {
-      const holder = doc.createElement("div");
-      holder.className = "exp-block";
-      const b = doc.createElement("button");
-      b.type = "button";
-      b.className = "exp-addview";
-      b.dataset.testid = `exploration-add-view-${n}`;
-      b.textContent = "Add as a view";
-      b.addEventListener("click", () => {
-        // jsui owns view creation; hand the query over.  views/new reads ?query=.
-        const url = `${BASE_PATH}/account/${encodeURIComponent(accountName)}`
-                  + `/repositories/${encodeURIComponent(repositoryName)}`
-                  + `/views/new?query=${encodeURIComponent(entry.sparql)}`;
-        if (app?.router?.navigate) app.router.navigate(url); else window.location.assign(url);
-      });
-      holder.appendChild(b);
-
-      // U-13: the second thing one can do with a query the model wrote.
-      // Beside "Add as a view" because it is the same decision one step
-      // further on -- this query, run now, and drawn -- and because the
-      // prose it sits under is most of what makes the query reviewable.
-      const draw = doc.createElement("button");
-      draw.type = "button";
-      draw.className = "exp-addview";
-      draw.dataset.testid = `exploration-draw-${n}`;
-      draw.textContent = "Draw it…";
-      draw.title = "Run this query here and ask the model to draw the result";
-      const gateHolder = doc.createElement("div");
-      gateHolder.className = "exp-gate-holder";
-      gateHolder.dataset.testid = `exploration-gate-holder-${n}`;
-      let gate = null;
-      draw.addEventListener("click", () => {
-        if (gate) { gate.destroy(); gate = null; draw.textContent = "Draw it…"; return; }
-        draw.textContent = "Close the gate";
-        gate = openFigureGate(gateHolder, {
-          doc, host, account: accountName, repository: repositoryName, state: st,
-          prompt: entry.promptText || st.lastPrompt || "",
-          text: entry.response || "", query: entry.sparql, session: st.session,
-          ran: ran.slice(),
-          onStatus: setStatus,
-          onDone: ({ figure, recorded }) => {
-            add({ kind: "note", title: `figure · ${figure.disposition || "drawn"}`,
-                  status: recorded?.ok ? "ok" : "fail",
-                  response: `${figure.kind} figure, drawn from ${figure.rows ?? "?"} row(s) `
-                          + `of ${figure.mimeType || "the result"} (digest ${figure.resultDigest}).\n`
-                          + (figure.promotedTo ? `Kept as the view ${figure.promotedTo}.\n` : "")
-                          + (recorded?.ok
-                              ? `Recorded in <${recorded.graph}>, with the query and the result digest.`
-                              : `Not recorded: ${recorded?.error}`) });
-          },
-        });
-        d.open = true;
-      });
-      holder.appendChild(draw);
-      d.appendChild(holder);
-      d.appendChild(gateHolder);
-    }
-
-    // Failures and the final answer open themselves; routine traffic does not,
-    // or a run of twenty calls would bury the thing you are reading.
-    if (entry.status === "fail" || entry.open) d.open = true;
-
-    const row = doc.createElement("div");
-    row.className = `exp-row exp-row-${entry.kind}`;
-    row.dataset.testid = `exploration-row-${n}`;
-
-    const toggle = doc.createElement("button");
-    toggle.type = "button";
-    toggle.className = "exp-toggle";
-    toggle.dataset.testid = `exploration-toggle-${n}`;
-    setCaret(toggle, d.open);
-    toggle.addEventListener("click", () => {
-      d.open = !d.open;
-      // `toggle' is dispatched asynchronously, so turn the caret here as well:
-      // a control that lags its own click by a frame reads as a missed press.
-      setCaret(toggle, d.open);
-    });
-    // The summary is still a disclosure in its own right, so the button follows
-    // the element rather than keeping its own idea of the state.
-    d.addEventListener("toggle", () => setCaret(toggle, d.open));
-
-    // Outer margin: left of a left-hand bubble, right of a right-hand one.
-    if (entry.kind === "mcp") { row.appendChild(d); row.appendChild(toggle); }
-    else { row.appendChild(toggle); row.appendChild(d); }
-
-    list.appendChild(row);
-    row.scrollIntoView({ block: "nearest" });
-    return d;
-  }
+  // Drawn by `exchange-list.js', which the account's exploration pane draws
+  // with too.  What is this pane's own is what it can do with a query: it
+  // knows which repository one belongs to, so it can offer the view and the
+  // figure that the account's pane, carrying several stores, has to ask about.
+  const { add } = createExchangeList(list, {
+    doc, store: st.exchanges, testid: "exploration",
+    addView: (entry) => {
+      // jsui owns view creation; hand the query over.  views/new reads ?query=.
+      const url = `${BASE_PATH}/account/${encodeURIComponent(accountName)}`
+                + `/repositories/${encodeURIComponent(repositoryName)}`
+                + `/views/new?query=${encodeURIComponent(entry.sparql)}`;
+      if (app?.router?.navigate) app.router.navigate(url); else window.location.assign(url);
+    },
+    draw: (entry, gateHolder) => openFigureGate(gateHolder, {
+      doc, host, account: accountName, repository: repositoryName, state: st,
+      prompt: entry.promptText || st.lastPrompt || "",
+      text: entry.response || "", query: entry.sparql, session: st.session,
+      ran: ran.slice(),
+      onStatus: setStatus,
+      onDone: ({ figure, recorded }) => {
+        add({ kind: "note", title: `figure · ${figure.disposition || "drawn"}`,
+              status: recorded?.ok ? "ok" : "fail",
+              response: `${figure.kind} figure, drawn from ${figure.rows ?? "?"} row(s) `
+                      + `of ${figure.mimeType || "the result"} (digest ${figure.resultDigest}).\n`
+                      + (figure.promotedTo ? `Kept as the view ${figure.promotedTo}.\n` : "")
+                      + (recorded?.ok
+                          ? `Recorded in <${recorded.graph}>, with the query and the result digest.`
+                          : `Not recorded: ${recorded?.error}`) });
+      },
+    }),
+  });
 
   /* ── connect ── */
 
+  // The handshake itself is the registry's (§34.4): whichever surface presses
+  // the button, every other surface sees the result.  What stays here is the
+  // presentation of it -- the chip, and the two answers laid out so they can
+  // be read -- because this is the repository's pane and that is where a
+  // repository's connection is presented.
   async function doConnect() {
     setChip("wait", "connecting…");
     connOut.textContent = "";
-    let discover, survey;
-    try {
-      ({ discover, survey } = await mcpConnect({ endpoint: st.mcpEndpoint, token: st.token }));
-    } catch (e) {
-      st.connected = false;
-      setChip("fail", "connect failed");
-      connOut.textContent = String(e);
-      connDetails.open = true;
-      return false;
-    }
-    const ok = discover.ok && survey.ok;
-    st.connected = ok;
-    // Both answers are JSON; indented they can be read, on one line they cannot.
     const shown = (r) => clip(prettyJson(r.response) || r.response || "(no body)", 4000);
-    st.connectText =
-      `server/discover   HTTP ${discover.status}   ${duration(discover.ms)}\n`
-    + `${shown(discover)}\n\n`
-    + `survey op=connect HTTP ${survey.status}   ${duration(survey.ms)}\n`
-    + `${shown(survey)}`;
+    const out = await connectMcp(conn, {
+      format: ({ discover, survey }) =>
+        `server/discover   HTTP ${discover.status}   ${duration(discover.ms)}\n`
+      + `${shown(discover)}\n\n`
+      + `survey op=connect HTTP ${survey.status}   ${duration(survey.ms)}\n`
+      + `${shown(survey)}`,
+    });
     connOut.textContent = st.connectText;
-    setChip(ok ? "ok" : "fail", ok ? "connected" : (discover.error || survey.error || "connect failed"));
-    if (!ok) connDetails.open = true;
-    return ok;
+    setChip(out.ok ? "ok" : "fail", out.ok ? "connected" : (out.error || "connect failed"));
+    if (!out.ok) connDetails.open = true;
+    return out.ok;
   }
 
   q(".exp-reconnect").addEventListener("click", doConnect);
@@ -565,13 +282,26 @@ explore, propose a query, then draw from what the interface fetched">
     const text = (prompt.innerText || "").trim();
     if (!text) { setStatus("nothing to send"); return; }
     if (!st.llmKey) {
-      connDetails.open = true;
-      setStatus("set a provider key in Connection, above");
-      q(".exp-llm-key")?.focus();
+      // The pane no longer holds a key field to open, because the key is not
+      // this repository's (§34.1).  So it says where the setting is, in the
+      // one wording every other surface uses, and stops.
+      setStatus(connectionRefusal("nothing was asked"));
+      add({ kind: "note", title: "no model is connected", status: "fail",
+            response: `${connectionRefusal("nothing was asked")}\n\n`
+                    + `The exploration tab in the account's left margin carries the `
+                    + `same setting, beside the choice of stores to ask across.` });
       return;
     }
     running = true;
     const started = new Date();
+    // Where this run's entries begin in the pane's transcript, so the report
+    // can carry its own exchanges rather than every exchange the pane has
+    // held since it was opened.
+    const from = st.exchanges.length;
+    // The last run's controls go now rather than when this one finishes: a
+    // run that throws leaves none, and a button that saves the PREVIOUS
+    // answer under a pane that is reporting a failure is a trap.
+    saveSlot.replaceChildren();
     // The gate opened under a later turn needs the question the run started
     // from: a figure drawn without it is a generic rendering of the columns
     // rather than an answer to what was asked.
@@ -639,6 +369,21 @@ explore, propose a query, then draw from what the interface fetched">
           ran.push(...queriesRan([e]));
           break;
 
+        case "session_lost":
+          add({ kind: "note", title: "session refused", status: "fail",
+                response: `${e.text}\n\n`
+                        + `The store issued this handle and then refused it. `
+                        + (e.recovering
+                            ? `A new exploration is being opened and the call repeated once.`
+                            : `It could not be reopened here.`) });
+          break;
+
+        case "session_retry":
+          add({ kind: "note", title: "call repeated", status: e.ok ? "ok" : "fail",
+                response: e.ok ? `Answered on the second attempt, under a new handle.`
+                               : `Refused again under a new handle.` });
+          break;
+
         case "session":
           add({ kind: "note", title: "exploration session", status: "note",
                 response: `${e.session}\n\nEvery later call in this run carries this handle, `
@@ -663,7 +408,14 @@ explore, propose a query, then draw from what the interface fetched">
         apiKey: st.llmKey,
         workspaceId: st.llmWorkspace,
         model: st.llmModel,
-        mcp: st.mcpEndpoint ? { endpoint: st.mcpEndpoint, token: st.token } : null,
+        // The repository this pane reads, in the shape the adapter routes on:
+        // one store, named, so that every event the turn produces says which
+        // repository the call went to (REQ-34.3.5).
+        mcp: paneStore(st),
+        // The exploration handles outlive the run (§34.4.3): a second Run in
+        // this pane, and a run started from the account's pane, continue the
+        // exploration the first one opened rather than opening another.
+        sessions: sessionStore(),
         // Figure mode changes two things and nothing else: the model is told
         // that drawing is step 3 and that this call ends at a proposal
         // (U-12), and `query' joins the offered tools, because a figure is
@@ -685,7 +437,16 @@ explore, propose a query, then draw from what the interface fetched">
         account: accountName, repository: repositoryName,
       };
       markStage(wrapper, st.lastProvenance);
-      setStatus(result.ok ? `done · ${result.iterations} turn(s)` : `failed · ${result.error}`);
+      if (result.ok && !result.calls) {
+        add({ kind: "note", title: "nothing was asked of this repository", status: "fail",
+              response: `The model took ${result.iterations} turn(s) and made no tool call, `
+                      + `so what it wrote is written from the question alone -- not from `
+                      + `this repository.` });
+      }
+      setStatus(result.ok
+                  ? (result.calls ? `done · ${result.iterations} turn(s)`
+                                  : `answered nothing · the repository was not read`)
+                  : `failed · ${result.error}`);
 
       // Keep the run.  The service records which operations ran; only this side
       // ever saw what they returned, or what the model was told, so if it is
@@ -697,15 +458,27 @@ explore, propose a query, then draw from what the interface fetched">
         session: st.session, result, prompt: text, started,
       });
       add({
-        kind: "note", title: "transcript", status: kept.ok ? "ok" : "fail",
+        kind: "note", title: "transcript",
+        status: kept.ok ? "ok" : (kept.wrote ? "note" : "fail"),
         ms: kept.ms,
         response: kept.ok
-          ? `${kept.exchanges} exchange(s) written to <${kept.graph}>\n\n`
+          ? `${kept.exchanges} exchange(s) written to <${kept.graph}> `
+          + `in ${kept.parts} request(s)\n\n`
           + `in <${accountName}>/mcp, beside the exploration the service records. `
           + `The payloads are kept whole, so what the model read can be read again.`
-          : `not recorded: ${kept.error}\n\n`
-          + `The run itself is unaffected; the record of it is what is missing.`,
+          // A record written in several requests can land in part: what did
+          // land is in the graph and is worth saying so, because "not
+          // recorded" would send a reader looking for nothing (§32.2).
+          : (kept.wrote
+              ? `partly recorded: ${kept.wrote} of ${kept.parts} part(s) written `
+              + `to <${kept.graph}>\n\n${kept.error}`
+              : `not recorded: ${kept.error}\n\n`
+              + `The run itself is unaffected; the record of it is what is missing.`),
       });
+      // The report, where it can be kept (§34.8).  Offered for a failed run
+      // too: a run that stopped halfway still wrote down what it read, and
+      // that is the copy somebody will want to send on.
+      showReport(result, text, kept, st.exchanges.slice(from));
       if (refreshLog && !sessionPanel.hidden) refreshLog();
     } catch (e) {
       add({ kind: "note", title: "run failed", status: "fail", response: String(e) });
@@ -713,6 +486,54 @@ explore, propose a query, then draw from what the interface fetched">
     } finally {
       running = false;
     }
+  }
+
+  /* ── keeping the report ── */
+
+  /**
+   * The run, as a page that can be kept (§34.8).
+   *
+   * The account's pane has an answer box to hang these on; this one has a
+   * transcript, whose entries collapse -- so the controls sit under the
+   * actions, where they are in view whether or not the turn that holds the
+   * answer is open.  They appear once there is something to keep and are
+   * replaced by each run, because the one anybody wants is the last one.
+   *
+   * What is reported is this repository: one store, one record line, and the
+   * exchanges of this run alone.  The Article 50 line is composed here in the
+   * same shape the account's pane uses -- the model AS SERVED, what was asked
+   * of the store, and the date -- because the saved copy is the one that
+   * leaves the interface that would otherwise be stating it.
+   */
+  function showReport(result, asked, kept, mine) {
+    const id = `${accountName}/${repositoryName}`;
+    const line = kept?.ok
+      ? `recorded: ${id} → ${kept.graph}`
+      : (kept?.wrote
+          ? `partly recorded: ${id} → ${kept.graph} `
+          + `(${kept.wrote} of ${kept.parts} parts; ${kept.error})`
+          : `not recorded: ${id} (${kept?.error || "unknown"})`);
+    const stage = `${result.servedModel || result.model || "an unidentified model"}`
+                + `${result.served ? "" : " (requested, not confirmed)"}`
+                + ` · ${id} ${result.calls || 0} call(s)`
+                + ` · ${new Date().toISOString().slice(0, 10)}`;
+
+    saveSlot.replaceChildren(saveControls(doc, {
+      testid: "exploration",
+      account: `${accountName}-${repositoryName}`,
+      onStatus: setStatus,
+      page: () => reportPage({
+        title: `Exploration — ${id}`,
+        asked,
+        answer: result.finalText || result.error || "",
+        stores: [id],
+        stage,
+        records: [line],
+        exchanges: mine.map((x) => ({ title: x.title, repository: id,
+                                      status: x.status, ms: x.ms })),
+        at: new Date(), account: accountName,
+      }),
+    }));
   }
 
   q(".exp-run").addEventListener("click", run);

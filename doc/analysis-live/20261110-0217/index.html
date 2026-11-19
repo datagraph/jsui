@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="date" content="2026-11-10">
+<title>An analysis across two repositories — 10 November</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; font: 15px/1.55 Georgia, "Times New Roman", serif; color: #1f2328;
+         background: #fff; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 1.9em; margin: 0 0 .2em; }
+  h2 { font-size: 1.25em; margin: 2em 0 .5em; border-bottom: 1px solid #e5e7eb;
+        padding-bottom: .25em; }
+  h3 { font-size: 1.05em; margin: 1.6em 0 .4em; }
+  p.lede { color: #4b5563; margin-top: 0; }
+  code, pre { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: .88em; }
+  pre { background: #f6f8fa; padding: 10px 14px; overflow-x: auto; border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: .92em; }
+  th, td { border: 1px solid #e5e7eb; padding: 6px 10px; text-align: left;
+            vertical-align: top; }
+  th { background: #f6f8fa; }
+  figure { margin: 2em 0; }
+  figure img { width: 100%; height: auto; border: 1px solid #d1d5db; border-radius: 3px;
+                display: block; }
+  figcaption { font-size: .9em; color: #4b5563; margin-top: .5em; }
+  .note { background: #f6f8fa; border-left: 3px solid #9ca3af; padding: 10px 14px;
+           margin: 1.2em 0; }
+  .bad { border-left-color: #b91c1c; }
+  .good { border-left-color: #15803d; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>An analysis across two repositories</h1>
+<p class="lede">The third live run of §35, 10 November 2026. Same question, same
+two repositories, a real model, and the service as it stands today.</p>
+
+<p>Earlier runs of the same question are kept beside this one:
+<a href="../20261109/">9 November</a>, the first that answered, and
+<a href="../cut-short/">the run before it</a>, which spent its whole round budget
+exploring and was cut off with nothing to show.</p>
+
+<h2>What this run was for</h2>
+
+<div class="note">
+<p><b>The fix it was run to confirm arrived after the run, not before it.</b>
+It was run to see the <code>$lang</code> resolution artefact gone. Two direct
+probes before the run said it was still there, and so did the run's own
+records: a <code>narrow</code> whose where-clause says <code>{ $lang: en }</code>
+came back with <code>unresolved: [en]</code> beside the right rows, and so did
+<code>{ $contains: classification }</code> written as a bare name.</p>
+<p>The host's loader had printed <code>;;; MCP patch 20261109b-de17</code>
+eight minutes earlier — but that banner is printed before the loader reads a
+single component file, so it names the revision string in
+<code>load.lisp</code> and says nothing about the thirty-six files beside it.
+The patch directory was synchronised in full the next morning. Probed again
+then, across all seven operators the change distinguishes:
+<code>$contains</code>, <code>$starts</code>, <code>$ends</code>,
+<code>$regex</code> and <code>$lang</code> leave their operand alone, while
+<code>$eq</code> and <code>$in</code> still resolve theirs and still report
+what they cannot find. The artefact is gone, and the control proves the
+resolver is still working rather than switched off.</p>
+<p>So this run is a record of the service as it was at 02:17 on 10 November,
+with the old behaviour, and the screenshots below should be read that way.</p>
+</div>
+
+<div class="note">
+<p><b>The model was not misled this time, which is not the same as being
+safe.</b> The 9 November run read that artefact and wrote into its
+<i>Not established</i> section that "the server reported <code>$lang: en</code>
+as unresolved, so the language filter may not have been applied" — a false
+caveat in the one section a reader trusts to say what is not known. This run
+saw the same artefact three times and said nothing about it. What varied was
+the reading, not the service — which is the argument for taking the stray word
+out of the reply rather than instructing the model around it.</p>
+</div>
+
+<h2>The run</h2>
+
+<table>
+<tr><th>Model turns</th><td>23 — 22 with tool calls, the last the report</td></tr>
+<tr><th>Served as</th><td><code>claude-opus-5-5</code></td></tr>
+<tr><th>Tool calls</th><td>34 — <code>james/finto</code> 25, <code>james/fibo</code> 9</td></tr>
+<tr><th>Operations chosen</th><td><code>select</code> 12, <code>narrow</code> 8, <code>catalog</code> 7, <code>connect</code> 2, <code>materialize</code> 2</td></tr>
+<tr><th>Service requests</th><td>39 — 34 answered, 5 refused the connection</td></tr>
+<tr><th>Tokens</th><td>506 284 in, 12 516 out</td></tr>
+<tr><th>Recorded as</th><td>two transcripts in <code>james/mcp</code>, one per store</td></tr>
+</table>
+
+<p>Five of the thirty-nine service requests failed outright — the host dropped
+the connection, twice on the opening <code>catalog</code> of each store. The
+model saw the 502, said <q>Both stores returned HTTP 502 on catalog;
+retrying</q>, and retried. That is the loop behaving as it should under a
+service that is not well, and it is why the run still has a complete inventory
+of both stores.</p>
+<figure>
+<img src="01-the-interface.png" alt="the chrome, with the location bar as the only prompt on the screen">
+<figcaption>the chrome, with the location bar as the only prompt on the screen</figcaption>
+</figure>
+<figure>
+<img src="02-the-question-typed.png" alt="a line that names two repositories — read as a question about data, not an instruction about the interface">
+<figcaption>a line that names two repositories — read as a question about data, not an instruction about the interface</figcaption>
+</figure>
+<figure>
+<img src="04-what-the-press-authorises.png" alt="the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept">
+<figcaption>the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept</figcaption>
+</figure>
+<figure>
+<img src="05-the-run-begins.png" alt="each store&#x27;s own tools and the server&#x27;s operation catalogue are read before the model is asked anything">
+<figcaption>each store&#x27;s own tools and the server&#x27;s operation catalogue are read before the model is asked anything</figcaption>
+</figure>
+<figure>
+<img src="08-turn-03-survey-james-finto-survey-james-fibo.png" alt="the model asks for: survey__james__finto {&quot;op&quot;:&quot;catalog&quot;,&quot;body&quot;:&quot;{ scope: types }&quot;,&quot;session&quot;:&quot;AEBF2962-DCA4-11F1-B393-F02F7494A8ED&quot;} | survey__james__fibo {&quot;op&quot;:&quot;catalog&quot;,&quot;body&quot;:&quot;{ scope: types }&quot;,&quot;session&quot;:&quot;BB03EABE-DCA4-11F1-AE60-F02F7494A8ED&quot;}">
+<figcaption>the model asks for: survey__james__finto {&quot;op&quot;:&quot;catalog&quot;,&quot;body&quot;:&quot;{ scope: types }&quot;,&quot;session&quot;:&quot;AEBF2962-DCA4-11F1-B393-F02F7494A8ED&quot;} | survey__james__fibo {&quot;op&quot;:&quot;catalog&quot;,&quot;body&quot;:&quot;{ scope: types }&quot;,&quot;session&quot;:&quot;BB03EABE-DCA4-11F1-AE60-F02F7494A8ED&quot;} — the retry after both stores answered 502</figcaption>
+</figure>
+
+<h2>The answer</h2>
+
+<p>In full as <a href="report.md"><code>report.md</code></a>; the run's own
+record, every turn and every call, in <a href="run.json"><code>run.json</code></a>.</p>
+
+<p>It reaches the same conclusion as the 9 November run by a different route,
+which is worth more than reaching it twice the same way. Both stores inventoried
+first; <code>james/fibo</code> read down to its restrictions and the properties
+they name; <code>james/finto</code> searched by regex in English and Swedish.
+The candidate table proposes four correspondences and one explicit <i>none</i>,
+each with a category declared as its own words rather than borrowed from SKOS,
+a confidence and a reason — and beside it the list of headings that match on the
+string and are <b>not</b> candidates, because in <code>james/finto</code>
+"lending" sits under library services and "loanwords" is about language.</p>
+
+<p>Its <i>Not established</i> is the sharpest of the three runs: no subject IRIs
+came back from <code>select</code>, so the finto headings are identified by
+label and scheme only; two fibo class IRIs were seen only as restriction
+targets and one class is unidentified; Finnish labels, <code>skos:altLabel</code>
+and <code>skos:hiddenLabel</code> were never searched; and the fibo type
+catalogue never ran, so that inventory comes from listing <code>rdf:type</code>
+directly.</p>
+<figure>
+<img src="29-answered.png" alt="the reply line: the first sentence of the answer, with the rest folded">
+<figcaption>the reply line: the first sentence of the answer, with the rest folded</figcaption>
+</figure>
+<figure>
+<img src="30-the-report.png" alt="the answer, folded under the bar rather than truncated into it">
+<figcaption>the answer, folded under the bar rather than truncated into it</figcaption>
+</figure>
+<figure>
+<img src="31-the-report-2.png" alt="the report, screenful 2 of 6">
+<figcaption>the report, screenful 2 of 6</figcaption>
+</figure>
+<figure>
+<img src="32-the-report-3.png" alt="the report, screenful 3 of 6">
+<figcaption>the report, screenful 3 of 6</figcaption>
+</figure>
+<figure>
+<img src="33-the-report-4.png" alt="the report, screenful 4 of 6">
+<figcaption>the report, screenful 4 of 6</figcaption>
+</figure>
+<figure>
+<img src="34-the-report-5.png" alt="the report, screenful 5 of 6">
+<figcaption>the report, screenful 5 of 6</figcaption>
+</figure>
+<figure>
+<img src="35-the-report-6.png" alt="the report, screenful 6 of 6">
+<figcaption>the report, screenful 6 of 6</figcaption>
+</figure>
+<figure>
+<img src="36-provenance.png" alt="the end of the report and the provenance the interface adds: model as served, calls, date, where it was recorded">
+<figcaption>the end of the report and the provenance the interface adds: model as served, calls, date, where it was recorded</figcaption>
+</figure>
+
+<h2>What is not established about this run</h2>
+
+<ul>
+<li><b>The <code>$lang</code> fix is unconfirmed in service.</b> It is right in
+the source and absent from the host. Until the host runs it, any report of a run
+that uses a bare-name operand may carry the false caveat.</li>
+<li><b>The service dropped five connections.</b> Whether that is load, the
+reload, or something else was not investigated.</li>
+<li><b>Three runs is three runs.</b> They agree on the shape of the answer and
+differ in the route; none of that settles whether the round budget is right.</li>
+</ul>
+
+</div>
+</body>
+</html>

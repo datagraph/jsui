@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="date" content="2026-11-09">
+<title>An analysis across two repositories, with a real model</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; font: 15px/1.55 Georgia, "Times New Roman", serif; color: #1f2328;
+         background: #fff; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 1.9em; margin: 0 0 .2em; }
+  h2 { font-size: 1.25em; margin: 2em 0 .5em; border-bottom: 1px solid #e5e7eb;
+        padding-bottom: .25em; }
+  h3 { font-size: 1.05em; margin: 1.6em 0 .4em; }
+  p.lede { color: #4b5563; margin-top: 0; }
+  code, pre { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: .88em; }
+  pre { background: #f6f8fa; padding: 10px 14px; overflow-x: auto; border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: .92em; }
+  th, td { border: 1px solid #e5e7eb; padding: 6px 10px; text-align: left;
+            vertical-align: top; }
+  th { background: #f6f8fa; }
+  figure { margin: 2em 0; }
+  figure img { width: 100%; height: auto; border: 1px solid #d1d5db; border-radius: 3px;
+                display: block; }
+  figcaption { font-size: .9em; color: #4b5563; margin-top: .5em; }
+  .note { background: #f6f8fa; border-left: 3px solid #9ca3af; padding: 10px 14px;
+           margin: 1.2em 0; }
+  .bad { border-left-color: #b91c1c; }
+  .good { border-left-color: #15803d; }
+  ol.turns { font-size: .92em; color: #374151; }
+  ol.turns code { font-size: .95em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>An analysis across two repositories, with a real model</h1>
+<p class="lede"><a href="../">Later run: 10 November.</a> The same question as the <a href="../../analysis-demonstration/">worked
+example of §35</a>, asked again on 9 November 2026 — this time against the patched
+service, and with Anthropic's <code>claude-opus-5-5</code> deciding every call.</p>
+
+<p>One line is typed into the location bar — <code>compare the concepts present
+in james/finto and james/fibo</code> — and nothing else is supplied. The model
+is given the brief, the two stores' MCP resources, and a round budget. What it
+does with them is its own.</p>
+
+<h2>What is real here</h2>
+
+<p>All of it. The earlier capture had to say which half was scripted; this one
+does not.</p>
+
+<ul>
+<li><b>The repositories.</b> <code>james/finto</code> and <code>james/fibo</code>
+on dydra.com, read live through their own MCP resources. Every count, label,
+class, restriction and compiled query in the report below came back from the
+service during the run.</li>
+<li><b>The service.</b> Running the patched score layer: the literal fix and the
+<code>narrow</code> fix are both in effect, which is why this run could do what
+the last one could not.</li>
+<li><b>The client path.</b> Reading the line, the disclosure, the grant, the
+brief, the per-store routing and tool naming, the digesting of large payloads,
+the progress line, and the recording of the run as RDF.</li>
+<li><b>The model.</b> Asked the question and left to it. 26 turns, 32 tool calls
+across the two stores, 4 requests for a digested payload in full.</li>
+</ul>
+
+<p>Neither credential reached the browser. The dydra token is read from
+<code>~/.dydra</code> and added by the harness proxy; the provider key is read
+from the environment or <code>~/.anthropic</code> and added by the
+<code>/model</code> relay. The page holds a placeholder for each.</p>
+
+<h2>The question, and what it authorises</h2>
+<figure>
+<img src="01-the-interface.png" alt="the chrome, with the location bar as the only prompt on the screen">
+<figcaption>the chrome, with the location bar as the only prompt on the screen</figcaption>
+</figure>
+<figure>
+<img src="02-the-question-typed.png" alt="a line that names two repositories — read as a question about data, not an instruction about the interface">
+<figcaption>a line that names two repositories — read as a question about data, not an instruction about the interface</figcaption>
+</figure>
+<figure>
+<img src="03-disclosed-before-it-runs.png" alt="nothing has run: the stores are named and one press is offered">
+<figcaption>nothing has run: the stores are named and one press is offered</figcaption>
+</figure>
+<figure>
+<img src="04-what-the-press-authorises.png" alt="the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept">
+<figcaption>the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept</figcaption>
+</figure>
+<h2>What the model did</h2>
+
+<p>Twenty-five rounds of tool calls and then the report. The operations it chose,
+counted: <code>select</code> 14, <code>narrow</code> 7, <code>catalog</code> 4,
+<code>materialize</code> 3, <code>profile</code> 2, <code>connect</code> 2 —
+and four <code>result_full</code> requests, where a payload had been digested
+and it wanted the whole of it.</p>
+
+<p>The shape of the exploration is worth reading as a shape. It inventoried both
+stores before saying anything about either; it read fibo's four classes with
+their restrictions; it profiled finto's <code>skos:Concept</code> and counted its
+relations; and then it spent the middle of the run searching finto's labels, in
+three languages, for the subjects fibo turned out to be about — which is the step
+that was impossible a day earlier.</p>
+<figure>
+<img src="05-the-run-begins.png" alt="each store&#x27;s own tools and the server&#x27;s operation catalogue are read before the model is asked anything">
+<figcaption>each store&#x27;s own tools and the server&#x27;s operation catalogue are read before the model is asked anything</figcaption>
+</figure>
+<figure>
+<img src="06-turn-01-survey-james-finto-survey-james-fibo.png" alt="the model asks for: survey__james__finto {&quot;op&quot;:&quot;connect&quot;} | survey__james__fibo {&quot;op&quot;:&quot;connect&quot;}">
+<figcaption>the model asks for: survey__james__finto {&quot;op&quot;:&quot;connect&quot;} | survey__james__fibo {&quot;op&quot;:&quot;connect&quot;}</figcaption>
+</figure>
+<figure>
+<img src="16-turn-11-survey-james-finto.png" alt="the model asks for: survey__james__finto {&quot;op&quot;:&quot;narrow&quot;,&quot;session&quot;:&quot;8C8F0B96-DC8B-11F1-8375-F02F7494A8ED&quot;,&quot;node&quot;:&quot;n5&quot;,&quot;body&quot;:&quot;{ where: { skos:prefLabel: { $regex:">
+<figcaption>the model asks for: survey__james__finto {&quot;op&quot;:&quot;narrow&quot;,&quot;session&quot;:&quot;8C8F0B96-DC8B-11F1-8375-F02F7494A8ED&quot;,&quot;node&quot;:&quot;n5&quot;,&quot;body&quot;:&quot;{ where: { skos:prefLabel: { $regex:</figcaption>
+</figure>
+<h2>The answer</h2>
+
+<p>The report is below in the pane, folded under the bar rather than truncated
+into it. It is reproduced in full as <a href="report.md"><code>report.md</code></a>
+in this directory; the run's own record — every turn, every call, every status
+and byte count — is in <a href="run.json"><code>run.json</code></a>.</p>
+
+<div class="note good">
+<p>That <code>report.md</code> was not scraped from the page. It was read back
+out of <code>james/mcp</code> with a SPARQL query against the graph the
+interface wrote while the run was happening —
+<code>&lt;http://dydra.com/explorations/8C8F0B96-…/transcript&gt;</code>, whose
+<code>mcp:content</code> literals hold the prompt, each payload and the prose.
+Keeping the analysis (§35.4) is therefore not a claim in this page; it is how
+the page got its text.</p>
+</div>
+<figure>
+<img src="32-answered.png" alt="the reply line: the first sentence of the answer, with the rest folded">
+<figcaption>the reply line: the first sentence of the answer, with the rest folded</figcaption>
+</figure>
+<figure>
+<img src="33-the-report.png" alt="the answer, folded under the bar rather than truncated into it">
+<figcaption>the answer, folded under the bar rather than truncated into it</figcaption>
+</figure>
+<figure>
+<img src="35-the-report-3.png" alt="the report, screenful 3 of 6">
+<figcaption>the report, screenful 3 of 6 — <b>the candidate table</b>: a FIBO class, the finto concepts that might correspond, a category, a confidence and a reason. This is what the two service defects had made impossible: the finto side could not be searched, so no candidate could be proposed at all.</figcaption>
+</figure>
+<figure>
+<img src="37-the-report-5.png" alt="the report, screenful 5 of 6">
+<figcaption>the report, screenful 5 of 6</figcaption>
+</figure>
+<figure>
+<img src="39-provenance.png" alt="the end of the report and the provenance the interface adds: model as served, calls, date, where it was recorded">
+<figcaption>the end of the report and the provenance the interface adds: model as served, calls, date, where it was recorded</figcaption>
+</figure>
+<h2>Two things this run found</h2>
+
+<h3>The round budget had no way to end in an answer</h3>
+
+<div class="note bad">
+<p>The first live run spent all 26 of its rounds exploring and was cut off with
+<code>stopped after 26 tool rounds</code> and nothing to show. Every call had
+succeeded; the work was simply discarded, because the loop ended on a tool
+result that no one was ever asked to read.</p>
+<p>The budget bounds what may be <i>spent</i>. It was never meant to decide
+whether the question gets answered. So the loop now asks once more with the
+tools withheld — there is nothing left to call, and the only thing to do with a
+turn is to write — and the brief tells the model to leave itself a round rather
+than need that. The screenshots of the cut-short run are kept in
+<a href="../cut-short/"><code>cut-short/</code></a>.</p>
+<p>This second run did not need the closing turn: it finished on its own at
+round 26, which is what the brief change was for. The closing turn is a
+backstop, and it is the unit tests that exercise it.</p>
+</div>
+
+<h3>A true-looking caveat produced by a reporting artefact</h3>
+
+<div class="note bad">
+<p>The report's <i>Not established</i> says: <q>The server reported
+<code>$lang: en</code> as "unresolved", so the language filter may not have been
+applied.</q> The filter <i>was</i> applied — the rows came back English — but the
+reply had listed <code>en</code> among the names it could not resolve, because
+name resolution runs before the where-clause is compiled and did not know that
+<code>$lang</code> takes characters rather than a term.</p>
+<p>That is the worst place for an artefact to surface: the section of a report a
+reader trusts to say what is <i>not</i> known. <code>$contains</code>,
+<code>$starts</code>, <code>$ends</code>, <code>$regex</code>,
+<code>$flags</code> and <code>$lang</code> are now opaque to resolution, which is
+the same distinction <code>narrow</code> already made when compiling them. Fixed
+in gensrc and in the de17 patch bundle; <b>not yet loaded on the live host</b>.</p>
+</div>
+
+<h2>What the run cost</h2>
+
+<table>
+<tr><th>Model turns</th><td>26 (25 with tool calls, the last the report)</td></tr>
+<tr><th>Served as</th><td><code>claude-opus-5-5</code></td></tr>
+<tr><th>Tool calls</th><td>32 — <code>james/finto</code> 19, <code>james/fibo</code> 13, plus 4 <code>result_full</code></td></tr>
+<tr><th>Service requests relayed</th><td>40, all 200 but one</td></tr>
+<tr><th>Tokens</th><td>527 481 in, 12 480 out</td></tr>
+<tr><th>Recorded as</th><td>two transcripts in <code>james/mcp</code>, one per store</td></tr>
+</table>
+
+<p>The one failure is <code>/system/accounts/james/collaboration</code>, which
+answers 500 on dydra.com. The client is built to survive it and does; it is
+noted here because a capture that hides a service fault is worth less than one
+that shows it.</p>
+
+</div>
+</body>
+</html>

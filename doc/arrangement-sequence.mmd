@@ -1,0 +1,139 @@
+%% arrangement-sequence.mmd — what happens, in order, when a line is typed into
+%% the location bar.  The companion to `arrangement-dataflow.dot': that figure
+%% says WHAT moves, this one says WHEN, and the participant boxes below are the
+%% same four domains in the same order.
+%%
+%% The claim this drawing is for: ONE CHANNEL, WHATEVER IT IS ADDRESSING, AND
+%% THE CLASS IS READ OFF THE PATCH RATHER THAN BELIEVED.
+%%
+%% Three things are easier to see here than in the dataflow figure:
+%%
+%%   * THE GRAMMAR DECIDES WITHOUT A MODEL, and it decides first.  Misreading a
+%%     line is not symmetric: a path sent to a model spends money on a 404, a
+%%     sentence read as a path produces a 404 and loses the sentence.  So the
+%%     three branches are settled by `parseInstruction' before anything is
+%%     asked of anyone.
+%%
+%%   * THE MODEL IS ASKED FOR A PATCH AND FOR NOTHING ELSE.  The adapter on
+%%     this path is built with allowTools = [] and maxIterations = 1: there is
+%%     no line to the store while the question is being asked, so the whole
+%%     left-to-right traffic of the exploration figure is absent here by
+%%     construction, not by luck.
+%%
+%%   * THE FORK IS DELIBERATE AND ASYMMETRIC.  A non-presentational patch is
+%%     REFUSED on the workspace and GATED on a presentation.  The chrome holds
+%%     no data, so a gate there would be asking a reader to authorise a query
+%%     against a repository the workspace never names.
+%%
+%% And one asymmetry the figure does not hide: the two addressable kinds are
+%% not persisted the same way.  The workspace is a tree of triples in
+%% `<account>/ui', one graph per presentation, written as a single four-
+%% statement update.  A presentation's revision is recorded as an mcp:Dashboard
+%% JSON literal in `<account>/mcp' by the same `recordRun' the exploration uses.
+%%
+%% Source: lib/app/instructions.js (parseInstruction, target), ui/app.js
+%% (instructWorkspace, addressableTargets, redrawChrome), lib/app/workspace-
+%% instruction.js (runWorkspaceInstruction), lib/app/patch.js (applyPatch,
+%% classify), lib/app/ui-store.js (writePresentation), ui/components/
+%% dashboard-pane.js (startRevision, receiveRevision, presentChange,
+%% applyRevision, record).
+
+sequenceDiagram
+  autonumber
+  actor U as you
+
+  box rgb(253,247,241) the main document — one instruction channel, whatever it is addressing
+    participant B as the location bar
+    participant A as THE ADDRESS
+    participant X as apply · classify
+  end
+  box rgb(250,236,226) the model provider — asked for a patch, and for nothing else
+    participant M as the model
+  end
+  box rgb(228,238,250) the dydra service
+    participant W as account/ui
+    participant R as account/mcp
+    participant S as the repository
+  end
+  box rgb(238,238,238) the page frame — opaque origin, no credential, no network
+    participant F as the page
+  end
+
+  U->>B: a line
+  B->>B: parseInstruction — tiny, and decidable without a model
+
+  alt the line is a path, with or without goto
+    B->>B: renderPage
+    B-->>U: the page
+  else goto name
+    B->>A: re-address
+    alt it names one thing
+      A-->>B: the workspace, or that presentation
+      B-->>U: the target indicator changes, and nothing else happens
+    else it names none, or more than one
+      A-->>B: REFUSED — never the nearest match
+      Note over B,A: what a wrong guess re-addresses is what the NEXT<br/>sentence will change, so a near miss is not a kindness
+    end
+  else anything else — an instruction, against the address shown
+    B->>A: what is addressed, and its document
+    A-->>B: the contract for that kind, and the document as an outline
+    Note over B,X: a presentation has panels, queries, parameters and a grant.<br/>The chrome has none, so it gets the shorter contract.  Offer a model a<br/>vocabulary of queries for a surface that cannot run one, and the cheapest<br/>way to satisfy a request becomes writing one into the furniture
+
+    B->>M: the instruction, the contract, and the outline<br/>· JSON + the PROVIDER key
+    Note right of M: allowTools = [] and maxIterations = 1 —<br/>no line to the store while asking
+    M-->>B: a patch · JSON ops
+
+    alt the answer carried no patch block
+      B-->>U: nothing has been changed — and if it was cut off at the<br/>token ceiling with the block still open, ask for a smaller change
+    else a patch
+      B->>X: applyPatch against a COPY of the document
+      alt any operation is invalid
+        X-->>B: refused whole — nothing was half-applied
+        B-->>U: the errors, and the patch, to read
+      else applied
+        X->>X: classify before against after — read off the documents,<br/>not off what the patch said it was doing
+
+        alt the address is the WORKSPACE and the class is not presentational
+          X-->>B: REFUSED — the interface itself holds no data
+          Note over X: the model has written a panel or a parameter into<br/>the furniture.  A gate here would ask for consent to<br/>a query against a repository the workspace never names
+        else a presentation, class = authority
+          X-->>B: REFUSED — a patch cannot widen a grant.<br/>Close the page and start again with the authority you want to give
+        else a presentation, class = data or computational
+          X-->>U: GATE — the panels before and after, side by side
+          U->>X: Run n panels and apply
+          X->>S: runPanels — only the panels the classifier says changed<br/>· SPARQL + the user's token
+          S-->>X: RESULT JSON
+        else presentational
+          Note over X: applied without a gate — a change of colour that asked<br/>permission would teach the reader to stop reading the<br/>gates that matter
+        end
+
+        alt the workspace
+          X->>W: DROP SILENT GRAPH, INSERT DATA, DELETE WHERE, INSERT DATA<br/>— one update, one graph
+          W-->>X: revision n+1
+          X->>B: redrawChrome — the whole page, not the chrome alone:<br/>a band that moved takes its contents with it
+        else a presentation
+          X->>F: the change, as instructions · postMessage
+          F-->>X: in place, or rebuilt
+          Note over X: in place, because rebuilding would throw away the scroll<br/>position, the open tab, a selection and the parameter just<br/>chosen — making the cheap change feel worse than the expensive one
+          X->>R: recordRun, disposition "revised" · SPARQL update
+        end
+
+        X-->>B: what the patch did, in a line
+        B-->>U: the reply, with an UNDO beside it
+
+        opt the reader presses undo
+          U->>B: undo
+          B->>X: the document as it was, held from before the write
+          Note over X: an authority change cannot be undone here — it needed a grant
+          X->>X: put back through the same path the change took, so going<br/>backwards over a presentational change re-runs nothing
+          alt the workspace
+            X->>W: written again
+          else a presentation
+            X->>R: recorded again, disposition "revised"
+          end
+          Note over X,W: a revert is a NEW revision and not a rewind — whoever has<br/>already read the version being undone still has something that happened
+          B-->>U: put back
+        end
+      end
+    end
+  end

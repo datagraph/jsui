@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="date" content="2026-11-09">
+<title>An analysis across two repositories — a worked example</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; font: 15px/1.55 Georgia, "Times New Roman", serif; color: #1f2328;
+         background: #fff; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 1.9em; margin: 0 0 .2em; }
+  h2 { font-size: 1.25em; margin: 2em 0 .5em; border-bottom: 1px solid #e5e7eb;
+        padding-bottom: .25em; }
+  p.lede { color: #4b5563; margin-top: 0; }
+  code, pre { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: .88em; }
+  pre { background: #f6f8fa; padding: 10px 14px; overflow-x: auto; border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: .92em; }
+  th, td { border: 1px solid #e5e7eb; padding: 6px 10px; text-align: left;
+            vertical-align: top; }
+  th { background: #f6f8fa; }
+  figure { margin: 2em 0; }
+  figure img { width: 100%; height: auto; border: 1px solid #d1d5db; border-radius: 3px;
+                display: block; }
+  figcaption { font-size: .9em; color: #4b5563; margin-top: .5em; }
+  .note { background: #f6f8fa; border-left: 3px solid #9ca3af; padding: 10px 14px;
+           margin: 1.2em 0; }
+  .bad { border-left-color: #b91c1c; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>An analysis across two repositories</h1>
+<p class="lede">A worked example of §35, captured against the live service on
+8 November 2026.</p>
+
+<div class="note"><p><b>Superseded, and kept.</b> This capture was made before
+the two service defects it found were fixed, and with the model scripted because
+no provider key was available. The same question was asked again on 9 November
+against the patched service with a real model: see
+<a href="../analysis-live/">an analysis across two repositories, with a real
+model</a>. This page is kept because it is the record of how the defects were
+found, which the later run cannot show.</p></div>
+
+<p>One line is typed into the location bar — <code>compare the concepts present
+in james/finto and james/fibo</code> — and the interface reads it as a question
+about data rather than an instruction about itself, because it names
+repositories. It says which stores it would read and runs nothing until the
+press. Then it explores each store through that store's own MCP resource,
+narrates what it is doing, can be stopped, and files the result as RDF.</p>
+
+<h2>What is real here, and what is not</h2>
+
+<table>
+<tr><th>Real</th><th>Not real</th></tr>
+<tr>
+<td>
+<p><b>The two repositories.</b> <code>james/finto</code> and
+<code>james/fibo</code> on dydra.com, read live through their own MCP
+resources. Every count, label, class definition and compiled query shown below
+came back from the service during this run. Fourteen calls were relayed; two
+transcript records were written.</p>
+<p><b>The whole client path.</b> Reading the line, the disclosure, the grant,
+the brief, the per-store routing and tool naming, the digesting of large
+payloads, the progress line, the stop, and the recording.</p>
+</td>
+<td>
+<p><b>The model.</b> There is no provider key in this environment, so the
+harness answers the provider's wire shape itself from a fixed script.</p>
+<p>The script is not invented: it is the sequence of operations an analyst ran
+by hand against these two stores, in that order, and the report it ends with is
+written from the figures those operations actually returned. The calls are
+real and their answers are real; what is scripted is the choosing of them.</p>
+</td>
+</tr>
+</table>
+
+<h2>What the run found</h2>
+
+<p><b>The two stores are not the same kind of thing.</b>
+<code>james/finto</code> declares twelve types, dominated by
+<b>96 797 <code>skos:Concept</code></b>, with 11 980
+<code>afo-meta:Concept</code>, 6 260 <code>GeographicalConcept</code>, 475
+collections and three <code>owl:Class</code>. <code>james/fibo</code> declares
+<b>four <code>owl:Class</code></b>, seven restrictions, two ontologies and
+<b>no <code>skos:Concept</code> at all</b>. That difference — a terminology
+against an ontology fragment — is the principal result, and two calls make it
+visible.</p>
+
+<div class="note">
+<p><b>Both defects were fixed in <code>gensrc</code> on 9 November 2026</b> —
+in the score writer (<code>orchestrator/score.lisp</code>), in
+<code>orchestrate-narrow</code> (<code>orchestrator/operations.lisp</code>) and
+in the Turtle vocabulary resource (<code>mcp/mcp-resources.lisp</code>). The
+build compiles and the logic is checked by
+<code>mcp/test/score-fix-check/run.sh</code> (27 assertions) against the
+definitions extracted from the source. The screenshots below are of the run
+that found them, against the build dydra.com was serving that day, and they
+have not been retaken: <b>the live hosts still carry the old code until the
+gensrc build is deployed.</b></p>
+</div>
+
+<div class="note bad">
+<p><b>Defect 1 — a language-tagged literal does not survive the score
+serializer.</b> Every <code>@en</code>, <code>@fi</code> and <code>@sv</code>
+literal arrives as a printed internal structure:</p>
+<pre>#S(PLAIN-LITERAL :ID 51432710 :LEXICAL-FORM yhteisöt :LANGUAGE-TAG fi)</pre>
+<p>Untagged literals are fine — fibo's <code>skos:definition</code> strings read
+correctly — and the same data over <code>/sparql</code> as CSV reads correctly,
+so this is the MCP score layer and not the store. For a multilingual thesaurus
+it is total: no label can be read and no language distinguished.</p>
+<p><b>Fixed:</b> the writer now emits a literal as its text, with the language
+tag appended — <code>yhteisöt@fi</code>. The tag goes inside the quotes rather
+than after them because score reserves <code>@</code> for its own operators, so
+<code>"yhteisöt"@fi</code> would lex as a string followed by a stray operator
+and would not read back.</p>
+</div>
+
+<div class="note bad">
+<p><b>Defect 2 — <code>narrow</code> does not narrow.</b> Asking
+<code>{ where: { skos:prefLabel: { $contains: "classification" } } }</code>
+returned the working set unchanged, and <code>materialize</code> on the
+narrowed node emits a query with no <code>FILTER</code> in it at all. With
+96 797 concepts, label narrowing <i>is</i> the Finto half of this
+comparison.</p>
+<p><b>Fixed:</b> a where-clause now compiles to FILTER algebra —
+<code>$eq $ne $lt $lte $gt $gte $contains $starts $ends $regex $in</code> and
+<code>$lang</code>, which tests the language tag rather than the text and is
+what a reader of a multilingual vocabulary needs first. The filter is added to
+the pattern <i>inside</i> the select, so it searches the extension rather than
+the rows a limit had already chosen; a property the node does not bind is now
+an error rather than a clause silently dropped. The string tests read the
+variable through <code>str</code>, so a tagged label compares at all.</p>
+</div>
+
+<div class="note">
+<p><b>And a third, smaller.</b>
+<code>GET /system/accounts/james/collaboration</code> answers 500 on
+dydra.com. The client is built to survive it — one list failing does not lose
+the other — and the run proceeded on the account's own repositories alone,
+which is the specified behaviour and had never been seen happen.</p>
+</div>
+
+<p><b>So no candidate table was produced</b>, and the reason is in the service,
+not the client. The client path ran end to end against live stores. What it
+could not do was read a Finnish thesaurus's labels, because they did not arrive
+as labels. With the two fixes above a repeat of this run can get past that
+point; it has not been repeated here, because the fixes are in
+<code>gensrc</code> and the repositories are served by a build that does not
+yet carry them.</p>
+
+<h2>The process, step by step</h2>
+
+  <figure id="s1">
+    <img src="01-the-interface.png" alt="the chrome, with the location bar as the only prompt on the screen" loading="lazy">
+    <figcaption><b>1.</b> the chrome, with the location bar as the only prompt on the screen</figcaption>
+  </figure>
+  <figure id="s2">
+    <img src="02-the-question-typed.png" alt="a line that names two repositories — the bar reads it as a question about data, not an instruction about the interface" loading="lazy">
+    <figcaption><b>2.</b> a line that names two repositories — the bar reads it as a question about data, not an instruction about the interface</figcaption>
+  </figure>
+  <figure id="s3">
+    <img src="03-disclosed-before-it-runs.png" alt="nothing has run: the stores are named and one press is offered" loading="lazy">
+    <figcaption><b>3.</b> nothing has run: the stores are named and one press is offered</figcaption>
+  </figure>
+  <figure id="s4">
+    <img src="04-what-the-press-authorises.png" alt="the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept" loading="lazy">
+    <figcaption><b>4.</b> the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept</figcaption>
+  </figure>
+  <figure id="s5">
+    <img src="05-reading-the-tools.png" alt="the run has begun: each store&#x27;s own tools and the server&#x27;s operation catalogue are read first" loading="lazy">
+    <figcaption><b>5.</b> the run has begun: each store&#x27;s own tools and the server&#x27;s operation catalogue are read first</figcaption>
+  </figure>
+  <figure id="s6">
+    <img src="06-inventory-finto.png" alt="the first call, routed to james/finto by the name it was called under" loading="lazy">
+    <figcaption><b>6.</b> the first call, routed to james/finto by the name it was called under</figcaption>
+  </figure>
+  <figure id="s7">
+    <img src="07-inventory-fibo.png" alt="the second, to james/fibo — one exploration per store" loading="lazy">
+    <figcaption><b>7.</b> the second, to james/fibo — one exploration per store</figcaption>
+  </figure>
+  <figure id="s8">
+    <img src="08-reading-the-classes.png" alt="fibo&#x27;s four owl:Class, read with their definitions" loading="lazy">
+    <figcaption><b>8.</b> fibo&#x27;s four owl:Class, read with their definitions</figcaption>
+  </figure>
+  <figure id="s9">
+    <img src="09-reading-the-labels.png" alt="finto&#x27;s labels — where the run meets the first defect" loading="lazy">
+    <figcaption><b>9.</b> finto&#x27;s labels — where the run meets the first defect</figcaption>
+  </figure>
+  <figure id="s10">
+    <img src="10-narrowing.png" alt="a label search over 96 797 concepts" loading="lazy">
+    <figcaption><b>10.</b> a label search over 96 797 concepts</figcaption>
+  </figure>
+  <figure id="s11">
+    <img src="11-the-compiled-query.png" alt="and the query that search compiled to, asked for so it can be rerun" loading="lazy">
+    <figcaption><b>11.</b> and the query that search compiled to, asked for so it can be rerun</figcaption>
+  </figure>
+  <figure id="s12">
+    <img src="12-writing-it-up.png" alt="the model has what it needs and is writing the report" loading="lazy">
+    <figcaption><b>12.</b> the model has what it needs and is writing the report</figcaption>
+  </figure>
+  <figure id="s13">
+    <img src="13-answered.png" alt="the reply line: the first sentence of the answer, with the rest folded" loading="lazy">
+    <figcaption><b>13.</b> the reply line: the first sentence of the answer, with the rest folded</figcaption>
+  </figure>
+  <figure id="s14">
+    <img src="14-the-report.png" alt="the answer, folded under the bar rather than truncated into it" loading="lazy">
+    <figcaption><b>14.</b> the answer, folded under the bar rather than truncated into it</figcaption>
+  </figure>
+  <figure id="s15">
+    <img src="15-observed-interpreted-not-established.png" alt="the three lists the brief requires, and the provenance the interface adds: model as served, stores, calls, date, and where it was recorded" loading="lazy">
+    <figcaption><b>15.</b> the three lists the brief requires, and the provenance the interface adds: model as served, stores, calls, date, and where it was recorded</figcaption>
+  </figure>
+
+<h2>Reproducing it</h2>
+<pre>node tests/analysis-demonstration.mjs</pre>
+<p>The harness proxies the service calls so that a page served from localhost
+may make them, and reads the credential from <code>~/.dydra</code> at run time;
+it is never sent to the browser.</p>
+
+</div>
+</body>
+</html>

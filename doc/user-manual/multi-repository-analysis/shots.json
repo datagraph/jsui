@@ -1,0 +1,38 @@
+[
+  {
+    "file": "01-sign-in.png",
+    "note": "the client as it is served, before anything is signed in"
+  },
+  {
+    "file": "02-signed-in.png",
+    "note": "the account page, with the location bar across the top"
+  },
+  {
+    "file": "03-the-location-bar.png",
+    "note": "the location bar, the last band of the chrome and present on every page"
+  },
+  {
+    "file": "04-the-connection-tab.png",
+    "note": "the account pane's Connection tab: provider, model and the key the analysis is asked with"
+  },
+  {
+    "file": "05-address-the-workspace.png",
+    "note": "the bar starts addressing nothing: `goto workspace' points it at the chrome"
+  },
+  {
+    "file": "06-addressed.png",
+    "note": "the bar says what it is addressing; from here a line that is not a path is an instruction"
+  },
+  {
+    "file": "07-the-question-typed.png",
+    "note": "a line that is not a path and that names two repositories"
+  },
+  {
+    "file": "08-disclosed-before-it-runs.png",
+    "note": "nothing has run: the bar names what it would read and offers one press"
+  },
+  {
+    "file": "09-what-the-press-authorises.png",
+    "note": "the disclosure in full: which repositories, how many rounds, how many calls, read-only, and where the answer is kept"
+  }
+]

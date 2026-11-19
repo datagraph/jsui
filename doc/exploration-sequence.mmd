@@ -1,0 +1,106 @@
+%% exploration-sequence.mmd — what happens, in order, when a question is asked
+%% of a repository.  The companion to `exploration-dataflow.dot': that figure
+%% says WHAT moves and under whose authority, this one says WHEN, and the two
+%% share their four domains — the participant boxes below are the clusters
+%% there, in the same order and the same colours.
+%%
+%% The claim this drawing is for is the same one: THE MODEL PROPOSES AND RUNS
+%% NOTHING.  Read down the `the model' lifeline and every arrow leaving it is
+%% a proposal that arrives at the interface, never at the service — there is
+%% no message from the provider box to the dydra box anywhere in the figure,
+%% and that absence is the point.
+%%
+%% Two things are easier to see here than in the dataflow figure:
+%%
+%%   * THE GRANT IS CONSULTED TWICE PER CALL AND ONCE PER RUN.  It is told to
+%%     the model before the first turn (`grantContract'), checked before each
+%%     call leaves (`grant.check', which CHARGES the query there and then),
+%%     and charged again for what came back (`chargeResult').  A limit enforced
+%%     after the store has been read is not a limit, it is a complaint.
+%%
+%%   * THE ARGUMENTS ARE SCREENED, NOT THE TOOL NAME.  `selectTools' decided
+%%     that `query' may be offered; it cannot decide what `query' is then
+%%     asked to do, because that is in an argument and every value of it wears
+%%     the same name.  Hence the two refusal branches, which are different
+%%     screens and not one screen twice.
+%%
+%% Source: lib/llm/tool-adapter.js (createToolAdapter, run, relayToolCall),
+%% lib/llm/grant.js (argumentRefusal, check, chargeResult), lib/mcp/mcp-client.js,
+%% lib/dashboard/frame.js (SANDBOX, CSP, buildPage), lib/mcp/transcript-store.js.
+
+sequenceDiagram
+  autonumber
+  actor U as you
+
+  box rgb(253,247,241) the main document — the only place both credentials are held
+    participant P as the interface<br/>(exploration pane)
+    participant G as THE GRANT
+  end
+  box rgb(250,236,226) the model provider — proposes, and runs nothing
+    participant M as the model
+  end
+  box rgb(228,238,250) the dydra service — authorization enforced by resource and agent
+    participant C as MCP endpoint
+    participant S as SPARQL / RDF
+  end
+  box rgb(238,238,238) the page frame — opaque origin, no credential, no network
+    participant F as the page
+  end
+
+  U->>P: a question, in words
+  Note over P,G: the grant was decided once — which repositories,<br/>read-only, queries, rows, bytes, expiry
+
+  opt the first turn of the session only
+    P->>C: tools/list · JSON-RPC + the user's token
+    C-->>P: everything the endpoint offers
+    Note over P: selectTools keeps ALLOW_TOOLS and withholds the rest —<br/>a live endpoint offers writes, and this is where they stop
+    P->>C: resources/read score://operations, score://grammar
+    C-->>P: the primer — the notation and the operations,<br/>read before a single row of data
+  end
+
+  P->>G: grantContract
+  G-->>P: what the model may ask for, as prose
+  P->>M: the prompt, the tool definitions, the primer,<br/>and the contract · JSON + the PROVIDER key
+  Note right of M: the provider sees the conversation<br/>and nothing of the store
+
+  loop up to 8 tool rounds
+    M-->>P: prose, and zero or more tool_use blocks · JSON
+    alt the turn carried no tool_use
+      Note over P: the run is over — what it produced is read out of<br/>the prose: a query, a dashboard, a figure
+    else the turn proposed one or more calls
+      loop for each proposed call
+        P->>G: check — the ARGUMENTS, before anything is sent
+        alt the arguments carry an update notation or an operative DELETE
+          G-->>P: REFUSED
+          P-->>M: tool_result — this call was not made, this run may only read
+        else past the query, row or byte ceiling, or expired
+          G-->>P: REFUSED, and the reason
+          P-->>M: tool_result — say what you still need<br/>rather than working around it
+        else allowed
+          G-->>P: charged — the query is spent now, not on the way back
+          P->>C: tools/call survey or query · JSON-RPC + the USER's token
+          Note over P,C: re-credentialled.  What the model proposed is a request<br/>TO THE BROWSER, and the browser makes it under its own authority
+          C->>S: SPARQL · score · GraphQL
+          S-->>C: RESULT JSON
+          C-->>P: the result, with its notation stated
+          P->>G: chargeResult — bytes, and rows
+          opt the payload is over 4000 bytes
+            Note over P: digested: the model is shown the SHAPE, not the rows,<br/>and may ask for the document with result_full —<br/>answered from what was relayed, never by reading the store twice
+          end
+          P-->>M: tool_result · the digest, or the document
+          Note over P,M: THE ONE CROSSING.  This is the only place repository<br/>content enters the model's domain
+        end
+      end
+    end
+  end
+
+  P->>P: read the final prose for a query, a dashboard, a figure
+  opt the run proposed a page
+    P->>F: markup and data, no credential · srcdoc, opaque origin,<br/>CSP connect-src 'none'
+    F-->>P: postMessage — rendered, or the reason it could not be
+    Note over P,F: the parent authenticates the reply by event.source,<br/>never by origin: the frame has none
+  end
+
+  P->>S: recordRun — prompt, primer, prose, payloads<br/>· SPARQL update + the user's token
+  Note over P,S: what the service cannot see, the browser records.<br/>The provider holds the conversation, the service holds the calls,<br/>and only the page has ever held both
+  P-->>U: prose, rows, the page — and the provenance note naming<br/>the model AS SERVED, the date, and the repository

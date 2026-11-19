@@ -1,0 +1,146 @@
+[
+  {
+    "file": "01-the-interface.png",
+    "note": "the chrome, with the location bar as the only prompt on the screen"
+  },
+  {
+    "file": "02-the-question-typed.png",
+    "note": "a line that names two repositories — read as a question about data, not an instruction about the interface"
+  },
+  {
+    "file": "03-disclosed-before-it-runs.png",
+    "note": "nothing has run: the stores are named and one press is offered"
+  },
+  {
+    "file": "04-what-the-press-authorises.png",
+    "note": "the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept"
+  },
+  {
+    "file": "05-the-run-begins.png",
+    "note": "each store's own tools and the server's operation catalogue are read before the model is asked anything"
+  },
+  {
+    "file": "06-turn-01-survey-james-finto-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"connect\"} | survey__james__fibo {\"op\":\"connect\"}"
+  },
+  {
+    "file": "07-turn-02-survey-james-finto-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"catalog\",\"body\":\"{ scope: types }\",\"session\":\"AEBF2962-DCA4-11F1-B393-F02F7494A8ED\"} | survey__james__fibo {\"op\":\"catalog\",\"body\":\"{ scope: types }\",\"session\":\"BB03EABE-DCA4-11F1-AE60-F02F7494A8ED\"}"
+  },
+  {
+    "file": "08-turn-03-survey-james-finto-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"catalog\",\"body\":\"{ scope: types }\",\"session\":\"AEBF2962-DCA4-11F1-B393-F02F7494A8ED\"} | survey__james__fibo {\"op\":\"catalog\",\"body\":\"{ scope: types }\",\"session\":\"BB03EABE-DCA4-11F1-AE60-F02F7494A8ED\"}"
+  },
+  {
+    "file": "09-turn-04-survey-james-finto-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"catalog\",\"body\":\"{ scope: predicates }\",\"session\":\"AEBF2962-DCA4-11F1-B393-F02F7494A8ED\"} | survey__james__fibo {\"op\":\"catalog\",\"body\":\"{ scope: predicates }\",\"session\":\"BB03EABE-DCA4-11F1-AE60-F02F7494A8ED\"}"
+  },
+  {
+    "file": "10-turn-05-survey-james-fibo-survey-james-finto.png",
+    "note": "the model asks for: survey__james__fibo {\"op\":\"select\",\"body\":\"{ @shape: [rdf:type], @optional: [rdfs:label], @limit: 50 }\",\"session\":\"BB03EABE-DCA4-11F1-AE60-F | survey__james__finto {\"op\":\"catalog\",\"body\":\"{ scope: types }\",\"session\":\"AEBF2962-DCA4-11F1-B393-F02F7494A8ED\"}"
+  },
+  {
+    "file": "11-turn-06-survey-james-fibo-survey-james-finto.png",
+    "note": "the model asks for: survey__james__fibo {\"op\":\"select\",\"body\":\"{ @type: owl:Class, @shape: [], @optional: [rdfs:label, skos:definition, rdfs:subClassOf, rdfs:is | survey__james__finto {\"op\":\"select\",\"body\":\"{ @type: skos:ConceptScheme, @shape: [], @optional: [dcterms:title, dc:title, rdfs:label, skos:pr"
+  },
+  {
+    "file": "12-turn-07-result-full-survey-james-fibo.png",
+    "note": "the model asks for: result_full {\"of\":\"r1\"} | survey__james__fibo {\"op\":\"materialize\",\"body\":\"sparql\",\"session\":\"BB03EABE-DCA4-11F1-AE60-F02F7494A8ED\"}"
+  },
+  {
+    "file": "13-turn-08-survey-james-fibo-survey-james-finto.png",
+    "note": "the model asks for: survey__james__fibo {\"op\":\"select\",\"body\":\"{ @type: owl:Restriction, @shape: [owl:onProperty], @optional: [owl:someValuesFrom, owl:allValues | survey__james__finto {\"op\":\"select\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel], @optional: [skos:inScheme, skos:exactMatch, skos"
+  },
+  {
+    "file": "14-turn-09-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"select\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel, skos:inScheme], @limit: 40 }\",\"session\":\"AEBF2962"
+  },
+  {
+    "file": "15-turn-10-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"body\":\"{ where: { skos:prefLabel: { $regex: \\\"loan\\\", $flags: \\\"i\\\", $lang: en } } }\",\"session\":\"AEBF296"
+  },
+  {
+    "file": "16-turn-11-result-full.png",
+    "note": "the model asks for: result_full {\"of\":\"r4\"}"
+  },
+  {
+    "file": "17-turn-12-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"select\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel], @distinct: true, @limit: 200 }\",\"session\":\"AEBF2"
+  },
+  {
+    "file": "18-turn-13-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"body\":\"{ where: { skos:prefLabel: { $regex: \\\"loan|lending|credit|industr|classification\\\", $flags: \\\"i\\"
+  },
+  {
+    "file": "19-turn-14-survey-james-finto-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"body\":\"{ where: { skos:prefLabel: { $regex: \\\"loan|lending|borrow\\\", $flags: \\\"i\\\", $lang: en } } }\",\"se | survey__james__finto {\"op\":\"narrow\",\"body\":\"{ where: { skos:prefLabel: { $regex: \\\"classif|industrial sector|sectors|branches of\\\", $flags: \\"
+  },
+  {
+    "file": "20-turn-15-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"select\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel, skos:inScheme, {skos:broader: [skos:prefLabel]}],"
+  },
+  {
+    "file": "21-turn-16-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"body\":\"{ where: { skos:prefLabel: { $in: [\\\"loans (amount of money)\\\"@en, \\\"lending\\\"@en, \\\"classificati"
+  },
+  {
+    "file": "22-turn-17-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"body\":\"{ where: { skos:prefLabel: { $regex: \\\"^(loans \\\\\\\\(amount of money\\\\\\\\)|lending|classification s"
+  },
+  {
+    "file": "23-turn-18-survey-james-finto-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"materialize\",\"body\":\"sparql\",\"session\":\"AEBF2962-DCA4-11F1-B393-F02F7494A8ED\",\"node\":\"n12\"} | survey__james__finto {\"op\":\"select\",\"body\":\"{ @type: skos:Concept, @shape: [skos:inScheme], @group: [skos:inScheme], @limit: 50 }\",\"session\":"
+  },
+  {
+    "file": "24-turn-19-survey-james-finto-survey-james-fibo.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"select\",\"body\":\"{ @type: skos:Concept, @shape: [skos:inScheme], @distinct: true, @limit: 50 }\",\"session\":\"AEBF296 | survey__james__fibo {\"op\":\"select\",\"body\":\"{ @type: owl:Ontology, @shape: [rdfs:label], @optional: [owl:versionIRI, dcterms:abstract, owl:im"
+  },
+  {
+    "file": "25-turn-20-result-full-survey-james-finto.png",
+    "note": "the model asks for: result_full {\"of\":\"r8\"} | survey__james__finto {\"op\":\"select\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel], @optional: [skos:exactMatch, skos:closeMatch, sk"
+  },
+  {
+    "file": "26-turn-21-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"body\":\"{ where: { skos:prefLabel: { $regex: \\\"^(loans \\\\\\\\(amount of money\\\\\\\\)|classification schemes|c"
+  },
+  {
+    "file": "27-turn-22-survey-james-finto.png",
+    "note": "the model asks for: survey__james__finto {\"op\":\"narrow\",\"body\":\"{ where: { skos:prefLabel: { $regex: \\\"företagslån|kommersiell|lån$|^lån\\\", $flags: \\\"i\\\", $lang:"
+  },
+  {
+    "file": "28-turn-23-prose.png",
+    "note": "the model writes rather than calls: # How the concepts in james/finto and james/fibo compare\n\n## Summary\n\nI compared the concepts in **james/finto** and **james/fibo**. They are different kinds of"
+  },
+  {
+    "file": "29-answered.png",
+    "note": "the reply line: the first sentence of the answer, with the rest folded"
+  },
+  {
+    "file": "30-the-report.png",
+    "note": "the answer, folded under the bar rather than truncated into it"
+  },
+  {
+    "file": "31-the-report-2.png",
+    "note": "the report, screenful 2 of 6"
+  },
+  {
+    "file": "32-the-report-3.png",
+    "note": "the report, screenful 3 of 6"
+  },
+  {
+    "file": "33-the-report-4.png",
+    "note": "the report, screenful 4 of 6"
+  },
+  {
+    "file": "34-the-report-5.png",
+    "note": "the report, screenful 5 of 6"
+  },
+  {
+    "file": "35-the-report-6.png",
+    "note": "the report, screenful 6 of 6"
+  },
+  {
+    "file": "36-provenance.png",
+    "note": "the end of the report and the provenance the interface adds: model as served, calls, date, where it was recorded"
+  }
+]

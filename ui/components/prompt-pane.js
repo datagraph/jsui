@@ -2,6 +2,11 @@
  * The prompt pane: compose a prompt, send it to MCP or to an LLM, and keep each
  * answer in its own timestamped tab beneath the prompt.
  *
+ * **Not mounted.**  This is the first MCP surface, kept for the tabbed
+ * transcript it shows and superseded by the exploration panes.  Its credential
+ * form came out on 2026-11-15 with the exploration pane's (§34.4): a third
+ * copy of the same fields, in a third place, for one object.
+ *
  * Shape of the thing (plan §4b.3):
  *   - a prompt editor that holds text AND links, so a prompt can cite a view or
  *     a repository by URL and still be edited as prose;
@@ -30,8 +35,8 @@ import { createToolAdapter } from "../../lib/llm/tool-adapter.js";
 import { renderSessionLog } from "./session-log.js";
 // Shared with the exploration pane that opens beside the view editors, so a
 // provider key typed in either is present in both.
-import { paneState } from "./mcp-pane-state.js";
-import { locationControl, modelControl, bindLlmSettings } from "./llm-settings.js";
+import { paneState, paneStore } from "./mcp-pane-state.js";
+import { CONNECTION_PLACE } from "../../lib/app/connection.js";
 
 const BASE_PATH = (typeof window !== "undefined" && window.APP_BASE_PATH) || "/ui";
 
@@ -54,22 +59,9 @@ function template(st) {
         <input type="text" data-testid="prompt-mcp-endpoint" class="prompt-mcp-endpoint"
                value="${esc(st.mcpEndpoint)}" style="width:320px;font-size:12px;padding:2px 4px;" />
       </label>
-      <label>LLM
-        ${locationControl(st, { testid: "prompt-llm-endpoint" })}
-      </label>
-      <label>key
-        <input type="password" data-testid="prompt-llm-key" class="prompt-llm-key"
-               placeholder="api key" value="${esc(st.llmKey)}"
-               style="width:120px;font-size:12px;padding:2px 4px;" />
-      </label>
-      <label>workspace
-        <input type="text" data-testid="prompt-llm-workspace" class="prompt-llm-workspace"
-               placeholder="wrkspc_… (org-scoped keys)" value="${esc(st.llmWorkspace)}"
-               style="width:150px;font-size:12px;padding:2px 4px;" />
-      </label>
-      <label>model
-        ${modelControl(st, { testid: "prompt-llm-model" })}
-      </label>
+      <span data-testid="prompt-llm-note" style="color:#666;">
+        model: ${esc(st.llmModel || "none")} — set in ${esc(CONNECTION_PLACE)}
+      </span>
     </div>
 
     <div class="prompt-editor" data-testid="prompt-editor" contenteditable="true"
@@ -247,7 +239,10 @@ async function executeLlm(root, st, app, promptText, setStatus = () => {}) {
     model: st.llmModel,
     // With no MCP endpoint the adapter sends no tools at all, which is the
     // plain completion the pane used to make.
-    mcp: st.mcpEndpoint ? { endpoint: st.mcpEndpoint, token: st.token } : null,
+    // The repository this pane reads, in the shape the adapter routes on:
+        // one store, named, so that every event the turn produces says which
+        // repository the call went to (REQ-34.3.5).
+        mcp: paneStore(st),
     onEvent,
   });
 
@@ -284,12 +279,6 @@ export function initPromptPane(app, pane, accountName, repositoryName) {
     if (el) el.addEventListener("change", () => { st[key] = el.value.trim(); });
   };
   bind(".prompt-mcp-endpoint", "mcpEndpoint");
-  // location and model are linked menus; the key and workspace are read by
-  // the same binding, because a new key re-reads the model list
-  bindLlmSettings(panel, st, {
-    keyInput: panel.querySelector(".prompt-llm-key"),
-    workspaceInput: panel.querySelector(".prompt-llm-workspace"),
-  });
 
   // links stay links: linkify on blur rather than on every keystroke, so the
   // caret is not moved while someone is typing a URL.

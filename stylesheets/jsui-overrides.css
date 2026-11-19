@@ -292,6 +292,23 @@ body.accounts.show .account-sidebar .manage-tab[data-tab="prefixes"] img {
   transform: scaleX(-1);
 }
 
+/* The exploration tab is not one of the sidebar's panel tabs: it opens the
+   account's exploration pane in the column beside the sidebar (§34.4).  So it
+   is set apart by a gap, and it marks itself open rather than active --
+   "active" in this strip means "this panel is showing", and that is not what
+   this one does. */
+body.accounts.show .account-sidebar .manage-tab.exploration-tab {
+  margin-top: 14px;
+  border-top: 1px solid #ccc;
+}
+
+body.accounts.show .account-sidebar .manage-tab.exploration-tab.open {
+  background: #fff;
+  border-color: #aaa;
+  border-right-color: #fff;
+  box-shadow: inset 2px 0 0 #1f4e79;
+}
+
 body.accounts.show .account-sidebar .manage-tab.active {
   background: #fff;
   color: #111;
@@ -865,6 +882,62 @@ body.repositories.show #content-container > #sidebar-gutter.dragging {
   border-radius: 3px;
   background: #fff;
   cursor: pointer;
+}
+
+.location-undo,
+.location-more,
+.location-stop,
+.location-confirm {
+  font-size: 11px;
+  padding: 0 5px;
+  margin-left: 4px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.location-confirm {
+  border-color: #6b7280;
+  font-weight: 600;
+}
+
+/* The way out of a run that is taking minutes (§35.3).  Marked, because it
+   is the one button on the bar that ends something already in progress. */
+.location-stop {
+  border-color: #b91c1c;
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.location-stop[disabled] {
+  border-color: #d1d5db;
+  color: #9ca3af;
+  cursor: default;
+}
+
+/* An answer about data is prose; the reply line is one sentence.  Folded
+   under the bar rather than truncated, and scrolled rather than endless. */
+.location-detail {
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  max-height: 45vh;
+  overflow: auto;
+  background: #fff;
+  border-top: 1px solid #d1d5db;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, .08);
+  z-index: 60;
+}
+
+.location-detail-text {
+  margin: 0;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .location-inert {

@@ -1,0 +1,870 @@
+{
+  "question": "compare the concepts present in james/finto and james/fibo",
+  "model": "claude-opus-5-5",
+  "answered": true,
+  "servedModel": "claude-opus-5-5",
+  "turns": [
+    {
+      "turn": 1,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"connect\"}",
+        "survey__james__fibo {\"op\":\"connect\"}"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 5662,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 122,
+        "output_tokens_details": {
+          "thinking_tokens": 19
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 2,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"catalog\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ scope: types }\"}",
+        "survey__james__fibo {\"op\":\"catalog\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ scope: types }\"}"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 6058,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 258,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 3,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__fibo {\"op\":\"catalog\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ scope: predicates }\"}",
+        "survey__james__fibo {\"op\":\"profile\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"owl:Class\"}",
+        "survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:ConceptScheme, @shape: [skos:prefL"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 7507,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 468,
+        "output_tokens_details": {
+          "thinking_tokens": 52
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 4,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Class, @shape: [rdfs:label, skos:de",
+        "survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Ontology, @shape: [rdfs:label, dcte"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 10054,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 437,
+        "output_tokens_details": {
+          "thinking_tokens": 31
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 5,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Class, @shape: [rdfs:label, rdfs:su",
+        "survey__james__fibo {\"op\":\"materialize\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"sparql\",\"node\":\"n4\"}"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 11420,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 454,
+        "output_tokens_details": {
+          "thinking_tokens": 118
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 6,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Restriction, @shape: [owl:onPropert",
+        "survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:DatatypeProperty, @shape: [rdfs:lab"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 13110,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 563,
+        "output_tokens_details": {
+          "thinking_tokens": 47
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 7,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Restriction, @shape: [owl:onPropert",
+        "survey__james__fibo {\"op\":\"select\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"body\":\"{ @type: owl:Restriction, @shape: [owl:onPropert"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 14057,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 444,
+        "output_tokens_details": {
+          "thinking_tokens": 121
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 8,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"profile\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"skos:Concept\"}",
+        "survey__james__finto {\"op\":\"catalog\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ scope: graphs }\"}"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 15416,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 351,
+        "output_tokens_details": {
+          "thinking_tokens": 95
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 9,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "result_full {\"of\":\"r1\"}"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 16200,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 48,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 10,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel, "
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 18198,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 301,
+        "output_tokens_details": {
+          "thinking_tokens": 138
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 11,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n5\",\"body\":\"{ where: { skos:prefLabel: { $regex:"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 18689,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 187,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 12,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n5\",\"body\":\"{ where: { skos:prefLabel: { $regex:"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 19065,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 273,
+        "output_tokens_details": {
+          "thinking_tokens": 61
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 13,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "result_full {\"of\":\"r4\"}"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 19529,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 113,
+        "output_tokens_details": {
+          "thinking_tokens": 64
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 14,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n5\",\"body\":\"{ where: { skos:prefLabel: { $regex:"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 21965,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 261,
+        "output_tokens_details": {
+          "thinking_tokens": 63
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 15,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel],"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 22413,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 250,
+        "output_tokens_details": {
+          "thinking_tokens": 85
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 16,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n9\",\"body\":\"{ where: { skos:prefLabel: { $regex:"
+      ],
+      "said": "Distinct works. Now narrow it to the finance/classification candidates in English.",
+      "usage": {
+        "input_tokens": 22874,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 231,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 17,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "result_full {\"of\":\"r7\"}"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 23305,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 48,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 18,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel, "
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 25121,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 395,
+        "output_tokens_details": {
+          "thinking_tokens": 203
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 19,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n11\",\"body\":\"{ where: { skos:prefLabel: { $in: ["
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 25707,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 221,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 20,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n11\",\"body\":\"{ where: { skos:prefLabel: { $regex"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 25956,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 252,
+        "output_tokens_details": {
+          "thinking_tokens": 30
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 21,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel, "
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 27708,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 378,
+        "output_tokens_details": {
+          "thinking_tokens": 193
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 22,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"narrow\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n14\",\"body\":\"{ where: { skos:prefLabel: { $regex"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 28270,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 195,
+        "output_tokens_details": {
+          "thinking_tokens": 0
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 23,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "result_full {\"of\":\"r10\"}"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 28652,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 77,
+        "output_tokens_details": {
+          "thinking_tokens": 28
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 24,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"materialize\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"node\":\"n13\",\"body\":\"sparql\"}",
+        "survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:inScheme], "
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 31900,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 385,
+        "output_tokens_details": {
+          "thinking_tokens": 77
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 25,
+      "status": 200,
+      "stop": "tool_use",
+      "calls": [
+        "survey__james__finto {\"op\":\"select\",\"session\":\"8C8F0B96-DC8B-11F1-8375-F02F7494A8ED\",\"body\":\"{ @type: skos:Concept, @shape: [skos:prefLabel, ",
+        "survey__james__fibo {\"op\":\"materialize\",\"session\":\"98DC5DB8-DC8B-11F1-9ED6-F02F7494A8ED\",\"node\":\"n6\",\"body\":\"sparql\"}"
+      ],
+      "said": "",
+      "usage": {
+        "input_tokens": 33166,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 569,
+        "output_tokens_details": {
+          "thinking_tokens": 258
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    },
+    {
+      "turn": 26,
+      "status": 200,
+      "stop": "end_turn",
+      "calls": [],
+      "said": "# Concepts in james/finto and james/fibo: a SKOS thesaurus collection set against a FIBO ontology fragment\n\n## Summary\nThe two stores do not hold the same kind ",
+      "usage": {
+        "input_tokens": 35479,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 0,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 0
+        },
+        "output_tokens": 5199,
+        "output_tokens_details": {
+          "thinking_tokens": 98
+        },
+        "service_tier": "standard",
+        "inference_geo": "global",
+        "speed": "standard"
+      }
+    }
+  ],
+  "service": [
+    {
+      "target": "https://dydra.com/system/accounts/james/collaboration",
+      "status": 502,
+      "bytes": 157
+    },
+    {
+      "target": "https://dydra.com/system/accounts/james/repositories",
+      "status": 200,
+      "bytes": 3294
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 7999
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 7999
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 3326
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 3198
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 628
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 625
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 2208
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1233
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1915
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 2797
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 1286
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1614
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1461
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1751
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1378
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 621
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1014
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1406
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1237
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 4746
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 728
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 5238
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 5227
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 5169
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 5120
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 7569
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 4707
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 10454
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 478
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 3754
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 7522
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 7897
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 1340
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 1118
+    },
+    {
+      "target": "https://dydra.com/james/finto/mcp",
+      "status": 200,
+      "bytes": 3103
+    },
+    {
+      "target": "https://dydra.com/james/fibo/mcp",
+      "status": 200,
+      "bytes": 1124
+    },
+    {
+      "target": "https://dydra.com/james/mcp/sparql",
+      "status": 200,
+      "bytes": 33
+    },
+    {
+      "target": "https://dydra.com/james/mcp/sparql",
+      "status": 200,
+      "bytes": 33
+    }
+  ],
+  "error": null
+}

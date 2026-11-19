@@ -1,0 +1,141 @@
+/*
+ * jsui — exploration: a prompt, and what is done with what it asks for.
+ *                                                          2026-11-03
+ *
+ * The same idiom as the other two figures: a TEXT is combined with WHAT
+ * AUTHORISES IT at a `+', and only the combination reaches a processor.  Here
+ * that authority is the grant, and it is consulted at both junctions — the
+ * model is TOLD what it may ask for, and every call it then makes is CHARGED
+ * against the same grant and refused past it.  What the user decides once, at
+ * the outset, is scope: which repositories, read-only or not, how many
+ * queries, how many rows and bytes, and for how long.  Confirming a dozen
+ * queries one at a time is not a safeguard; it is a dialog one learns to
+ * dismiss.
+ *
+ * A call is refused UNSENT when its arguments carry an update notation or an
+ * operative DELETE, or when it would take the run past its budget.  The
+ * ARGUMENTS are screened and not merely the tool name, because a name-only
+ * allow-list could do neither; and the query count is charged before the
+ * call, since a refusal after the store has been read is not a limit but a
+ * complaint.
+ *
+ * The claim the picture is for: THE MODEL PROPOSES AND RUNS NOTHING.  A tool
+ * call, a query, a whole page — each comes back as a proposal, and each is
+ * then run by the interface, under the user's own token.  So the rows on the
+ * screen were fetched by the interface through the same path a view editor
+ * uses, rather than reported by a model; and the one edge returning to the
+ * orange `+' is where repository content enters the model's domain, digested.
+ *
+ * What the service cannot see, the browser records: the provider sees the
+ * conversation and nothing of the store, the service sees the calls and
+ * nothing of the model, and only the page sees both — so the prompt, the
+ * primer, the prose and the payloads are written back as RDF beside the
+ * server's own journal of the calls.
+ *
+ * The exploration is the draft and the view is the artifact: a query the
+ * model proposes becomes a stored view only when the user says so.
+ *
+ * Credentials are the subject of `authorization-domains.dot'.  The notation
+ * each hop is carried in is named on the edge.
+ *
+ *   dot -Tsvg exploration-dataflow.dot -o exploration-dataflow.svg
+ */
+digraph exploration {
+  rankdir = TB;
+  compound = true;
+  newrank = true;
+  fontname = "Helvetica";
+  ranksep = 0.75;
+  nodesep = 0.4;
+  node [fontname = "Helvetica", fontsize = 11, shape = box, style = "rounded,filled",
+        fillcolor = white, color = "#555555", margin = "0.14,0.08"];
+  edge [fontname = "Helvetica", fontsize = 9, color = "#555555", arrowsize = 0.8];
+
+  /* ─────────────────────────── the browser ─────────────────────────── */
+  subgraph cluster_main {
+    label = "the main document\nthe model proposes; the interface runs";
+    labelloc = t; labeljust = l; fontsize = 13; style = "rounded";
+    color = "#555555"; bgcolor = "#fbfbf9";
+
+    prompt [label = "the prompt", shape = parallelogram, style = filled, fillcolor = "#f3f0e8"];
+
+    grant  [label = "THE GRANT\nwhich repositories · read-only ·\nqueries · rows · bytes · expiry\ndecided once, charged per call",
+            shape = note, fillcolor = "#eef6ee", color = "#2f6b3f", fontsize = 10];
+
+    jm [label = "+", shape = circle, width = 0.38, fixedsize = true, fontsize = 15,
+        style = filled, fillcolor = "#f6ece8", color = "#8a4b2a"];
+    jg [label = "+", shape = circle, width = 0.38, fixedsize = true, fontsize = 15,
+        style = filled, fillcolor = "#eef6ee", color = "#2f6b3f"];
+
+    propose [label = "what the model proposes\na tool call · a query · a page",
+             shape = parallelogram, style = filled, fillcolor = "#f3f0e8"];
+
+    result [label = "results", shape = parallelogram, style = filled, fillcolor = "#f3f0e8"];
+    prose  [label = "prose", shape = parallelogram, style = filled, fillcolor = "#f3f0e8"];
+
+    iface  [label = "the interface", shape = folder, style = filled, fillcolor = "#eef3ee"];
+  }
+
+  /* ─────────────────────────── the provider ────────────────────────── */
+  subgraph cluster_provider {
+    label = "the model provider\nproposes, and runs nothing";
+    labelloc = t; fontsize = 13; style = "rounded"; color = "#8a4b2a"; bgcolor = "#fbf7f2";
+    model [label = "the model", shape = ellipse, style = filled, fillcolor = "#ffffff"];
+  }
+
+  /* ─────────────────────────── the service ─────────────────────────── */
+  subgraph cluster_service {
+    label = "the dydra service\nthe repository, and the record of what was asked of it";
+    labelloc = t; fontsize = 13; style = "rounded"; color = "#1f4e79"; bgcolor = "#f7f9fc";
+    mcp    [label = "MCP", shape = ellipse, style = filled, fillcolor = "#e8eef6", color = "#1f4e79"];
+    sparql [label = "SPARQL / RDF", shape = ellipse, style = filled,
+            fillcolor = "#e8eef6", color = "#1f4e79"];
+    view   [label = "a view", shape = folder, style = filled, fillcolor = "#e8eef6", color = "#1f4e79"];
+  }
+
+  /* ─────────────────────────── the frame ───────────────────────────── */
+  subgraph cluster_frame {
+    label = "the page frame\nopaque origin · no credential · no network";
+    labelloc = t; fontsize = 13; style = "rounded"; color = "#8a4b2a"; bgcolor = "#fdf6f2";
+    render [label = "render", shape = ellipse, style = filled, fillcolor = "#ffffff"];
+    page   [label = "the page", shape = folder, style = filled, fillcolor = "#ffffff"];
+  }
+
+  /* ───────────────── a text, combined with its authority ───────────── */
+  prompt -> jm [color = "#8a4b2a"];
+  grant  -> jm [color = "#2f6b3f"];
+  jm -> model  [color = "#8a4b2a", fontcolor = "#8a4b2a",
+                label = "  the prompt, the tool definitions,\n  the primer, and what the grant\n  allows it to ask for · JSON"];
+
+  model -> propose [color = "#8a4b2a"];
+  model -> prose   [color = "#8a4b2a", label = "  PROSE"];
+
+  propose -> jg [color = "#2f6b3f"];
+  grant   -> jg [color = "#2f6b3f"];
+  prose   -> jg [color = "#2f6b3f", fontcolor = "#2f6b3f", style = dashed,
+                 label = "  and the record:\n  prompt · primer ·\n  prose · payloads"];
+
+  jg -> mcp    [color = "#1f4e79", fontcolor = "#1f4e79",
+                label = "  charged, or REFUSED unsent\n  · JSON-RPC"];
+  jg -> sparql [color = "#1f4e79", fontcolor = "#1f4e79",
+                label = "  the INTERFACE runs it, and records it,\n  under the user's own token · SPARQL"];
+  jg -> view   [color = "#1f4e79", fontcolor = "#1f4e79", style = dashed,
+                label = "  at the user's say-so:\n  the exploration is the draft,\n  the view is the artifact"];
+
+  mcp -> sparql [color = "#1f4e79"];
+
+  /* ───────────────── what comes back, and where it is shown ────────── */
+  mcp    -> result [color = "#1f4e79", label = "  RESULT JSON · score · GraphQL"];
+  sparql -> result [color = "#1f4e79", label = "  RESULT JSON"];
+
+  result -> jm [color = "#8a4b2a", fontcolor = "#8a4b2a", style = dashed, constraint = false,
+                taillabel = "digested — the only content that crosses\ninto the model's domain, and the loop\nreturns to the model  ",
+                labeldistance = 11, labelangle = 20, labelfontsize = 9,
+                labelfontname = "Helvetica", labelfontcolor = "#8a4b2a"];
+
+  result -> render [label = "  data only,\n  no credential"];
+  render -> page;
+  page -> iface    [style = dashed, label = "  postMessage"];
+  result -> iface;
+  prose  -> iface;
+}

@@ -1,0 +1,62 @@
+[
+  {
+    "file": "01-the-interface.png",
+    "note": "the chrome, with the location bar as the only prompt on the screen"
+  },
+  {
+    "file": "02-the-question-typed.png",
+    "note": "a line that names two repositories — the bar reads it as a question about data, not an instruction about the interface"
+  },
+  {
+    "file": "03-disclosed-before-it-runs.png",
+    "note": "nothing has run: the stores are named and one press is offered"
+  },
+  {
+    "file": "04-what-the-press-authorises.png",
+    "note": "the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept"
+  },
+  {
+    "file": "05-reading-the-tools.png",
+    "note": "the run has begun: each store's own tools and the server's operation catalogue are read first"
+  },
+  {
+    "file": "06-inventory-finto.png",
+    "note": "the first call, routed to james/finto by the name it was called under"
+  },
+  {
+    "file": "07-inventory-fibo.png",
+    "note": "the second, to james/fibo — one exploration per store"
+  },
+  {
+    "file": "08-reading-the-classes.png",
+    "note": "fibo's four owl:Class, read with their definitions"
+  },
+  {
+    "file": "09-reading-the-labels.png",
+    "note": "finto's labels — where the run meets the first defect"
+  },
+  {
+    "file": "10-narrowing.png",
+    "note": "a label search over 96 797 concepts"
+  },
+  {
+    "file": "11-the-compiled-query.png",
+    "note": "and the query that search compiled to, asked for so it can be rerun"
+  },
+  {
+    "file": "12-writing-it-up.png",
+    "note": "the model has what it needs and is writing the report"
+  },
+  {
+    "file": "13-answered.png",
+    "note": "the reply line: the first sentence of the answer, with the rest folded"
+  },
+  {
+    "file": "14-the-report.png",
+    "note": "the answer, folded under the bar rather than truncated into it"
+  },
+  {
+    "file": "15-observed-interpreted-not-established.png",
+    "note": "the three lists the brief requires, and the provenance the interface adds: model as served, stores, calls, date, and where it was recorded"
+  }
+]

@@ -32,7 +32,9 @@
 // The credentials are the exploration pane's: `paneState' is keyed by
 // repository, so a key typed there is present here and neither pane asks
 // twice.  This pane therefore has no Connection block of its own.
-import { paneState } from "./mcp-pane-state.js";
+import { paneState, paneStore } from "./mcp-pane-state.js";
+import { sessionStore } from "../../lib/mcp/registry.js";
+import { connectionRefusal } from "../../lib/app/connection.js";
 import { createToolAdapter, DASHBOARD_TOOLS, DEFAULT_SYSTEM } from "../../lib/llm/tool-adapter.js";
 import { createGrant, DEFAULT_GRANT } from "../../lib/llm/grant.js";
 import { dashboardSystem, revisionSystem } from "../../lib/llm/dashboard-prompt.js";
@@ -753,7 +755,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     const text = (promptEl.innerText || "").trim();
     if (!text) { grantStatus.textContent = "nothing to ask for"; return; }
     if (!st.llmKey) {
-      grantStatus.textContent = "set a provider key in the exploration pane's Connection";
+      grantStatus.textContent = connectionRefusal("nothing was asked");
       return;
     }
     running = true;
@@ -835,7 +837,14 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       const adapter = createToolAdapter({
         provider: st.llmProvider, endpoint: st.llmEndpoint, apiKey: st.llmKey,
         workspaceId: st.llmWorkspace, model: st.llmModel,
-        mcp: st.mcpEndpoint ? { endpoint: st.mcpEndpoint, token: st.token } : null,
+        // The repository this pane reads, in the shape the adapter routes on:
+        // one store, named, so that every event the turn produces says which
+        // repository the call went to (REQ-34.3.5).
+        mcp: paneStore(st),
+        // The exploration handle is the session's, not the run's (§34.4.3):
+        // a page composed from a repository joins the exploration already
+        // open on it rather than opening a second beside it.
+        sessions: sessionStore(),
         allowTools: DASHBOARD_TOOLS,
         grant,
         // A dozen result sets fit no context; one small one should not be
@@ -1477,7 +1486,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     if (revising || !appDoc) return null;
     if (!ask) { reviseStatus.textContent = "nothing to change"; return null; }
     if (!st.llmKey) {
-      reviseStatus.textContent = "set a provider key in the exploration pane's Connection";
+      reviseStatus.textContent = connectionRefusal("nothing was asked");
       return null;
     }
     revising = true;
@@ -1506,7 +1515,14 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       const adapter = createToolAdapter({
         provider: st.llmProvider, endpoint: st.llmEndpoint, apiKey: st.llmKey,
         workspaceId: st.llmWorkspace, model: st.llmModel,
-        mcp: st.mcpEndpoint ? { endpoint: st.mcpEndpoint, token: st.token } : null,
+        // The repository this pane reads, in the shape the adapter routes on:
+        // one store, named, so that every event the turn produces says which
+        // repository the call went to (REQ-34.3.5).
+        mcp: paneStore(st),
+        // The exploration handle is the session's, not the run's (§34.4.3):
+        // a page composed from a repository joins the exploration already
+        // open on it rather than opening a second beside it.
+        sessions: sessionStore(),
         allowTools: DASHBOARD_TOOLS,
         grant,
         digestOver: 4000,

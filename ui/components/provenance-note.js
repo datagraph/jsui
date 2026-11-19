@@ -65,7 +65,7 @@ export function provenanceNote(doc, provenance = null, { testid = null } = {}) {
   const update = (p) => {
     if (!p || !(p.model || p.servedModel)) {
       mark.className = `${NOTE_CLASS}-none`;
-      mark.textContent = "Nothing on this stage was produced by a model.";
+      mark.textContent = "Nothing on this pane was produced by a model.";
       note.removeAttribute("data-provenance");
       for (const k of Object.keys({ ...note.dataset })) {
         if (k.startsWith("ai")) delete note.dataset[k];

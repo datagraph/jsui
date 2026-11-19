@@ -1,0 +1,28 @@
+
+protocol 1 — login
+  ok   1.1  the login form is shown
+  ok   1.3  signed in — the account pane is drawn
+
+protocol 2.2 / 2.3 / 9.1 — two repositories open, one visible
+  ok   2.2  a tab per opened repository — 4 tabs
+  ok   2.3  both repository panes are in the document — test, mcp
+  ok   9.1  exactly one is displayed — the chrome shows ONE repository — shown: mcp
+
+protocol 4 — the location bar, with no model
+  ok   the bar is on the screen
+  ok   the chrome is the workspace — six hosts — flashes header tabs content footer location
+  ok   4.1  a path navigates — shown=mcp display="/account/playwright/repositories/mcp"
+  ok   4.2  goto before a path also navigates — shown=test display="/account/playwright/repositories/test"
+  ok   4.3  goto workspace re-addresses and does not navigate — target="→ workspace (the arrangement)" shown=test
+  ok   4.4  an unknown address is refused, not guessed — target="→ workspace (the arrangement)" reply="there is nothing addressed as `zzz-no-such-target' — try workspace"
+
+defect — the editors pane does not scroll to the editor it just added
+  protoscroll1: editors 0→1  scrollY 0→0  editor top=209/900  inView=true
+  protoscroll2: editors 1→2  scrollY 0→0  editor top=686/900  inView=true
+  protoscroll3: editors 2→3  scrollY 0→0  editor top=1163/900  inView=false
+  ok   the editors were added — 3 of 3
+  ok   REPRODUCED — the pane did not scroll to the editor it added — scrollY stayed 0; the new editor is at y=1163 in a 900px viewport (page is 900px)
+
+page errors: 0
+
+13 passed, 0 failed

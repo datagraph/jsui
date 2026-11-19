@@ -1,0 +1,127 @@
+/*
+ * jsui — arrangement: one line typed in the location bar.   2026-11-03
+ *
+ * The same idiom twice: a TEXT is combined with WHAT IT IS ADDRESSED TO at a
+ * `+', and only the combination reaches a processor.  First the instruction
+ * is combined with the address, and that is what the model is given.  Then
+ * the patch is combined with the same document, and that is what is applied.
+ * The address is the only thing either step consults, which is why
+ * re-addressing is a whole operation of the grammar rather than a setting.
+ *
+ * The grammar decides WITHOUT a model and without a DOM, because misreading a
+ * line costs differently in each direction: an exploration read as an
+ * arrangement wastes a turn, an arrangement read as a path loses the
+ * sentence, and a path sent to a model spends money on a 404.  For the same
+ * reason an ambiguous address refuses rather than resolving to the nearest
+ * match — a wrong guess misdirects the NEXT instruction, which may not be
+ * presentational.
+ *
+ * One fork, at the classifier: the chrome holds no data, so a change that
+ * reaches the data class is REFUSED there, where on a presentation it is
+ * GATED.  A gate on the chrome would ask the reader to authorise a query
+ * against a repository the workspace never names.
+ *
+ * Credentials are not drawn here; they are the subject of
+ * `authorization-domains.dot', and every edge crossing a domain boundary in
+ * this figure carries the one that figure gives it.
+ *
+ *   dot -Tsvg arrangement-dataflow.dot -o arrangement-dataflow.svg
+ */
+digraph arrangement {
+  rankdir = TB;
+  compound = true;
+  newrank = true;
+  fontname = "Helvetica";
+  ranksep = 0.75;
+  nodesep = 0.4;
+  node [fontname = "Helvetica", fontsize = 11, shape = box, style = "rounded,filled",
+        fillcolor = white, color = "#555555", margin = "0.14,0.08"];
+  edge [fontname = "Helvetica", fontsize = 9, color = "#555555", arrowsize = 0.8];
+
+  /* ─────────────────────────── the browser ─────────────────────────── */
+  subgraph cluster_main {
+    label = "the main document\none instruction channel, whatever it is addressing";
+    labelloc = t; labeljust = l; fontsize = 13; style = "rounded";
+    color = "#555555"; bgcolor = "#fbfbf9";
+
+    line    [label = "the line", shape = parallelogram, style = filled, fillcolor = "#f3f0e8"];
+
+    grammar [label = "the grammar\nno model · no DOM", shape = ellipse,
+             style = filled, fillcolor = "#eef3ee"];
+
+    address [label = "THE ADDRESS\nthe workspace, or a presentation —\nand that document,\nread from <account>/ui at load", shape = note,
+             fillcolor = "#eef6ee", color = "#2f6b3f", fontsize = 10];
+
+    jt [label = "+", shape = circle, width = 0.38, fixedsize = true, fontsize = 15,
+        style = filled, fillcolor = "#f6ece8", color = "#8a4b2a"];
+    jp [label = "+", shape = circle, width = 0.38, fixedsize = true, fontsize = 15,
+        style = filled, fillcolor = "#eef6ee", color = "#2f6b3f"];
+
+    apply [label = "apply · classify", shape = ellipse, style = filled, fillcolor = "#eef3ee"];
+
+    next  [label = "the next document", shape = parallelogram, style = filled, fillcolor = "#f3f0e8"];
+
+    router [label = "navigate", shape = ellipse, style = filled, fillcolor = "#eef3ee"];
+    redraw [label = "redraw", shape = ellipse, style = filled, fillcolor = "#eef3ee"];
+
+    chrome [label = "the interface", shape = folder, style = filled, fillcolor = "#eef3ee"];
+  }
+
+  /* ─────────────────────────── the provider ────────────────────────── */
+  subgraph cluster_provider {
+    label = "the model provider\nasked for a patch, and for nothing else";
+    labelloc = t; fontsize = 13; style = "rounded"; color = "#8a4b2a"; bgcolor = "#fbf7f2";
+    model [label = "the model", shape = ellipse, style = filled, fillcolor = "#ffffff"];
+  }
+
+  /* ─────────────────────────── the service ─────────────────────────── */
+  subgraph cluster_service {
+    label = "the dydra service\n<account>/ui — revisioned, one graph per presentation";
+    labelloc = t; fontsize = 13; style = "rounded"; color = "#1f4e79"; bgcolor = "#f7f9fc";
+    store [label = "SPARQL / RDF", shape = ellipse, style = filled,
+           fillcolor = "#e8eef6", color = "#1f4e79"];
+  }
+
+  /* ─────────────────────────── the frame ───────────────────────────── */
+  subgraph cluster_frame {
+    label = "the page frame\nopaque origin · no credential · no network";
+    labelloc = t; fontsize = 13; style = "rounded"; color = "#8a4b2a"; bgcolor = "#fdf6f2";
+    render [label = "render", shape = ellipse, style = filled, fillcolor = "#ffffff"];
+    page   [label = "the page", shape = folder, style = filled, fillcolor = "#ffffff"];
+  }
+
+  /* ───────────────── what the line turns out to be ─────────────────── */
+  line -> grammar;
+  grammar -> router  [label = "  a path, or goto <path>"];
+  grammar -> address [color = "#2f6b3f", fontcolor = "#2f6b3f",
+                      label = "  goto <name> — re-address\n  ambiguous ⇒ refuse, never\n  the nearest match"];
+  grammar -> jt      [color = "#8a4b2a", fontcolor = "#8a4b2a", label = "  anything else:\n  an instruction"];
+
+  /* ───────────────── a text, combined with its address ─────────────── */
+  address -> jt [color = "#8a4b2a"];
+  jt -> model   [color = "#8a4b2a", fontcolor = "#8a4b2a",
+                 label = "  the instruction, the contract for\n  what it addresses, and that\n  document as an outline"];
+
+  model -> jp   [color = "#2f6b3f", fontcolor = "#2f6b3f", label = "  patch · JSON ops"];
+  address -> jp [color = "#2f6b3f"];
+  jp -> apply   [color = "#2f6b3f", fontcolor = "#2f6b3f", label = "  the patch against\n  that document"];
+
+  apply -> line [style = dashed, constraint = false,
+                 taillabel = "the bar's reply —  \npresentational ⇒ done, with an undo beside it;  \ndata or authority ⇒ REFUSED on the workspace,  \nGATED on a presentation  ",
+                 labeldistance = 13, labelangle = -26, labelfontsize = 9,
+                 labelfontname = "Helvetica"];
+  apply -> next [label = "  presentational"];
+
+  /* ───────────────── what is written, and what is drawn ────────────── */
+  next -> store  [color = "#1f4e79", fontcolor = "#1f4e79",
+                  label = "  DROP GRAPH ; INSERT DATA\n  one transaction"];
+
+  next -> redraw [label = "  the workspace:\n  grid areas"];
+  next -> render [label = "  a presentation:\n  instructions · postMessage"];
+  router -> chrome [label = "  renderPage"];
+  redraw -> chrome;
+  render -> page;
+  page -> chrome [style = dashed, label = "  in place, or rebuilt"];
+
+
+}

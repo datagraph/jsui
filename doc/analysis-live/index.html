@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="date" content="2026-11-14">
+<title>An analysis across two repositories — 10 November, after the sync</title>
+<style>
+  :root { color-scheme: light; }
+  body { margin: 0; font: 15px/1.55 Georgia, "Times New Roman", serif; color: #1f2328;
+         background: #fff; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 1.9em; margin: 0 0 .2em; }
+  h2 { font-size: 1.25em; margin: 2em 0 .5em; border-bottom: 1px solid #e5e7eb;
+        padding-bottom: .25em; }
+  h3 { font-size: 1.05em; margin: 1.6em 0 .4em; }
+  p.lede { color: #4b5563; margin-top: 0; }
+  code, pre { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: .88em; }
+  pre { background: #f6f8fa; padding: 10px 14px; overflow-x: auto; border-radius: 4px; }
+  table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: .92em; }
+  th, td { border: 1px solid #e5e7eb; padding: 6px 10px; text-align: left;
+            vertical-align: top; }
+  th { background: #f6f8fa; }
+  figure { margin: 2em 0; }
+  figure img { width: 100%; height: auto; border: 1px solid #d1d5db; border-radius: 3px;
+                display: block; }
+  figcaption { font-size: .9em; color: #4b5563; margin-top: .5em; }
+  .note { background: #f6f8fa; border-left: 3px solid #9ca3af; padding: 10px 14px;
+           margin: 1.2em 0; }
+  .bad { border-left-color: #b91c1c; }
+  .good { border-left-color: #15803d; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>An analysis across two repositories</h1>
+<p class="lede">The fourth live run of §35, 10 November 2026, made after the
+patch directory was synchronised with de17 in full and the servers restarted.
+Same question, same two repositories, a real model.</p>
+
+<p>The earlier runs are kept beside this one:
+<a href="20261110-0217/">the 02:17 run</a> of the same morning, made against the
+old resolution behaviour; <a href="20261109/">9 November</a>, the first that
+answered; and the run before that, which spent its whole round budget exploring and was
+cut off with nothing to show — kept as
+<a href="cut-short/run.json"><code>cut-short/run.json</code></a> and four
+screenshots, since it has no report to show.</p>
+
+<div class="note">
+<p><b>These pictures are a harness, not the client.</b> The runs are driven by
+<code>tests/analysis-live.mjs</code>, which builds a minimal page so that both
+credentials can be held outside the browser. That page imports the real
+<code>App</code>, the real location bar and the real analysis path — the
+behaviour recorded here is the shipped behaviour — but it skips sign-in and
+navigation and draws no sidebar or pane tabs, so it does not look like the
+client a reader uses. For what the end user actually sees and does, see
+<a href="../user-manual/multi-repository-analysis.html">Asking Across Several
+Repositories</a> in the user manual, which is illustrated from the shipped
+client.</p>
+</div>
+
+<h2>What this run was for</h2>
+
+<div class="note good">
+<p><b>The resolution fix is in the service and in use.</b> Probed immediately
+before the run, across all seven operators the change distinguishes:
+<code>$contains</code>, <code>$starts</code>, <code>$ends</code>,
+<code>$regex</code> and <code>$lang</code> leave their operand alone, while
+<code>$eq</code> and <code>$in</code> still resolve theirs and still report what
+they cannot find. The control matters as much as the result: the resolver is
+discriminating, not switched off.</p>
+<p>The run then issued eight <code>narrow</code> calls — one
+<code>$contains</code> and seven <code>$regex</code> — every one of them with a
+bare-name operand. <b>The word
+<code>unresolved</code> does not occur anywhere in the report.</b> The false
+caveat of 9 November — "the server reported <code>$lang: en</code> as
+unresolved, so the language filter may not have been applied" — has no
+counterpart here, because there was nothing to misread.</p>
+</div>
+
+<div class="note good">
+<p><b>The closing turn earned its place.</b> The model spent all twenty-six
+rounds on tool calls, as it did in the cut-short run. That one ended with
+<code>stopped after 26 tool rounds</code> and no report at all. This one was
+asked once more with no tools offered, and wrote the report below — six
+sections, a candidate table, and a <i>Not established</i> that names the
+specific select it issued and never read. The interface says so in its own
+footer rather than letting the reader assume the exploration finished:
+<q>the exploration was stopped at the 26-round limit</q>. This is REQ-35.5
+working against a real model for the first time.</p>
+</div>
+
+<div class="note bad">
+<p><b>The model found two more service defects, and this time it was right
+about both.</b></p>
+<p><b>1. <code>@optional</code> is inert when the same predicate is also named
+in <code>@shape</code>.</b> It reported: "The <code>@optional</code> properties
+were also compiled as required patterns, so the <q>optional</q> declarations
+had no effect." Reproduced directly afterwards against
+<code>james/fibo</code> —</p>
+<pre>{ @type: owl:Class, @shape: [rdfs:label, rdfs:subClassOf],
+  @optional: [rdfs:subClassOf], @limit: 5 }</pre>
+<p>compiles to</p>
+<pre>SELECT ?RDFS_LABEL ?RDFS_SUBCLASSOF ?RDFS_SUBCLASSOF
+ WHERE { { { ?S rdf:type owl:Class .
+             ?S rdfs:label ?RDFS_LABEL .
+             ?S rdfs:subClassOf ?RDFS_SUBCLASSOF }
+           OPTIONAL
+           { ?S rdfs:subClassOf ?RDFS_SUBCLASSOF } }}}</pre>
+<p>The predicate is required <i>and</i> optional, so the OPTIONAL rebinds a
+variable that is already bound and cannot widen anything; and the variable is
+projected twice. Named in <code>@optional</code> alone it compiles correctly,
+so the defect is exactly the overlap.
+<code>compile-standard-shape-algebra</code> builds its required triple patterns
+from <code>@shape</code> and then appends <code>@optional</code> without
+consulting what it already has. <code>@optional</code> is the more specific
+declaration and should win: the predicate belongs in the leftjoin and not in
+the BGP, and its variable should be projected once.</p>
+<p><b>2. A format name is run through vocabulary resolution.</b>
+<code>materialize</code> takes a format, not a score body — and
+<code>{"op":"materialize","body":"sparql"}</code> answers with
+<code>unresolved: [sparql]</code>. It is the same false signal that
+<code>$lang: en</code> gave, one level up: <code>score-run</code> passes every
+operation's body through <code>resolve-names</code> uniformly, and a bare
+scalar body has no control key above it that the
+<code>*score-control-keys*</code> table could protect. The model did not act on
+it this time. Neither did it act on <code>$lang</code> at 02:17; on 9 November
+it did.</p>
+</div>
+
+<h2>The run</h2>
+
+<table>
+<tr><th>Model turns</th><td>27 — 26 with tool calls, the last the closing turn that wrote the report</td></tr>
+<tr><th>Served as</th><td><code>claude-opus-5-5</code></td></tr>
+<tr><th>Tool calls</th><td>37 — 32 to a store (<code>james/finto</code> 22, <code>james/fibo</code> 10) and 5 client-side <code>result_full</code></td></tr>
+<tr><th>Operations chosen</th><td><code>select</code> 14, <code>narrow</code> 8, <code>result_full</code> 5, <code>catalog</code> 3, <code>profile</code> 3, <code>connect</code> 2, <code>materialize</code> 2</td></tr>
+<tr><th>Service requests</th><td>40 — <b>all answered 200</b></td></tr>
+<tr><th>Tokens</th><td>697 055 in, 12 600 out</td></tr>
+<tr><th>Recorded as</th><td>two transcripts in <code>james/mcp</code>, one per store</td></tr>
+</table>
+
+<p>Two things about that table are new. Every one of the forty service requests
+was answered — the 02:17 run lost five to dropped connections, two of them on
+the opening <code>catalog</code> of each store, and this one lost none. And
+<code>GET /system/accounts/james/collaboration</code>, which answered 502 in all
+three earlier runs, answered 200 with a body in this one — so the
+account-collaboration read path of the bundle is now serving.</p>
+
+<figure>
+<img src="01-the-interface.png" alt="the chrome, with the location bar as the only prompt on the screen">
+<figcaption>the chrome, with the location bar as the only prompt on the screen</figcaption>
+</figure>
+<figure>
+<img src="02-the-question-typed.png" alt="a line that names two repositories — read as a question about data, not an instruction about the interface">
+<figcaption>a line that names two repositories — read as a question about data, not an instruction about the interface</figcaption>
+</figure>
+<figure>
+<img src="04-what-the-press-authorises.png" alt="the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept">
+<figcaption>the disclosure: which repositories, how many rounds, how many calls, read-only, and where the answer will be kept</figcaption>
+</figure>
+<figure>
+<img src="05-the-run-begins.png" alt="each store&#x27;s own tools and the server&#x27;s operation catalogue are read before the model is asked anything">
+<figcaption>each store&#x27;s own tools and the server&#x27;s operation catalogue are read before the model is asked anything</figcaption>
+</figure>
+<figure>
+<img src="16-turn-11-survey-james-finto.png" alt="the model asks for a narrow whose where-clause uses $contains with a bare-name operand">
+<figcaption>turn 11 — the first <code>narrow</code> with <code>$contains</code> and a bare-name operand. Before the fix this is the call that came back with the operand listed as unresolved.</figcaption>
+</figure>
+<figure>
+<img src="30-turn-25-survey-james-finto.png" alt="the model asks for a narrow over skos:altLabel">
+<figcaption>turn 25 — searching <code>skos:altLabel</code>, which the 02:17 run had to list under <i>Not established</i> as never searched. Here it is what finds the housing-finance slant in finto&#x27;s loan labels.</figcaption>
+</figure>
+
+<h2>The answer</h2>
+
+<p>In full as <a href="report.md"><code>report.md</code></a>; the run&#x27;s own
+record, every turn and every call, in <a href="run.json"><code>run.json</code></a>.</p>
+
+<p>Its first move is the one that matters: it refuses to treat the comparison as
+a search for matching words. <code>james/finto</code> holds 96,797
+<code>skos:Concept</code> — topics for indexing, labelled in three languages,
+arranged by broader and narrower, and carrying 52 definitions between them.
+<code>james/fibo</code> holds four <code>owl:Class</code> with textual
+definitions, named superclasses and property restrictions on their members.
+"Any correspondence across the two is therefore a <q>topic about</q> relation,
+not class equivalence." Everything after that is argued under that constraint,
+and the categories in the candidate table are declared as the model&#x27;s own
+words rather than borrowed from SKOS.</p>
+
+<p>It proposes five candidates with confidences and one explicit <i>not a
+match</i> — finto distinguishes "loans (amount of money)" from "loans (loaned
+object)", and only the first is a counterpart to FIBO&#x27;s commercial loan.
+It then records the searches that found nothing, which is the part a reader
+needs: no business, corporate or commercial loan label exists in finto under
+any of the English or Finnish patterns it tried, and the altLabels it did find
+— "lainat", "aravalainat" — show a Finnish housing-finance slant rather than a
+commercial one.</p>
+
+<p>Its <i>Not established</i> is the longest of the four runs and the most
+specific. It names the select it issued and never read (node n21, the narrower
+concepts of finto&#x27;s loan concept, where a commercial-loan-like term could
+still be hiding); it says the grouped query failed with a type error, so the
+distribution of concepts across finto&#x27;s schemes is unknown and LIITO — the
+business ontology, the most relevant vocabulary here — may or may not be
+loaded; and it is explicit that absence of a match means "not found by these
+searches", not "absent".</p>
+
+<figure>
+<img src="32-turn-27-prose.png" alt="the model writes rather than calls">
+<figcaption>turn 27 — the closing turn. No tools are offered and the model writes.</figcaption>
+</figure>
+<figure>
+<img src="33-answered.png" alt="the reply line: the first sentence of the answer, with the rest folded">
+<figcaption>the reply line: the first sentence of the answer, with the rest folded</figcaption>
+</figure>
+<figure>
+<img src="34-the-report.png" alt="the answer, folded under the bar rather than truncated into it">
+<figcaption>the answer, folded under the bar rather than truncated into it</figcaption>
+</figure>
+<figure>
+<img src="35-the-report-2.png" alt="the report, screenful 2 of 6">
+<figcaption>the report, screenful 2 of 6</figcaption>
+</figure>
+<figure>
+<img src="36-the-report-3.png" alt="the report, screenful 3 of 6">
+<figcaption>the report, screenful 3 of 6</figcaption>
+</figure>
+<figure>
+<img src="37-the-report-4.png" alt="the report, screenful 4 of 6">
+<figcaption>the report, screenful 4 of 6</figcaption>
+</figure>
+<figure>
+<img src="38-the-report-5.png" alt="the report, screenful 5 of 6">
+<figcaption>the report, screenful 5 of 6</figcaption>
+</figure>
+<figure>
+<img src="39-the-report-6.png" alt="the report, screenful 6 of 6">
+<figcaption>the report, screenful 6 of 6</figcaption>
+</figure>
+<figure>
+<img src="40-provenance.png" alt="the end of the report and the provenance the interface adds: model as served, calls, date, where it was recorded">
+<figcaption>the end of the report and the provenance the interface adds: model as served, calls, date, where it was recorded, and that the exploration was stopped at the round limit</figcaption>
+</figure>
+
+<h2>What is not established about this run</h2>
+
+<ul>
+<li>The two defects above are <b>not fixed</b>. They are reproduced and
+diagnosed, and the code was not changed.</li>
+<li>Whether the model&#x27;s substantive conclusions are right is a question
+for someone who knows these vocabularies. What is established is how it
+arrived at them and what it declined to claim.</li>
+<li>The round budget was spent again. Twenty-six rounds is enough to answer
+this question only because the closing turn exists; it is not enough to
+explore both stores to the model&#x27;s own satisfaction.</li>
+</ul>
+
+</div>
+</body>
+</html>
