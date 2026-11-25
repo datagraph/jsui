@@ -13,7 +13,7 @@
  *      endpoint and the token come from the session; it connects on open, so
  *      the pane is usable without a first ritual click, and it opens itself
  *      when there is something to attend to.
- *   2. The prompt, with Run and Session beside it.
+ *   2. The prompt, with Ask, Compose and Past runs beside it.
  *   3. The transcript, drawn by `exchange-list.js'.
  *   4. The session log, when asked for -- the durable half of the same record.
  *
@@ -133,10 +133,12 @@ export function openExplorationPane(app, { container, accountName, repositoryNam
       <div class="exp-prompt" contenteditable="true" data-testid="exploration-prompt"
            data-placeholder="Describe what you want to find…"></div>
       <div class="exp-actions">
-        <button type="button" class="exp-run" data-testid="exploration-run">Run</button>
-        <button type="button" class="exp-session" data-testid="exploration-session">Session</button>
+        <button type="button" class="exp-run" data-testid="exploration-run"
+                title="Ask a question about this repository. The model reads it and answers in prose; any query it ends with has not run.">Ask</button>
         <button type="button" class="exp-dashboard" data-testid="exploration-dashboard"
-                title="Compose a page from several queries">Compose</button>
+                title="Build a whole page from several queries. Authority is granted once, up front, with a budget.">Compose</button>
+        <button type="button" class="exp-session" data-testid="exploration-session"
+                title="The record of what has already happened: past explorations, their transcripts, and the endpoint's own journal. Asks no model and runs no query.">Past runs</button>
         <label class="exp-mode" title="Ask for a figure drawn from the result, in three steps:
 explore, propose a query, then draw from what the interface fetched">
           <input type="checkbox" class="exp-figure-mode"
@@ -144,6 +146,9 @@ explore, propose a query, then draw from what the interface fetched">
         </label>
         <span class="exp-status" data-testid="exploration-status"></span>
       </div>
+      <p class="exp-legend" data-testid="exploration-legend">
+        <b>Ask</b> answers a question · <b>Compose</b> builds a page ·
+        <b>Past runs</b> shows what has already happened</p>
 
       <div class="exp-save-slot" data-testid="exploration-save-slot"></div>
 
@@ -316,6 +321,7 @@ explore, propose a query, then draw from what the interface fetched">
           setStatus(e.ok ? `tools: ${e.names.join(", ")}` : "tools/list failed");
           add({
             kind: "mcp", title: "tools/list", status: e.ok ? "ok" : "fail", ms: e.ms,
+            http: e.http,
             response: e.ok
               ? `offered:  ${e.names.join(", ")}\nwithheld: ${e.withheld.length ? e.withheld.join(", ") : "(none)"}`
               + `\n\nDeprecated spellings and anything outside the allow-list are not offered.`
@@ -351,6 +357,14 @@ explore, propose a query, then draw from what the interface fetched">
 
         case "tool_call":
           setStatus(`${e.name} ${e.input?.op || ""}…`.trim());
+          break;
+
+        // The only status that is true while it is shown.  Everything else a
+        // turn reports has already happened, so between the last call and the
+        // answer the line stood still and read as a pane that had stopped.
+        case "asking":
+          setStatus(e.closing ? "asking for a closing answer…"
+                              : `turn ${e.iteration} · waiting for the model…`);
           break;
 
         case "tool_result":

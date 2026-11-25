@@ -50,7 +50,10 @@ const {
   validateProposal, figureSpecFrom, figurePolicy, aspectOf, capRows, acceptFor, figureRecord,
   DOT_ENGINES, DEFAULT_ENGINE,
 } = await load("figure/spec.js");
-const { buildFigurePage, FIGURE_SANDBOX, FIGURE_CSP } = await load("figure/frame.js");
+const { buildFigurePage, buildSavedFigure, savedFigurePolicy, savedFigureIsRefreshable,
+        savedFigureTrouble, FIGURE_SANDBOX, FIGURE_CSP } = await load("figure/frame.js");
+const { savedFigureRuntime, missingFigureSource, FIGURE_BUNDLES } =
+  await load("figure/saved-runtime.js");
 const { insertData, exchangesFrom, readTranscript } = await load("mcp/transcript-store.js");
 
 let pass = 0, fail = 0;
@@ -277,6 +280,26 @@ section("U-12: the prompt says that drawing is step 3");
   ok(FIGURE_MAX_TOKENS > 4096, "the drawing turn gets room, for the same reason");
   ok(RESULT_NOTATIONS.CONSTRUCT.includes("text/turtle"),
      "a CONSTRUCT is offered turtle, not a table");
+}
+
+section("U-12: across several stores, the proposal has to say which one");
+{
+  const base = "You are analysing several repositories.";
+  const one = figureSystem(base, { stores: ["dydra/foaf"] });
+  ok(!/Say which store/i.test(one),
+     "one store raises no question, so nothing is said about it");
+
+  const many = figureSystem(base, { stores: ["dydra/foaf", "dydra/nxp"] });
+  ok(/Say which store/i.test(many), "two stores do, and the clause appears");
+  ok(many.includes("dydra/foaf") && many.includes("dydra/nxp"),
+     "listing them in the spelling the interface matches on");
+  ok(/ONE of them/.test(many),
+     "the query is run against one repository, and the model is told so");
+  ok(many.indexOf(base) < many.indexOf("Say which store"),
+     "after the base prompt and the contract, not instead of them");
+
+  ok(figureSystem(base, { stores: ["a/b", "c/d"], tools: false }).includes("step 1 cannot happen"),
+     "and the no-tools clause still lands when there are none");
 }
 
 section("U-12: the drawing turn carries the result and the question");
@@ -538,6 +561,100 @@ section("U-16: reading it back does not mistake a figure for a run");
      "the figure comes back attached to the run that drew it");
   ok(r.runs[0].figures[0].resultDigest === "d1e2",
      "with the digest that joins it to the data, which is the question the record exists to answer");
+}
+
+section("U-113: a downloaded figure can be asked whether it is still true");
+{
+  const svg = `<svg viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">`
+            + `<rect width="400" height="300" fill="#eef"/></svg>`;
+  const page = buildFigurePage({ kind: "svg", text: svg },
+    { caption: 'a "quoted" & ampersanded caption', title: "Sales",
+      meta: { rows: 3, resultDigest: "abc123", mimeType: "text/tab-separated-values" },
+      at: "2026-11-22T10:00:00.000Z" });
+  const source = { host: "https://nl4.dydra.com", account: "alice", repository: "sales" };
+  const query = "SELECT ?month ?total WHERE { ?s :month ?month ; :total ?total }";
+  const file = buildSavedFigure({ page, title: "Sales", query, accept: "text/tab-separated-values",
+                                  mimeType: "text/tab-separated-values", digest: "abc123", rows: 3,
+                                  source, at: "2026-11-22T10:00:00.000Z", aspect: 400 / 300 });
+
+  ok(savedFigureIsRefreshable(), "this tree can build a figure that checks itself");
+  ok(missingFigureSource().length === 0,
+     "with every bundle its host script uses");
+  ok(savedFigureTrouble(file) === null, "and the file says nothing to the contrary");
+
+  // The point of the two-document form: the picture is still a picture.  A
+  // saved figure that needed a script to DRAW would have traded away the one
+  // property the single document had.
+  ok(file.includes('srcdoc="<!doctype html>'),
+     "the figure travels as a srcdoc attribute, written by the build -- so the file "
+     + "still draws with JavaScript turned off");
+  ok(file.includes('viewBox=&quot;0 0 400 300&quot;') && file.includes("&amp;quot;quoted&amp;quot;"),
+     "with every quote and ampersand inside it escaped -- the figure's own attributes once, "
+     + "and the caption's, already escaped for the document, a second time -- or the srcdoc "
+     + "attribute would end in the middle of the picture");
+  ok(file.includes('sandbox=""'),
+     "under the same empty sandbox the pane mounts it in, which is every restriction");
+
+  // Nothing is fetched.  Same claim as the saved dashboard, and the reason the
+  // file works on a machine that has never heard of the host.
+  ok(!/<script src=|<link |@import|url\(https?:/.test(file),
+     "and loads nothing: no script, no stylesheet, no font, no image from anywhere");
+  const policy = savedFigurePolicy("https://nl4.dydra.com");
+  ok(policy.includes("default-src 'none'") && policy.includes("connect-src https://nl4.dydra.com"),
+     "the file's policy forbids everything but a connection to the figure's own host");
+  ok(!policy.includes("unsafe-eval"),
+     "and grants no eval -- unlike the dashboard's, nothing here compiles a transform");
+  ok(file.includes(`content="${savedFigurePolicy("https://nl4.dydra.com").replace(/'/g, "&#39;")}"`),
+     "which is the policy the file declares");
+
+  // The query is the evidence, and it travels.
+  ok(file.includes("the query this was drawn from") && file.includes("?month ?total"),
+     "the query is in the file, readable without running anything");
+  ok(file.includes('"digest":"abc123"') && file.includes('"rows":3'),
+     "and so is what the picture was drawn from, which is what a check compares against");
+
+  // The host script is real code, not a sketch.
+  const runtime = savedFigureRuntime();
+  ok(typeof runtime === "string" && runtime.length > 10000, "the runtime travels as source");
+  new Function(runtime);                       // throws if it does not parse
+  ok(true, "and it parses -- a saved page has nobody to report a syntax error to");
+  const F = new Function(`${runtime.split("\n\n(function ()")[0]}\nreturn { RD, RF, AU };`)();
+  ok(F.AU.authHeader("T") === "Bearer T", "the credential header is the interface's own");
+  ok(F.RD.digestResult("a\tb\n1\t2\n", "text/tab-separated-values").digest
+       === F.RD.contentDigest("a\tb\n1\t2\n"),
+     "and so is the digest the check turns on");
+  ok(F.RF.resultFault("ASK { ?s ?p ?o }",
+       F.RD.digestResult("a\tb\n1\t2\n", "text/tab-separated-values")) !== null,
+     "and the check that a 200 with a body actually answers the query, so a figure is "
+     + "never called stale on the strength of a document that answers something else");
+  ok(F.RD.tableOf("month\ttotal\n01\t7\n", "text/tab-separated-values").rows.length === 1,
+     "with the reader for what the query answers now");
+
+  // What it does NOT carry.
+  ok(!runtime.includes("bindParameters") && !runtime.includes("staleAssertions"),
+     "it carries no parameter encoder and no passage comparison: a figure has neither, "
+     + "and the subset keeps about 7 KB out of every saved figure");
+  ok(FIGURE_BUNDLES.length === 3,
+     "three bundles are named; `carried-source.js' adds what they need underneath");
+
+  // And it does not pretend it can redraw.
+  ok(runtime.includes("a picture cannot redraw itself without the"),
+     "the file says plainly that a change in the data is not a new drawing -- there is no "
+     + "model in a saved file, and a picture that silently became another picture would "
+     + "falsify the provenance strip under it");
+}
+
+section("U-113: and a figure with nowhere to check itself is the file it always was");
+{
+  const page = buildFigurePage({ kind: "svg", text: `<svg viewBox="0 0 2 1"/>` }, {});
+  ok(buildSavedFigure({ page, query: "SELECT * {}", source: null }) === page,
+     "no address: the plain document, unchanged");
+  ok(buildSavedFigure({ page, query: null,
+                        source: { host: "https://h", account: "a", repository: "r" } }) === page,
+     "no query: the same -- there is nothing to run again");
+  ok(buildSavedFigure({ page, query: "SELECT * {}",
+                        source: { host: "not a url", account: "a", repository: "r" } }) === page,
+     "an address that is not an origin: the same, because the policy could not name it");
 }
 
 rmSync(scratch, { recursive: true, force: true });

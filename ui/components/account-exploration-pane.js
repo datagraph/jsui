@@ -33,9 +33,11 @@
  * is `recordRun''s, one graph per store, as it has always been.
  */
 
-import { createToolAdapter, ALLOW_TOOLS } from "../../lib/llm/tool-adapter.js";
+import { createToolAdapter, ALLOW_TOOLS, FIGURE_TOOLS } from "../../lib/llm/tool-adapter.js";
+import { figureSystem } from "../../lib/llm/figure-prompt.js";
 import { analysisSystem, analysisBudget, analysisProgress } from "../../lib/llm/analysis-prompt.js";
 import { createGrant } from "../../lib/llm/grant.js";
+import { continuationFrom } from "../../lib/llm/continuation.js";
 import { connectionFor, connectionRefusal, CONNECTION_PLACE } from "../../lib/app/connection.js";
 import { ensureRepositories } from "../../lib/app/repositories.js";
 import { recordRun } from "../../lib/mcp/transcript-store.js";
@@ -97,6 +99,23 @@ const STYLE = `
 .account-exploration-pane .exp-answer {
   border: 1px solid #e2e6ea; border-radius: 4px; padding: 8px 10px; background: #fcfdfe;
   font-size: 12.5px; line-height: 1.5; white-space: pre-wrap; }
+
+/* The next-steps box reads as a place to write, not as another panel of the
+   report: the label is above it and the field is the prompt's own field, so
+   the second question is asked where the first one was answered. */
+.account-exploration-pane .exp-next { margin: 10px 0 4px; }
+.account-exploration-pane .exp-next-label {
+  font-size: 10px; letter-spacing: .06em; text-transform: uppercase;
+  color: #8a94a0; margin-bottom: 3px; }
+.account-exploration-pane .exp-next-text {
+  min-height: 40px; border: 1px solid #ccd3da; border-radius: 4px; padding: 7px 8px;
+  background: #fff; font-size: 13px; line-height: 1.45; }
+.account-exploration-pane .exp-next-text:empty::before {
+  content: attr(data-placeholder); color: #aaa; }
+.account-exploration-pane .exp-next-actions {
+  display: flex; gap: 8px; align-items: baseline; margin-top: 6px; }
+.account-exploration-pane .exp-next-actions button { padding: 4px 14px; cursor: pointer; }
+.account-exploration-pane .exp-next-note { color: #777; font-size: 11px; }
 `;
 
 function ensureStyle(doc) {
@@ -169,15 +188,27 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
       <div class="exp-prompt" contenteditable="true" data-testid="account-exploration-prompt"
            data-placeholder="Ask across the stores you have chosen…"></div>
       <div class="exp-actions">
-        <button type="button" class="exp-run" data-testid="account-exploration-ask">Ask</button>
+        <button type="button" class="exp-run" data-testid="account-exploration-ask"
+                title="Ask a question about the stores you have chosen. The model reads them and answers in prose; any query it ends with has not run.">Ask</button>
         <button type="button" class="exp-stop" data-testid="account-exploration-stop"
+                title="Stop between rounds. A call already in flight comes back and is recorded, and you keep the prose the run had."
                 hidden>Stop</button>
-        <button type="button" class="exp-session" data-testid="account-exploration-session"
-                >Session</button>
         <button type="button" class="exp-dashboard" data-testid="account-exploration-compose"
-                title="Compose a page from several queries">Compose</button>
+                title="Build a whole page from several queries. Authority is granted once, up front, with a budget.">Compose</button>
+        <button type="button" class="exp-session" data-testid="account-exploration-session"
+                title="The record of what has already happened: past explorations, their transcripts, and the endpoint's own journal. Asks no model and runs no query."
+                >Past runs</button>
+        <span class="exp-scope" data-testid="account-exploration-scope"></span>
+        <label class="exp-mode" title="Ask for a figure drawn from the result, in three steps:
+explore, propose a query, then draw from what the interface fetched">
+          <input type="checkbox" class="exp-figure-mode"
+                 data-testid="account-exploration-figure-mode" /> Figure
+        </label>
         <span class="exp-status" data-testid="account-exploration-status"></span>
       </div>
+      <p class="exp-legend" data-testid="account-exploration-legend">
+        <b>Ask</b> answers a question · <b>Compose</b> builds a page ·
+        <b>Past runs</b> shows what has already happened</p>
       <p class="exp-authorises" data-testid="account-exploration-authorises"></p>
 
       <div class="exp-session-panel" data-testid="account-exploration-session-panel" hidden
@@ -185,6 +216,23 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
 
       <div class="exp-exchanges" data-testid="account-exploration-exchanges"></div>
       <div class="exp-results" data-testid="account-exploration-results"></div>
+
+      <!-- Moved under the newest answer by showAnswer, which is where it is
+           read: the answer ends in candidate next steps and this is where one
+           of them is named.  Hidden until there is an exploration to continue,
+           because a box offering to continue nothing is a box that has to be
+           explained. -->
+      <div class="exp-next" data-testid="account-exploration-next" hidden>
+        <div class="exp-next-label">Next steps</div>
+        <div class="exp-next-text" contenteditable="true"
+             data-testid="account-exploration-next-text"
+             data-placeholder="What to do next — \u2318\u23ce to execute…"></div>
+        <div class="exp-next-actions">
+          <button type="button" class="exp-next-run"
+                  data-testid="account-exploration-next-run">Execute</button>
+          <span class="exp-next-note" data-testid="account-exploration-next-note"></span>
+        </div>
+      </div>
     </div>`;
 
   // §2.6 R-P2: the disclosure is on the screen while the content is, before
@@ -201,10 +249,16 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
   const prompt = q(".exp-prompt");
   const statusEl = q(".exp-status");
   const authorises = q(".exp-authorises");
+  const figureMode = q(".exp-figure-mode");
   const askButton = q(".exp-run");
+  const scope = q(".exp-scope");
   const stopButton = q(".exp-stop");
   const sessionPanel = q(".exp-session-panel");
   const results = q(".exp-results");
+  const nextBox = q(".exp-next");
+  const nextText = q(".exp-next-text");
+  const nextRun = q(".exp-next-run");
+  const nextNote = q(".exp-next-note");
 
   const setStatus = (s) => { statusEl.textContent = s || ""; };
 
@@ -250,14 +304,40 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
     + `${ids.map((i) => `  · ${i}`).join("\n")}\n`
     + `Up to ${budget.rounds} rounds of tool calls, ${budget.grant.maxQueries} calls in all, `
     + `read-only, for this run. Large results are read as their shape first; the answer `
-    + `is recorded in \`${accountName}/mcp\` and the run can be stopped while it goes.`;
+    + `is recorded in \`${accountName}/mcp\` and the run can be stopped while it goes.`
+    // Figure mode widens what is offered -- `query' joins `survey' -- and this
+    // paragraph is the one place that is stated before the press (§35.2).  The
+    // grant does not change: it was read-only before and is read-only now, and
+    // the argument screen is what keeps a query from being a write.
+    + (figureMode?.checked
+        ? `\nFigure: the turn ends at a proposed query rather than an answer, and `
+        + `\`query\` is offered beside \`survey\` so the model can see what its own `
+        + `SPARQL returns. The figure itself is drawn afterwards, from the result `
+        + `the interface fetches, and only where the proposal names one of the `
+        + `stores above.`
+        : "");
   };
 
   const showChosen = () => {
     const n = chosen.size;
     storesChip.className = `exp-chip exp-chip-${n ? "ok" : "wait"}`;
     storesChip.textContent = n ? `${n} chosen` : "none chosen";
-    askButton.textContent = n > 1 ? `Ask across ${n}` : "Ask";
+    /*
+     * REQ-37.2.4.  The count used to be grown into the label -- "Ask across
+     * 3", "Compose from 3" -- which read as a different operation from the
+     * "Run" of a repository's pane and from the plain "Ask" of one store, so
+     * a reader who had learned any one of them did not recognise the others.
+     * The verb is the verb; the scope is said beside it, which is also where
+     * it can say WHICH stores rather than only how many, and where "nothing
+     * is chosen" can be said at all -- a state the old label could not
+     * express, since it fell back to the same word it used for one store.
+     */
+    const names = [...chosen].join(", ");
+    scope.className = `exp-scope${n ? "" : " exp-scope-none"}`;
+    scope.textContent = n === 0 ? "no store chosen"
+                      : n === 1 ? names
+                      : `across ${n} stores`;
+    scope.title = n ? names : "Choose a store above before asking.";
     describeBudget();
   };
 
@@ -363,6 +443,8 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
     showChosen();
   }
 
+  figureMode.addEventListener("change", describeBudget);
+
   // A pane that is open while a repository pane connects something should show
   // it without being reopened: the registry is the one place that knows.
   const unwatch = onConnections(() => { if (wrapper.isConnected) drawStores(); });
@@ -374,6 +456,27 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
 
   /* ── the transcript ── */
 
+  /**
+   * Which repository a query in the transcript is a query ON.
+   *
+   * Three answers, in order of how much they are worth trusting.  A tool
+   * result carries the store the call went to, and that is the fact.  Where
+   * only one store was chosen there is nothing to be wrong about.  Otherwise
+   * the query came out of the model's prose, and the prose is where it says
+   * which store it wrote it for -- which figure mode now asks it to do in so
+   * many words.  A mention of exactly one chosen store is taken; a mention of
+   * two is not resolved by preferring the first, because running one
+   * repository's query against another is not a near miss and a figure drawn
+   * that way is a measurement of the wrong thing.
+   */
+  const storeFor = (entry) => {
+    if (entry.repository) return entry.repository;
+    if (chosen.size === 1) return [...chosen][0];
+    const said = String(entry.response || "");
+    const named = [...chosen].filter((id) => said.includes(id));
+    return named.length === 1 ? named[0] : null;
+  };
+
   const { add } = createExchangeList(wrapper.querySelector(".exp-exchanges"), {
     doc, store: exchanges, testid: "account-exploration",
     emptyText: "Nothing asked yet.",
@@ -382,7 +485,7 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
     // not, this pane cannot know, and offering a view in the wrong repository
     // is worse than not offering one.
     addView: (entry) => {
-      const where = entry.repository || (chosen.size === 1 ? [...chosen][0] : null);
+      const where = storeFor(entry);
       if (!where) { setStatus("that query names no repository to add it to"); return; }
       const [account, repository] = where.split("/");
       const url = `${(typeof window !== "undefined" && window.APP_BASE_PATH) || "/ui"}`
@@ -396,8 +499,12 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
     // the entry says, and where it does not the gate is not offered, because
     // running one repository's query against another is not a near miss.
     draw: (entry, gateHolder) => {
-      const where = entry.repository || (chosen.size === 1 ? [...chosen][0] : null);
-      if (!where) { setStatus("that query names no repository to draw it from"); return null; }
+      const where = storeFor(entry);
+      if (!where) {
+        setStatus("that query names no repository to draw it from -- say which store "
+                  + "it is for and ask again");
+        return null;
+      }
       const [account, repository] = where.split("/");
       const st = paneState(account, repository, host);
       return openFigureGate(gateHolder, {
@@ -433,19 +540,29 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
 
   /* ── composing a page ── */
 
-  // A dashboard is granted authority once, up front, over one repository (D-O),
-  // so it is offered when exactly one store is chosen and refused otherwise --
-  // with the reason, rather than by a control that is simply dead.
+  // A dashboard is granted authority once, up front (D-O) -- over the stores
+  // that were chosen, which until 2026-11-19 had to be exactly one.  The limit
+  // was never in the grant, which has taken a list of repositories and a
+  // `widen' since it was written, nor in the runner, where a panel's `source'
+  // has decided where its request goes since U-84.  It was here, in the
+  // button: one store was all it would pass on.
+  //
+  // What a second store makes possible is the panel that could not be written
+  // before -- a measure from each, and a transform that puts them beside each
+  // other.  The grant names every chosen store, so a call to one that was not
+  // chosen is refused by the authority rather than by the routing.
   q(".exp-dashboard").addEventListener("click", () => {
-    if (chosen.size !== 1) {
+    const stores = storesFor([...chosen]);
+    if (!stores.length) {
       setStatus(chosen.size
-        ? "a composed page is granted over one repository; choose one store"
+        ? "none of the chosen stores has an endpoint to compose from"
         : "choose a store to compose from");
       return;
     }
-    const [account, repository] = [...chosen][0].split("/");
-    openDashboardPane(app, { container: results, accountName: account,
-                             repositoryName: repository,
+    openDashboardPane(app, { container: results,
+                             accountName: stores[0].account,
+                             repositoryName: stores[0].repository,
+                             stores,
                              prompt: (prompt.innerText || "").trim() });
   });
 
@@ -455,6 +572,13 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
   let stopReason = null;
   /** The question the last run was given, which the saved page states. */
   let lastAsked = "";
+  /**
+   * The exploration a next step continues: the run's own return value and the
+   * question that started it.  Held rather than re-derived because the
+   * conversation is the run's, not the transcript's -- the transcript is what
+   * a reader sees, and `out.messages' is what the model was actually sent.
+   */
+  let lastRun = null;
 
   stopButton.addEventListener("click", () => {
     stopReason = "stopped from the exploration pane";
@@ -462,10 +586,19 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
     setStatus("stopping after this call…");
   });
 
-  async function ask() {
+  /**
+   * Ask, or continue.
+   *
+   * With no arguments this is the Ask button: the prompt box, a fresh
+   * conversation.  With TEXT and PRIOR it is the next step: the same stores,
+   * the same grant and budget, and the previous turns in front of the
+   * instruction so that "the second one" names something.
+   */
+  async function ask({ text: given = null, prior = null } = {}) {
     if (running) return;
-    const text = (prompt.innerText || "").trim();
-    if (!text) { setStatus("nothing to ask"); return; }
+    const continuing = Boolean(prior && prior.length);
+    const text = given !== null ? String(given).trim() : (prompt.innerText || "").trim();
+    if (!text) { setStatus(continuing ? "nothing to execute" : "nothing to ask"); return; }
     if (!connection.llmKey) {
       connDetails.open = true;
       setStatus(connectionRefusal("nothing was asked"));
@@ -496,11 +629,17 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
     const started = new Date();
     lastAsked = text;
     const ids = stores.map((s) => `${s.account}/${s.repository}`);
-    add({ kind: "note", title: "prompt", status: "note", response: text,
-          responseLabel: `asked of ${ids.join(", ")}` });
+    add({ kind: "note", title: continuing ? "next step" : "prompt", status: "note",
+          response: text,
+          responseLabel: continuing
+            ? `continuing the exploration of ${ids.join(", ")}`
+            : `asked of ${ids.join(", ")}` });
 
     const budget = analysisBudget(ids.map((i) => ({ id: i })));
     const grant = createGrant(budget.grant);
+    // Read once, here: a box ticked while the run is going does not change
+    // what the run was asked, and the transcript would then say otherwise.
+    const figuring = figureMode.checked;
     const watch = analysisProgress(setStatus, { rounds: budget.rounds });
 
     // The same events the repository pane draws, with the store named on each
@@ -510,7 +649,11 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
       switch (e.type) {
         case "tools":
           add({ kind: "mcp", title: "tools/list", status: e.ok ? "ok" : "fail", ms: e.ms,
-                repository: e.repository,
+                // The status code belongs on the indicator line.  A store that
+                // offered nothing under a 200 sends a reader to a server log
+                // that recorded a success, and the search starts in the wrong
+                // place; the code and the refusal side by side end it.
+                http: e.http, repository: e.repository,
                 response: e.ok
                   ? `offered:  ${e.names.join(", ")}\nwithheld: `
                   + `${e.withheld.length ? e.withheld.join(", ") : "(none)"}`
@@ -594,9 +737,21 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
         apiKey: connection.llmKey, workspaceId: connection.llmWorkspace,
         model: connection.llmModel,
         mcp: { repositories: stores },
-        allowTools: ALLOW_TOOLS,
-        system: analysisSystem({ stores: ids.map((i) => ({ id: i })), asked: text,
-                                 rounds: budget.rounds, answerTokens: budget.answerTokens }),
+        // Figure mode changes the same two things it changes in a repository
+        // pane (U-12): the model is told that drawing is step 3 and that this
+        // call ends at a proposal, and `query' joins the offered tools,
+        // because a figure is drawn from a query and a model that can only
+        // survey must guess at what its own SPARQL would return (U-11).  What
+        // is added here and not there is the list of stores: across several,
+        // the proposal has to say which one it is for.
+        allowTools: figuring ? FIGURE_TOOLS : ALLOW_TOOLS,
+        system: figuring
+          ? figureSystem(analysisSystem({ stores: ids.map((i) => ({ id: i })), asked: text,
+                                          rounds: budget.rounds,
+                                          answerTokens: budget.answerTokens }),
+                         { stores: ids })
+          : analysisSystem({ stores: ids.map((i) => ({ id: i })), asked: text,
+                             rounds: budget.rounds, answerTokens: budget.answerTokens }),
         maxIterations: budget.rounds,
         maxTokens: budget.answerTokens,
         digestOver: budget.digestOver,
@@ -605,7 +760,7 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
         stop: () => stopReason,
         onEvent,
       });
-      out = await adapter.run(text);
+      out = await adapter.run(text, { prior });
     } catch (e) {
       add({ kind: "note", title: "the model could not be asked", status: "fail",
             response: String(e) });
@@ -613,6 +768,11 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
       running = false; stopButton.hidden = true; askButton.disabled = false;
       return null;
     }
+
+    // What a next step continues.  Set before the record is written, because
+    // a transcript that could not be saved does not make the conversation
+    // less real -- the model was asked and answered either way.
+    lastRun = { out, asked: text };
 
     // One record per store, not one for the turn: each repository is its own
     // exploration with its own handle, and the events say which store they
@@ -671,11 +831,51 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
                              : `answered nothing · no store was read`)
                 : `failed · ${out.error}`);
     if (refreshLog && !sessionPanel.hidden) refreshLog();
+    // The instruction is in the transcript now, so clearing the box loses
+    // nothing and leaves it ready for the step after this one.
+    if (continuing) nextText.innerText = "";
     running = false;
     stopButton.hidden = true;
     askButton.disabled = false;
     return out;
   }
+
+  /* ── the next step ── */
+
+  /**
+   * What the Execute press will carry, as a sentence, before it is pressed.
+   *
+   * The same rule the Ask button follows (§35.2): the authority a press
+   * exercises is stated where the press is, not in a document about the pane.
+   * Here what is carried is the conversation, and its size is the thing a
+   * reader cannot otherwise see.
+   */
+  function showCarried() {
+    const prior = continuationFrom(lastRun?.out, { asked: lastRun?.asked });
+    const chars = prior.reduce((n, m) => n + JSON.stringify(m).length, 0);
+    nextNote.textContent = prior.length
+      ? `carries ${prior.length} earlier turn(s), ${(chars / 1000).toFixed(1)} KB, `
+      + `to ${[...chosen].join(", ") || "no store"}`
+      : "nothing earlier to carry — this will be asked as a first question";
+    return prior;
+  }
+
+  function offerNextStep(answerBox) {
+    nextBox.hidden = false;
+    // Under the newest answer rather than at the foot of the column: the
+    // answer is what the next step responds to, and answers are newest-first.
+    answerBox.parentNode.insertBefore(nextBox, answerBox.nextSibling);
+    showCarried();
+  }
+
+  nextRun.addEventListener("click", () => {
+    const line = (nextText.innerText || "").trim();
+    if (!line) { setStatus("nothing to execute"); return; }
+    ask({ text: line, prior: showCarried() });
+  });
+  nextText.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); nextRun.click(); }
+  });
 
   /**
    * The answer, where a report can be read (§35.4).
@@ -697,6 +897,7 @@ export function openAccountExplorationPane(app, { container, accountName } = {})
     foot.textContent = `${footer}\n${kept.join("\n")}`;
     box.append(body, foot, reportControls(out, footer, kept));
     results.insertBefore(box, results.firstChild);
+    offerNextStep(box);
   }
 
   /**

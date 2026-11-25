@@ -206,8 +206,16 @@ section("a prompt that needs one tool round");
 
   ok(result.ok === true && result.iterations === 2, "the loop ran twice and succeeded");
   ok(/SELECT \?name/.test(result.sparql || ""), "the fenced query is extracted");
-  ok(seen.join(",") === "prompt,tools,primer,primer,assistant,tool_call,tool_result,assistant,done",
+  ok(seen.join(",") === "prompt,tools,primer,primer,asking,assistant,tool_call,"
+                      + "tool_result,asking,assistant,done",
      `the event sequence is the one a transcript renders (${seen.join(",")})`);
+  // `asking' is emitted BEFORE the request it describes, which is the whole
+  // of its usefulness: it is the only event a surface can show for the one
+  // interval that produces none, and a surface with nothing to show there
+  // leaves whatever it last said standing -- `reading the primer', for as
+  // long as the model takes to answer.
+  ok(seen.indexOf("asking") === seen.indexOf("assistant") - 1,
+     "each turn is announced before it is awaited, not after it has arrived");
 
   ok(/scope: types, predicates or graphs/.test(calls[3].body.system)
      && /Score notation/.test(calls[3].body.system),
@@ -785,6 +793,31 @@ section("the stores a turn carries");
   ok(/alice\/sales/.test(note) && /bob\/parts/.test(note)
      && /survey__bob__parts/.test(note),
      "and a two-store turn is told both, with the tool name that reaches each");
+  ok(!/NOT READABLE/.test(note),
+     "where every store answered, nothing is said about one that did not");
+
+  const short = repositoriesNote(two, [
+    { name: "survey__alice__sales", store: two[0], tool: "survey" },
+  ], [{ id: "bob/parts", why: "HTTP 403" }]);
+  ok(/bob\/parts\*\* — NOT READABLE this turn: HTTP 403/.test(short),
+     "a store that offered nothing is named with the REASON, not with an absence");
+  ok(/nothing you say[\s\S]*about it can come from this turn/.test(short),
+     "and the model is told what that means for its answer");
+  ok(/Say so in your answer/.test(short),
+     "including that the gap is to be stated: an answer covering only the stores "
+     + "that replied reads as an answer about all of them");
+
+  const silent = repositoriesNote(two, [
+    { name: "survey__alice__sales", store: two[0], tool: "survey" },
+  ]);
+  ok(/no reason was recorded/.test(silent),
+     "with no reason to hand, the note says THAT rather than inventing one");
+
+  const wordy = repositoriesNote(two, [
+    { name: "survey__alice__sales", store: two[0], tool: "survey" },
+  ], [{ id: "bob/parts", why: `x${"y".repeat(400)}` }]);
+  ok(wordy.split("\n").every((l) => l.length < 240),
+     "a long reason is clipped: the note is a list, and one item is not a payload");
 }
 
 section("a question that crosses a repository boundary");
@@ -855,6 +888,76 @@ section("a question that crosses a repository boundary");
   ok(out.repositories.join(",") === "alice/sales,bob/parts",
      "and the run says which stores it carried");
   ok(out.ok && /bob\/parts/.test(out.finalText), "the turn answers across both");
+}
+
+section("a store that answers and still offers nothing says why");
+{
+  const A = "https://example.test/alice/sales/mcp";
+  const B = "https://example.test/bob/parts/mcp";
+  const { calls, fetchImpl } = stub([
+    () => jsonResponse(200, toolsList),
+    // 200, and a JSON-RPC error inside it.  This is the shape an access
+    // refusal takes when the transport succeeded: a server log sees a
+    // success, and only the body says the call was refused.
+    () => jsonResponse(200, { jsonrpc: "2.0", id: 1,
+                              error: { code: -32602,
+                                       message: "Repository not found: bob/parts" } }),
+    () => jsonResponse(200, resourceReply("operations")),
+    () => jsonResponse(200, resourceReply("grammar")),
+    () => jsonResponse(200, finishes("Orders in alice/sales, and nothing from bob/parts.")),
+  ]);
+
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl,
+    mcp: { repositories: [
+      { account: "alice", repository: "sales", endpoint: A, token: "ta" },
+      { account: "bob", repository: "parts", endpoint: B, token: "tb" },
+    ] },
+  });
+  const out = await adapter.run("compare them");
+
+  const told = out.events.find((e) => e.type === "tools" && e.repository === "bob/parts");
+  ok(told && told.ok === false, "the store that offered nothing is reported as a failure");
+  ok(told.http === 200,
+     "with the status it actually answered with -- 200, which is why a server log shows none of this");
+  ok(/Repository not found/.test(told.error),
+     "and the server's own words, not a status code standing in for them");
+
+  const asked = calls.filter((c) => c.url === LLM);
+  ok(/bob\/parts\*\* — NOT READABLE this turn: Repository not found/.test(asked[0].body.system),
+     "the model is told WHY the store is unreadable, in the same words (REQ-34.3.6)");
+  ok(/alice\/sales\*\* — `survey/.test(asked[0].body.system),
+     "and the one that answered is listed as before");
+  ok((asked[0].body.tools || []).every((t) => !/bob/.test(t.name)),
+     "no tool routes to it: a tool offered for a store that refused is a call that will fail");
+  ok(out.ok, "the run is not failed by it -- one store short is an answer with a gap in it");
+}
+
+section("a 200 that is not JSON-RPC is named as such");
+{
+  const A = "https://example.test/alice/sales/mcp";
+  const B = "https://example.test/bob/parts/mcp";
+  const html = { status: 200, ok: true, text: async () => "<!doctype html><title>Sign in</title>" };
+  const { calls, fetchImpl } = stub([
+    () => jsonResponse(200, toolsList),
+    () => html,
+    () => jsonResponse(200, resourceReply("operations")),
+    () => jsonResponse(200, resourceReply("grammar")),
+    () => jsonResponse(200, finishes("Only alice/sales answered.")),
+  ]);
+  const adapter = createToolAdapter({
+    endpoint: LLM, apiKey: "k", fetchImpl,
+    mcp: { repositories: [
+      { account: "alice", repository: "sales", endpoint: A, token: "ta" },
+      { account: "bob", repository: "parts", endpoint: B, token: "tb" },
+    ] },
+  });
+  const out = await adapter.run("compare them");
+  const told = out.events.find((e) => e.type === "tools" && e.repository === "bob/parts");
+  ok(/not JSON-RPC/.test(told.error) && /other than an MCP resource/.test(told.error),
+     "answering 200 with a page is a different fault from refusing, and is named differently");
+  const asked = calls.filter((c) => c.url === LLM);
+  ok(/not JSON-RPC/.test(asked[0].body.system), "and that reaches the model too");
 }
 
 section("the model names a repository the turn does not carry");

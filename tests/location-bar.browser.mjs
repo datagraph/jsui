@@ -439,7 +439,7 @@ console.log("\n§35: a turn that takes minutes can be watched and stopped");
       message: "james/finto and james/fibo — under your credentials, nothing has run yet",
       detail: "Up to 26 rounds of tool calls, read-only, for this run.",
       confirm: {
-        label: "Ask across 2",
+        label: "Ask",
         working: "asking james/finto, james/fibo…",
         run: (controls) => new Promise((resolve) => {
           window.__ran += 1;
@@ -457,8 +457,16 @@ console.log("\n§35: a turn that takes minutes can be watched and stopped");
      "the offer says the stores and that nothing has run");
   ok(await page.isVisible('[data-testid="location-confirm"]'),
      "and offers one press");
-  ok((await page.textContent('[data-testid="location-confirm"]')) === "Ask across 2",
-     "whose label says how many repositories it would reach");
+  // REQ-37.2.4: one name, in all three places the operation is reached from.
+  // The label used to carry the count -- `Ask across 2' -- while the detail
+  // above it already named every repository line by line, so the button was
+  // repeating the weaker half of what was on the screen and making one
+  // operation look like several.
+  ok((await page.textContent('[data-testid="location-confirm"]')) === "Ask",
+     "whose label is the same verb the panes use, and carries no count");
+  ok((await replyText()).includes("james/finto and james/fibo"),
+     "the repositories it would reach being said in the reply, where there is "
+   + "room to name them");
   ok(await page.evaluate(() => window.__ran) === 0,
      "nothing ran before the press — the disclosure is not a formality");
 

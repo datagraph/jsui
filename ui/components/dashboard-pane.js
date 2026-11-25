@@ -42,6 +42,10 @@ import {
   withInputDigests, staleAssertions, dashboardRecord,
 } from "../../lib/dashboard/spec.js";
 import { mountDashboard } from "../../lib/dashboard/frame.js";
+// A new FILE, not a new export of an existing one: the stale-cache link
+// error has taken this interface down three times, and a module no cache has
+// ever held cannot be the fourth (`reference_jsui_deploy_cache`).
+import { whereItLanded } from "../../lib/dashboard/landing.js";
 import {
   validateApplication, applicationFrom, mintId, specOf,
 } from "../../lib/app/document.js";
@@ -61,10 +65,70 @@ import {
   lift as liftArrangement, apply as applyArrangement, checkApply, printName,
   requestsOf,
 } from "../../lib/app/arrangement.js";
+/*
+ * The exports added since the last deploy, read through a namespace.
+ *
+ * `/ui/' is served with no cache lifetime, so a reload after a deploy builds
+ * this page out of two deploys at once.  A NAMED import of an export the
+ * cached copy does not have is a LINK error: the module graph never loads
+ * and the WHOLE INTERFACE is blank over a feature nobody has used yet.  That
+ * is not a hypothesis -- it has now happened three times, most recently to
+ * `templateParts' here.
+ *
+ * A namespace import links nothing.  A missing member is `undefined' at the
+ * point it is read, so the cost of a half-stale tree is the one feature,
+ * said out loud where it matters, and the application keeps working.  Every
+ * export this file takes from a module that predates it belongs here until
+ * it has been deployed long enough to be in everyone's cache.
+ */
+import * as arrangement0 from "../../lib/app/arrangement.js";
+import * as anchors0 from "../../lib/app/anchors.js";
+
+/*
+ * And the cure the page can apply itself.
+ *
+ * The module is stale in the CACHE; the server has the new one, as `curl'
+ * shows every time this happens.  A dynamic import of the same specifier
+ * under a query no cache has ever seen is a different URL, so it is fetched
+ * rather than reused and the missing export is in it.  Fired once at load,
+ * only for a namespace that came up short, and never awaited: nothing on the
+ * screen waits for it, and what it repairs is read at call time anyway.
+ *
+ * The holders are mutable because a namespace binding is not.
+ */
+let arrangement = arrangement0;
+let anchors = anchors0;
+
+const WANTED = [
+  ["../../lib/app/arrangement.js", () => arrangement, (ns) => { arrangement = ns; },
+   ["templateParts"]],
+  ["../../lib/app/anchors.js", () => anchors, (ns) => { anchors = ns; }, ["anchorTips"]],
+];
+
+for (const [specifier, get, set, names] of WANTED) {
+  if (names.every((n) => typeof get()[n] === "function")) continue;
+  import(`${specifier}?reload=${Date.now()}`)
+    .then((fresh) => { if (names.some((n) => typeof fresh[n] === "function")) set(fresh); })
+    .catch(() => { /* a tree that really is older than this file is the fallback's case */ });
+}
 import {
   ensureRepository, writeArrangement, readArrangement, deleteArrangement, recordApplication,
 } from "../../lib/app/ui-store.js";
 import { recordRun } from "../../lib/mcp/transcript-store.js";
+import { expectation, anchorsFor } from "../../lib/app/anchors.js";
+import { missingFigure } from "../../lib/app/figure-ask.js";
+import { evidenceFrom, mergeEvidence, evidenceSummary } from "../../lib/llm/evidence.js";
+// The transcript, drawn exactly as the exploration pane draws it.  A compose
+// run is the same conversation as an ask -- the model on one side, the stores
+// on the other -- and until now this pane showed a one-line-per-event log of
+// it and nothing else: no arguments, no payload, no prose, nothing to open.
+// Two surfaces showing the same exchange two different ways is how a reader
+// comes to believe Compose does something less than Ask (REQ-34.3.10).
+import {
+  createExchangeList, ensureExplorationStyle,
+} from "./exchange-list.js";
+import { rowsIn, digestRequest } from "../../lib/format/transcript.js";
+import { sparqlFrom } from "../../lib/mcp/mcp-client.js";
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -169,6 +233,13 @@ const STYLE = `
 .dashboard-pane .dsh-log { font-family: ui-monospace, Menlo, monospace; font-size: 11px;
   color: #44505c; max-height: 160px; overflow: auto; white-space: pre-wrap; }
 .dashboard-pane .dash-frame { display: block; }
+/* The transcript carries its own styling, from exchange-list.js, scoped to
+   .exploration-pane; what belongs here is only how much of this pane it is
+   allowed to take.  Unbounded, a sixteen-turn compose pushes Gate 1 off the
+   bottom of the screen -- so it scrolls, and each new row scrolls itself into
+   view inside it, which is also what makes a long turn visibly alive. */
+.dashboard-pane .dsh-exchange { max-height: 420px; overflow: auto; }
+.dashboard-pane .dsh-exchange .exp-x > summary { font-size: 11px; }
 `;
 
 function ensureStyle(doc) {
@@ -298,13 +369,70 @@ function panelBox(doc, { kind, label, name, notes = [], body, open = true, testi
 
 /* ─────────────────────────── the pane ─────────────────────────── */
 
+/**
+ * STORES is the whole set a page may read; ACCOUNTNAME/REPOSITORYNAME is the
+ * first of them, and remains what the pane is keyed, credentialled and
+ * recorded against.  A panel with no `source' reads that one; a panel that
+ * names another reads it through `destinationOf', which is the mechanism an
+ * applied arrangement already used (U-84).
+ *
+ * Passing none is the one-store case and behaves exactly as it did: D-O grants
+ * authority once, up front, and what changes here is only how many
+ * repositories that one grant may name.
+ */
 export function openDashboardPane(app, { container, accountName, repositoryName,
+                                          stores = [],
                                           prompt: seedPrompt = "" } = {}) {
   if (!container) return null;
   const doc = container.ownerDocument || document;
   ensureStyle(doc);
+  ensureExplorationStyle(doc);
 
-  const id = `dashboard-${slug(accountName)}-${slug(repositoryName)}`;
+  // The primary first, then the rest, each once.  The order is what the model
+  // is told and what a panel with no source falls back to, so it is fixed
+  // here rather than left to the caller's iteration order.
+  //
+  // The primary is TAKEN FROM the passed stores when it is one of them, which
+  // it almost always is: the account's pane opens this pane named for its
+  // first chosen store and passes that same store in the list.  Composing the
+  // primary as a bare `{account, repository}' and letting the dedupe drop the
+  // real entry behind it cost that store its endpoint and its token -- and
+  // `runStores' then dropped it for having none, so the first store was named
+  // in the grant and in the brief, had no tool, and was never asked for one.
+  // The run reached every repository but the one the page was named for, and
+  // nothing said so: no request was made, so no server log recorded anything
+  // either (REQ-34.3.9).
+  const given = new Map();
+  for (const st_ of (Array.isArray(stores) ? stores : [])) {
+    if (st_ && st_.account && st_.repository) {
+      const k = `${st_.account}/${st_.repository}`;
+      if (!given.has(k)) given.set(k, st_);
+    }
+  }
+  const primaryKey = `${accountName}/${repositoryName}`;
+  const storeList = [];
+  const seenStore = new Set();
+  for (const st_ of [given.get(primaryKey) || { account: accountName, repository: repositoryName },
+                     ...given.values()]) {
+    const key = st_ && st_.account && st_.repository
+      ? `${st_.account}/${st_.repository}` : null;
+    if (!key || seenStore.has(key)) continue;
+    // With a list of stores, a key that carries no endpoint is not a store:
+    // it is the pane's name.  Naming it to the model and in the grant offers
+    // a repository no call can reach, which reads to a reader of the answer
+    // as a repository that was read and had nothing in it.
+    if (given.size && !(st_.endpoint || st_.mcpEndpoint)) continue;
+    seenStore.add(key);
+    storeList.push(st_);
+  }
+  const storeKeys = storeList.map((s) => `${s.account}/${s.repository}`);
+  const several = storeKeys.length > 1;
+
+  // Two store sets over the same primary are two different pages, so they are
+  // two panes: keying on the primary alone would have the second press scroll
+  // to the first page rather than compose the one that was asked for.
+  const id = `dashboard-${slug(accountName)}-${slug(repositoryName)}`
+           + (several ? `-${slug(storeKeys.slice(1).join("+"))}` : "");
   const existing = container.querySelector(`#${id}`);
   if (existing) {
     existing.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -322,7 +450,10 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     dataset: { account: accountName, repository: repositoryName, testid: "dashboard-pane" },
   });
   wrapper.appendChild(el(doc, "div", { class: "dsh-head" }, [
-    el(doc, "span", { text: `/${accountName}/${repositoryName} · dashboard` }),
+    el(doc, "span", { text: several
+      ? `${storeKeys.slice(0, 2).join(" + ")}`
+        + `${storeKeys.length > 2 ? ` + ${storeKeys.length - 2} more` : ""} · dashboard`
+      : `/${accountName}/${repositoryName} · dashboard` }),
     el(doc, "button", { type: "button", class: "dsh-close", title: "Close",
                         dataset: { testid: "dashboard-close" }, text: "×",
                         onclick: () => { teardown(); wrapper.remove(); } }),
@@ -333,8 +464,46 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
 
   /* ── state for the whole run ── */
 
+  /**
+   * The stores the turn may call, in the adapter's shape.
+   *
+   * One store stays exactly what it was -- `paneStore', the pane's own
+   * credential -- so nothing about a single-repository compose changes.  With
+   * several, each carries its own endpoint from the registry and falls back to
+   * this pane's token, which is the account's: the repositories are the
+   * account's own, and a store the account cannot reach is dropped here rather
+   * than failing per call.
+   */
+  const runStores = () => {
+    if (!several) return paneStore(st);
+    const many = storeList
+      .map((s) => ({ account: s.account, repository: s.repository,
+                     endpoint: s.endpoint || s.mcpEndpoint || null,
+                     token: s.token || st.token || null }))
+      .filter((s) => s.endpoint);
+    return many.length ? many : paneStore(st);
+  };
+
   let grant = null;
   let adapterResult = null;
+  /**
+   * What this interface put in front of the model, turn by turn (REQ-23.2.6).
+   *
+   * The compose is turn 1 and every revision is the next, because a page is
+   * built by a sequence of exchanges and a reader asking what a passage rests
+   * on is owed the sequence rather than the last of it.  Built from the
+   * adapter's own events -- the repository, the query, the shape and the
+   * digest were on them already -- and posted into the frame with the data,
+   * so the page writes its marks from the interface's record instead of from
+   * what the model declared about its own work.
+   */
+  let ledger = [];
+  const noteEvidence = (result) => {
+    if (!result) return;
+    ledger = mergeEvidence(ledger, evidenceFrom(result.events || [],
+                                                { turn: ledger.length + 1, at: result.at }));
+  };
+  const evidence = () => evidenceSummary(ledger);
   /**
    * What produced the content on each stage, told to the stages (§2.6 R-P2).
    *
@@ -352,7 +521,10 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     const p = result ? {
       model: result.model, servedModel: result.servedModel, served: result.served,
       provider: result.provider, endpoint: result.endpoint, at: result.at,
-      account: accountName, repository: repositoryName,
+      // Article 50 names what was READ, and a page composed over two stores
+      // was read from both: naming only the primary would attribute half of
+      // it to the wrong repository (§2.6).
+      account: accountName, repository: storeKeys.join(", "),
     } : null;
     for (const sec of [phase1, gate1, stagePage, stageRevise, gatePatch, gate2]) {
       if (sec) markStage(sec, p);
@@ -435,7 +607,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
   const fQueries = field("calls", "queries", DEFAULT_GRANT.maxQueries);
   const fRows = field("rows", "rows", DEFAULT_GRANT.maxRows);
   const fBytes = field("KiB", "bytes", Math.round(DEFAULT_GRANT.maxBytes / 1024));
-  const fRepos = field("repositories", "repos", repoKey, "text");
+  const fRepos = field("repositories", "repos", storeKeys.join(", "), "text");
   const fRuns = field("page runs", "runs", DEFAULT_INTERACTION.maxRuns);
   const readOnly = el(doc, "input", { type: "checkbox", checked: true,
                                       dataset: { testid: "dashboard-grant-readonly" } });
@@ -564,6 +736,14 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     appState = { ...(appDoc.state || {}) };
     parameterValues = { ...defaultValues(appDoc.parameters), ...pick(appState, appDoc.parameters) };
     patches = [];
+    // A page read back out of the archive was composed by a run this session
+    // never saw -- so the ledger comes out of the RECORD, which keeps what
+    // that run was shown as statements (REQ-23.2.6).  A page recorded before
+    // the ledger existed has none, and an empty one is the right answer for
+    // it: the frame then says it holds no record rather than saying nothing
+    // was read, which would be the same over-claim the ledger exists to
+    // retire.
+    ledger = Array.isArray(stored.evidence) ? stored.evidence : [];
     repair = createRepairLoop();
     interaction = interaction || createInteractionBudget({}, { onChange: () => paintInteraction() });
     viaCatalog = false;          // run the recorded query text; the temporary views are long gone
@@ -598,17 +778,23 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       onState: ({ key, value }) => rememberState(key, value),
       onLayout: (request) => layoutGraph(request),
       onPropose: ({ what, detail }) => presentProposalFromPage(what, detail),
-      onEvent: (e) => { if (e.type === "error") frameErrors.push(e); },
+      onEvent: (e) => { if (anchorEvent(e)) return; if (e.type === "error") frameErrors.push(e); },
       doc,
     });
     mounted.post({ results: payloadsFor(appDoc, results), stale,
                    parameters: parameterValues, state: appState,
+                   evidence: evidence(),
                    budget: budgetForPage(interaction) });
     paintInteraction();
     stageRevise.hidden = false;
     // A reopened dashboard is as addressable as a new one: it is a page on
     // the screen, which is all the bar's address means.
     becomeAddressable();
+    // What everything is called goes in at once, so a reader who never
+    // touches the bar can still find out; the App then says the line being
+    // typed, if there is one, rather than leaving the page dark.
+    showAnchors(null);
+    app?.refreshAnchors?.();
     progress.appendChild(el(doc, "div", { class: stale.length ? "dsh-warn" : "dsh-note",
       text: stale.length
         ? `${stale.length} passage(s) were written against data that has since changed; `
@@ -679,6 +865,212 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     log(`grant widened: ${JSON.stringify(changed)}`);
     paintMeter();
   });
+
+  /* ── the exchange: the same transcript the exploration pane draws ── */
+
+  /*
+   * REQ-34.3.10.  Compose and Ask are the same conversation.
+   *
+   * Ask shows it in full -- what was sent to the model, what it answered,
+   * the arguments of every call, the payload that came back, each one its own
+   * disclosure -- and Compose showed a scrolling log of one line per event.
+   * The log is good at what it is for (the grant, the meter, the budget
+   * verdict, a store that would not answer) and useless for the thing a
+   * reader actually wants from a run that went somewhere unexpected, which is
+   * to open the turn and read it.
+   *
+   * So the list is the SAME list, from the same module, with the same styles:
+   * `exchange-list.js' exists because a second copy of this rendering is how
+   * two surfaces stop agreeing about what a failure looks like, and a third
+   * copy here would have been the same mistake twice.  What this surface does
+   * not pass is `addView' and `draw': a dashboard's queries are reviewed
+   * together at Gate 1 and run by the interface, so a per-entry "add this
+   * one" would be a second, quieter authority beside the one the gate asks
+   * for.
+   *
+   * It holds the revision turns too, after the compose that opened it.  A
+   * second prompt is part of the same conversation and reads as one.
+   */
+  const stageExchange = stage(doc, "The exchange",
+                              "every call and every answer, in full",
+                              { testid: "exchange" });
+  stageExchange.hidden = true;
+  body.appendChild(stageExchange);
+
+  const exchangeHost = el(doc, "div", { class: "exploration-pane" });
+  const exchangeList = el(doc, "div", { class: "dsh-exchange",
+                                        dataset: { testid: "dashboard-exchange" } });
+  exchangeHost.appendChild(exchangeList);
+  stageExchange._body.appendChild(exchangeHost);
+
+  const exchangeStore = [];
+  const exchanges = createExchangeList(exchangeList, {
+    doc, store: exchangeStore, testid: "dashboard",
+    emptyText: "Nothing has been asked yet.",
+    // Inside its own box: a revision's rows appear while the reader is at the
+    // Revise prompt further down, and a transcript that scrolled the page back
+    // up to itself on every event would make the box unusable.
+    follow: "container",
+  });
+
+  /**
+   * One adapter event, as a transcript entry.
+   *
+   * The mapping is the exploration pane's, kept deliberately close to it: the
+   * two panes are showing the same events and a reader who has learned to read
+   * one should not have to learn the other.  What differs is what this pane
+   * additionally has -- a grant, which can refuse a call the model made, and
+   * that refusal belongs in the conversation rather than only in the log.
+   */
+  function onExchange(e) {
+    switch (e.type) {
+      case "tools":
+        exchanges.add({
+          kind: "mcp", title: "tools/list", status: e.ok ? "ok" : "fail", ms: e.ms,
+          http: e.http, repository: e.repository,
+          response: e.ok
+            ? `offered:  ${(e.names || []).join(", ") || "(none)"}\n`
+            + `withheld: ${e.withheld?.length ? e.withheld.join(", ") : "(none)"}`
+            : `${e.error}\n\nThis store is not read by this run. Panels written `
+            + `against it would be written from the question alone.`,
+        });
+        break;
+
+      case "primer":
+        exchanges.add({ kind: "mcp", title: `resources/read ${e.uri}`,
+                        status: e.ok ? "ok" : "fail", ms: e.ms, repository: e.repository,
+                        response: e.ok ? `${e.chars} characters folded into the system prompt.`
+                                       : `${e.error}\n\nWithout it the model has to guess `
+                                       + `the operations.` });
+        break;
+
+      case "assistant":
+        exchanges.add({
+          kind: "llm",
+          title: e.toolCalls ? `turn ${e.iteration} → ${e.toolCalls} call(s)`
+                             : `turn ${e.iteration}`,
+          status: "ok", ms: e.ms, stopReason: e.stopReason,
+          tokensIn: e.usage?.input_tokens, tokensOut: e.usage?.output_tokens,
+          request: digestRequest(e.request) || e.request || null,
+          requestLabel: "sent to the model",
+          response: e.text || "(no text in this turn)", responseLabel: "answer", prose: true,
+          raw: [{ label: "the request in full", text: e.request },
+                { label: "the response in full", text: e.response }],
+          // The fenced block the gate is about to review, shown as what it is.
+          sparql: sparqlFrom(e.text || ""),
+          open: !e.toolCalls,
+        });
+        break;
+
+      case "tool_result":
+        exchanges.add({
+          kind: "mcp", title: `${e.name} ${e.input?.op || e.input?.of || ""}`.trim() + " · via LLM",
+          status: e.ok ? "ok" : "fail", ms: e.ms, http: e.status, repository: e.repository,
+          op: e.input?.op || null, rows: rowsIn(e.text),
+          request: JSON.stringify(e.input || {}, null, 2), requestLabel: "arguments",
+          response: e.text || "(empty payload)", responseLabel: "payload",
+          raw: [{ label: "the JSON-RPC request", text: e.request },
+                // What the MODEL was shown, when that is not what came back.
+                // A page written from a shape rather than from rows is a
+                // different thing to review, and this is where that is visible.
+                ...(e.label ? [{ label: `what the model was shown (${e.label})`,
+                                 text: e.shown }] : [])],
+          sparql: sparqlFrom(e.text || ""),
+        });
+        break;
+
+      case "refused":
+        exchanges.add({ kind: "note", title: `refused · ${e.name}`, status: "fail",
+                        request: JSON.stringify(e.input || {}, null, 2),
+                        requestLabel: "arguments",
+                        response: `${e.reason}\n\nThe grant refused this call. `
+                                + `Widen it and the model can continue from here.` });
+        break;
+
+      case "session_lost":
+        exchanges.add({ kind: "note", title: "session refused", status: "fail",
+                        response: `${e.text}\n\nThe store issued this handle and then `
+                                + (e.recovering ? `refused it. A new exploration is being `
+                                                + `opened and the call repeated once.`
+                                                : `refused it. It could not be reopened here.`) });
+        break;
+
+      case "session_retry":
+        exchanges.add({ kind: "note", title: "call repeated", status: e.ok ? "ok" : "fail",
+                        response: e.ok ? "Answered on the second attempt, under a new handle."
+                                       : "Refused again under a new handle." });
+        break;
+
+      case "session":
+        exchanges.add({ kind: "note", title: "exploration session", status: "note",
+                        response: `${e.session}\n\nEvery later call in this run carries this `
+                                + `handle, so the operations form one tree in `
+                                + `<${accountName}>/mcp.` });
+        break;
+
+      case "error":
+        exchanges.add({ kind: e.where === "provider" ? "llm" : "mcp",
+                        title: `error · ${e.where}`, status: "fail", ms: e.ms, http: e.status,
+                        response: `${e.error}`,
+                        raw: [{ label: "the response in full", text: e.response }] });
+        break;
+
+      default: break;
+    }
+  }
+
+  /**
+   * What a long turn says about itself while it is still going (REQ-34.3.11).
+   *
+   * The compose turn that writes the page, and every revision turn, send one
+   * request and wait -- sometimes a minute or more, with no event in between,
+   * because there is nothing between a request and its answer.  A status that
+   * reads `asking…' for that long is indistinguishable from one that has
+   * stopped, and the user is left pressing nothing and waiting for a screen
+   * that gives no sign of being alive.
+   *
+   * So the phrase is kept current by the events, and the seconds are counted
+   * by a ticker between them.  It is the cheapest thing that answers the only
+   * question being asked: is it still working?
+   */
+  function waiting(setText) {
+    let phrase = "asking…";
+    const started = Date.now();
+    const paint = () => {
+      const s_ = Math.round((Date.now() - started) / 1000);
+      setText(s_ >= 2 ? `${phrase} · ${s_}s` : phrase);
+    };
+    const timer = setInterval(paint, 1000);
+    paint();
+    return {
+      say(next) { phrase = next; paint(); },
+      /** The phrase an event moves the status on to; null leaves it alone. */
+      note(e) {
+        switch (e.type) {
+          case "tools": return this.say(e.ok ? `tools · ${e.repository || "store"}`
+                                             : `tools · ${e.repository || "store"} unreadable`);
+          case "primer": return this.say("reading the primer…");
+          // The one phrase that is true for as long as it is shown: the
+          // request has gone and nothing will happen until it is answered.
+          // Everything else a turn says is the name of something that has
+          // ALREADY finished, which is why `reading the primer' stood on the
+          // screen for thirty seconds of a model writing a patch.
+          case "asking":
+            return this.say(e.closing ? "asking for a closing answer…"
+                                      : `turn ${e.iteration} · waiting for the model…`);
+          case "assistant":
+            return this.say(e.toolCalls ? `turn ${e.iteration} · ${e.toolCalls} call(s)`
+                                        : `turn ${e.iteration} · writing the answer…`);
+          case "tool_call": return this.say(`${e.name} ${e.input?.op || ""}…`.trim());
+          case "tool_result": return this.say(`${e.name} answered${
+            e.ok ? "" : " with a failure"} · thinking…`);
+          case "refused": return this.say("a call was refused · thinking…");
+          default: return undefined;
+        }
+      },
+      stop(text) { clearInterval(timer); if (text != null) setText(text); },
+    };
+  }
 
   /* ── Gate 1: the panel set ── */
 
@@ -769,7 +1161,8 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       { onChange: () => paintInteraction() });
 
     grant = createGrant({
-      repositories: String(fRepos.input.value || repoKey).split(/[,\s]+/).filter(Boolean),
+      repositories: String(fRepos.input.value || storeKeys.join(", "))
+                      .split(/[,\s]+/).filter(Boolean),
       readOnly: readOnly.checked,
       maxQueries: Number(fQueries.input.value) || DEFAULT_GRANT.maxQueries,
       maxRows: Number(fRows.input.value) || DEFAULT_GRANT.maxRows,
@@ -778,6 +1171,12 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     }, { onChange: () => paintMeter() });
 
     phase1.hidden = false;
+    // The transcript opens with the run and keeps what earlier runs in this
+    // pane said: a second compose in the same pane is a second conversation
+    // about the same page, and reading them together is the point.
+    stageExchange.hidden = false;
+    exchanges.add({ kind: "note", title: "prompt", status: "note",
+                    response: text, responseLabel: "sent" });
     runLog.replaceChildren();
     log(`grant: ${grant.summary()}`);
     log(viaCatalog ? "panels will be written as temporary views and run by name"
@@ -785,13 +1184,33 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     paintMeter();
 
     const started = new Date();
+    const tick = waiting((t) => { grantStatus.textContent = t; });
+    tick.say("asking…");
     const onEvent = (e) => {
+      // Three readers of one event, each wanting a different thing from it:
+      // the transcript wants the exchange, the status line wants the one
+      // phrase that says what is happening now, and the log wants the terse
+      // record that the grant and the meter are read against.
+      onExchange(e);
+      tick.note(e);
       switch (e.type) {
+        // One line per STORE, and the line says which (REQ-34.3.6).  A page
+        // composed over three repositories printed three lines reading
+        // `tools: …' with nothing to tell them apart, and the one that said
+        // `(none)' dropped both the repository and the reason -- so a run
+        // that could read two of three left no record of which one it could
+        // not read, or why.  The model was told; the reader was not.
         case "tools":
-          log(`tools: ${e.names?.join(", ") || "(none)"}`
-            + (e.withheld?.length ? `  withheld ${e.withheld.join(", ")}` : ""));
+          log(`tools${e.repository ? ` · ${e.repository}` : ""}`
+            + (e.http ? ` [${e.http}]` : "")
+            + `: ${e.ok ? (e.names?.join(", ") || "(none)") : `NOT READABLE — ${e.error}`}`
+            + (e.ok && e.withheld?.length ? `  withheld ${e.withheld.join(", ")}` : ""),
+            e.ok ? "" : "dsh-err");
           break;
-        case "primer": log(`primer ${e.uri}: ${e.ok ? `${e.chars} chars` : e.error}`); break;
+        case "primer":
+          log(`primer ${e.uri}${e.repository ? ` · ${e.repository}` : ""}: `
+            + `${e.ok ? `${e.chars} chars` : e.error}`, e.ok ? "" : "dsh-warn");
+          break;
         case "assistant":
           log(`turn ${e.iteration}: ${e.toolCalls} call(s)`
             + (e.usage ? `  ${e.usage.input_tokens}→${e.usage.output_tokens} tokens` : ""));
@@ -817,6 +1236,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     // guessed at.
     const system = dashboardSystem(DEFAULT_SYSTEM, { grant, digesting: true,
                                                      answerTokens: ANSWER_TOKENS,
+                                                     stores: storeKeys,
                                                      request: text });
     const verdict = promptVerdict(system);
     log(`${budgetLine(verdict)}, answer ceiling ${ANSWER_TOKENS}`,
@@ -827,7 +1247,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       // it taught the reader to scroll past a number that never meant
       // anything.  Nothing is sent.
       log(verdict.reason, "dsh-err");
-      grantStatus.textContent = "refused — the prompt is over its ceiling";
+      tick.stop("refused — the prompt is over its ceiling");
       running = false;
       grantBtn.disabled = false;
       return null;
@@ -837,10 +1257,10 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       const adapter = createToolAdapter({
         provider: st.llmProvider, endpoint: st.llmEndpoint, apiKey: st.llmKey,
         workspaceId: st.llmWorkspace, model: st.llmModel,
-        // The repository this pane reads, in the shape the adapter routes on:
-        // one store, named, so that every event the turn produces says which
+        // The repositories this pane reads, in the shape the adapter routes
+        // on: named, so that every event the turn produces says which
         // repository the call went to (REQ-34.3.5).
-        mcp: paneStore(st),
+        mcp: runStores(),
         // The exploration handle is the session's, not the run's (§34.4.3):
         // a page composed from a repository joins the exploration already
         // open on it rather than opening a second beside it.
@@ -861,14 +1281,16 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       adapterResult = await adapter.run(text);
       st.session = adapterResult.session || st.session;
       markRun(adapterResult);
-      grantStatus.textContent = adapterResult.ok
+      noteEvidence(adapterResult);
+      tick.stop(adapterResult.ok
         ? `phase 1 done · ${adapterResult.iterations} turn(s)`
-        : `phase 1 failed · ${adapterResult.error}`;
+        : `phase 1 failed · ${adapterResult.error}`);
       presentProposal(text, started);
     } catch (e) {
       log(String(e), "dsh-err");
-      grantStatus.textContent = "failed";
+      tick.stop("failed");
     } finally {
+      tick.stop();
       running = false;
       grantBtn.disabled = false;
     }
@@ -958,6 +1380,16 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     }
     for (const w of warnings) {
       gate1._body.appendChild(el(doc, "div", { class: "dsh-warn", text: `note: ${w}` }));
+    }
+
+    // The half of the prompt that was dropped, said at the gate rather than
+    // discovered by re-reading the page against the question (REQ-34.3.12).
+    // A notice, not a refusal: the page may be right and only the person who
+    // asked can tell.
+    const noFigure = missingFigure(promptText, spec);
+    if (noFigure) {
+      gate1._body.appendChild(el(doc, "div", { class: "dsh-warn",
+        dataset: { testid: "dashboard-no-figure" }, text: noFigure }));
     }
 
     for (const p of spec.panels) {
@@ -1176,6 +1608,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       onLayout: (request) => layoutGraph(request),
       onPropose: ({ what, detail }) => presentProposalFromPage(what, detail),
       onEvent: (e) => {
+        if (anchorEvent(e)) return;
         if (e.type !== "error") return;
         frameErrors.push(e);
         stagePage._body.appendChild(el(doc, "div", { class: "dsh-err",
@@ -1191,10 +1624,13 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     });
     mounted.post({ results: payloadsFor(spec, results), stale: [],
                    parameters: parameterValues, state: appState,
+                   evidence: evidence(),
                    budget: budgetForPage(interaction) });
     paintInteraction();
     stageRevise.hidden = false;
     becomeAddressable();
+    showAnchors(null);
+    app?.refreshAnchors?.();
     presentDisposition(promptText, started);
   }
 
@@ -1491,21 +1927,34 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     }
     revising = true;
     reviseBtn.disabled = true;
-    reviseStatus.textContent = "asking…";
+    // REQ-34.3.11.  A revision used to say `asking…' and then nothing at all
+    // until the page changed under it -- one request, no events, a minute of
+    // silence.  The ticker counts the seconds, the events move the phrase on,
+    // and the transcript below grows a row per exchange, so the screen says
+    // what it is doing while it does it.
+    const tick = waiting((t) => { reviseStatus.textContent = t; });
+    stageExchange.hidden = false;
+    exchanges.add({ kind: "note", title: "revision asked for", status: "note",
+                    response: ask, responseLabel: "sent" });
     // §13.9: the prompt is a budget too, spent on every request whether or not
     // the page turns out to want what it carries -- and spent out of the same
     // turn that has to carry the whole page.  Measured here rather than
-    // guessed at.
-    const system = dashboardSystem(DEFAULT_SYSTEM, { grant, digesting: true,
-                                                     answerTokens: ANSWER_TOKENS,
-                                                     request: text });
+    // guessed at, and measured on the prompt that is actually SENT: this read
+    // `dashboardSystem(…, {request: text})', which is neither this turn's
+    // prompt (the box's text is `ask'; `text' is undefined when the button is
+    // what called this) nor the prompt the turn carries -- a revision sends
+    // `revisionSystem', which holds the page's shape and not the compose
+    // contract's store clause.  The ceiling was being checked against a
+    // document nobody was going to send.
+    const system = revisionSystem(DEFAULT_SYSTEM, { grant, document: appDoc,
+                                                    answerTokens: ANSWER_TOKENS, request: ask });
     const verdict = promptVerdict(system);
     log(`${budgetLine(verdict)}, answer ceiling ${ANSWER_TOKENS}`,
         verdict.ok ? (verdict.level === "warned" ? "dsh-warn" : "") : "dsh-err");
     if (!verdict.ok) {
       // REQ-23.1.4, as above: refused before the call, not reported after it.
       log(verdict.reason, "dsh-err");
-      reviseStatus.textContent = "refused — the prompt is over its ceiling";
+      tick.stop("refused — the prompt is over its ceiling");
       revising = false;
       reviseBtn.disabled = false;
       return null;
@@ -1515,10 +1964,10 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       const adapter = createToolAdapter({
         provider: st.llmProvider, endpoint: st.llmEndpoint, apiKey: st.llmKey,
         workspaceId: st.llmWorkspace, model: st.llmModel,
-        // The repository this pane reads, in the shape the adapter routes on:
-        // one store, named, so that every event the turn produces says which
+        // The repositories this pane reads, in the shape the adapter routes
+        // on: named, so that every event the turn produces says which
         // repository the call went to (REQ-34.3.5).
-        mcp: paneStore(st),
+        mcp: runStores(),
         // The exploration handle is the session's, not the run's (§34.4.3):
         // a page composed from a repository joins the exploration already
         // open on it rather than opening a second beside it.
@@ -1528,22 +1977,39 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
         digestOver: 4000,
         maxTokens: ANSWER_TOKENS,
         maxIterations: 8,
-        system: revisionSystem(DEFAULT_SYSTEM, { grant, document: appDoc,
-                                                 answerTokens: ANSWER_TOKENS, request: ask }),
-        onEvent: (e) => { if (e.type === "refused") log(`  ✗ refused: ${e.reason}`, "dsh-warn"); },
+        system,
+        // A revision reads the stores again, and a store that has become
+        // unreadable between the compose and the revision is the same event
+        // as above -- silent here until now, which is the worst place for it:
+        // the page is rewritten either way and nothing says it was rewritten
+        // with one repository missing.
+        onEvent: (e) => {
+          // The same three readers as the compose turn, and for the same
+          // reason: a revision is a turn of the same conversation, so it is
+          // shown the same way rather than as a status line that changes once.
+          onExchange(e);
+          tick.note(e);
+          if (e.type === "refused") log(`  ✗ refused: ${e.reason}`, "dsh-warn");
+          else if (e.type === "tools" && !e.ok)
+            log(`tools · ${e.repository || "store"}`
+              + `${e.http ? ` [${e.http}]` : ""}: NOT READABLE — ${e.error}`, "dsh-err");
+          else if (e.type === "error") log(`error (${e.where}): ${e.error}`, "dsh-err");
+        },
       });
       const out = await adapter.run(ask);
       st.session = out.session || st.session;
+      noteEvidence(out);
       // A revision is a new model answer, so the stages say so: the page on
       // the screen after it is applied was produced by THIS turn, and a
       // footnote still naming the first run's model would be false.
       markRun(out);
-      reviseStatus.textContent = out.ok ? "answered" : `failed · ${out.error}`;
+      tick.stop(out.ok ? "answered" : `failed · ${out.error}`);
       return receiveRevision(out, ask);
     } catch (e) {
-      reviseStatus.textContent = String(e);
+      tick.stop(String(e));
       return null;
     } finally {
+      tick.stop();
       revising = false;
       reviseBtn.disabled = false;
     }
@@ -1634,6 +2100,80 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     return { ok: false, message: `\`${instruction.verb}' is not an arrangement verb` };
   }
 
+  /* ── what this page's parts are called (U-104) ─────────────────────── */
+
+  /**
+   * Every element of this page, whichever view holds it.
+   *
+   * All the views and not the one on screen: an anchor is unique within the
+   * presentation and not within a view, the reader may change tab while the
+   * line is still being typed, and a table that covered one tab would make
+   * an element's name appear and disappear with a press that has nothing to
+   * do with it.
+   */
+  const pageElements = () =>
+    ({ elements: (appDoc?.views || []).flatMap((v) => v.elements || []) });
+
+  /** The last table sent into the frame, to read a reported name back from. */
+  let anchorMarks = null;
+
+  /**
+   * Tell the page what its elements are called, resolved for the line being
+   * typed out in the bar.
+   *
+   * Two of the four verbs are refused by this pane — a mount belongs to the
+   * workspace — so nothing is marked for them.  An interface that lit a
+   * component up for `unmount' would be promising an operation that answers
+   * with directions elsewhere.
+   */
+  /**
+   * What everything on this page is called, whether or not anyone is typing.
+   *
+   * Sent beside the marks and kept by the frame when the marks are cleared:
+   * the badge belongs to the moment an operation is being composed, and the
+   * NAME is worth reading at any moment -- which is the complaint this
+   * answers.  A tab captioned `view pmulti' names a panel; the table above
+   * it, captioned nothing, has no name at all until its view is a tree.
+   * Neither fact was anywhere on the screen.
+   */
+  const tipTable = () =>
+    anchors.anchorTips?.(appDoc, { presentation: appDoc?.id || null }) || null;
+
+  function showAnchors(line, { addressed = false } = {}) {
+    if (typeof mounted?.anchors !== "function") return;
+    if (line == null) {
+      anchorMarks = null;
+      mounted.anchors({ wants: null, marks: null, tips: tipTable() });
+      return;
+    }
+    const read = expectation(line);
+    const mine = read.verb === "lift" || read.verb === "apply";
+    const table = anchorsFor(pageElements(), read.verb, { presentation: appDoc?.id || null });
+    anchorMarks = table;
+    const marks = {};
+    for (const [name, m] of Object.entries(table)) marks[name] = { badge: m.badge, ok: m.ok };
+    mounted.anchors({ wants: addressed && mine ? read.wants : null, marks, tips: tipTable() });
+  }
+
+  /**
+   * A name the page reported, answered out here, where the words are.
+   *
+   * The page sends a name and never a sentence; everything shown is looked
+   * up in the table this pane sent in, so a page cannot write into the bar.
+   */
+  function anchorEvent(e) {
+    if (e?.type === "anchor") {
+      app?.locationBar?.note(anchorMarks?.[e.name]?.line || "");
+      return true;
+    }
+    if (e?.type === "pick") {
+      const held = anchorMarks?.[e.name];
+      if (held?.ok) app?.locationBar?.insert(held.argument);
+      return true;
+    }
+    return false;
+  }
+
   /** Where this page's arrangements are kept, and under whose credentials. */
   const arrangementStore = () => ({ host, account: accountName, token: st.token });
 
@@ -1651,7 +2191,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     if (presentation !== appDoc.id) {
       return { ok: false,
                message: `this page is \`${appDoc.id}'; \`${presentation}' is something else — `
-                      + `lift ${appDoc.id}#${element} as ${as}` };
+                      + `lift ${appDoc.id}${element ? `#${element}` : ""} as ${as}` };
     }
     // The source every request in the template will be repeated against: the
     // repository THIS page was built over, recorded at the lift because it
@@ -1666,15 +2206,30 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     if (!ready.ok) return { ok: false, message: `\`${accountName}/ui' is not there: ${ready.error}` };
     const kept = await writeArrangement({
       ...arrangementStore(), name: as, template: lifted.template, creator: accountName,
-      title: `${appDoc.title || appDoc.id} — ${element}`,
+      title: element ? `${appDoc.title || appDoc.id} — ${element}`
+                     : `${appDoc.title || appDoc.id} — the whole page`,
     });
     if (!kept.ok) return { ok: false, message: `it could not be kept: ${kept.error}` };
     const t = lifted.template;
-    log(`lifted ${element} as \`${as}': ${t.panels.length} request(s), `
+    log(`lifted ${printName({ presentation, element })} as \`${as}': ${t.panels.length} request(s), `
       + `${t.parameters.length} parameter(s), ${t.transforms.length} transform(s)`);
+    /* A composite says what did NOT travel as well as what did.  A page that
+       arrives plainer than it left looks broken, and the reason -- a page's
+       own script is one of the four carriers §20 withholds, and an apply is
+       not that path -- is worth one clause now rather than a question
+       later. */
+    const whole = !element;
     return {
       ok: true,
-      message: `lifted as \`${as}' — ${t.panels.length} request(s) it will repeat, against `
+      message: whole
+        ? `lifted the whole of \`${presentation}' as \`${as}' — `
+          + `${t.placeholders.length} element(s) and ${t.panels.length} request(s) it will `
+          + `repeat, against ${accountName}/${repositoryName}`
+          + `${(appDoc.styles || appDoc.script) ? "; the page's own stylesheet and script stay "
+             + "behind, so an applied copy arrives with its structure and its queries and not "
+             + "its styling" : ""}`
+        : `lifted ${printName({ presentation, element })} as \`${as}' — `
+             + `${t.panels.length} request(s) it will repeat, against `
              + `${accountName}/${repositoryName}`,
       // The undo of a lift is to forget it.  Nothing on this page changed:
       // a lift is a read, and the only thing it left behind is the entry.
@@ -1719,10 +2274,39 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     gateArrange._body.appendChild(el(doc, "p", { class: "dsh-note",
       dataset: { testid: "arrange-provenance" },
       text: `\`${name}' was lifted from ${template.source?.presentation || "a page"}`
-          + `${template.source?.element ? ` (${template.source.element})` : ""}`
+          + `${template.source?.element ? ` (${template.source.element})`
+                                        : template.source?.whole ? " (the whole page)" : ""}`
           + `${creator ? ` by ${creator}` : ""}`
           + `${foreign ? " — somebody else" : ""}. It carries definitions and no data: `
           + `everything it shows, it will ask for.` }));
+
+    /* What text in it something will run, said in words (REQ-33.3.3).  A
+       composite carries a whole page's markup and every transform the page
+       defined, which is more than a component lift ever did; an arrangement
+       is not yet behind the U-74 admission, so the reader is at least told
+       what is arriving rather than finding out by running it. */
+    /* Read at call time, not linked: see the namespace imports at the top.
+       A tree too old to have it cannot say what the arrangement will run --
+       which is a DISCLOSURE, so its absence is said rather than left to look
+       like an arrangement that carries nothing. */
+    const parts = arrangement.templateParts?.(template) || null;
+    if (!parts) {
+      gateArrange._body.appendChild(el(doc, "p", { class: "dsh-warn",
+        dataset: { testid: "arrange-executable" },
+        text: "This page cannot say what text the arrangement carries that something "
+            + "will run: it was loaded from a copy of the interface older than that "
+            + "reading. A hard reload (Shift-Reload) is the cure. The requests above "
+            + "are complete." }));
+    } else if (parts.length) {
+      const say = parts.map((x) => `${x.what} (${x.where}, ${x.bytes} bytes)`).join(", ");
+      gateArrange._body.appendChild(el(doc, "p", { class: "dsh-note",
+        dataset: { testid: "arrange-executable" },
+        text: `It also carries text this page will run: ${say}. `
+            + (foreign
+                 ? `It was written by ${creator}, and an arrangement does not yet pass the `
+                 + `admission a shared presentation passes — read it as somebody else's code.`
+                 : `It is your own.`) }));
+    }
 
     for (const r of requests) {
       const s = r.source;
@@ -1864,6 +2448,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       presentation: appDoc?.id || null,
       instruct,
       arrange,
+      anchors: (line, how) => showAnchors(line, how),
       document: () => appDoc,
     });
     // Addressed as soon as it exists: the page the user just asked for is
@@ -2019,6 +2604,9 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     const c = applied.classification;
     gatePatch.hidden = true;
     const next = applied.document;
+    // The document as it stood, kept before anything replaces it: saying
+    // which view a change landed in needs to know which views there were.
+    const viewsBefore = appDoc;
     if (c.rerun.length) {
       const progress = el(doc, "div", { class: "dsh-log",
                                         dataset: { testid: "dashboard-patch-progress" } });
@@ -2055,13 +2643,30 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       post: { results: payloadsFor(appDoc, results),
               stale: staleAssertions(appDoc, results),
               parameters: parameterValues, state: appState,
+              evidence: evidence(),
               budget: budgetForPage(interaction) },
     });
     if (how.applied === "rebuild" && !c.rebuild) {
       log("the page could not apply that in place and was rebuilt", "dsh-warn");
     }
-    reviseStatus.textContent = `revision ${appDoc.revision} · ${c.class} · `
-      + `${how.applied === "in-place" ? "applied in place" : "rebuilt"}`;
+    /* Whether anything changed WHERE THE READER IS LOOKING.
+     *
+     * `applied in place' was being said of any patch that left no operation
+     * unapplied, which is also true of a patch that moved nothing and of one
+     * whose every change landed in a view that is not on screen.  Both read
+     * as "it worked" over a page that looks exactly as it did, and the
+     * reader's next move is to ask for it again.  So the status says which
+     * of the three happened, and names the view when the change is real but
+     * elsewhere. */
+    const landed = whereItLanded(how, { before: viewsBefore, after: appDoc, ops });
+    if (landed.note) log(landed.note, landed.level || "dsh-note");
+    /* A revision can rename, add or drop elements, so the standing answer
+       is said again before anything is read from it. */
+    showAnchors(null);
+    reviseStatus.textContent = `revision ${appDoc.revision}`
+      + `${appDoc.id ? ` of \`${appDoc.id}\`` : ""} · ${c.class} · `
+      + `${how.applied === "in-place" ? "applied in place" : "rebuilt"}`
+      + `${landed.short ? ` · ${landed.short}` : ""}`;
     revisePrompt.textContent = "";
     recorded = false;
     record(ask || lastPrompt, startedAt || new Date(), "revised");
@@ -2176,12 +2781,18 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
 
     save.addEventListener("click", () => {
       // The combination the page is showing is recorded with it, so a
-      // control in the saved copy can replay what it holds and say plainly
-      // that it holds nothing else (§7.4).
+      // control in the saved copy can replay what it holds without a
+      // credential, and say plainly that it holds nothing else (§7.4).
       const replay = Object.keys(parameterValues).length
         ? { [JSON.stringify([null, parameterValues])]: payloadsFor(appDoc, results) } : null;
+      // Where the panels ran, so the saved copy can offer to run them again
+      // (U-111).  It is an address and not a credential: the reader supplies
+      // the token, into the tab, and the file never holds one.
       const html = mounted.page(payloadsFor(appDoc, results),
-                                { replay, parameters: parameterValues });
+                                { replay, parameters: parameterValues,
+                                  stale: staleAssertions(appDoc, results),
+                                  source: { host, account: accountName,
+                                            repository: repositoryName } });
       const blob = new Blob([html], { type: "text/html" });
       const url = URL.createObjectURL(blob);
       const a = el(doc, "a", { href: url, download: `${slug(appDoc.title)}.html` });
@@ -2189,7 +2800,20 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
       a.click();
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 10000);
-      outcome.textContent = "saved — the data is inlined, so the file still draws offline";
+      /* Which of the two copies came back is visible in the copy itself, and
+         asking it is better than asserting: on a tree half-way through a
+         deploy the builder falls back to the one that replays, and a line
+         promising a refresh that is not there would be the worse outcome.
+         The document is read rather than the library asked a second time,
+         which is also how this avoids one more named import from a module
+         that may be a deploy behind this one. */
+      const trouble = /<!-- dydra-saved: no refresh: ([\s\S]*?) -->/.exec(html);
+      outcome.textContent = html.includes('id="saved-page-data"')
+        ? "saved — the data is inlined, so the file draws with no network, and it can "
+          + "run the queries again under your own token"
+        : "saved — the file draws with no network, but this copy replays what it holds "
+          + "and has no Refresh: "
+          + (trouble ? trouble[1] : "this page could not build one");
       record(promptText, started, "downloaded");
     });
 
@@ -2215,7 +2839,7 @@ export function openDashboardPane(app, { container, accountName, repositoryName,
     if (!appDoc) return;
     const dash = {
       ...dashboardRecord({ ...appDoc, state: appState }, results,
-                         { grant, prompt: promptText, patches,
+                         { grant, prompt: promptText, patches, evidence: ledger,
                            interaction: interaction?.state() || null }),
       disposition,
       via: viaCatalog ? "catalog" : "direct",

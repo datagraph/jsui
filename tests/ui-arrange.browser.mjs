@@ -40,7 +40,7 @@
  * produced — and a sequence that stops early is a suite that failed.
  */
 import { createServer } from "node:http";
-import { readFile, mkdir, writeFile } from "node:fs/promises";
+import { readFile, mkdir, rm, writeFile } from "node:fs/promises";
 import { join, dirname, extname, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
@@ -72,6 +72,11 @@ const ok = (cond, what) => {
 };
 const section = (title) => console.log(`\n${title}`);
 
+// Swept rather than overwritten: the figures are numbered in the order they
+// are taken, so inserting one renames every figure after it and leaves the
+// old numbers behind as images the contact sheet no longer names.  A figure
+// nothing references is a figure nothing keeps true.
+await rm(IMAGES, { recursive: true, force: true });
 await mkdir(IMAGES, { recursive: true });
 
 const browser = await chromium.launch();
@@ -199,6 +204,95 @@ ok(catalogued.arrangements[0].sources?.[0]?.includes("alice/parts"),
 ok(!("template" in (catalogued.arrangements[0] || {})),
    "and the listing does not carry the template: U-83 lists without disclosing");
 
+/* ════════ 1b. the identifiers inside a page, which is a sandbox (U-104) ═══ */
+
+section("U-104: a page says what its parts are called before anyone types anything");
+{
+  const inPage = page.frameLocator(`${PARTS_PANE} [data-testid="dashboard-frame-holder"] iframe`);
+  // Nothing has been typed into the bar in this session yet: the tips arrive
+  // with the mount, not with a line.
+  ok(await inPage.locator("[data-ui-candidate]").count() === 0,
+     "nothing is marked -- the badge and the outline belong to the moment an operation "
+     + "is being composed, and this is not that moment");
+  const title = await inPage.locator('[data-ui="e-tab"]').getAttribute("title");
+  ok(/#e-tab · table/.test(title || ""),
+     `and yet the element carries its name, as the browser's own tooltip: "${title}"`);
+  ok(/shows panel onhand/.test(title || ""),
+     "with what fills it, which is the other half of the question somebody hovering has");
+  ok(await inPage.locator('[data-ui="e-head"]').getAttribute("title") !== null
+     && await inPage.locator('[data-ui="e-card"]').getAttribute("title") !== null,
+     "every addressable element has one, not only the ones a verb would take");
+  ok(await inPage.locator("[data-ui-tip]").count()
+       === await inPage.locator("[data-ui]").count(),
+     "and each is marked as ours, so a redraw can replace it without touching a title "
+     + "the page wrote for its own reasons");
+}
+
+section("U-104: a page in a frame says what its parts are called");
+{
+  const inPage = page.frameLocator(`${PARTS_PANE} [data-testid="dashboard-frame-holder"] iframe`);
+  const inOrders = page.frameLocator(`${ORDERS_PANE} [data-testid="dashboard-frame-holder"] iframe`);
+  const note = () => page.evaluate(() => window.__note());
+
+  await page.evaluate(() => window.__app.locationBar.setAddress("dashboard-alice-parts"));
+  await page.evaluate(() => window.__line("lift "));
+  await settle(150);
+
+  const lit = await inPage.locator("[data-ui-candidate]").count();
+  ok(lit >= 4, `the page the bar addresses lights its own components: ${lit}`);
+  ok(await inOrders.locator("[data-ui-candidate]").count() === 0,
+     "the other page lights nothing: an operation goes to the address, and only there");
+
+  await inPage.locator('[data-ui="e-head"]').hover();
+  await settle(150);
+  ok(await inPage.locator('[data-ui="e-head"]').getAttribute("data-ui-hover") === "yes",
+     "an element inside the sandbox marks itself — the parent cannot reach in to do it");
+  ok((await inPage.locator('[data-testid="anchor-badge"]').textContent()) === "e-head · heading",
+     "and draws its own badge, out of the table it was sent");
+  ok((await note()).startsWith(`${PARTS_ID}#e-head · heading`),
+     `while the bar out here says the whole name: ${await note()}`);
+  ok(/lift this/.test(await note()),
+     "and what the verb would do — a sentence the page never sees and cannot compose");
+
+  await inPage.locator('[data-ui="e-tab"]').hover();
+  await settle(150);
+  ok(/#e-tab · table/.test(await note()), `a child names itself: ${await note()}`);
+  ok(/shows panel onhand/.test(await note()),
+     "and says which request fills it, which is what a lift would have to bring");
+
+  await figure("named", "With a line being typed, every component the verb could take is "
+                      + "outlined and the one under the pointer carries its anchor in its own "
+                      + "border — the name `lift' is about to be given. Nothing is marked when "
+                      + "nobody is composing an operation.",
+               { at: `${PARTS_PANE} [data-testid="dashboard-frame-holder"]` });
+  await inPage.locator('[data-ui="e-tab"]').hover();
+  await settle(150);
+
+  section("U-104: and the press types it, across the sandbox boundary");
+  await inPage.locator('[data-ui="e-head"]').click();
+  await settle(150);
+  const typed = await page.evaluate(() => document.getElementById("location-input").value);
+  ok(typed === `lift ${PARTS_ID}#e-head`,
+     `the name crossed back and landed in the line: \`${typed}'`);
+  ok(await turns() === 2 && (await asked()).length === 2,
+     "and none of it asked a model or a store anything");
+
+  section("U-104: a verb the page would refuse lights nothing in it");
+  await page.evaluate(() => window.__line("mount inventory into "));
+  await settle(150);
+  ok(await inPage.locator("[data-ui-candidate]").count() === 0,
+     "a page does not mount, so nothing in it is offered as somewhere to mount into");
+  await inPage.locator('[data-ui="e-head"]').hover();
+  await settle(150);
+  ok((await note()).startsWith(`${PARTS_ID}#e-head`),
+     "the name is still shown, because a name is true whatever is being typed");
+
+  await page.evaluate(() => window.__closeLine());
+  await settle(150);
+  ok(await inPage.locator("[data-ui-hover]").count() === 0,
+     "and closing the line puts the page back exactly as it was");
+}
+
 /* ═══════════════════ 2. apply, and the disclosure (U-82, U-84, U-88) ══════ */
 
 section("U-88: what an applied component will ask for, before it asks");
@@ -322,6 +416,148 @@ ok((await asked()).length === before,
 
 await figure("expanded", "Pressed. The mounted presentation is drawn in place, keeping its own "
                        + "element names — it is the same presentation, included by reference.");
+
+/* ══════════════ 4b. the presentation as a file (U-122) ═══════════════ */
+
+section("U-122: and a press writes it to a file that runs where it came from");
+{
+  /* The blob is read here rather than through the browser's download
+     plumbing: what is being judged is the FILE — that the press reached the
+     builder, that the builder was given the presentation as the store holds
+     it, and that what came back is the runnable form.  The anchor's own
+     `download' is asserted beside it so the gesture is covered too. */
+  const got = await page.evaluate(async () => {
+    const real = URL.createObjectURL;
+    let text = null, suggested = null;
+    URL.createObjectURL = (blob) => { window.__blob = blob; return real.call(URL, blob); };
+    const click = HTMLAnchorElement.prototype.click;
+    HTMLAnchorElement.prototype.click = function () { suggested = this.download; };
+    const band = document.querySelector('[data-ui-mount="inventory"]');
+    band.querySelector('[data-testid="mount-download"]').click();
+    for (let i = 0; i < 100 && !window.__blob; i += 1) await new Promise((r) => setTimeout(r, 20));
+    URL.createObjectURL = real;
+    HTMLAnchorElement.prototype.click = click;
+    if (window.__blob) text = await window.__blob.text();
+    await new Promise((r) => setTimeout(r, 50));
+    return { text, suggested, type: window.__blob?.type || null,
+             said: band.querySelector(".ui-mount-status")?.textContent || "",
+             red: band.querySelector(".ui-mount-status")?.classList.contains("ui-mount-bad") };
+  });
+
+  ok(Boolean(got.text) && got.type === "text/html" && got.suggested === "inventory.html",
+     `the press hands the browser one HTML file, named for the presentation `
+     + `(${JSON.stringify(got.suggested)})`);
+  ok(/id="saved-page-data"/.test(got.text || "") && /id="saved-page-frame"/.test(got.text || ""),
+     "and it is the saved-page form U-111 settled — the file and the sandboxed "
+     + "frame — and not a second kind of artifact");
+  /* Read out of the file the way the file reads itself: the page is one
+     field of the saved payload, so a regex over the raw text would be
+     matching JSON escaping and would pass on the wrong thing. */
+  const held = JSON.parse(
+    /<script type="application\/json" id="saved-page-data">([\s\S]*?)<\/script>/
+      .exec(got.text)[1].replace(/\\u003c/g, "<"));
+  ok(/data-ui="i-head"/.test(held.page) && /data-ui="i-parts"/.test(held.page)
+     && /Inventory at a glance/.test(held.page),
+     "the presentation's own tree is in it, element names and all — the store's "
+     + "copy, read for this press, and not whatever the band happened to be "
+     + "showing (what makes such a file RUNNABLE is its panels, and this "
+     + "fixture has none; that half is judged in `ui-arrangement.test.mjs')");
+  ok(!/test-token/.test(got.text || ""),
+     "and the credential this session is signed in with is NOT in it: a file that "
+     + "travels with a credential is a credential that travels");
+  ok(/saved as a page/.test(got.said) && !got.red,
+     `the band says what it wrote, and not in the colour it says failures in: `
+     + `${JSON.stringify(got.said.slice(0, 60))}…`);
+  ok(await page.locator(`${band} .ui-mount-content`).innerHTML() !== "",
+     "and the band is as it was: downloading it neither drew it nor closed it");
+}
+
+/* ═══════════════ 5. the identifiers, on the page (U-104) ═════════════════ */
+
+section("U-104: an element says what it is called while a line is being typed");
+{
+  const badge = '[data-testid="anchor-badge"]';
+  const note = () => page.evaluate(() => window.__note());
+
+  ok(await page.locator(`${band} [data-ui="i-row"][data-ui-hover]`).count() === 0,
+     "nothing is marked while nobody is typing: the interface is mostly read, not arranged");
+  await page.hover(`${band} [data-ui="i-row"]`);
+  await settle(80);
+  ok(await page.locator(badge).count() === 0,
+     "and a pointer passing over an element draws nothing at all");
+
+  await page.evaluate(() => window.__line("lift "));
+  await settle(80);
+  const lit = await page.locator(`${band} [data-ui-candidate]`).count();
+  ok(lit >= 4, `\`lift ' lights the elements it could take: ${lit} of them`);
+  ok(await page.locator('#chrome > [data-ui][data-ui-candidate]').count() === 0,
+     "and not the chrome's own bands, which are hosts and cannot be lifted from");
+
+  await page.hover(`${band} [data-ui="i-row"]`);
+  await settle(100);
+  ok(await page.locator(`${band} [data-ui="i-row"]`).getAttribute("data-ui-hover") === "yes",
+     "the element under the pointer is marked as one the verb could take");
+  ok((await page.locator(badge).textContent()) === "i-row · stack",
+     "with its anchor and its kind in its own border — the thing that gets typed");
+  ok(/^inventory#i-row · stack/.test(await note()),
+     `and the bar carries the whole name: ${await note()}`);
+  ok(/lift this/.test(await note()), "and what the verb would do with it");
+
+  await page.hover(`${band} [data-ui="i-parts"]`);
+  await settle(100);
+  ok((await page.locator(badge).textContent()) === "i-parts · metric",
+     "a child inside it is its own identity, not its parent's");
+  ok(/inventory#i-parts/.test(await note()), "and the bar follows the pointer");
+
+  section("U-104: and says when the verb could NOT take it");
+  await page.evaluate(() => window.__line("unmount "));
+  await settle(100);
+  ok(await page.locator(`${band} [data-ui="i-row"][data-ui-candidate]`).count() === 0,
+     "`unmount' lights nothing inside a presentation: an element is not a mount");
+  await page.hover(`${band} [data-ui="i-row"]`);
+  await settle(100);
+  ok(await page.locator(`${band} [data-ui="i-row"]`).getAttribute("data-ui-hover") === "no",
+     "the element still says what it is, and says it cannot be taken");
+  ok(/nothing is mounted here/.test(await note()),
+     `in the words of the refusal that would have come back after the Enter: ${await note()}`);
+
+  const bandElement = await page.evaluate(() =>
+    document.querySelector('[data-ui-mount="inventory"]').closest("[data-ui]")
+            .getAttribute("data-ui"));
+  await page.hover(`#chrome > [data-ui="${bandElement}"] .ui-mount-note`);
+  await settle(100);
+  ok(/mounts .inventory./.test(await note()),
+     `the band that mounts it IS a candidate for unmount: ${await note()}`);
+
+  section("U-104: a press on a candidate types its name");
+  await page.evaluate(() => window.__line("lift "));
+  await settle(100);
+  await page.click(`${band} [data-ui="i-parts"]`);
+  await settle(120);
+  const typed = await page.evaluate(() => document.getElementById("location-input").value);
+  ok(typed === "lift inventory#i-parts",
+     `the name lands where the caret was, qualified as a lift takes it: \`${typed}'`);
+  ok(await page.evaluate(() => document.activeElement?.id) === "location-input",
+     "and the caret is still in the bar: the press was cancelled, so nothing blurred it");
+
+  await page.evaluate(() => window.__line("show me the regions"));
+  await settle(100);
+  ok(await page.locator(`${band} [data-ui-candidate]`).count() === 0,
+     "prose lights nothing: the page must behave normally in the ordinary case");
+  await page.hover(`${band} [data-ui="i-row"]`);
+  await settle(100);
+  ok(/^inventory#i-row/.test(await note()),
+     "though a name is still worth reading, so it is still shown");
+
+  await page.evaluate(() => window.__closeLine());
+  await settle(120);
+  ok(await page.locator(`${band} [data-ui-candidate]`).count() === 0
+     && await page.locator(`${band} [data-ui-hover]`).count() === 0,
+     "closing the input puts every mark back");
+  ok((await note()) === "", "and takes the note with it");
+  ok(await page.locator(badge).count() === 0 || !(await page.locator(badge).isVisible()),
+     "and the badge is gone");
+}
 
 section("§21.4.1: one presentation is mounted in one place at a time");
 const second = await page.evaluate(() => window.__submit("mount inventory"));

@@ -25,6 +25,8 @@ export const TARGET_ID = "location-target";
 export const REPLY_ID = "location-reply";
 /** Where an answer too long for the reply line is folded away (§34.2). */
 export const DETAIL_ID = "location-detail";
+/** Where a note about what the pointer is over is written (U-104). */
+export const NOTE_ID = "location-note";
 
 const el = (doc, tag, attrs = {}, kids = []) => {
   const n = doc.createElement(tag);
@@ -61,7 +63,18 @@ function ensureParts(bar) {
     reply.hidden = true;
     bar.appendChild(reply);
   }
-  return { targetEl, reply };
+  // Where something the pointer is over says what it is called (U-104).  Its
+  // own element rather than the reply line: a reply is the answer to a press
+  // and must not be overwritten by a mouse crossing the page on its way
+  // somewhere else.
+  let noteEl = bar.querySelector(`#${NOTE_ID}`);
+  if (!noteEl) {
+    noteEl = el(doc, "span", { id: NOTE_ID, class: "location-note",
+                               dataset: { testid: "location-note" } });
+    noteEl.hidden = true;
+    bar.appendChild(noteEl);
+  }
+  return { targetEl, reply, noteEl };
 }
 
 /**
@@ -79,13 +92,14 @@ export function mountLocationBar(bar, {
   arrange = null,
   path = () => "/",
   onAddress = () => {},
+  onLine = () => {},
 } = {}) {
   if (!bar) return null;
   const doc = bar.ownerDocument;
   const display = bar.querySelector(`#${DISPLAY_ID}`);
   const input = bar.querySelector(`#${INPUT_ID}`);
   if (!display || !input) return null;
-  const { targetEl, reply } = ensureParts(bar);
+  const { targetEl, reply, noteEl } = ensureParts(bar);
 
   let addressed = null;          // the target an unprefaced line acts on
   let working = false;
@@ -371,20 +385,30 @@ export function mountLocationBar(bar, {
   display.style.display = "block";
   showAddress();
 
+  /**
+   * Opening and closing the input is also the whole of the ledger's gate
+   * (U-104).  An identifier is worth showing while a line is being typed and
+   * is noise at every other moment, and the one surface that knows which of
+   * those it is, is the input itself.
+   */
   const open = () => {
     input.style.display = "block";
     display.style.display = "none";
     input.focus();
     input.select();
+    onLine(input.value);
   };
   const close = () => {
     input.style.display = "none";
     display.style.display = "block";
     input.value = display.textContent;
+    onLine(null);
+    api.note("");
   };
 
   display.addEventListener("click", open);
   input.addEventListener("blur", close);
+  input.addEventListener("input", () => onLine(input.value));
   input.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
       const value = input.value.trim();
@@ -402,6 +426,39 @@ export function mountLocationBar(bar, {
     submit,
     say,
     clearReply,
+    /**
+     * A note beside the address: what the pointer is over, as against what a
+     * press answered.  Written by whatever is pointing, and cleared when the
+     * input closes.
+     */
+    note(text) {
+      const node = doc.getElementById(NOTE_ID) || noteEl;
+      const s0 = String(text || "");
+      node.textContent = s0;
+      node.hidden = !s0;
+      return s0;
+    },
+    /**
+     * Put text where the caret is.
+     *
+     * The caret is wherever the user left it, so a name picked off the page
+     * lands in the argument position they were typing, and the selection --
+     * which on a freshly opened bar is the whole path -- is what it replaces.
+     */
+    insert(text) {
+      const s0 = String(text || "");
+      if (!s0) return input.value;
+      const at = Number.isInteger(input.selectionStart) ? input.selectionStart : input.value.length;
+      const to = Number.isInteger(input.selectionEnd) ? input.selectionEnd : at;
+      input.value = input.value.slice(0, at) + s0 + input.value.slice(to);
+      const caret = at + s0.length;
+      try { input.setSelectionRange(caret, caret); } catch { /* not a text input */ }
+      input.focus();
+      onLine(input.value);
+      return input.value;
+    },
+    /** Is a line being typed at all? */
+    isOpen() { return input.style.display !== "none"; },
     setPath(p) { showPath(String(p || "/")); },
     address() { return addressed; },
     /** Take the address, by target or by id, and say so without a reply line. */

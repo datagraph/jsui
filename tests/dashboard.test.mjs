@@ -14,7 +14,7 @@
  * does, which keeps the relative imports intact.
  */
 
-import { cpSync, mkdtempSync, writeFileSync } from "node:fs";
+import { cpSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -32,13 +32,19 @@ const { digestResult, renderDigest, contentDigest } = await load("mcp/result-dig
 const {
   dashboardFrom, validateDashboard, slotsOf, withInputDigests, staleAssertions, dashboardRecord,
 } = await load("dashboard/spec.js");
-const { buildPage, CSP, SANDBOX } = await load("dashboard/frame.js");
+const { buildPage, buildSavedPage, savedPolicy, savedOrigins, CSP, SANDBOX } =
+  await load("dashboard/frame.js");
+const { sharedSource, missingSource } = await load("dashboard/saved-runtime.js");
+const { bindParameters } = await load("app/parameters.js");
 const { runPanels, payloadsFor, totals } = await load("dashboard/runner.js");
 const { putPanelSet, tempName, isTempName, sweep, authHeader } = await load("dashboard/catalog.js");
 const { createToolAdapter, DASHBOARD_TOOLS, RESULT_FULL } = await load("llm/tool-adapter.js");
 const { insertData } = await load("mcp/transcript-store.js");
 const { dashboardSystem } = await load("llm/dashboard-prompt.js");
+const { figureAsked, missingFigure } = await load("app/figure-ask.js");
 const { listDashboards, readDashboard } = await load("dashboard/archive.js");
+const { sourcesFrom, evidenceFrom, mergeEvidence, evidenceSummary,
+        evidenceRecord, sourceLine } = await load("llm/evidence.js");
 
 let pass = 0, fail = 0;
 const ok = (cond, what) => {
@@ -533,8 +539,18 @@ section("D-S: the record answers what the page was drawn from");
   const spec = withInputDigests(validateDashboard(PROPOSAL).spec,
                                 { sales: { digest: "d1" }, costs: { digest: "d2" } });
   const grant = createGrant({ maxQueries: 3 });
+  // REQ-23.2.6: the record keeps what the model was SHOWN, not only what it
+  // produced.  Without it a reopened page cannot say what its own prose rests
+  // on, which is the state every archived dashboard was in.
+  const run1 = evidenceFrom([
+    { type: "prompt", text: "a dashboard of sales", at: "2026-11-21T09:00:00Z" },
+    { type: "digest", id: "c1", label: "r1", rows: 34, form: "table", digest: "d1" },
+    { type: "tool_result", id: "c1", name: "query", ok: true, repository: "acct/repo",
+      input: { op: "query", query: "SELECT ?region ?total WHERE {}" },
+      label: "r1", digest: "d1", text: "x".repeat(9000), at: "2026-11-21T09:00:02Z" },
+  ], { turn: 1 });
   const rec = dashboardRecord(spec, { sales: { digest: "d1", rows: 10, ok: true } },
-                              { grant, prompt: "a dashboard of sales" });
+                              { grant, prompt: "a dashboard of sales", evidence: [run1] });
   ok(rec.pageDigest && rec.panels.length === 2, "the record carries the page and its panels");
   ok(rec.transforms[0].body.includes("inputs.sales"),
      "the transform SOURCE, because a derived number is only checkable against it");
@@ -556,6 +572,22 @@ section("D-S: the record answers what the page was drawn from");
   ok(/mcp:inputDigest "sales=d1"/.test(update),
      "and what each sentence was written against, which is what makes D-T checkable later");
   ok(/mcp:disposition "promoted"/.test(update), "and what the user did with it");
+
+  ok(/mcp:Source/.test(update) && /mcp:sourceKind "result"/.test(update),
+     "and the ledger goes in as STATEMENTS, not as one JSON literal — `which pages "
+   + "were built from acct/repo' is a question a provenance record exists to answer, "
+   + "and a blob answers none of them");
+  ok(/mcp:turn "1"\^\^/.test(update),
+     "each source carrying the turn that read it, which is what regroups them: a turn "
+   + "node holding sources would be two levels out from the dashboard and would read "
+   + "back empty");
+  ok(/mcp:repository "acct\/repo"/.test(update) && /mcp:rows "34"\^\^/.test(update)
+     && /mcp:resultDigest "d1"/.test(update),
+     "with the repository, the shape and the digest the interface already had on the event");
+  ok(/SELECT \?region \?total/.test(update),
+     "and the query as it was SENT — the one piece of evidence that outlives the run");
+  ok(/mcp:sourceKind "request"/.test(update),
+     "the prompt is a source too: it was sent to the model like everything else");
 }
 
 section("U-24: a dashboard can be read back out of the record and reopened");
@@ -586,6 +618,41 @@ section("U-24: a dashboard can be read back out of the record and reopened");
     { s: D + "-a", p: M + "content", o: "The north leads." },
     { s: D + "-a", p: M + "input", o: "sales" },
     { s: D + "-a", p: M + "inputDigest", o: "sales=was-this" },
+    // Two turns, out of order and with their sources shuffled, because the
+    // store keeps neither: the reader has to put both back.
+    { s: D + "-s2", p: M + "type", o: M + "Source" },
+    { s: D + "-s2", p: M + "turn", o: "1" },
+    { s: D + "-s2", p: M + "sourceKind", o: "result" },
+    { s: D + "-s2", p: M + "name", o: "r1" },
+    { s: D + "-s2", p: M + "repository", o: "acct/repo" },
+    { s: D + "-s2", p: M + "query", o: "SELECT ?r ?v WHERE { ?s :r ?r ; :v ?v }" },
+    { s: D + "-s2", p: M + "rows", o: "34" },
+    { s: D + "-s2", p: M + "resultDigest", o: "was-this" },
+    { s: D + "-s2", p: M + "ok", o: "true" },
+    { s: D + "-s2", p: M + "recorded", o: "2026-10-17T09:00:02Z" },
+    { s: D + "-s1", p: M + "type", o: M + "Source" },
+    { s: D + "-s1", p: M + "turn", o: "1" },
+    { s: D + "-s1", p: M + "sourceKind", o: "request" },
+    { s: D + "-s1", p: M + "name", o: "the request" },
+    { s: D + "-s1", p: M + "content", o: "a dashboard of sales" },
+    { s: D + "-s1", p: M + "ok", o: "true" },
+    { s: D + "-s1", p: M + "recorded", o: "2026-10-17T09:00:00Z" },
+    { s: D + "-s4", p: M + "type", o: M + "Source" },
+    { s: D + "-s4", p: M + "turn", o: "2" },
+    { s: D + "-s4", p: M + "sourceKind", o: "result" },
+    { s: D + "-s4", p: M + "name", o: "r3" },
+    { s: D + "-s4", p: M + "repository", o: "acct/other" },
+    { s: D + "-s4", p: M + "rows", o: "2" },
+    { s: D + "-s4", p: M + "ok", o: "true" },
+    { s: D + "-s4", p: M + "recorded", o: "2026-10-17T09:05:03Z" },
+    { s: D + "-s3", p: M + "type", o: M + "Source" },
+    { s: D + "-s3", p: M + "turn", o: "2" },
+    { s: D + "-s3", p: M + "sourceKind", o: "result" },
+    { s: D + "-s3", p: M + "name", o: "r2" },
+    { s: D + "-s3", p: M + "repository", o: "acct/down" },
+    { s: D + "-s3", p: M + "ok", o: "false" },
+    { s: D + "-s3", p: M + "error", o: "the store refused" },
+    { s: D + "-s3", p: M + "recorded", o: "2026-10-17T09:05:01Z" },
   ];
   const fetchImpl = async (url, init) => {
     const q = String(init.body || "");
@@ -612,6 +679,37 @@ section("U-24: a dashboard can be read back out of the record and reopened");
   const stale = staleAssertions(stored.spec, { sales: { digest: "is-now-this" } });
   ok(stale.length === 1 && stale[0].id === "lead",
      "so a page reopened after the data moved marks its own prose on the way up");
+
+  /*
+   * REQ-23.2.6, the half that makes an archived page as truthful as a fresh
+   * one.  Until the ledger was recorded, a dashboard read back out of the
+   * store could only say it held no record of what the model was shown --
+   * correct, and useless.  It now comes back as the turns it was built in.
+   */
+  ok(stored.evidence.length === 2,
+     "the ledger comes back as the turns it was built in, not as one flat list");
+  ok(stored.evidence[0].turn === 1 && stored.evidence[1].turn === 2,
+     "in the order they happened");
+  ok(stored.evidence[0].sources.map((x) => x.label).join(",") === "the request,r1",
+     "each turn's sources in the order they were READ -- the store keeps none, and "
+   + "`r1, then r2' means nothing without it");
+  ok(stored.evidence[0].ask === "a dashboard of sales",
+     "with the prompt that opened the turn, read back off its request source");
+  ok(stored.evidence[0].repositories.join(",") === "acct/repo"
+     && stored.evidence[1].repositories.join(",") === "acct/other",
+     "and the repositories each turn actually read from");
+  ok(stored.evidence[0].sources[1].rows === 34
+     && typeof stored.evidence[0].sources[1].rows === "number",
+     "numbers come back as numbers: the store answers in strings and a row count "
+   + "that is a string reads as `34 rows' by luck and sorts by accident");
+  ok(stored.evidence[1].sources[0].ok === false
+     && /refused/.test(stored.evidence[1].sources[0].error),
+     "a call that failed is kept, and kept marked");
+  const summary = evidenceSummary(stored.evidence);
+  ok(summary.known === true && summary.repositories.join(",") === "acct/repo,acct/other",
+     "so a reopened page is marked from the same record a fresh one is");
+  ok(!summary.repositories.includes("acct/down"),
+     "and the store that refused is still not named as a source of its data");
 }
 
 section("the prompt states the contract the parser enforces");
@@ -625,6 +723,365 @@ section("the prompt states the contract the parser enforces");
   ok(/7 tool call/.test(text), "and the grant is described, so a refusal is not a surprise");
   ok(/connect-src|No network/i.test(text),
      "as are the frame's rules, which the model could not otherwise discover");
+}
+
+section("a page composed over more than one store");
+{
+  const one = dashboardSystem("base", { grant: createGrant({ repositories: ["a/b"] }),
+                                        stores: ["a/b"] });
+  ok(!/may read more than one repository/.test(one),
+     "with one store the prompt says nothing about choosing one — the choice does not exist");
+
+  const two = dashboardSystem("base", { grant: createGrant({ repositories: ["a/b", "a/c"] }),
+                                        stores: ["a/b", "a/c"] });
+  ok(/may read more than one repository/.test(two), "with two it says so");
+  ok(/a\/b, a\/c/.test(two), "naming both");
+  ok(/"source"/.test(two) && /"repository": "c"/.test(two),
+     "and shows the field that sends one panel to the other store");
+  ok(/reads `a\/b` unless it says otherwise/.test(two),
+     "stating which store a panel with no source reads");
+  ok(/cannot span two repositories/.test(two),
+     "a single query is not offered as a way to cross the boundary — they are separate endpoints");
+  ok(/TRANSFORM/.test(two),
+     "the transform is named as the place the two results are put together");
+  ok(/2 stores/.test(two), "and the count is stated");
+}
+
+/*
+ * REQ-34.3.12.  A prompt asking for tables AND bar graphs came back with
+ * tables, and nothing on either side said half the question had been dropped.
+ * The remedy is in two places and both are asserted: the contract, which says
+ * the fallback table is not an answer to a request for a chart, and the
+ * interface, which notices when the two do not match.
+ */
+section("a figure the request named is not optional");
+{
+  const text = dashboardSystem("base", { grant: createGrant({ repositories: ["a/b"] }),
+                                         request: "sales by region as a bar chart" });
+  ok(/not optional/i.test(text), "the contract says so in as many words");
+  ok(/fallback/i.test(text) && /is NOT an/.test(text),
+     "and says what the fallback table is not");
+  ok(/dashboard\.render/.test(text) && /SVG/.test(text),
+     "giving both ways to draw: a component, or the slot taken over");
+  ok(/no plotting library/i.test(text) && /no network/i.test(text),
+     "and ruling out the third way a model would otherwise reach for");
+  ok(/two REGIONS over one\s+panel/.test(text),
+     "a table and a chart of one measure is two slots, not two queries");
+  ok(/nearest honest\s+thing/.test(text),
+     "with what to do when the result cannot carry the figure");
+  ok(/A figure is bound where it can be/.test(text),
+     "and a figure chooses its kind the way every other region does");
+  ok(/photograph/.test(text) && /cannot refresh/.test(text),
+     "an SVG with the values written into it is an assertion, and says why that costs something");
+  ok(/notice later that\s+those results moved/.test(text),
+     "`inputs' is asked for because it makes staleness detectable — not to attribute anything");
+  // REQ-23.2.6.  The model used to be told how a figure would be marked and
+  // what to declare so that the mark would read correctly.  It is not told
+  // now, because the interface sent the data and does not have to ask.
+  ok(/Do not write a note about where a figure or a passage came from/.test(text),
+     "the model is told NOT to attribute its own work");
+  ok(/keeps its own record/.test(text) && /marks the\s+page from that/.test(text),
+     "and told why: the interface holds the record and marks the page from it");
+  ok(!/not from this repository/.test(text) && !/no source declared/.test(text),
+     "and no wording of the mark itself is put in front of the model");
+  ok(/That is about furniture/.test(text),
+     "and the toolbox's own `none of this is required' is qualified where it is given, "
+   + "rather than argued against elsewhere");
+}
+
+section("the gate notices a figure that was asked for and not drawn");
+{
+  const page = (extra = {}) => ({ uses: [], views: [{ name: "main", html: "<table></table>" }],
+                                  transforms: [], ...extra });
+
+  ok(figureAsked("plot the totals"), "`plot' is a request for a drawing");
+  ok(figureAsked("show me a bar graph of walls per storey"), "so is `bar graph'");
+  ok(figureAsked("a histogram, please"), "and `histogram'");
+  ok(!figureAsked("every triple in the default graph"),
+     "`graph' alone is NOT -- in this interface it is an RDF graph far more often "
+   + "than it is a picture, and reading it as one would warn on every page");
+  ok(!figureAsked("list the rooms with their areas"), "and a request for a list is not");
+
+  ok(missingFigure("a bar chart by storey", page()),
+     "a page of tables, where a chart was asked for, is noticed");
+  ok(/bar graph|chart/.test(missingFigure("a bar chart by storey", page()) || ""),
+     "and the notice quotes the word the request used");
+  ok(missingFigure("a bar chart by storey", page({ uses: ["bar-chart"] })) === null,
+     "a page that names the component is not");
+  ok(missingFigure("a bar chart by storey",
+                   page({ views: [{ name: "main", html: "<svg viewBox='0 0 1 1'></svg>" }] })) === null,
+     "nor is one that draws its own SVG");
+  ok(missingFigure("a bar chart by storey",
+                   page({ views: [{ name: "main",
+                                    html: "<script>dashboard.render('x', () => {})<\/script>" }] })) === null,
+     "nor one that takes the slot over");
+  ok(missingFigure("a bar chart by storey",
+                   page({ transforms: [{ name: "t", body: "const s = document.createElementNS(NS,'svg');" }] })) === null,
+     "nor one whose transform returns a drawing -- the third legitimate way, "
+   + "and the one that leaves no trace in the markup");
+  ok(missingFigure("list the rooms", page()) === null,
+     "and a page of tables for a question that asked for none says nothing at all");
+}
+
+/* ═════════════ REQ-23.2.6: the interface keeps its own record ═════════════ */
+
+/**
+ * The attribution a page carries is the INTERFACE's, built from what it sent.
+ *
+ * The defect that ended this argument: a chart drawn from three panels was
+ * marked "not from this repository" while the paragraph beneath it, citing
+ * the same three panels, said it had come from them.  Both marks were read
+ * out of the document -- the first from the ABSENCE of an `inputs'
+ * declaration -- and a page cannot be more reliable about where its data came
+ * from than the bookkeeping of the thing that wrote it.
+ *
+ * It never had to be.  Every row the model read left through the adapter, on
+ * an event carrying its repository, its query, its shape and its digest.
+ * These assertions are that the record is built from those events, that it
+ * survives being merged across revisions, and that the three states a reader
+ * can be in -- data was read, nothing was read, nothing is known -- are three
+ * different sentences rather than one sentence and two guesses.
+ */
+section("the ledger is built from what the interface sent, not from the answer");
+{
+  const events = [
+    { type: "prompt", text: "sales by region, as a table and a bar chart", at: "2026-11-21T10:00:00Z" },
+    { type: "primer", uri: "urn:primer", repository: "ns223", ok: true, chars: 1200,
+      at: "2026-11-21T10:00:01Z" },
+    // A repository whose SCHEMA was read and whose rows never were.
+    { type: "primer", uri: "urn:primer", repository: "nsonly", ok: true, chars: 400,
+      at: "2026-11-21T10:00:01Z" },
+    { type: "tool_call", name: "query", input: { op: "query", query: "SELECT * {}" } },
+    { type: "digest", id: "c1", label: "r1", rows: 34, form: "table", digest: "abc123",
+      repository: "ns223" },
+    { type: "tool_result", id: "c1", name: "query", ok: true, repository: "ns223",
+      input: { op: "query", query: "SELECT ?region ?total WHERE {}" },
+      text: "x".repeat(9000), label: "r1", digest: "abc123", at: "2026-11-21T10:00:02Z" },
+    { type: "tool_result", id: "c2", name: "query", ok: true, repository: "nsbrick",
+      input: { op: "query", query: "SELECT ?a WHERE {}" }, text: "a,b\n1,2",
+      at: "2026-11-21T10:00:03Z" },
+    { type: "tool_result", id: "c3", name: "query", ok: false, repository: "nsmulti",
+      input: { op: "query", query: "SELECT ?b WHERE {}" }, text: "the store refused",
+      at: "2026-11-21T10:00:04Z" },
+    { type: "tool_result", id: "c4", name: "result_full", ok: true, local: true, label: "r1",
+      text: "x".repeat(9000), input: { of: "r1" }, at: "2026-11-21T10:00:05Z" },
+    { type: "assistant", text: "```dashboard\n{}\n```" },
+  ];
+  const src = sourcesFrom(events);
+  const kinds = src.map((x) => x.kind);
+
+  ok(kinds.filter((k) => k === "request").length === 1, "the prompt is a source: it was sent too");
+  ok(kinds.filter((k) => k === "primer").length === 2, "so is the repository's own documentation");
+  ok(src.filter((x) => x.kind === "result").length === 3,
+     "three calls reached a store, and the fourth is not counted -- `result_full' is "
+   + "a document the model had already been shown, not a second source");
+  const r1 = src.find((x) => x.label === "r1" && x.kind === "result");
+  ok(r1.repository === "ns223" && r1.rows === 34 && r1.digest === "abc123",
+     "and a result carries the repository, the row count and the digest the interface "
+   + "already had on the event");
+  ok(/SELECT \?region \?total/.test(r1.query),
+     "with the query that was actually SENT, not one retyped into prose");
+  const bad = src.find((x) => x.repository === "nsmulti");
+  ok(bad.ok === false && /refused/.test(bad.error),
+     "a call that failed is kept -- what the model was shown when a store would not "
+   + "answer is part of what it worked from");
+
+  const turn = evidenceFrom(events, { turn: 1 });
+  ok(turn.repositories.join(",") === "ns223,nsbrick",
+     "but a store that answered nothing is not somewhere the page's data came from");
+  ok(!turn.repositories.includes("nsmulti"), "which is the whole point of naming them at all");
+
+  const summary = evidenceSummary([turn]);
+  ok(summary.known === true && summary.results === 2 && summary.attempted === 3,
+     "the summary counts what answered and what was tried");
+  ok(summary.documented.includes("nsonly") && !summary.repositories.includes("nsonly"),
+     "documentation read is kept apart from data read: a page marked `from nsonly' "
+   + "because its SCHEMA was read would be saying the wrong thing in the one place "
+   + "a reader is relying on it");
+  ok(/r1 · ns223 · 34 rows/.test(summary.detail),
+     "and the detail names each source the way a person reads it");
+  ok(/1 call did not answer/.test(summary.detail),
+     "including the one that did not answer, counted rather than dropped");
+}
+
+section("the ledger spans the turns, because the page does");
+{
+  const one = evidenceFrom([
+    { type: "prompt", text: "compose", at: "2026-11-21T10:00:00Z" },
+    { type: "tool_result", id: "a", name: "query", ok: true, repository: "ns223",
+      input: { query: "SELECT * {}" }, text: "x,y", at: "2026-11-21T10:00:01Z" },
+  ], { turn: 1 });
+  const two = evidenceFrom([
+    { type: "prompt", text: "now as a bar chart", at: "2026-11-21T10:05:00Z" },
+    { type: "tool_result", id: "b", name: "query", ok: true, repository: "nsbrick",
+      input: { query: "SELECT * {}" }, text: "x,y", at: "2026-11-21T10:05:01Z" },
+  ], { turn: 2 });
+
+  const ledger = mergeEvidence(mergeEvidence([], one), two);
+  ok(ledger.length === 2 && ledger[0].turn === 1 && ledger[1].turn === 2,
+     "a revision adds a turn rather than replacing the record of the compose");
+  const s2 = evidenceSummary(ledger);
+  ok(s2.repositories.join(",") === "ns223,nsbrick",
+     "so a figure added by the second turn is attributed to everything the page rests on, "
+   + "not to the last request alone");
+  ok(/over 2 turns/.test(s2.detail), "and the reader is told it took two");
+  ok(mergeEvidence(ledger, evidenceFrom([], { turn: 2 })).length === 2,
+     "re-noting a turn replaces it: a retried revision does not count twice");
+
+  // The three states, which used to be two and a guess.
+  ok(evidenceSummary([]).known === false,
+     "no ledger at all is a state of its own — an archived page reopened");
+  ok(/No record of what the model was shown/.test(evidenceSummary([]).detail),
+     "and it says it holds no record, rather than saying nothing was read");
+  const dry = evidenceSummary([evidenceFrom([{ type: "prompt", text: "hello" }], { turn: 1 })]);
+  ok(dry.known === true && dry.results === 0 && /answered from the request/.test(dry.detail),
+     "a run that read nothing says THAT, which is the honest form of the sentence "
+   + "`not from this repository' was reaching for");
+
+  const rec = evidenceRecord(ledger);
+  ok(rec["prov:wasDerivedFrom"].length === 2 && rec["dydra:turns"] === 2,
+     "and the same facts come out as data, for a record that is not a sentence");
+  ok(sourceLine({ kind: "result", label: "r2", repository: "nsbrick", ok: true, rows: 1208 })
+       === "r2 · nsbrick · 1208 rows",
+     "one source reads as one line");
+}
+
+/* ═════════════════════ the downloaded copy (U-111) ═══════════════════════ */
+
+section("what a saved page carries, and what it must not");
+{
+  const spec = withInputDigests(validateDashboard(PROPOSAL).spec, { sales: { digest: "first" } });
+  const results = { sales: { ok: true, mimeType: "text/tab-separated-values",
+                             text: "?region\t?value\nNorth\t120\n", digest: "first", rows: 1 } };
+  const source = { host: "https://dydra.com", account: "alice", repository: "sales" };
+  const file = buildSavedPage(spec, { results, source, at: "2026-11-21T09:00:00.000Z" });
+
+  ok(file.includes('id="saved-page-data"') && file.includes('id="saved-page-frame"'),
+     "it is two documents: the data and the runner outside, the page in a frame of its own");
+  const blob = file.split('id="saved-page-data">')[1].split("</script>")[0];
+  const held = JSON.parse(blob.replace(/\\u003c/g, "<"));
+  ok(held.spec.panels[0].query === PROPOSAL.panels[0].query,
+     "the panel's own query travels with it, which is what a refresh runs");
+  ok(held.results.sales.text.includes("North"),
+     "and so does the data, so the file still draws with no network");
+  ok(held.source.account === "alice" && !("token" in held) && !/secret|password/i.test(blob),
+     "the ADDRESS travels and no credential does -- the reader supplies that, into the tab");
+  ok(!/<\/script>/.test(blob),
+     "the page inside the blob cannot close the block that carries it");
+
+  ok(/connect-src https:\/\/dydra\.com/.test(savedPolicy(savedOrigins(spec, source))),
+     "the file may reach the host its panels name");
+  ok(savedOrigins(spec, { host: "https://dydra.com/some/path" }).join() === "https://dydra.com",
+     "as an origin, not as whatever address happened to be recorded");
+  ok(savedOrigins({ panels: [{ source: { host: "https://other.example" } }] }, source)
+       .join() === "https://dydra.com,https://other.example",
+     "and a panel with a source of its own adds that one, since the token goes there too");
+  ok(/connect-src 'none'/.test(savedPolicy([])),
+     "a page with no recorded address reaches nothing at all");
+  ok(/default-src 'none'/.test(savedPolicy(["https://dydra.com"]))
+     && /form-action 'none'/.test(savedPolicy(["https://dydra.com"])),
+     "everything the page's own policy closes stays closed out here");
+  ok(/connect-src 'none'/.test(CSP),
+     "and the page's own policy is unchanged: it still cannot open a connection, "
+   + "which is what the two documents exist to keep true");
+}
+
+section("the library a saved page carries is the library, not a copy of it");
+{
+  /* The whole point of stringifying rather than copying: a saved page that
+     digests differently marks prose stale that is not, and one that binds
+     parameters differently runs a query the reader never authorised. */
+  const F = new Function(`${sharedSource()}\nreturn { RD, PM, SP, AU, RF };`)();
+  const text = "?region\t?value\nNorth\t120\n";
+  ok(F.RD.contentDigest(text) === contentDigest(text),
+     "the same bytes digest the same in the file as in the pane");
+  ok(JSON.stringify(F.RD.digestResult(text, "text/tab-separated-values"))
+       === JSON.stringify(digestResult(text, "text/tab-separated-values")),
+     "and are read the same way");
+
+  const panel = { name: "p", query: "SELECT ?x WHERE { ?x :in ?region }", parameters: ["region"] };
+  const declared = [{ name: "region", kind: "literal", domain: { values: ["North"] } }];
+  ok(F.PM.bindParameters(panel, { region: "North" }, { parameters: declared }).query
+       === bindParameters(panel, { region: "North" }, { parameters: declared }).query,
+     "a parameter is encoded by the one encoder D-X promises there is");
+  ok(F.PM.bindParameters(panel, { region: "Elsewhere" }, { parameters: declared }).ok === false,
+     "and a value outside the declared domain is refused in the file as well");
+
+  const doc = { assertions: [{ id: "lead", inputs: ["p"], inputDigests: { p: "aaa" } }] };
+  ok(JSON.stringify(F.SP.staleAssertions(doc, { p: { digest: "bbb" } }))
+       === JSON.stringify(staleAssertions(doc, { p: { digest: "bbb" } })),
+     "and a passage goes stale in the saved copy exactly when it would in the pane");
+
+  ok(F.AU.authHeader("abc") === "Bearer abc" && F.AU.authHeader("Bearer x") === "Bearer x",
+     "a pasted token is read the same way too");
+  const boolean = JSON.stringify({ head: {}, boolean: false });
+  ok(/EMPTY result set/.test(String(F.RF.resultFault(
+       "SELECT ?a WHERE { ?a :b ?c }",
+       F.RD.digestResult(boolean, "application/sparql-results+json")))),
+     "and the check that stops an empty result being drawn as a table travels with it");
+}
+
+section("a half-deployed tree loses the refresh, and nothing else");
+{
+  /* What this guards is not hypothetical: /ui/ is served with no cache
+     lifetime, the first deploy of U-111 came up with a cached `grant.js'
+     beside the new `saved-runtime.js', and a NAMED import of an export the
+     cached copy did not have took the whole application down -- a link
+     error, before a line of it ran, over a feature nobody had used yet. */
+  ok(missingSource().length === 0,
+     "this tree has every bundle, so it builds the copy that can ask again");
+
+  /* A second copy of the tree with yesterday's `grant.js' in it. */
+  const old = mkdtempSync(join(tmpdir(), "jsui-stale-"));
+  cpSync(join(root, "lib"), join(old, "lib"), { recursive: true });
+  writeFileSync(join(old, "package.json"), JSON.stringify({ type: "module" }));
+  const grantPath = join(old, "lib/llm/grant.js");
+  writeFileSync(grantPath,
+    readFileSync(grantPath, "utf8").replace(/export const QUERY_FORM_SOURCE[^;]*;/, ""));
+  const stale = await import(pathToFileURL(join(old, "lib/dashboard/frame.js")).href);
+
+  ok(typeof stale.buildPage === "function",
+     "`frame.js' LOADS against the older module -- which is the thing that failed on the "
+   + "deploy, and failed before a line of the application ran");
+  ok(stale.savedPageIsRefreshable() === false,
+     "it simply knows it cannot build a refreshable copy");
+  const spec = withInputDigests(validateDashboard(PROPOSAL).spec, { sales: { digest: "d" } });
+  const results = { sales: { ok: true, mimeType: "text/tab-separated-values",
+                             text: "?region\t?value\nNorth\t120\n", digest: "d", rows: 1 } };
+  const source = { host: "https://dydra.com", account: "alice", repository: "sales" };
+  const degraded = stale.buildSavedPage(spec, { results, source });
+  ok(!degraded.includes('id="saved-page-data"') && /dash-data/.test(degraded),
+     "so a download still happens -- as the copy that replays, which is what the reader "
+   + "had yesterday, rather than as a failure");
+  ok(/North/.test(degraded), "with its data, so it still draws");
+  ok(buildSavedPage(spec, { results, source }).includes('id="saved-page-data"'),
+     "while a tree with everything in it builds the copy that can ask again");
+  ok(/dydra-saved: no refresh: a refreshable copy needs a newer grant\.js/.test(degraded),
+     "and the copy that replays says, in itself, which module it went without -- a download "
+   + "with no Refresh looks exactly like a finished one, so the reason has to travel");
+  ok(stale.savedPageTrouble(degraded)?.startsWith("a refreshable copy needs a newer grant.js"),
+     "which is the line the pane reads back out of the document it just built");
+  ok(stale.savedPageTrouble(buildSavedPage(spec, { results, source })) === null,
+     "and the full copy says nothing of the sort");
+
+  /* The deploy race, as it actually happens: the module is stale in the
+     CACHE and current on the SERVER.  Here the file stands in for the
+     server -- restoring it is the deploy landing -- and the second,
+     cache-defeating read is what the page does about it. */
+  const { repairMissingSource } = await import(
+    pathToFileURL(join(old, "lib/dashboard/saved-runtime.js")).href);
+  writeFileSync(grantPath, readFileSync(join(root, "lib/llm/grant.js"), "utf8"));
+  const got = await repairMissingSource();
+  ok(got.includes("grant.js"),
+     "a second read of the same module under a URL the cache has never seen gets the export "
+   + "the first read did not have");
+  ok(stale.savedPageIsRefreshable() === true,
+     "so the tree can build the refreshable copy after all, with no reload");
+  const repaired = stale.buildSavedPage(spec, { results, source });
+  ok(repaired.includes('id="saved-page-data"') && /QUERY_FORM/.test(repaired) === false,
+     "and the next download is the one with the Refresh in it");
+  ok(/function stripComments/.test(repaired),
+     "carrying the recovered module's own source, not a copy of it");
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);

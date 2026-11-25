@@ -502,8 +502,15 @@ export function openFigureGate(container, {
       caption, title: proposal.figure.title, notes, doc: d,
       engine: proposal.figure.engine || null,
       aiProvenance: drawnBy,
+      // Where it was drawn from, which is what a downloaded copy needs in
+      // order to ask the same question again (U-113).  The query travels as
+      // the text that RAN -- not the proposal's -- because a file that
+      // checked itself against a different query would be answering a
+      // question nobody asked of this picture.
+      source: { host, account, repository },
       meta: { view: promoted || temp, query: phase2.query, rows: phase2.rows,
-              mimeType: phase2.mimeType, resultDigest: phase2.digest },
+              accept: phase2.accept, mimeType: phase2.mimeType,
+              resultDigest: phase2.digest },
     });
     // A graph that does not lay out is not a failed run: the source is there,
     // the result is there, and the user can still keep the query.  So it is
@@ -540,7 +547,9 @@ export function openFigureGate(container, {
     body.appendChild(el(d, "div", { class: "fig-prov", testid: "figure-provenance",
       text: "The figure is the model's rendering of the result above; the result is the "
           + "interface's own run. Both go into the record either way — a figure you "
-          + "discard is recorded as discarded." }));
+          + "discard is recorded as discarded. A downloaded copy carries the query and "
+          + "the digest it was drawn from, so it can be asked later whether it is still "
+          + "true." }));
     onStatus("a figure is ready");
   }
 
@@ -564,7 +573,25 @@ export function openFigureGate(container, {
 
   function download() {
     disposition = disposition || "downloaded";
-    const page = mounted.page();
+    // The copy that can check itself, where this tree can build one: the
+    // same figure document, in a file that also carries the query and the
+    // digest it was drawn from.  `page()' is still the figure alone, and is
+    // still what the record digests.
+    const page = mounted.savedPage ? mounted.savedPage() : mounted.page();
+    const why = mounted.savedTrouble ? mounted.savedTrouble(page) : null;
+    const plain = page === mounted.page();
+    body.appendChild(el(d, "div", { class: why ? "fig-warn" : "fig-note",
+      testid: "figure-download-outcome",
+      text: plain
+        ? "saved — the picture draws with no network, and this copy records no "
+          + "address to check itself against"
+        : why
+          ? "saved — the picture draws with no network, but this copy cannot check "
+            + `itself against the repository: ${why}`
+          : "saved — the picture draws with no network, and it carries its own query: "
+            + "pressing Refresh in the saved file runs it again under your own token and "
+            + "says whether the drawing is still a picture of the data. It does not "
+            + "redraw." }));
     const base = (proposal.figure.title || "figure").replace(/[^A-Za-z0-9_-]+/g, "-").slice(0, 48);
     const blob = new Blob([page], { type: "text/html" });
     const url = URL.createObjectURL(blob);

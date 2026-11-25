@@ -184,6 +184,26 @@ window.__type = (line) => {
 };
 
 /**
+ * The same, as a person types it: the `input' event is what tells the
+ * ledgers what is being composed (U-104), and setting `value' from script
+ * does not fire one.
+ */
+window.__line = (line) => {
+  const input = document.getElementById("location-input");
+  if (input.style.display === "none") document.getElementById("location-display").click();
+  input.value = line;
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+  return input.value;
+};
+
+/** Give up on the line, which is what closes the input. */
+window.__closeLine = () => { document.getElementById("location-input").blur(); return true; };
+
+/** What the bar says the pointer is over. */
+window.__note = () =>
+  document.querySelector('[data-testid="location-note"]')?.textContent || "";
+
+/**
  * Press it.
  *
  * `submit' is what the bar's own Enter calls — the same function, reached

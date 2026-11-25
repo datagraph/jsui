@@ -49,7 +49,7 @@ const load = (p) => import(pathToFileURL(join(scratch, "lib", p)).href);
 const {
   parseName, printName, displayName, xpathOf, nameable, checkScopes,
   lift, apply, checkApply, mount, unmount, mountsOf, remintElements,
-  requestsOf, sourcesOf, describeRequests,
+  requestsOf, sourcesOf, describeRequests, templateParts, liftWhole,
   MOUNT_SCHEME, mountHostValue, mountedPresentation, TEMPLATE_VERSION,
 } = await load("app/arrangement.js");
 const {
@@ -63,6 +63,8 @@ const { parseInstruction, parseArrangement } = await load("app/instructions.js")
 const { mount: mountDom, INERT_ATTRIBUTE } = await load("app/reconcile.js");
 const { index, find } = await load("app/tree.js");
 const { copyView } = await load("dashboard/catalog.js");
+const { specOfPresentation, sourceOfPresentation, presentationFile, fileNameFor } =
+  await load("app/presentation-file.js");
 
 let pass = 0, fail = 0;
 const ok = (cond, what) => {
@@ -200,14 +202,147 @@ section("U-81: the request source travels with the request, and is not provenanc
      + "destination has been shown the uninteresting half");
 }
 
-section("U-81: a whole presentation is not lifted");
+section("U-81: an opaque leaf is not lifted FROM");
 {
-  const r = lift({ document: doc(), name: "inventory" });
-  ok(!r.ok && /mounted, not lifted/.test(r.errors[0]),
-     "a whole presentation is mounted; lifting one would make a copy where D-AV says "
-     + "there is a reference");
-  ok(!lift({ document: doc(), name: "inventory#e-legacy" }).ok,
-     "and an opaque leaf is refused here too, not only by `nameable'");
+  const r = lift({ document: doc(), name: "inventory#e-legacy" });
+  ok(!r.ok && /opaque/.test(r.errors[0]),
+     "an `html' leaf has no inside the arrangement machinery can read, and the refusal "
+     + "is made here and not only by `nameable'");
+  ok(/whole presentation/.test(r.errors[0]),
+     "and it names the way out: the whole of it can be lifted, markup and all (§33)");
+}
+
+/* ── 2b. the composite (§33, U-114) ───────────────────────────────────────── */
+
+section("§33: a whole presentation is an arrangement too");
+{
+  const source = { host: HOST, account: ACCOUNT, repository: "parts" };
+  const r = lift({ document: doc(), name: "inventory", source, revision: 4 });
+  ok(r.ok, "`lift inventory as …' is no longer a refusal: the unit of reuse was ONE "
+         + "element, and a page arranged as a matrix is a shape somebody wants again");
+  const t = r.template;
+
+  // The whole view, as one placeable element.
+  ok(t.root.kind === "div" && t.root.children.length === 2,
+     "the view's two roots arrive under one container, because what is applied has to be "
+     + "one element to place");
+  ok(!t.root.layout,
+     "the container declares no layout of its own -- a grid belongs to the element that "
+     + "declared it, and inventing one here would arrange the page a second way");
+  const grid = t.root.children.find((n) => n.layout);
+  ok(grid && grid.layout.areas.join("|") === "filter table",
+     "the arrangement itself travels: the grid template is the thing being lifted");
+  ok(grid.children.map((n) => n.placement?.area).join(",") === "filter,table,",
+     "and so does where each child sits in it");
+  ok(t.root.placement === null && t.root.order === null,
+     "the root's own placement and key are dropped: a key is meaningful only among the "
+     + "siblings it was minted between");
+  ok(t.placeholders.length === 6 && t.root.name === "p-0",
+     "every name is a placeholder, as in a component lift");
+
+  // What a composite carries that a component lift cannot.
+  const names = t.panels.map((p) => p.name).sort().join(",");
+  ok(names === "parts,regions",
+     "every panel the page defines travels, not the ones an element points at");
+  const one = lift({ document: doc(), name: "inventory#e-panel", source });
+  ok(one.template.panels.map((p) => p.name).join(",") === "parts",
+     "which is the difference: a component lift takes what its subtree names, and drops "
+     + "`regions' -- the panel that fills the select's domain, so the lifted control "
+     + "arrives with nothing to choose from");
+  ok(t.uses.includes("select") && t.uses.includes("table"),
+     "`uses' travels, because a page that is still markup names its components inside "
+     + "the markup, where no walk will find them");
+  ok(t.panels.every((p) => p.source && p.source.repository === "parts"),
+     "and every request carries the address it will be repeated against");
+  ok(t.source.whole === true && t.source.element === null && t.source.view === "main",
+     "the record says what was taken: the whole of a named view, not an element of it");
+  ok(t.unresolved.length === 0,
+     "nothing can be unresolved -- every definition the page had is in the template");
+}
+
+section("§33: and applying one puts the arrangement back, over other data");
+{
+  const source = { host: HOST, account: ACCOUNT, repository: "parts" };
+  const t = lift({ document: doc(), name: "inventory", source }).template;
+  const into = built({
+    title: "Somewhere else", uses: [], panels: [], views: [{ name: "main", elements: [
+      { name: "e-page", kind: "div", order: "a" }] }],
+  });
+  const out = apply({ document: into, template: t, parent: "e-page" });
+  ok(out.ok, "it applies into a page that had nothing in common with it");
+  const placed = find(out.document.views[0].elements, out.element);
+  const grid = placed.children.find((n) => n.layout);
+  ok(grid && grid.layout.areas.join("|") === "filter table"
+     && grid.children.map((n) => n.placement?.area).join(",") === "filter,table,",
+     "the matrix survives the crossing: the grid template and every placement are the "
+     + "same, which is the whole of what was being reused");
+  ok(out.document.panels.map((p) => p.name).sort().join(",") === "parts,regions",
+     "with every request it needs to fill itself");
+  ok(out.document.uses.includes("select") && !out.document.uses.includes("html"),
+     "and the components it is made of -- but not `html' or `host', which name no "
+     + "component and would be asked of the toolbox and refused");
+  ok(out.requests.length === 2 && out.charge === 1,
+     "two requests to repeat, one charge: the reader asked for one thing");
+}
+
+section("§33: a page that is still markup is lifted whole, and is not promoted to do it");
+{
+  const markup = built({
+    title: "Predicate statistics", uses: ["table"],
+    panels: [{ name: "p223", query: PARTS, caption: "counts" }],
+    views: [{ name: "main", title: "Main",
+              html: '<h1>Counts</h1><section id="t" data-bound="p223"></section>' }],
+  });
+  const t = lift({ document: markup, name: "stats",
+                   source: { host: HOST, account: ACCOUNT, repository: "x" } }).template;
+  ok(t.root.kind === "html" && /data-bound="p223"/.test(t.root.html),
+     "the markup travels verbatim as the one leaf it already is -- which is what a "
+     + "composed page IS, so this is the common case and not the exotic one");
+  ok(markup.views[0].elements == null,
+     "and the source is left exactly as it was found: a lift is a read, and the document "
+     + "is somebody's open page");
+  ok(t.panels.length === 1 && t.uses.includes("table"),
+     "the queries its `data-bound' regions name travel with it, which no walk of the "
+     + "tree could have worked out -- they are inside the markup");
+}
+
+section("§33: and what it carries that something will run is readable before it runs");
+{
+  const t = lift({ document: doc(), name: "inventory",
+                   source: { host: HOST, account: ACCOUNT, repository: "parts" } }).template;
+  const parts = templateParts(t);
+  const kinds = parts.map((p) => p.what).sort().join(",");
+  ok(kinds === "markup,transform",
+     "a composite carries a whole page's markup AND every transform it defined -- more "
+     + "than a component lift ever did, and an arrangement does not yet pass the U-74 "
+     + "admission (REQ-33.3.3)");
+  ok(parts.every((p) => p.bytes > 0 && p.where),
+     "each one is named and measured, because `a transform and one block of markup' is a "
+     + "sentence a reader can weigh and `executable: true' is not");
+  ok(templateParts(lift({ document: doc(), name: "inventory#e-num" }).template).length === 1,
+     "where a component lift of a metric carries one transform and no markup at all, "
+     + "which is the difference the disclosure exists to show");
+}
+
+section("§33: the two refusals, both narrow");
+{
+  const two = built({
+    title: "Tabbed", panels: [], uses: [],
+    views: [{ name: "main", html: "<p>one</p>" }, { name: "detail", html: "<p>two</p>" }],
+  });
+  const r = lift({ document: two, name: "tabbed" });
+  ok(!r.ok && /2 views/.test(r.errors[0]) && /`main'/.test(r.errors[0])
+     && /`detail'/.test(r.errors[0]),
+     "a presentation of several views is refused, naming them: a composite is placed as "
+     + "ONE element, and three tabs flattened into one column is a different page");
+  ok(/lift the view's own root by its anchor/.test(r.errors[0]),
+     "with the exact operation that does what was meant");
+  const w = lift({ document: doc(), name: "workspace", scope: "workspace" });
+  ok(!w.ok && /column of hosts/.test(w.errors[0]),
+     "and the chrome is refused for the reason `checkScopes' refuses mounting one -- a "
+     + "copy of it inside a page is a column of bands nothing will draw");
+  ok(!lift({ document: { views: [] }, name: "empty" }).ok,
+     "a presentation with no view has nothing to lift");
 }
 
 /* ── 3. apply (U-82, U-84) ────────────────────────────────────────────────── */
@@ -662,6 +797,128 @@ section("U-85: the four verbs reach the bar, and prose still reaches the model")
   ok(parseInstruction("apply the same colours to the legend").kind === "instruct",
      "and so is anything else the strict form does not match exactly");
   ok(parseArrangement("goto /x") === null, "navigation is not an arrangement verb");
+
+  // §33: the composite is the same verb with the anchor left off.
+  const whole = parseArrangement("lift predicate-statistics as matrix");
+  ok(whole?.verb === "lift" && whole.element === null
+     && whole.presentation === "predicate-statistics" && whole.as === "matrix",
+     "`lift <presentation> as <name>' is the composite: one form and not two, because "
+     + "the two differ in exactly one thing -- how much is taken -- and a hash already "
+     + "spells it");
+  ok(parseArrangement("lift inventory#e-7k2m as card")?.element === "e-7k2m",
+     "and the component form is untouched by widening it");
+  ok(parseArrangement("lift the whole page as it stands") === null,
+     "while prose that begins with the verb is still prose: the form is whole-string, "
+     + "and `the whole page' is three words where one name goes");
+}
+
+section("U-118: a destination may name a presentation, and says so with a hash");
+{
+  const here = parseArrangement("apply stock-card to e-7k2m");
+  ok(here?.at === null && here?.into === "e-7k2m",
+     "a bare name is an element of what is addressed, which is what it has always been");
+
+  const there = parseArrangement("apply stock-card to orders#e-7k2m");
+  ok(there?.at === "orders" && there?.into === "e-7k2m",
+     "a qualified name is that element of that presentation");
+
+  const whole = parseArrangement("apply stock-card to orders#");
+  ok(whole?.at === "orders" && whole?.into === null,
+     "and a trailing hash is the presentation itself, at its root — as it is in a URL");
+
+  const mounted = parseArrangement("mount orders into chrome#w-content");
+  ok(mounted?.at === "chrome" && mounted?.into === "w-content",
+     "`mount' takes the same destination, because there is one spelling of "
+     + "`a place in a presentation' and not two");
+
+  ok(parseArrangement("apply stock-card to #e-7k2m") === null,
+     "a hash with nothing before it names no presentation and is refused rather "
+     + "than read as the address");
+  ok(parseArrangement("apply stock-card to orders#e-7k2m#x") === null,
+     "and so is a second hash");
+
+  // The whole reason the hash is required, shown rather than asserted: the
+  // same word is a good anchor and a good presentation name, so a bare one
+  // cannot be read as either without guessing where the reader meant it.
+  const ambiguous = parseArrangement("apply stock-card to orders");
+  ok(ambiguous?.into === "orders" && ambiguous?.at === null,
+     "`to orders' is still an element called `orders' here, and not the `orders' "
+     + "presentation — the hash is what distinguishes them, because nothing in "
+     + "the shape of the word does");
+}
+
+/* ── 9. the presentation as a file (U-122) ───────────────────────── */
+
+section("U-122: a presentation downloads to the same file a composed page does");
+{
+  const spec = specOfPresentation(doc());
+  ok(spec.views.length === 1 && /<dydra-table/.test(spec.views[0].html),
+     "the element tree becomes markup — `htmlFromTree' is the bridge the tree "
+     + "model was written with, not a second renderer written for this");
+  ok(/data-bound="parts"/.test(spec.views[0].html)
+     && /data-derived="count"/.test(spec.views[0].html)
+     && /data-ui="e-tab"/.test(spec.views[0].html),
+     "carrying the marks the saved page's own runtime fills: what binds it to a "
+     + "panel, what is recomputed, and what each element is called");
+  ok(/<p id=inner>old<\/p>/.test(spec.views[0].html),
+     "and a carrier's markup travels byte for byte, as it does everywhere else");
+  ok(spec.panels.length === 2 && spec.panels[0].query === REGIONS
+     && spec.uses.includes("table"),
+     "the queries and the components it uses travel with it — without them the "
+     + "file would be a picture of a page");
+
+  ok(sourceOfPresentation(doc()) === null,
+     "a presentation whose panels say nowhere records no address: not guessed, "
+     + "because a Refresh offered against a guess refuses after asking for a "
+     + "credential rather than before");
+  const sourced = built({
+    title: "Inventory", uses: ["table"],
+    panels: [{ name: "parts", query: PARTS, source: SOURCE }],
+    views: [{ name: "main", elements: [
+      { name: "e-t", kind: "table", order: "a", bound: "parts" }] }],
+  });
+  const where = sourceOfPresentation(sourced);
+  ok(where && where.repository === "parts" && where.account === "bob",
+     `the panel's own source is the authority (U-84): ${JSON.stringify(where)}`);
+  ok(sourceOfPresentation(doc(), SOURCE)?.repository === "parts",
+     "and a page-level address stands in for panels that name none");
+
+  const file = presentationFile(sourced, { name: "stats-matrix", at: "2026-11-25T10:00:00.000Z" });
+  ok(file.ok && file.name === "stats-matrix.html",
+     `it saves under its own name: ${file.name}`);
+  ok(/id="saved-page-data"/.test(file.html),
+     "as the two-document saved page U-111 settled, and not as a second kind of "
+     + "artifact answering the same questions differently");
+  ok(file.html.includes(PARTS.slice(0, 20)),
+     "the query is in the file, which is what makes the copy runnable at all");
+  ok(/"results":\{\}/.test(file.html.replace(/\s/g, "")),
+     "and no data, because a presentation held by reference has not been run — "
+     + "the file opens empty with its Refresh offered rather than opening with "
+     + "rows nobody read");
+  /* What the file carries, read out of the file rather than argued about: a
+     credential baked into a document that travels is a credential that
+     travels, and the saved runtime is built so that the reader types one in
+     and it is held in a closure. */
+  const carried = JSON.parse(
+    /<script type="application\/json" id="saved-page-data">([\s\S]*?)<\/script>/
+      .exec(file.html)[1].replace(/\\u003c/g, "<"));
+  ok(JSON.stringify(carried.source) === JSON.stringify(SOURCE),
+     "the address travels whole — host, account, repository — and is all that does");
+  ok(!/"token"|"password"|"authorization"/i.test(JSON.stringify(carried)),
+     "and no credential travels with it: nothing in what the file holds is one, "
+     + "which is the whole reason the reader is asked for theirs");
+  ok(/nl4\.dydra\.com/.test(file.html),
+     "the address it may connect to is in the file, and in its policy");
+  ok(/bob\/parts/.test(file.message) && /Refresh/.test(file.message)
+     && /holds no data/.test(file.message),
+     `and the press says both of the things that cannot be seen by looking at `
+     + `the file: ${JSON.stringify(file.message)}`);
+
+  const empty = presentationFile({ views: [] }, { name: "nothing" });
+  ok(!empty.ok && /nothing to draw/.test(empty.error),
+     "a presentation with nothing in it is refused rather than saved as a blank page");
+  ok(fileNameFor("Stats Matrix!") === "stats-matrix.html",
+     "the file name is made from the presentation's own name");
 }
 
 console.log(`\n${pass} passed, ${fail} failed`);

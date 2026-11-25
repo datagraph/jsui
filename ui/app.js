@@ -2,11 +2,14 @@ import { LayoutView } from "./components/layout.js";
 import { NotFoundPage } from "./pages/index.js";
 import { APP_CONFIG } from "../lib/config.js";
 import { mountLocationBar } from "./components/location-bar.js";
-import { target as makeTarget, describeTarget } from "../lib/app/instructions.js";
+import { target as makeTarget, describeTarget, resolveTarget, addressRefusal }
+  from "../lib/app/instructions.js";
 import {
   loadWorkspace, saveWorkspace, arrangementOf, restoreRequested, placeBand,
-  WORKSPACE_NAME, CHROME_ELEMENT,
+  workspaceViewFor, WORKSPACE_NAME, WORKSPACE_SCOPE, CHROME_ELEMENT,
 } from "../lib/app/workspace.js";
+import { ensureRegionViews, regionViewName, parseRegionHost, REGION_ATTRIBUTE }
+  from "../lib/app/regions.js";
 import {
   ensureRepository, listPresentations, listArrangements, listMounts, claimMount, releaseMount,
   writeArrangement, readArrangement, recordApplication, readPresentation,
@@ -15,7 +18,9 @@ import {
   lift as liftArrangement, apply as applyArrangement,
   mount as mountPresentation, unmount as unmountPresentation, printName,
 } from "../lib/app/arrangement.js";
-import { installExpanders, expandInto } from "./components/mount-band.js";
+import { installExpanders, expandInto, mountedIn } from "./components/mount-band.js";
+import { downloadPresentation } from "./components/presentation-download.js";
+import { mountAnchorLedger } from "./components/anchor-ledger.js";
 import { runWorkspaceInstruction } from "../lib/app/workspace-instruction.js";
 import { instructionSystem } from "../lib/llm/instruction-prompt.js";
 import { createToolAdapter, DEFAULT_SYSTEM, ALLOW_TOOLS } from "../lib/llm/tool-adapter.js";
@@ -116,6 +121,29 @@ export class App {
    * implement it without anything here changing.
    */
   async arrange({ target, instruction }) {
+    /* U-118: the destination may name somewhere other than the address.
+     *
+     * `apply stock-card to orders#e-7k2m' goes to `orders' whatever the bar
+     * is pointing at, which is the whole of what "describing a destination"
+     * means here.  It is resolved against what is OPEN rather than against
+     * the catalogue: an arrangement applied into a presentation nobody is
+     * looking at would be saved correctly and seen by no one, and the pane
+     * holding that presentation would go on showing the revision before it.
+     * So a destination that is not open is a refusal with the sentence that
+     * opens it, and not a silent write.
+     */
+    if (instruction?.at) {
+      const found = resolveTarget(instruction.at, this.addressableTargets());
+      if (!found.ok) {
+        return { ok: false,
+                 message: `${addressRefusal(found, instruction.at)} — \`goto ${instruction.at}'`
+                        + ` opens it, and then the verb needs no destination` };
+      }
+      target = found.target;
+      // The presentation half has been honoured; what goes on to the handler
+      // is the anchor, which is what it has always taken.
+      instruction = { ...instruction, at: null };
+    }
     if (!target) return { ok: false, message: "nothing is addressed" };
     if (typeof target.arrange === "function") return target.arrange(instruction);
     return { ok: false,
@@ -210,14 +238,24 @@ export class App {
 
     if (instruction.verb === "lift") {
       const source = { host: auth.host, account: accountName, repository: null };
+      // `scope' so that a composite lift of the CHROME is refused where the
+      // sentence can name it (§33): a copy of the workspace inside a page is
+      // a column of hosts with nothing registered to draw them, which is the
+      // same argument `checkScopes' makes about mounting one.
       const lifted = liftArrangement({
-        document: document0, source,
+        document: document0, source, scope: WORKSPACE_SCOPE,
         name: printName({ presentation: instruction.presentation, element: instruction.element }) });
       if (!lifted.ok) return { ok: false, message: lifted.errors[0] };
       const kept = await writeArrangement({ ...where, name: instruction.as,
                                             template: lifted.template, creator: accountName });
       return kept.ok
-        ? { ok: true, message: `lifted as \`${instruction.as}'` }
+        ? { ok: true,
+            // The name it was lifted FROM, in the reply as well as in the
+            // record (`ui:anchor'): an entry whose source is only in the
+            // graph is one nobody can trace back from what they just read.
+            message: `lifted ${printName({ presentation: instruction.presentation,
+                                           element: instruction.element })} `
+                   + `as \`${instruction.as}'` }
         : { ok: false, message: `it could not be kept: ${kept.error}` };
     }
 
@@ -275,9 +313,15 @@ export class App {
       console.warn("[App] the workspace could not be read:", error);
       loaded = await loadWorkspace({ page, restore: true });
     }
+    // A kind of pane this build arranges and the stored document does not
+    // is topped up here rather than in `loadWorkspace', so that the
+    // workspace reader knows nothing about regions and the dependency runs
+    // one way (U-115).  An account that has never rearranged a pane then
+    // still has something for a patch to address.
+    const document0 = ensureRegionViews(loaded.document);
     this.workspace = { account: accountName, page, restore, source: loaded.source,
-                       why: loaded.why, document: loaded.document,
-                       arrangement: arrangementOf(loaded.document, { page }) };
+                       why: loaded.why, document: document0,
+                       arrangement: arrangementOf(document0, { page }) };
     return this.workspace;
   }
 
@@ -408,7 +452,12 @@ export class App {
             + `read-only, for this run.\nLarge results are read as their shape first; `
             + `the answer is recorded in \`${accountName}/mcp\` and can be stopped while it runs.`,
       confirm: {
-        label: n === 1 ? "Ask" : `Ask across ${n}`,
+        // REQ-37.2.4: one name, in all three places it is reached from.  The
+        // count was in the label -- "Ask across 2" -- and the detail above it
+        // already names every repository the press would read, line by line,
+        // so the label was repeating the weaker half of what was on the
+        // screen while making one operation look like two.
+        label: "Ask",
         working: `asking ${reading.repositories.map((r) => r.id).join(", ")}…`,
         run: (controls) => this.askRepositories(reading, { accountName, auth, connection }, controls),
       },
@@ -609,7 +658,17 @@ export class App {
       document.body.className = page.getBodyClass() || "";
 
       this.currentPage = page;
-      page.setContext({ navLinks, session, app: this });
+      // U-72: the bands are placed by the account's own arrangement.  One
+      // view, named `main', is wired -- the model and the store hold a view
+      // per routed page, but the App has no stable name for a route (every
+      // repository is its own path), so that waits for one.
+      //
+      // Read BEFORE the page draws, because a pane now asks for the
+      // arrangement of its own regions while it is building its markup
+      // (U-115) and a pane drawn before the read would be drawn with the
+      // build's arrangement and never told otherwise.
+      const workspace = await this.workspaceFor("main");
+      page.setContext({ navLinks, session, app: this, workspace: workspace.document });
       console.log("[App] Rendering content...");
       const content = await page.renderContent();
       console.log("[App] Content rendered, length:", content?.length || 0);
@@ -620,11 +679,6 @@ export class App {
       console.log("[App] paneTabsBar length:", paneTabsBar?.length || 0);
       console.log("[App] paneTabsDefault:", paneTabsDefault);
       console.log("[App] Calling LayoutView render() for page:", page.constructor.name);
-      // U-72: the bands are placed by the account's own arrangement.  One
-      // view, named `main', is wired -- the model and the store hold a view
-      // per routed page, but the App has no stable name for a route (every
-      // repository is its own path), so that waits for one.
-      const workspace = await this.workspaceFor("main");
       const html = this.layout.render({ navLinks, session, content, sidebar, paneTabsBar,
                                         paneTabsDefault, workspace: workspace.arrangement });
       console.log("[App] Layout used: StandardLayout");
@@ -794,6 +848,17 @@ export class App {
       }
     }
     
+    /* The results pane goes with them (U-120).  What is in it was read under
+       the session being ended -- readings of somebody's data, and references
+       to their presentations -- and a pane that survived a logout would
+       leave them on the screen for whoever signs in next.  The registration
+       goes too, so the address book does not keep offering `results'. */
+    const resultsPane = document.getElementById("tab-results");
+    if (resultsPane) resultsPane.remove();
+    /* The tabs that reach it go with the panes whose margins they are in, so
+       there is nothing to take out of the bar above: that bar never had one. */
+    if (this.__resultsTarget) { this.__resultsTarget(); this.__resultsTarget = null; }
+
     // Clear all editor instances
     if (this.editorInstances) {
       this.editorInstances.clear();
@@ -868,11 +933,90 @@ export class App {
       instruct: (request) => this.instruct(request),
       arrange: (request) => this.arrange(request),
       path: () => this.router?.currentPath || this.router?.getCurrentPath?.() || "/",
+      onLine: (text) => this.showAnchors(text),
+      // The address is half of what a candidate means, so moving it while a
+      // line is open changes what may be pressed.
+      onAddress: () => this.refreshAnchors(),
     });
     // The page was redrawn, not reloaded: an address the user set before the
     // redraw is still the one they mean, and losing it on every navigation
     // would make the target feel accidental.
     if (was && this.locationBar) this.locationBar.setAddress(was.id);
+    this.initializeAnchorLedger();
+  }
+
+  /**
+   * The identifiers, where the pointer is (U-104).
+   *
+   * Wired beside the bar and torn down with it, because the chrome is
+   * redrawn in place after an arrangement changes it: the previous ledger's
+   * root is, from that moment, a detached tree, and the attributes it marked
+   * are on elements nobody can see.
+   *
+   * It is enabled by the bar's own input opening and by nothing else, and
+   * what it does with a press depends on what the line is waiting for — both
+   * decided in `lib/app/anchors.js', which is also what tells the ledger
+   * inside a page's frame the same thing.
+   */
+  initializeAnchorLedger() {
+    try { this.anchorLedger?.destroy(); } catch { /* a torn-down root is gone anyway */ }
+    this.anchorLedger = mountAnchorLedger(this.root, {
+      viewFor: (el) => this.anchorViewFor(el),
+      note: (text) => this.locationBar?.note(text),
+      onPick: (text) => this.locationBar?.insert(text),
+    });
+  }
+
+  /** Which presentation an element in the chrome belongs to, and its tree. */
+  anchorViewFor(el) {
+    const inside = mountedIn(el);
+    if (inside) return inside;
+    const document0 = this.workspace?.document || null;
+    // A region of a pane is addressable (U-115), and its name is in the
+    // pane's own view of the workspace rather than in the chrome's: the
+    // ledger has to be told which, or it would report a perfectly good
+    // anchor as one it does not know.
+    const region = el?.closest?.(`[${REGION_ATTRIBUTE}]`);
+    const parsed = region ? parseRegionHost(region.getAttribute(REGION_ATTRIBUTE)) : null;
+    if (parsed && document0) {
+      const paneView = (document0.views || []).find((v) => v?.name === regionViewName(parsed.kind));
+      if (paneView) return { presentation: WORKSPACE_NAME, view: paneView };
+    }
+    const view = document0 ? workspaceViewFor(document0, this.workspace?.page || "main") : null;
+    return view ? { presentation: WORKSPACE_NAME, view } : null;
+  }
+
+  /**
+   * The line as it is being typed, to the ledgers.
+   *
+   * Null means the input closed.  Both ledgers are told — this document's,
+   * and every open page's, which is in a frame and has to be posted to.  A
+   * page whose pane is addressed is not the only one that may be pointed at:
+   * the user may well read one page while composing an operation against
+   * another, and an identifier that appeared only in the addressed pane
+   * would be missing exactly where it was being looked for.
+   */
+  showAnchors(text) {
+    this.anchorLine = text == null ? null : String(text);
+    if (text == null) {
+      this.anchorLedger?.disable();
+      for (const t of this.addressableTargets()) t.anchors?.(null, { addressed: false });
+      return;
+    }
+    // Where the operation would GO decides what may be pressed.  The bar
+    // sends an arrangement verb to the address and nowhere else, so a
+    // candidate marked in a document that is not the address would be an
+    // offer that lands as a refusal somewhere the user is not looking.
+    const addressed = this.locationBar?.address()?.id || null;
+    this.anchorLedger?.enable(text, { marking: addressed === WORKSPACE_NAME });
+    for (const t of this.addressableTargets()) {
+      t.anchors?.(text, { addressed: t.id === addressed });
+    }
+  }
+
+  /** Say it again — after a page was re-drawn, or the address moved. */
+  refreshAnchors() {
+    if (this.locationBar?.isOpen?.()) this.showAnchors(this.anchorLine ?? "");
   }
 
   /**
@@ -890,7 +1034,8 @@ export class App {
    * inert as this one was, and takes its own press.
    */
   initializeMounts() {
-    installExpanders(this.root, { expand: (request) => this.expandMount(request) });
+    installExpanders(this.root, { expand: (request) => this.expandMount(request),
+                                  download: (request) => this.downloadMount(request) });
   }
 
   /** Read one mounted presentation and draw it where it is mounted. */
@@ -903,6 +1048,36 @@ export class App {
     if (!read.ok) return { ok: false, error: read.errors?.[0] || read.error || "it could not be read" };
     return expandInto(band, { presentation: read.document, name,
                               revision: read.document?.revision ?? null });
+  }
+
+  /**
+   * Write one mounted presentation to a file (U-122).
+   *
+   * The same read the press makes — `readPresentation', as this account,
+   * with this account's own credentials — so Download asks for exactly what
+   * Open asks for and a presentation a reader may not read is refused in one
+   * place for both.  What comes back is the saved-page form U-111 settled:
+   * the queries travel, the data does not because none has been run, and no
+   * credential travels at all.
+   */
+  async downloadMount({ name, band = null }) {
+    const accountName = this.state.session?.accountName || null;
+    if (!accountName) return { ok: false, error: "sign in to download a presentation" };
+    const auth = this.state.getAuthContext?.(accountName) || {};
+    const read = await readPresentation({ host: auth.host, account: accountName,
+                                          token: auth.token, name, reader: accountName });
+    if (!read.ok) {
+      return { ok: false, error: read.errors?.[0] || read.error || "it could not be read" };
+    }
+    return downloadPresentation(read.document, {
+      name,
+      doc: band?.ownerDocument || this.root?.ownerDocument || document,
+      // Where the panels that name no source of their own would have run.
+      // The account is this one; the repository is not knowable from a
+      // presentation, so there is no page-level address to offer and the
+      // file says so rather than being handed a guess.
+      fallback: null,
+    });
   }
 
   showLocationMessage(message, duration = 3000) {

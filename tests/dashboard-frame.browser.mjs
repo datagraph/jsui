@@ -40,7 +40,48 @@ const PROPOSAL = {
       + '<p data-derived="total"></p><p data-asserted="lead"></p><p data-asserted="outside"></p>',
 };
 
+/*
+ * The same page, with two figures the model drew: one declaring the panel it
+ * was drawn from and one declaring nothing.  It is mounted in the frame on
+ * its own rather than added to PROPOSAL, because PROPOSAL is also what the
+ * stubbed model answers with, and a page that draws something is not the
+ * page the gate's missing-figure notice is about.
+ */
+const FIGURED = {
+  ...PROPOSAL,
+  assertions: [...PROPOSAL.assertions,
+               { id: "figure", inputs: ["sales"], text: "" },
+               { id: "unsourced", inputs: [], text: "" }],
+  html: PROPOSAL.html
+      + '<figure data-asserted="figure"><svg viewBox="0 0 10 10"><rect width="4" height="9"/>'
+      + '</svg></figure>'
+      + '<figure data-asserted="unsourced"><svg viewBox="0 0 10 10"><rect width="2" height="3"/>'
+      + '</svg></figure>',
+};
+
 const TSV = "?region\t?value\nNorth\t120\nSouth\t80\n";
+
+/*
+ * Two views made of elements, for U-116.  A patch is diffed over every view a
+ * document has and the runtime holds one section per view, so an instruction
+ * had to say which view it was for -- and until it did, a root-level insert
+ * destined for the view that is NOT showing was applied to the one that was.
+ * Nothing faulted, so the pane reported it applied in place, and the element
+ * was in the wrong section.  Two views, two panels, and one insert is the
+ * whole reproduction.
+ */
+const TWO_VIEWS = {
+  title: "Two views",
+  panels: [],
+  views: [
+    { name: "main", title: "First",
+      elements: [{ name: "e-main", kind: "panel", order: "a",
+                   attributes: { label: "First" } }] },
+    { name: "second", title: "Second",
+      elements: [{ name: "e-second", kind: "panel", order: "a",
+                   attributes: { label: "Second" } }] },
+  ],
+};
 
 const HARNESS = `<!doctype html><meta charset="utf-8"><title>dashboard harness</title>
 <body>
@@ -48,18 +89,25 @@ const HARNESS = `<!doctype html><meta charset="utf-8"><title>dashboard harness</
   <div class="view-editors"><div class="view-editors-container"></div></div>
 </div>
 <div id="frame-host"></div>
+<div id="views-host"></div>
+<div id="ledger-host"></div>
 <div id="broken-host"></div>
+<div id="blank-host"></div>
 <script type="module">
 import { mountDashboard } from "/lib/dashboard/frame.js";
 import { validateDashboard, withInputDigests } from "/lib/dashboard/spec.js";
+import { validateApplication } from "/lib/app/document.js";
 import { openDashboardPane } from "/ui/components/dashboard-pane.js";
 import { paneState } from "/ui/components/mcp-pane-state.js";
+import { evidenceFrom, evidenceSummary } from "/lib/llm/evidence.js";
 
 const PROPOSAL = ${JSON.stringify(PROPOSAL)};
+const TWO_VIEWS = ${JSON.stringify(TWO_VIEWS)};
+const FIGURED = ${JSON.stringify(FIGURED)};
 const TSV = ${JSON.stringify(TSV)};
 
 /* ── the frame on its own ─────────────────────────────────────────────── */
-const v = validateDashboard(PROPOSAL);
+const v = validateDashboard(FIGURED);
 window.__validation = { ok: v.ok, errors: v.errors, warnings: v.warnings };
 const spec = withInputDigests(v.spec, { sales: { digest: "first" } });
 const handle = mountDashboard(document.getElementById("frame-host"), spec, {
@@ -67,8 +115,54 @@ const handle = mountDashboard(document.getElementById("frame-host"), spec, {
   onEvent: (e) => { (window.__frameEvents = window.__frameEvents || []).push(e); },
 });
 window.__handle = handle;
+
+/* ── two views, and a patch that addresses the one not showing (U-116) ── */
+{
+  // validateApplication, not validateDashboard: a dashboard spec is markup,
+  // and an element tree is an application document.  The frame draws either.
+  const two = validateApplication({ id: "two-views", ...TWO_VIEWS });
+  window.__twoValidation = { ok: two.ok, errors: two.errors,
+                             views: (two.document?.views || []).map((v) => v.name) };
+  const viewsHandle = mountDashboard(document.getElementById("views-host"), two.document, {
+    onEvent: (e) => { (window.__viewEvents = window.__viewEvents || []).push(e); },
+  });
+  window.__insertIntoSecond = async () => {
+    const next = JSON.parse(JSON.stringify(two.document));
+    next.revision = (next.revision || 1) + 1;
+    next.views[1].elements.push({ name: "e-added", kind: "panel", order: "b",
+                                  attributes: { label: "Added" }, children: [] });
+    return viewsHandle.update(next, {
+      ops: [{ op: "insert-element", view: "second", parent: null, kind: "panel" }],
+      post: { results: {}, stale: [], parameters: {}, state: {} },
+    });
+  };
+}
 handle.post({ results: { sales: { ok: true, mimeType: "text/tab-separated-values",
                                   text: TSV, digest: "first", rows: 2 } }, stale: [] });
+
+/* ── the same page, with the interface's own record posted in ─────────── */
+/* Built from events of the shape the adapter emits, so the test exercises
+   the ledger end to end rather than a hand-written summary of one. */
+const RUN = [
+  { type: "prompt", text: "sales by region, as a table and a bar chart" },
+  { type: "primer", uri: "urn:primer", repository: "nsonly", ok: true, chars: 400 },
+  { type: "digest", id: "c1", label: "r1", rows: 34, form: "table", digest: "d1" },
+  { type: "tool_result", id: "c1", name: "query", ok: true, repository: "ns223",
+    input: { query: "SELECT ?region ?total WHERE {}" }, label: "r1", digest: "d1",
+    text: "x".repeat(9000) },
+  { type: "tool_result", id: "c2", name: "query", ok: true, repository: "nsbrick",
+    input: { query: "SELECT ?a WHERE {}" }, text: "a,b" },
+  { type: "tool_result", id: "c3", name: "query", ok: false, repository: "nsmulti",
+    input: { query: "SELECT ?b WHERE {}" }, text: "the store refused" },
+];
+const ledgerHandle = mountDashboard(document.getElementById("ledger-host"), spec, {
+  onEvent: () => {},
+});
+ledgerHandle.post({ results: { sales: { ok: true, mimeType: "text/tab-separated-values",
+                                        text: TSV, digest: "first", rows: 2 } },
+                    stale: [],
+                    evidence: evidenceSummary([evidenceFrom(RUN, { turn: 1 })]) });
+window.__ledgerHandle = ledgerHandle;
 
 /* ── a transform that throws, mounted straight past validation ────────── */
 const BROKEN = {
@@ -83,6 +177,60 @@ const broken = mountDashboard(document.getElementById("broken-host"), BROKEN, {
 broken.post({ results: { sales: { ok: true, mimeType: "text/tab-separated-values",
                                   text: TSV, digest: "first", rows: 2 } }, stale: [] });
 
+/* ── three figures the page promised, two of which do not draw ────────── */
+/*
+ * Both failures are ones a renderer commits WITHOUT THROWING: it runs to the
+ * end, the caption and the legend beside it are right, and the picture is
+ * not there.  The first is the namespace -- createElement("svg") makes an
+ * HTML element of that name, which is in the document and is never drawn --
+ * and the second is the arithmetic, where one log of zero turns every
+ * coordinate into NaN.  The third draws, and is here to be left alone.
+ */
+const BLANK = {
+  title: "Figures", panels: PROPOSAL.panels, assertions: [],
+  transforms: ["wrongNamespace", "notANumber", "drawn"].map((name) => ({
+    name, inputs: ["sales"], body: "return inputs.sales.objects;",
+  })),
+  html: '<section data-bound="sales"></section>'
+      + '<figure data-derived="wrongNamespace"><figcaption>Counts by predicate</figcaption></figure>'
+      + '<figure data-derived="notANumber"></figure>'
+      + '<figure data-derived="drawn"></figure>',
+  script: [
+    'var SVG = "http://www.w3.org/2000/svg";',
+    'dashboard.render("wrongNamespace", function (el, ctx) {',
+    '  var svg = document.createElement("svg");',       // the whole bug
+    '  svg.setAttribute("viewBox", "0 0 100 40");',
+    '  var r = document.createElement("rect");',
+    '  r.setAttribute("x", "0"); r.setAttribute("y", "0");',
+    '  r.setAttribute("width", "20"); r.setAttribute("height", "30");',
+    '  svg.appendChild(r); el.appendChild(svg);',
+    '});',
+    'dashboard.render("notANumber", function (el, ctx) {',
+    '  var svg = document.createElementNS(SVG, "svg");',
+    '  svg.setAttribute("viewBox", "0 0 100 40");',
+    '  var r = document.createElementNS(SVG, "rect");',
+    '  var h = 30 * Math.log10(0) / Math.log10(100);',   // -Infinity -> NaN
+    '  r.setAttribute("x", "0"); r.setAttribute("y", String(40 - h));',
+    '  r.setAttribute("width", "20"); r.setAttribute("height", String(h));',
+    '  svg.appendChild(r); el.appendChild(svg);',
+    '});',
+    'dashboard.render("drawn", function (el, ctx) {',
+    '  var svg = document.createElementNS(SVG, "svg");',
+    '  svg.setAttribute("viewBox", "0 0 100 40");',
+    '  svg.setAttribute("width", "200"); svg.setAttribute("height", "80");',
+    '  var r = document.createElementNS(SVG, "rect");',
+    '  r.setAttribute("x", "0"); r.setAttribute("y", "10");',
+    '  r.setAttribute("width", "20"); r.setAttribute("height", "30");',
+    '  svg.appendChild(r); el.appendChild(svg);',
+    '});',
+  ].join("\\n"),
+};
+const blank = mountDashboard(document.getElementById("blank-host"), BLANK, {
+  onEvent: (e) => { (window.__blankEvents = window.__blankEvents || []).push(e); },
+});
+blank.post({ results: { sales: { ok: true, mimeType: "text/tab-separated-values",
+                                 text: TSV, digest: "first", rows: 2 } }, stale: [] });
+
 /* ── the pane, with the provider and the store stubbed ────────────────── */
 const st = paneState("playwright", "test", location.origin);
 st.llmKey = "test-key";
@@ -91,6 +239,9 @@ st.token = "test-token";
 const st2 = paneState("playwright", "cutoff", location.origin);
 st2.llmKey = "test-key";
 st2.token = "test-token";
+const st3 = paneState("playwright", "chart", location.origin);
+st3.llmKey = "test-key";
+st3.token = "test-token";
 
 let llmTurn = 0;
 const counts = { llm: 0, mcp: 0, sparql: 0, views: 0 };
@@ -106,6 +257,14 @@ window.fetch = async (url, init = {}) => {
   if (u.includes("/mcp")) {
     counts.mcp += 1;
     const body = init.body ? JSON.parse(init.body) : {};
+    /* A store that answers 200 and refuses in the body: the shape an access
+       refusal takes when the transport succeeded, and the one a server log
+       records as a success. */
+    if (u.includes("/refuses/")) {
+      return json({ jsonrpc: "2.0", id: 1,
+                    error: { code: -32602,
+                             message: "Repository not found: playwright/refuses" } });
+    }
     if (body.method === "tools/list") {
       return json({ jsonrpc: "2.0", id: 1, result: { tools: [
         { name: "survey", description: "Survey the repository.", inputSchema: { type: "object" } },
@@ -168,6 +327,25 @@ window.__openSecond = () => openDashboardPane(app, {
   container: document.querySelector(".view-editors-container"),
   accountName: "playwright", repositoryName: "cutoff",
   prompt: "a dashboard too large to finish",
+});
+// A prompt that names a figure, answered by the proposal above -- which is
+// three regions of table and prose and draws nothing.
+window.__openChart = () => openDashboardPane(app, {
+  container: document.querySelector(".view-editors-container"),
+  accountName: "playwright", repositoryName: "chart",
+  prompt: "sales by region, as a table and as a bar chart",
+});
+window.__openPair = () => openDashboardPane(app, {
+  container: document.querySelector(".view-editors-container"),
+  // Named for its FIRST store, exactly as the account's pane opens it.
+  accountName: "playwright", repositoryName: "test",
+  stores: [
+    { account: "playwright", repository: "test",
+      endpoint: location.origin + "/playwright/test/mcp", token: "t" },
+    { account: "playwright", repository: "refuses",
+      endpoint: location.origin + "/playwright/refuses/mcp", token: "t" },
+  ],
+  prompt: "a page over both",
 });
 window.__pane = openDashboardPane(app, {
   container: document.querySelector(".view-editors-container"),
@@ -266,8 +444,35 @@ console.log("\nD-P: the page binds, computes and marks");
      "a sentence written from a panel says which");
   ok((await inside.evaluate(() =>
        document.querySelector('[data-asserted="outside"] .dash-prov').textContent))
-       .includes("not from this repository"),
-     "and one that came from outside says that instead -- the distinction survives into the artifact");
+       .includes("no source declared"),
+     "and one that cites nothing says THAT -- what the interface knows is that the document "
+   + "declared no source, not where the content came from");
+
+  /*
+   * The mark is about the document, not about the data's origin.
+   *
+   * It read "written by the model — not from this repository", which is a
+   * claim the interface has never been in a position to make: all it has is
+   * whether the assertion declared `inputs'.  Live, 2026-11-21: a revision
+   * drew a chart from three panels and the chart carried that note, while the
+   * paragraph under it cited the same three panels and said so.  Same data,
+   * two contradictory provenances, and the one the reader could see was the
+   * false one.
+   */
+  ok((await inside.evaluate(() =>
+       document.querySelector('[data-asserted="figure"] svg') !== null)),
+     "a figure in an asserted slot survives the fill -- an SVG with no text in it "
+   + "used to read as an empty slot and be replaced by the assertion's text");
+  const fig = await inside.evaluate(() =>
+    document.querySelector('[data-asserted="figure"] .dash-prov').textContent);
+  ok(/drawn by the model from sales/.test(fig),
+     `a figure drawn from a panel is attributed to that panel, exactly as the prose is: "${fig}"`);
+  ok(!/not from this repository/.test(fig),
+     "and is not told it came from somewhere else");
+  const un = await inside.evaluate(() =>
+    document.querySelector('[data-asserted="unsourced"] .dash-prov').textContent);
+  ok(/drawn by the model/.test(un) && /no source declared/.test(un),
+     `a figure that declares nothing says so, as drawn and not written: "${un}"`);
 }
 
 console.log("\nD-T: a sentence is marked when the data under it moves");
@@ -330,6 +535,119 @@ console.log("\na transform that throws says what it said");
      "with its provenance intact -- a failed region is still a declared region");
 }
 
+console.log("\nthe frame settles on a height instead of climbing to the ceiling");
+{
+  /* The reported symptom: a page that "continues to append content after the
+     tables are complete -- it is whitespace, but it continues without
+     conclusion".  Nothing was appended.  The frame measured the scrolling
+     box, which is never smaller than the viewport it had just been given, so
+     every observation returned the previous height plus the margin and the
+     pane set it again: about 480 pixels a second, up to the ceiling. */
+  const height = () => page.evaluate(() =>
+    parseFloat(document.querySelector("#frame-host iframe").style.height) || 0);
+  const first = await height();
+  await page.waitForTimeout(900);
+  const second = await height();
+  ok(second === first,
+     `the height stops where the content is and stays there (${first}px, then ${second}px)`);
+  ok(second < 4000, "rather than climbing to the ceiling the pane caps it at");
+
+  const content = await (await frameIn("#frame-host iframe")).evaluate(() =>
+    Math.max(document.body.scrollHeight, document.documentElement.offsetHeight));
+  ok(Math.abs(second - (content + 8)) <= 1,
+     `and it is the content's own height plus the margin (${content} + 8), measured on the `
+   + "body, whose box does not know the viewport");
+}
+
+console.log("\nU-116: a patch applies in the view it names, not in the view on screen");
+{
+  /* The report this answers: `revision 3 · presentational · applied in place'
+     over a page that had not changed. Two faults behind it, and this is the
+     first -- every instruction was applied against the SHOWING view's
+     section, so an insert destined for another view went into this one. */
+  // Read from inside the frame: its origin is opaque to the embedder, which
+  // is the whole of D-R and is asserted above.
+  ok((await page.evaluate(() => window.__twoValidation)).views.join(",") === "main,second",
+     "the document really has two element views");
+  const inViews = await frameIn("#views-host iframe");
+  const sections = () => inViews.evaluate(() => Array.from(
+    document.querySelectorAll(".dash-view")
+  ).map((s) => ({ view: s.getAttribute("data-view-name"),
+                  hidden: s.hasAttribute("hidden"),
+                  named: Array.from(s.querySelectorAll("[data-ui]"))
+                              .map((e) => e.getAttribute("data-ui")) })));
+  await inViews.waitForFunction(
+    () => document.querySelectorAll(".dash-view").length === 2, null, { timeout: 5000 });
+
+  const before = await sections();
+  ok(before.length === 2 && before[0].view === "main" && before[1].hidden,
+     "two views, the first showing and the second hidden");
+
+  const how = await page.evaluate(() => window.__insertIntoSecond());
+  ok(how.applied === "in-place", `the patch applied in place (${how.applied})`);
+
+  const after = await sections();
+  const main = after.find((s) => s.view === "main");
+  const second = after.find((s) => s.view === "second");
+  ok(second.named.includes("e-added"),
+     "the new element is in the view the patch named");
+  ok(!main.named.includes("e-added"),
+     "and NOT in the view that happened to be on screen — which is where it "
+     + "went before, silently, because a null parent resolved to one root for "
+     + "every view");
+
+  ok(how.here === 0 && how.elsewhere === 1,
+     `and the pane is told where it landed: ${how.here} here, ${how.elsewhere} elsewhere`);
+  ok((how.views || []).join(",") === "second",
+     "by name, so the reply can say which view to look at rather than reporting "
+     + "a change the reader cannot see as an unqualified success");
+}
+
+console.log("\na figure that drew nothing says so, where the figure is not");
+{
+  /* The report this answers: the page's own prose described a clustered bar
+     chart on a log axis, the legend named all three repositories, and there
+     was no chart.  Nothing threw, so nothing was reported, and the only
+     party who could see the omission was the reader. */
+  const blank = await frameIn("#blank-host iframe");
+  await blank.waitForFunction(
+    () => document.querySelectorAll('[data-derived] > .dash-blank').length >= 2,
+    null, { timeout: 5000 });
+
+  const read = async (name) => blank.evaluate((n) => {
+    const el = document.querySelector(`[data-derived="${n}"]`);
+    const note = el.querySelector(":scope > .dash-blank");
+    return { failed: el.hasAttribute("data-failed"), note: note ? note.textContent : null,
+             box: el.querySelector("svg")
+                    ? el.querySelector("svg").getBoundingClientRect().height : null };
+  }, name);
+
+  const ns = await read("wrongNamespace");
+  ok(ns.failed && /did not draw/.test(ns.note || ""),
+     "a renderer that built its SVG with createElement is caught, although it threw nothing "
+   + "and left an <svg> in the document");
+  ok(/HTML element, not an SVG one/.test(ns.note || "")
+     && /createElementNS/.test(ns.note || ""),
+     `and is told exactly what to do instead: "${(ns.note || "").slice(40, 130)}…"`);
+
+  const nan = await read("notANumber");
+  ok(nan.failed && /not a finite number/.test(nan.note || ""),
+     "a bar whose height came out NaN -- one log of zero on a log axis -- is caught too");
+  ok(/\(rect@[a-z]+=(NaN|-?Infinity)\)/.test(nan.note || ""),
+     `naming the first attribute that is not a number: "${(nan.note || "").slice(55, 110)}…"`);
+
+  const drew = await read("drawn");
+  ok(!drew.failed && drew.note === null && drew.box > 10,
+     "while the figure that drew is left alone");
+
+  const errs = await page.evaluate(() =>
+    (window.__blankEvents || []).filter((e) => e.type === "error").map((e) => e.where));
+  ok(errs.includes("render:wrongNamespace") && errs.includes("render:notANumber"),
+     "and both reach the pane as errors, which is what puts them in front of the repair loop "
+   + "instead of in front of nobody");
+  ok(!errs.includes("render:drawn"), "with nothing said about the one that worked");
+}
+
 console.log("\nthe pane: Gate 0 before anything is asked");
 {
   const pane = page.locator('[data-testid="dashboard-pane"]');
@@ -368,6 +686,11 @@ console.log("\nPhase 1 runs inside the grant, and Gate 1 reviews the set");
   ok(gate1.includes("outside knowledge"), "and which sentences nothing in the repository supports");
   ok((await page.locator('[data-testid="dashboard-run-panels"]').textContent()).includes("1 panel"),
      "and the button says how much will run");
+
+  const runLog = await page.locator('[data-testid="dashboard-pane"] '
+                                  + '[data-testid="dashboard-log"]').textContent();
+  ok(/tools · playwright\/test/.test(runLog),
+     "the run log names the repository that offered the tools, not just that some were offered");
 }
 
 /*
@@ -490,6 +813,25 @@ console.log("\nPhase 2 is the interface's own, and Gate 2 follows it");
      "and the catalogue was not written, because that box was not ticked");
   ok(await page.locator('[data-testid="dashboard-frame-holder"] iframe').count() === 1,
      "the page is mounted");
+
+  // REQ-23.2.6, through the pane rather than the frame on its own: the
+  // ledger the run built reaches the page it composed.  This is the half
+  // that cannot be tested by posting a summary in by hand -- it asserts that
+  // the pane kept the record of its own exchange and sent it.
+  {
+    const inside = await frameIn('[data-testid="dashboard-frame-holder"] iframe');
+    await inside.waitForFunction(
+      () => document.querySelector('[data-asserted] .dash-prov') !== null, null,
+      { timeout: 8000 });
+    const m = await inside.evaluate(() =>
+      document.querySelector('[data-asserted] .dash-prov').textContent);
+    const t = await inside.evaluate(() =>
+      document.querySelector('[data-asserted] .dash-prov').title);
+    ok(/by the model from \S/.test(m),
+       `and marked from the record the PANE kept of its own run: "${m}"`);
+    ok(/The interface put \d+ results? in front of the model/.test(t),
+       `with the sources it was shown, in order: "${t}"`);
+  }
   const sandbox = await page.locator('[data-testid="dashboard-frame-holder"] iframe')
                             .getAttribute("sandbox");
   ok(sandbox === "allow-scripts", "in the same frame the policy describes");
@@ -522,6 +864,131 @@ console.log("\nan answer cut off at the ceiling is reported as that, not as a re
   ok(/turn 1 of 2/.test(stale), "naming which turn it came from");
   ok(await page.locator(`${pane} [data-testid="dashboard-run-panels"]`).count() === 0,
      "and nothing is offered to run, because there is nothing to run");
+}
+
+console.log("\na store that offers nothing is named in the run log, with the reason");
+{
+  // Compose, not Ask: this pane keeps its own log and writes nothing to the
+  // exploration pane's transcript, so this log is the only place a reader
+  // could have found out which store was missing from the page.
+  await page.evaluate(() => { window.__truncate = false; window.__openPair(); });
+  // Addressed by its store, not by its id: a pane over several carries the
+  // other stores in the id, which is the pane's business and not the test's.
+  // The pane over several carries the other stores in its id, so it is
+  // addressed by that prefix rather than by the primary alone.
+  const pane = '[data-testid="dashboard-pane"][id^="dashboard-playwright-test-"]';
+  await page.locator(`${pane} [data-testid="dashboard-grant"]`).click();
+  await page.waitForFunction(
+    (sel) => /NOT READABLE/.test(
+      document.querySelector(`${sel} [data-testid="dashboard-log"]`)?.textContent || ""),
+    pane, { timeout: 8000 });
+
+  const log = await page.locator(`${pane} [data-testid="dashboard-log"]`).textContent();
+  ok(/tools · playwright\/refuses/.test(log),
+     "the store that offered nothing is named -- three stores used to print three identical lines");
+  ok(/Repository not found/.test(log),
+     "with the server's own words for why");
+  ok(/\[200\]/.test(log),
+     "and the status it answered with, which is why a server log shows nothing wrong");
+  ok(/tools · playwright\/test[^\n]*survey/.test(log),
+     "and the FIRST store -- the one the pane is named for -- has its tools too");
+}
+
+/*
+ * REQ-34.3.12.  The half of the prompt that was dropped.
+ *
+ * Live, 2026-11-20: a prompt asking for tables AND bar graphs produced three
+ * tables, and the user found out by re-reading their own question against the
+ * page.  The gate reviews what the model proposed; this is the one thing it
+ * can check the proposal against that nothing else in the pane holds -- the
+ * question it was an answer to.
+ */
+console.log("\na figure that was asked for and not drawn is said at the gate");
+{
+  await page.evaluate(() => { window.__truncate = false; window.__openChart(); });
+  const pane = '[data-testid="dashboard-pane"][id="dashboard-playwright-chart"]';
+  await page.locator(`${pane} [data-testid="dashboard-grant"]`).click();
+  await page.locator(`${pane} [data-testid="dashboard-no-figure"]`).waitFor({ timeout: 8000 });
+
+  const said = await page.locator(`${pane} [data-testid="dashboard-no-figure"]`).textContent();
+  ok(/draws none/.test(said), "the gate says the page draws nothing");
+  ok(/chart/.test(said), "quoting the word the request used");
+  ok(/may be right/.test(said),
+     "as a notice and not a refusal -- some results cannot carry a chart, "
+   + "and only the person who asked can say");
+  ok(await page.locator(`${pane} [data-testid="dashboard-run-panels"]`).count() === 1,
+     "and the page is still offered: nothing is blocked by this");
+
+  const list = `${pane} [data-testid="dashboard-exchange"]`;
+  ok(await page.locator(list).count() === 1,
+     "this pane too draws the exchange rather than summarising it");
+  ok(/sales by region, as a table and as a bar chart/.test(
+       await page.locator(list).textContent()),
+     "beginning with the prompt the run was started from");
+}
+
+console.log("\nREQ-23.2.6: the page is marked from the interface's record, not from the answer");
+{
+  /*
+   * The argument that retired the last version of this mark.
+   *
+   * A mark read out of the document is only as good as the model's
+   * bookkeeping about its own work, and it had already been wrong once in
+   * the worst possible way -- a chart and the paragraph under it, drawn from
+   * the same three panels, carrying contradictory provenances.  The fix is
+   * not better wording for a claim derived from `inputs'.  It is that the
+   * interface SENT the data: every row went out through the adapter on an
+   * event with its repository and digest attached, so the attribution is
+   * something the interface knows rather than something it is told.
+   */
+  const inside = await frameIn("#ledger-host iframe");
+  await inside.waitForFunction(
+    () => document.querySelector('[data-asserted="figure"] .dash-prov') !== null);
+
+  const prov = (id) => inside.evaluate((x) =>
+    document.querySelector('[data-asserted="' + x + '"] .dash-prov').textContent, id);
+  const title = (id) => inside.evaluate((x) =>
+    document.querySelector('[data-asserted="' + x + '"] .dash-prov').title, id);
+
+  const fig = await prov("figure");
+  ok(/drawn by the model from ns223, nsbrick/.test(fig),
+     `a figure is attributed to the repositories the INTERFACE read: "${fig}"`);
+  ok(!/nsmulti/.test(fig),
+     "and not to the store that refused -- an error message is not data from a store");
+  ok(!/nsonly/.test(fig),
+     "nor to one whose documentation was read and whose rows were not");
+
+  const un = await prov("unsourced");
+  ok(/drawn by the model from ns223, nsbrick/.test(un),
+     `a figure that declared NOTHING gets the same attribution, because the `
+   + `interface knows what it showed the model whether or not the model said so: "${un}"`);
+  ok(!/no source declared/.test(un) && !/not from this repository/.test(un),
+     "and carries no claim about where the content did not come from");
+  ok((await prov("lead")) === un.replace("drawn", "written"),
+     "the prose and the picture say the same thing about the same data -- which is "
+   + "the contradiction the reader saw, stated as it should have been");
+
+  const t = await title("figure");
+  ok(/r1 · ns223 · 34 rows/.test(t),
+     `the detail names each source, in the order it was read: "${t}"`);
+  ok(/1 call did not answer/.test(t), "including the one that did not");
+  ok(/names sales as what it was written against/.test(t),
+     "and `inputs' keeps its own, separate job: what the staleness check watches");
+  ok(/not marked when the data moves/.test(await title("unsourced")),
+     "which the figure that declared nothing is told it does not have");
+
+  ok(/Read from ns223, nsbrick\./.test(await inside.evaluate(() =>
+       document.querySelector(".dash-footer").textContent)),
+     "and the page's own footer says what it was built from");
+
+  // The third state: a page this interface holds no record for.
+  const other = await frameIn("#frame-host iframe");
+  ok(/no source declared/.test(await other.evaluate(() =>
+       document.querySelector('[data-asserted="outside"] .dash-prov').textContent)),
+     "a frame posted no ledger falls back to what the document declares");
+  ok(/No record of what the model was shown/.test(await other.evaluate(() =>
+       document.querySelector('[data-asserted="outside"] .dash-prov').title)),
+     "and says it holds no record -- which is not the same statement as `nothing was read'");
 }
 
 await browser.close();

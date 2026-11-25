@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="date" content="2026-11-08">
+    <meta name="date" content="2026-11-25">
     <title>Arrangement - Dydra Studio</title>
     <link rel="stylesheet" href="manual.css">
 </head>
@@ -30,8 +30,11 @@
                 <li><a href="#address">Addressing: what a sentence will change</a></li>
                 <li><a href="#asking">Asking for an arrangement</a></li>
                 <li><a href="#reply">What comes back</a></li>
-                <li><a href="#verbs">The four arrangement verbs</a></li>
-                <li><a href="#bands">The bands</a></li>
+                <li><a href="#verbs">The four arrangement verbs</a>
+                    <ul><li><a href="#destinations">Destinations — saying where it goes</a></li></ul></li>
+                <li><a href="#bands">The bands</a>
+                    <ul><li><a href="#regions">8.1 The parts of a pane</a></li>
+                        <li><a href="#results-pane">8.2 The results pane</a></li></ul></li>
                 <li><a href="#operations">Vocabulary: the operations</a></li>
                 <li><a href="#components">Vocabulary: the components</a></li>
                 <li><a href="#refused">What is refused, and why</a></li>
@@ -380,6 +383,10 @@ writing it up…</code></pre>
                 <tr><td><code>lift <em>presentation</em>#<em>element</em> as <em>name</em></code></td>
                     <td>keep one component of a page, with the requests behind it, under a
                         name</td></tr>
+                <tr><td><code>lift <em>presentation</em> as <em>name</em></code></td>
+                    <td>keep the <strong>whole</strong> page the same way — its
+                        arrangement, every request it makes, and the components it is made
+                        of</td></tr>
                 <tr><td><code>apply <em>name</em></code><br>
                         <code>apply <em>name</em> into <em>element</em></code></td>
                     <td>put a kept component into the thing being addressed</td></tr>
@@ -419,10 +426,12 @@ writing it up…</code></pre>
                     <td><code>mount</code>, <code>unmount</code>, <code>apply</code></td>
                     <td><code>lift</code> is accepted and then refused by whatever it
                         names: the six bands are <code>host</code> elements and a host is
-                        opaque — <code>`w-tabs' is a `host' element: it is opaque, and an
-                        arrangement cannot be lifted from inside one</code></td></tr>
+                        opaque. Lifting the chrome <em>whole</em> is refused too, and for
+                        the reason mounting one is — <code>a workspace: it arranges the
+                        interface's own bands, and a copy of it inside a page is a column
+                        of hosts with nothing registered to draw them</code></td></tr>
                 <tr><td>a <strong>presentation</strong> (a page in a pane)</td>
-                    <td><code>lift</code>, <code>apply</code></td>
+                    <td><code>lift</code> (a component or the whole page), <code>apply</code></td>
                     <td><code>mount</code> and <code>unmount</code>, and the refusal says
                         where to go: <code>a presentation is mounted in the workspace, not
                         in a page: the band is drawn and opened by the chrome, and this
@@ -433,6 +442,48 @@ writing it up…</code></pre>
             <p>A target that offers neither says so in its own words:
             <em>… cannot be rearranged from here</em>. A pane with nothing open in it
             answers <em>there is no page in this pane yet</em>.</p>
+
+            <h3>Finding the names</h3>
+
+            <p>A verb needs an element's <strong>anchor</strong> — <code>e-7k2m</code>,
+            <code>i-row</code>, <code>w-tabs</code> — and an anchor is minted, not chosen,
+            so the first question anyone has is where to read one. Three answers, in the
+            order you will want them:</p>
+
+            <ul>
+                <li><strong>Hover anything.</strong> Every addressable element carries its
+                name as an ordinary tooltip, at any moment, whether or not you are typing:
+                <em>predicate-statistics#e-7k2m · table, shows panel pmulti</em>. That is
+                the qualified name — what a <code>lift</code> takes — followed by what the
+                element is and what fills it.</li>
+                <li><strong>Start typing a verb.</strong> Then every element the verb could
+                take is outlined, and the one under the pointer carries its anchor and its
+                kind in its own border. An element the verb could <em>not</em> take says so,
+                in the words of the refusal you would otherwise have met after the
+                Enter.</li>
+                <li><strong>Click one.</strong> While the line is waiting for an element, a
+                press types that element's name at the caret and does nothing else — not
+                the tab, not the button, not the link that was under it.</li>
+            </ul>
+
+            <div class="note">
+                <strong>Three kinds of name look alike and are not alike.</strong> A tab
+                captioned <em>view pmulti</em> names a <strong>panel</strong> — a query and
+                its result, which <code>data-bound="pmulti"</code> points at and an
+                instruction changes. An <code>id</code> in a page's markup names a
+                <strong>region</strong>, which an instruction rewrites. Only an
+                <strong>anchor</strong> is an element, and only an anchor is what the four
+                verbs take. The tooltips say which you are looking at.
+            </div>
+
+            <p>A page that is still <strong>markup</strong> — which is what a composed page
+            is until something converts it — has no anchors at all. Its regions have ids and
+            nothing else, which is why they can read as nameless: a composite table with no
+            caption has no name on the screen because it has none in the document. Hovering
+            one says so, and says that the way to change it is an instruction. To make such
+            a page addressable by verbs, ask for its view to be written as elements, naming
+            them as you want to type them — otherwise they are minted and you will be
+            hovering to find out what they turned out to be.</p>
 
             <h3>lift — keeping a component</h3>
 
@@ -450,13 +501,48 @@ writing it up…</code></pre>
             which composes several. Naming the wrong page is refused with the right form
             spelled out.</p>
 
-            <p>Two refusals are worth knowing before you meet them. <strong>A whole
-            presentation cannot be lifted</strong> — <code>`inventory' names a whole
-            presentation; a whole presentation is mounted, not lifted</code> — and an
-            <strong>opaque element cannot be lifted from</strong>: <code>html</code> and
-            <code>host</code> elements have no inside the arrangement machinery can read.
-            Undoing a lift is forgetting it; nothing on the page changed, because a lift
-            is a read.</p>
+            <p>One refusal is worth knowing before you meet it: an <strong>opaque element
+            cannot be lifted from</strong>. <code>html</code> and <code>host</code> elements
+            have no inside the arrangement machinery can read, and the refusal names the
+            way out — the whole of such an element can be lifted, markup and all, by
+            leaving the <code>#element</code> off. Undoing a lift is forgetting it; nothing
+            on the page changed, because a lift is a read.</p>
+
+            <h3>lift — keeping a whole page</h3>
+
+            <p>Leave the <code>#element</code> off and the unit of reuse is the page:
+            <code>lift predicate-statistics as matrix</code>. It is the same verb and the
+            same catalogue entry, and it is there for the case one component could not
+            serve — a page arranged <em>as a whole</em>, a matrix of one row per
+            repository, say, is a shape you want again over three other repositories, and
+            lifting the row three times and rebuilding the grid by hand reproduces the
+            contents and loses the arrangement.</p>
+
+            <p>What travels is more than a component lift takes, and deliberately:</p>
+
+            <ul>
+                <li><strong>Every definition the page has</strong>, not the ones its
+                elements point at. A component lift walks the subtree for what it is bound
+                to; that walk cannot see inside an <code>html</code> carrier, which is
+                where a composed page's <code>data-bound</code> regions actually are. A
+                page's panels are its panels, so there is nothing to work out — and a
+                composite that reasoned the other way would arrive with the markup and
+                none of the queries.</li>
+                <li><strong>The components it declares.</strong> Same reason: a carrier
+                names its components inside the markup, where no walk will find them.</li>
+                <li><strong>Not the stylesheet, and not the page's own script.</strong> A
+                page's script is one of the four carriers of executable text that §20
+                withholds behind an admission, and an apply is not that path. What arrives
+                is structure and requests, which is what an arrangement has always meant.
+                The reply says so, so that a page arriving plainer than it left is not a
+                surprise.</li>
+            </ul>
+
+            <p>Two refusals, both narrow. A presentation of <strong>more than one
+            view</strong> is refused, naming them: a composite is placed as one element,
+            and three tabs flattened into one column is a different page — lift that view's
+            own root by its anchor instead, which is exact. And the <strong>workspace</strong>
+            is refused, as above.</p>
 
             <h3>apply — putting it somewhere</h3>
 
@@ -494,6 +580,51 @@ writing it up…</code></pre>
                 presentational and holds no data of its own, so there is normally nothing
                 to disclose, but an arrangement carrying requests is better applied to a
                 page, where you can see what it will ask for before it asks.
+            </div>
+
+            <h3 id="destinations">Destinations — saying where it goes</h3>
+
+            <p>Every verb that puts something somewhere takes a destination, and until
+            you give it one the destination is the thing the bar is <em>addressing</em>.
+            That is why an instruction that names another pane in its prose does not
+            reach it: a patch changes the addressed presentation and no other.</p>
+
+            <table>
+                <tr><th>Destination</th><th>Where it goes</th></tr>
+                <tr><td><em>(omitted)</em></td><td>the root of what is addressed</td></tr>
+                <tr><td><code>e-7k2m</code></td><td>that element of what is addressed</td></tr>
+                <tr><td><code>orders#e-7k2m</code></td><td>that element of <code>orders</code></td></tr>
+                <tr><td><code>orders#</code></td><td><code>orders</code> itself, at its root</td></tr>
+            </table>
+
+            <pre><code>apply stock-card to orders#e-7k2m
+apply stock-card to orders#
+mount census into chrome#w-content
+mount stats-matrix in results#</code></pre>
+
+            <p>The last of those names the <a href="#results-pane">results pane</a>, which
+            is what you reach for when a page you have composed should be kept beside other
+            results rather than left in the pane that made it.</p>
+
+            <div class="note">
+                <strong>The hash is not optional punctuation.</strong> An element anchor
+                and a presentation name are the same shape, so <code>to orders</code> is
+                an element called <code>orders</code> <em>here</em> — it always has been,
+                and it still is. Nothing in the word says which was meant, and guessing
+                where you wanted something put is the one thing an exact operation must
+                not do. A trailing hash reads as it does in a URL: that document, no
+                fragment.
+            </div>
+
+            <div class="note">
+                <strong>The destination has to be open.</strong> It is resolved against
+                what is addressable — the workspace and the panes you have open — and not
+                against the catalogue. An arrangement applied into a presentation nobody
+                is looking at would be written correctly and seen by no one, and the pane
+                holding it would go on showing the revision before. A destination that is
+                not open is refused with the line that opens it:
+                <em>there is nothing addressed as `orders' — try workspace, census —
+                `goto orders' opens it, and then the verb needs no destination</em>.
             </div>
 
             <h3>mount — including a whole presentation</h3>
@@ -640,6 +771,139 @@ writing it up…</code></pre>
                 components in <a href="#components">§10</a> are part of the vocabulary the
                 model is given; in the workspace they have no effect.
             </div>
+
+            <h3 id="regions">8.1 The parts of a pane</h3>
+
+            <p><code>content</code> is one band, and it holds every pane you have open.
+            Inside the pane you are looking at, the parts are hosts in their own right,
+            and they are arranged the same way: a grid, a template, and one rewrite of the
+            template to change it.</p>
+
+            <table>
+                <tr><th>Host</th><th>What it draws</th><th>Immutable</th></tr>
+                <tr><td><code>account:metadata</code></td><td>the account's own properties, and the panels that edit them</td><td>no</td></tr>
+                <tr><td><code>account:repositories</code></td><td>the account's repositories, as a list</td><td><strong>yes</strong></td></tr>
+                <tr><td><code>repository:metadata</code></td><td>the repository's properties, prefixes, collaborators and logs</td><td>no</td></tr>
+                <tr><td><code>repository:summary</code></td><td>the repository's summary and readme</td><td>no</td></tr>
+                <tr><td><code>repository:views</code></td><td>the view list</td><td><strong>yes</strong></td></tr>
+                <tr><td><code>repository:editors</code></td><td>the open views — their text, their results, and any pane mounted beside them</td><td><strong>yes</strong></td></tr>
+                <tr><td><code>view:editor</code></td><td>one view: its text and its results</td><td><strong>yes</strong></td></tr>
+                <tr><td><code>results:readings</code></td><td>results sent here from a view's own result tab, each as it was read and saying when</td><td><strong>yes</strong></td></tr>
+                <tr><td><code>results:presentations</code></td><td>presentations moved here — each by reference, drawn when it is opened</td><td>no</td></tr>
+            </table>
+
+            <p>Each kind of pane has its own arrangement, held as a separate view of the
+            same workspace presentation: <code>account-pane</code>,
+            <code>repository-pane</code>, <code>view-pane</code>,
+            <code>results-pane</code>. The anchors are
+            <code>r-repository-views</code> and so on, and the container is
+            <code>r-repository-pane</code>. Hover any of them with the bar open and the
+            name is in the border; hover one at any time and the name is in the tooltip.</p>
+
+            <p>Sentences that work:</p>
+
+            <pre><code>put the view list above the editors rather than beside them
+move the repository properties to the right-hand side
+hide the summary and give the editors the whole width
+in a view pane, nothing to arrange — there is one region</code></pre>
+
+            <div class="note">
+                <strong>A region is arranged for every pane of its kind.</strong>
+                <code>repository:views</code> is the view list of <em>every</em> repository
+                pane, not of one repository. There is deliberately no way to arrange one
+                repository differently from another: that would be a preferences store
+                with a presentation's name on it.
+            </div>
+
+            <div class="note">
+                <strong>A region cannot be lifted.</strong> It is a host, so
+                <code>lift</code> refuses it exactly as it refuses <code>content</code>.
+                What is inside a region is live — editors, fetched metadata, a results
+                table — and there is no definition of it to carry anywhere. Rearranging is
+                what the names are for.
+            </div>
+
+            <div class="note">
+                <strong>The pane is the boundary.</strong> The parts of one pane can be put
+                in any relation to each other. A part of the account pane cannot be put
+                beside a part of the repository pane: those are two panes, and only one of
+                them is on the screen at a time.
+            </div>
+
+            <h3 id="results-pane">8.2 The results pane</h3>
+
+            <p>The last kind in that table is not a page of the service. The
+            <strong>results pane</strong> is a station, reached by the <em>Results</em> tab
+            — the graph icon — in the left margin of whichever pane you are looking at, and
+            it holds the two things a reader keeps rather than reads once: readings sent out
+            of a view's own result tabs, and presentations moved there by name.</p>
+
+            <p>A repository pane has no results region, and the reason is worth stating
+            because it had one for a day. The result of running a view is in that view's
+            own result tabs and was never in question; a result that is <em>kept</em> is
+            kept to be compared — with readings from other repositories, and with
+            presentations composed somewhere else entirely. A destination scoped to one
+            repository cannot hold that, and a destination the width of a column cannot
+            hold what it does hold.</p>
+
+            <p>Both ways of putting something there name the pane rather than a place in
+            it:</p>
+
+            <pre><code>mount stats-matrix in results#
+unmount stats-matrix</code></pre>
+
+            <p>and a result is dragged from an editor onto the <em>Results</em> tab itself.
+            The tab and not the pane, because only one pane is displayed at a time: while
+            you are dragging out of an editor the results pane is hidden, and an element
+            that is not displayed has no layout box and can receive no drop. The tab is
+            always laid out, so the tab takes the drop and the pane comes forward to show
+            what landed.</p>
+
+            <p>That is why the tab is in the margin <em>strip</em> of every pane — beside
+            Profile, Configuration, Logs, Exploration — and not in the bar of tabs across
+            the top of the window. The drop has to be reachable from the pane the drag
+            starts in; and the bar at the top lists what is open, which this station is not.
+            The pane carries the same tab in a margin of its own, marked open: showing the
+            pane hides the one whose margin you pressed, so the way back has to be here.
+            That strip is the pane's chrome and no arrangement moves it — an arrangement
+            that could would be an arrangement that could strand you.</p>
+
+            <p>A band carries two controls. <strong>Open</strong> draws the presentation
+            where it is mounted, and nothing else can: expansion is an act outside the
+            document (§21.4.3). <strong>Download</strong> writes it to a file — the same
+            kind of file a composed page downloads to, and for the same reasons. The
+            file holds the presentation's own tree and its panels' own queries, it holds
+            no data because a mount has run nothing, and it holds no credential at all:
+            whoever opens it presses <em>Refresh</em>, types in a credential of their
+            own, and the queries run against the addresses the panels carry. Downloading
+            neither draws the presentation nor spends anything — it is the one way to
+            take a presentation out of this interface, since what the pane holds is a
+            reference that a reload forgets.</p>
+
+            <p>A kept reading carries the same control. Beside its <strong>Run</strong>,
+            which reads it again under this account's own credentials, each card carries
+            <strong>Download</strong>, and it writes that reading to the same kind of file:
+            the rows as they were read — all of them, where the pane draws the first two
+            hundred — the query that produced them, and no credential. A reading Run
+            refuses, because it kept no query or was taken with URL arguments this cannot
+            reproduce, travels with its rows and with no address at all, and says so on its
+            face rather than offering a Refresh that would answer a different question.
+            This is how a reading leaves a pane that keeps nothing past the page.</p>
+
+            <div class="note">
+                <strong>What is here is here for this page.</strong> A reading is a reading
+                and not a copy of a store; a presentation moved here is held by its name
+                and drawn only when you open it. Nothing is written to
+                <code>&lt;account&gt;/ui</code> by either gesture, no mount is claimed for
+                a band in this pane, and a reload empties it. The pane says so itself when
+                it is empty rather than leaving it to be discovered.
+            </div>
+
+            <p>Arranging it is like arranging any other pane — the readings and the
+            presentations are regions of one grid in the view <code>results-pane</code>:</p>
+
+            <pre><code>in the results pane, put the presentations above the readings
+give the readings a third of the height and the presentations the rest</code></pre>
 
             <h2 id="operations">9. Vocabulary: the operations</h2>
 
@@ -874,6 +1138,13 @@ writing it up…</code></pre>
             what arrangement uses; the rest address named parts of a document and are
             listed here so that a refusal naming one is legible.</p>
 
+            <p>Every element operation takes an optional <code>view</code> field naming
+            which view of the document it addresses. The workspace holds several — the
+            chrome's own, and one per kind of pane (<a href="#regions">§8.1</a>) — so a
+            patch that means to move a part of a pane must say
+            <code>"view": "repository-pane"</code>. With one view only, it may be left
+            out.</p>
+
             <p>The four verbs of <a href="#verbs">§7</a> are not in this table and are not
             patch operations. They are read by the bar, not written by a model, and what
             they produce is a patch — an <code>apply</code> is one patch and one
@@ -895,8 +1166,8 @@ writing it up…</code></pre>
                         never read</td></tr>
                 <tr><td><code>set-view</code>, <code>set-state</code></td>
                     <td>presentational</td>
-                    <td>accepted; little use — the chrome has one view per routed
-                        page</td></tr>
+                    <td>accepted; little use — the chrome has one view per routed page and
+                        one per kind of pane (<a href="#regions">§8.1</a>)</td></tr>
                 <tr><td><code>set-slot</code>, <code>append-slot</code></td>
                     <td>presentational</td>
                     <td>refused: <code>`set-slot' addresses view `main' as markup, but its
@@ -979,9 +1250,16 @@ writing it up…</code></pre>
                 <tr><td><code>lifted as `…' — N request(s) it will repeat, against
                         <em>account</em>/<em>repository</em></code></td>
                     <td>the component was kept, with the requests behind it</td></tr>
-                <tr><td><code>`…' names a whole presentation; a whole presentation is
-                        mounted, not lifted</code></td>
-                    <td>the name carried no <code>#element</code></td></tr>
+                <tr><td><code>lifted the whole of `…' as `…' — N element(s) and N
+                        request(s) it will repeat …</code></td>
+                    <td>the name carried no <code>#element</code>, so the whole page was
+                        kept (§33)</td></tr>
+                <tr><td><code>`…' has N views (`…', `…'); a composite is placed as one
+                        element …</code></td>
+                    <td>a whole-page lift of a presentation with tabs</td></tr>
+                <tr><td><code>`…' is a workspace: it arranges the interface's own bands,
+                        and a copy of it inside a page is a column of hosts …</code></td>
+                    <td>a whole-page lift of the chrome</td></tr>
                 <tr><td><code>`…' is a `host' element: it is opaque, and an arrangement
                         cannot be lifted from inside one</code></td>
                     <td>an <code>html</code> or <code>host</code> element has no inside to

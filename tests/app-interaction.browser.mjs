@@ -134,9 +134,16 @@ window.fetch = async (url, init = {}) => {
   }
   if (u.includes("/v1/messages")) {
     counts.llm += 1;
-    const say = (text) => json({ id: "m", type: "message", role: "assistant",
-      stop_reason: "end_turn", content: [{ type: "text", text }],
-      usage: { input_tokens: 5, output_tokens: 5 } });
+    const say = async (text) => {
+      // A turn that takes its time, so the thing the screen does WHILE it
+      // waits can be asserted rather than inferred.  The live complaint is
+      // about exactly this interval: one request, no events, and a status
+      // line that said "asking..." and then nothing for a minute.
+      if (window.__slow) await new Promise((r) => setTimeout(r, window.__slow));
+      return json({ id: "m", type: "message", role: "assistant",
+        stop_reason: "end_turn", content: [{ type: "text", text }],
+        usage: { input_tokens: 5, output_tokens: 5 } });
+    };
     if (window.__answer === "proposal") {
       return say("Two panels and a selector.\\n\\n\\\`\\\`\\\`dashboard\\n"
                + JSON.stringify(PROPOSAL) + "\\n\\\`\\\`\\\`");
@@ -506,6 +513,84 @@ console.log("\na patch that does not apply is refused whole and reported");
      "and says so, naming the operation");
   ok(await page.evaluate(() => window.__pane.document.revision === 5),
      "the document is still the revision it was: half a patch is not applied");
+}
+
+/*
+ * REQ-34.3.11.  What the screen does while a turn is in flight.
+ *
+ * The live complaint: "when it was working from the second prompt on the
+ * graphics there was no feedback that it was still working until it completed
+ * and displayed the result".  A revision is one request and one answer -- no
+ * tool calls, nothing to report in between -- so the interval the user sits
+ * through is exactly the interval that produced no events, and a status line
+ * that is written once at the start of it is indistinguishable from one that
+ * has stopped.
+ *
+ * So the assertion is made DURING the turn and not after it, with the answer
+ * delayed to make the interval long enough to look at.
+ */
+console.log("\na turn in flight says it is still working, and says what it is working on");
+{
+  await page.evaluate(() => { window.__answer = "presentation"; window.__slow = 2600; });
+  const asked = page.evaluate(() => window.__pane.revise("make the margin red when negative"));
+
+  // Counting, not spinning: the seconds are the part that proves the screen
+  // is still attached to a running turn rather than merely decorated.
+  await page.waitForFunction(
+    (sel) => /·\s*\d+s/.test(
+      document.querySelector(`${sel} [data-testid="dashboard-revise-status"]`)?.textContent || ""),
+    pane, { timeout: 8000 });
+  const mid = await page.locator(`${pane} [data-testid="dashboard-revise-status"]`).textContent();
+  ok(/·\s*\d+s/.test(mid), `the status counts the seconds while it waits: "${mid}"`);
+  // And says the true thing rather than the last finished one.  Every event a
+  // turn emits names something that has ALREADY happened, so a pane with
+  // nothing to show for the request itself left `reading the primer' on the
+  // screen for the whole of a thirty-second turn -- naming a read that had
+  // taken four milliseconds.
+  ok(/waiting for the model/.test(mid),
+     `and names what it is waiting on, not the last step that finished: "${mid}"`);
+
+  ok(await page.locator(`${pane} [data-testid="dashboard-exchange"]`).isVisible(),
+     "and the transcript is open, where the exchange will appear");
+  const live = await page.locator(`${pane} [data-testid="dashboard-exchange"]`).textContent();
+  ok(/revision asked for/.test(live),
+     "carrying what was asked, before there is any answer to show");
+
+  await asked;
+  await page.waitForFunction(
+    (sel) => !/·\s*\d+s/.test(
+      document.querySelector(`${sel} [data-testid="dashboard-revise-status"]`)?.textContent || ""),
+    pane, { timeout: 8000 });
+  const done = await page.locator(`${pane} [data-testid="dashboard-revise-status"]`).textContent();
+  ok(!/\d+s/.test(done) && done.trim().length > 0,
+     `and stops counting when the answer lands: "${done}"`);
+  await page.evaluate(() => { window.__slow = 0; });
+}
+
+/*
+ * REQ-34.3.10.  Compose shows the same transcript Ask shows.
+ *
+ * "The process started by the compose button did not display the same
+ * detailed transcript of the exchange between mcp and llm."  It did not: it
+ * had a log of one line per event and nothing to open.  The exchange list is
+ * the exploration pane's own module, so what is asserted here is that this
+ * pane is drawing it -- the model's turn with what was sent and what came
+ * back, each as its own disclosure.
+ */
+console.log("\nthe compose pane draws the exchange, not a summary of it");
+{
+  const list = `${pane} [data-testid="dashboard-exchange"]`;
+  ok(await page.locator(`${list} [data-testid="dashboard-exchange-1"]`).count() === 1,
+     "the first entry is the prompt that started the run");
+  ok(await page.locator(`${list} details.exp-x`).count() > 2,
+     "and every exchange after it is its own disclosure, as in the exploration pane");
+  const text = await page.locator(list).textContent();
+  ok(/tools\/list/.test(text), "the handshake is in it");
+  ok(/offered:/.test(text) && /withheld:/.test(text),
+     "with what was offered and what was withheld -- the log said only that some were");
+  ok(/sent to the model/.test(text),
+     "and the model's turn carries what was SENT, which no log line ever did");
+  ok(/turn 1/.test(text), "named by turn");
 }
 
 await browser.close();

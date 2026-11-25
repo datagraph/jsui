@@ -64,6 +64,16 @@ section("§11: a fault names a region, and the region names its source");
      "an assertion fault carries the sentence");
   ok(regionSource(doc, "page").source.includes("missing()"),
      "and a page fault carries the model's own script");
+  /* A figure that drew nothing is reported from the frame as `render:<name>'.
+     The renderer lives in the page's script, so that is what travels -- but
+     the region is named, because "the page's script reported" over a figure
+     that is simply absent sends the model looking for a throw. */
+  const r = regionSource(doc, "render:growth");
+  ok(r.kind === "script" && r.source.includes("missing()"),
+     "a renderer fault carries the page's own script, which is where a renderer is");
+  ok(/renderer for .growth./.test(r.label),
+     `and names the figure that did not draw: ${JSON.stringify(r.label)}`);
+
   ok(regionSource(doc, "transform:ghost") === null,
      "a fault naming something the document does not contain is null — the frame and the "
    + "document have come apart, and the answer is a rebuild rather than a repair");

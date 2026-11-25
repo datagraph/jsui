@@ -16,6 +16,13 @@ import { renderHistoryTable, renderCollaborationTable }
   from "../components/history-table.js";
 import { applyDeletionPermissions as stripDeletionControls }
   from "../components/deletion-controls.js";
+import { regionMarkup, regionArrangementOf } from "../../lib/app/regions.js";
+import { mountResultSheet } from "../components/result-sheet.js";
+import { mountResultsPane, resultsPaneMarkup, RESULTS_PANE_ID }
+  from "../components/results-pane.js";
+import { resultsMarginTab } from "../components/results-tab.js";
+import { bringPanelIntoView } from "../components/panel-scroll.js";
+import { runPanel } from "../../lib/dashboard/runner.js";
 
 export const errorMessages = () => `
   <div class="widget">
@@ -1967,20 +1974,15 @@ const renderPaneTabsBar = ({ tabs = [], avatarUrl = "" } = {}) => `
   </div>
 `;
 
-const renderAccountPane = ({ accountName, account, repos, config = {}, authToken = "", tracker = null }) => `
+const renderAccountPane = ({ accountName, account, repos, config = {}, authToken = "",
+                            tracker = null, regions = null }) => `
   <div id="${paneIdAccount(accountName)}" class="account-pane" data-account="${escapeHtml(accountName)}">
-    <div class="account-pane-layout">
-      <div class="account-pane-content">
-        ${renderAccountRepositories({ account, repos })}
-      </div>
-      ${renderAccountSidebar({
-        account,
-        accountName,
-        config,
-        authToken,
-        tracker,
-      })}
-    </div>
+    ${regionMarkup({ kind: "account", arrangement: regions, parts: {
+      metadata: renderAccountSidebar({ account, accountName, config, authToken, tracker }),
+      repositories: `<div class="account-pane-content">`
+                  + renderAccountRepositories({ account, repos })
+                  + `</div>`,
+    } })}
   </div>
 `;
 
@@ -2063,7 +2065,7 @@ const resolveRepositoryFieldValue = ({ fieldKey, defs, tracker, config, reposito
   return "";
 };
 
-const renderRepositoryPane = async (state, accountName, repositoryName) => {
+const renderRepositoryPane = async (state, accountName, repositoryName, regions = null) => {
   const account = await state.getAccount(accountName);
   const repository = await state.getRepository(accountName, repositoryName);
   // Check if tracker already has config to avoid duplicate fetch
@@ -2089,18 +2091,35 @@ const renderRepositoryPane = async (state, accountName, repositoryName) => {
   const sparqlUrl = `${host}/${encodedAccount}/${encodedRepository}/sparql`;
   const directDownloadUrl = `${host}/${encodedAccount}/${encodedRepository}.ttl`;
   const views = await fetchRepositoryViews(state, accountName, repositoryName, config);
-  return `
-    <div id="${paneIdRepository(accountName, repositoryName)}" class="repository-pane" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-class="${escapeHtml(classValue)}">
-      <div class="repository-pane-layout">
-        <div class="repository-pane-content">
+  // The pane's four parts, each built exactly as it was before U-115 and
+  // then handed to `regionMarkup' to be placed.  Nothing inside one has
+  // moved: `#repository-queries' still wraps the catalogue, `.view-editors'
+  // still holds the container the editors are appended to, and every handler
+  // that queries from the pane still finds what it queries for.  What is new
+  // is that the four are siblings of one grid instead of being nested in a
+  // content column and a sidebar, so the arrangement can put any of them
+  // anywhere (U-115).
+  const summaryRegion = `
           <div id="repository-detail">
             <div id="repository-summary">
               ${repository?.summary ? `<p>${escapeHtml(repository.summary)}</p>` : ""}
             </div>
           </div>
+          <div id="repository-about">
+            <h2>Readme</h2>
+            <div id="repository-markdown">
+              ${(() => {
+                const descriptionDef = defs.description;
+                const descriptionValue = descriptionDef ? resolveRepositoryFieldValue({ fieldKey: "description", defs, tracker, config, repository }) : null;
+                const descriptionText = descriptionValue ? (DISPLAY_TYPE_HANDLERS[descriptionDef?.type] || DISPLAY_TYPE_HANDLERS.text).format(descriptionValue) : "";
+                return descriptionText ? `<p>${escapeHtml(descriptionText)}</p>` : `<p>A description has not been added for this repository yet.</p>`;
+              })()}
+            </div>
+          </div>
+  `;
+  const viewsRegion = `
           <div id="repository-queries">
             <div class="block">
-              <div class="repository-views-layout">
                 <div class="query-catalog">
                   <h2 style="display: flex; align-items: center;">Views
                     <span style="margin-left: auto; display: flex; align-items: center; gap: 6px;">
@@ -2148,6 +2167,10 @@ const renderRepositoryPane = async (state, accountName, repositoryName) => {
                     `}
                   </div>
                 </div>
+            </div>
+          </div>
+  `;
+  const editorsRegion = `
                 <div class="view-editors">
                   <div class="view-editors-head" style="display: flex; justify-content: space-between; align-items: center;">
                     <div style="display: flex; align-items: center; gap: 8px;">
@@ -2204,21 +2227,8 @@ const renderRepositoryPane = async (state, accountName, repositoryName) => {
                   </div>
                   <div class="view-editors-container"></div>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div id="repository-about">
-            <h2>Readme</h2>
-            <div id="repository-markdown">
-              ${(() => {
-                const descriptionDef = defs.description;
-                const descriptionValue = descriptionDef ? resolveRepositoryFieldValue({ fieldKey: "description", defs, tracker, config, repository }) : null;
-                const descriptionText = descriptionValue ? (DISPLAY_TYPE_HANDLERS[descriptionDef?.type] || DISPLAY_TYPE_HANDLERS.text).format(descriptionValue) : "";
-                return descriptionText ? `<p>${escapeHtml(descriptionText)}</p>` : `<p>A description has not been added for this repository yet.</p>`;
-              })()}
-            </div>
-          </div>
-        </div>
+  `;
+  const metadataRegion = `
         <div class="repository-sidebar">
           <div class="repository-meta-tabs">
             <button type="button" class="manage-tab active" data-tab="profile" data-testid="repo-tab-profile" title="Profile"><img src="./images/database.svg" alt="Profile" width="16" height="16" /></button>
@@ -2227,6 +2237,12 @@ const renderRepositoryPane = async (state, accountName, repositoryName) => {
             <button type="button" class="manage-tab" data-tab="prefixes" data-testid="repo-tab-prefixes" title="Prefixes"><img src="./images/puzzle.svg" alt="Prefixes" width="16" height="16" /></button>
             <button type="button" class="manage-tab" data-tab="collaboration" data-testid="repo-tab-collaboration" title="Collaboration"><img src="./images/users.svg" alt="Collaboration" width="16" height="16" /></button>
             <button type="button" class="manage-tab" data-tab="logs" data-testid="repo-tab-logs" title="Logs"><img src="./images/logs.svg" alt="Logs" width="16" height="16" /></button>
+            <!-- Set apart, like the exploration tab in an account's strip and for
+                 the same reason: it selects no panel here, it shows the results
+                 pane (U-120).  It is in THIS strip because this is the pane the
+                 editors are in, so it is the tab a result tab can be dragged to
+                 while the editor is still in front of everything. -->
+            ${resultsMarginTab()}
           </div>
           <div class="repository-meta-panel active" data-panel="profile">
             ${profileKeys.map((fieldKey) => {
@@ -2402,9 +2418,101 @@ const renderRepositoryPane = async (state, accountName, repositoryName) => {
             </div>
           </div>
         </div>
-      </div>
+  `;
+  return `
+    <div id="${paneIdRepository(accountName, repositoryName)}" class="repository-pane" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-class="${escapeHtml(classValue)}">
+      ${regionMarkup({ kind: "repository", arrangement: regions, parts: {
+          metadata: metadataRegion,
+          summary: summaryRegion,
+          views: viewsRegion,
+          editors: editorsRegion,
+        } })}
     </div>
   `;
+};
+
+/**
+ * Read one of the sheet's queries again, under the account's own credentials
+ * (U-119).
+ *
+ * This is the whole of what the sheet needs and the whole of what it is
+ * given: a function that takes a store and a query and answers with the
+ * result.  The credential is read from the session for the account the
+ * reading came FROM, not from the pane it is being looked at in — they are
+ * the same account today, and a rule that happens to hold is not a rule.
+ *
+ * `runPanel' and not a fetch of its own: it already binds nothing it was not
+ * given, digests what came back, and refuses a 200 whose body does not
+ * answer the query.  A second implementation of that would disagree with the
+ * first the day either is corrected.
+ */
+const rereadForAccount = (app) => async ({ account, repository, query, view }) => {
+  const auth = app?.state?.getAuthContext?.(account) || {};
+  const token = app?.state?.getAuthToken?.(account) || null;
+  if (!auth.host) {
+    return { ok: false, error: `there is no signed-in session for \`${account}'` };
+  }
+  const out = await runPanel({
+    host: auth.host, account, repository, token,
+    panel: { name: view || "result", query,
+             accept: "application/sparql-results+json" },
+  });
+  if (!out.ok) return { ok: false, error: out.error || `HTTP ${out.status}` };
+  let results = null;
+  try { results = JSON.parse(out.text); }
+  catch (e) { return { ok: false, error: `the answer was not results JSON: ${String(e)}` }; }
+  return { ok: true, results, ms: out.ms, revision: out.revision || null };
+};
+
+/**
+ * The host a reading's account is signed in to, for a download (U-123).
+ *
+ * The same lookup the re-read makes and for the same reason: the address a
+ * kept reading would ask at again is the one its own account is open on,
+ * not the one the pane it is being looked at in happens to use.  Null where
+ * there is no session for it, and the file is then built without an address
+ * rather than with a guessed one.
+ */
+const hostForAccount = (app) => (account) =>
+  app?.state?.getAuthContext?.(account)?.host || null;
+
+/**
+ * The arrangement one kind of pane is to be drawn with (U-115).
+ *
+ * Read from the App's held workspace rather than from the store: the
+ * workspace is read once per render and a pane that re-draws on its own --
+ * after a save, after a view is opened -- must get the same arrangement as
+ * the one beside it, not a second read that could answer differently.  With
+ * no App and no workspace this answers the build's own arrangement, which is
+ * what every test and every page that does not read the store gets.
+ */
+const paneArrangement = (app, kind) =>
+  regionArrangementOf(app?.workspace?.document || null, { kind });
+
+/**
+ * The results pane, present and wired (U-120).
+ *
+ * Called from everywhere a pane is drawn or re-drawn, because the pane is a
+ * station rather than a page: it is not routed to, it is not re-rendered
+ * with the repository it holds readings from, and the one thing it must be
+ * is THERE — a drop target that has to be opened before it can be dropped on
+ * is the defect this replaces.
+ *
+ * It is created only once an account is open.  With nobody signed in there
+ * is nothing that can be read and so nothing that can be kept, and a tab
+ * that leads to a pane saying as much is worse than no tab.
+ */
+const ensureResultsPane = (app) => {
+  if (!app || typeof document === "undefined") return null;
+  if (!app.state?.listOpenAccounts?.().length) return null;
+  const container = document.getElementById("content-container");
+  if (container && !document.getElementById(RESULTS_PANE_ID)) {
+    const tmp = document.createElement("div");
+    tmp.innerHTML = resultsPaneMarkup({ arrangement: paneArrangement(app, "results") });
+    const pane = tmp.firstElementChild;
+    if (pane) container.appendChild(pane);
+  }
+  return mountResultsPane(app, { run: rereadForAccount(app), hostFor: hostForAccount(app) });
 };
 
 const paneIdAccount = (accountName) => `tab-account-${accountName.replace(/[^a-z0-9_-]/gi, "-")}`;
@@ -2421,6 +2529,11 @@ const buildGlobalTabs = async (state, { includeInfo = false } = {}) => {
   tabs.push({ id: "tab-login", label: "Login", location: `${BASE_PATH}/login`, showAside: false });
 
   const accountNames = state.listOpenAccounts();
+  /* No tab here for the results pane.  This bar lists what is OPEN — one
+     entry per account, repository and view — and a station that is always
+     there would sit in it claiming to be a document.  Its tab is in each
+     pane's own left margin, beside the other things a pane can be asked to
+     show, which is also where a drag can reach it (U-120). */
   for (const accountName of accountNames) {
     const account = await state.getAccount(accountName);
     const label = escapeHtml(account?.friendlyId || accountName);
@@ -2482,7 +2595,7 @@ const buildGlobalTabs = async (state, { includeInfo = false } = {}) => {
   return tabs;
 };
 
-const buildAccountPanes = async (state) => Promise.all(
+const buildAccountPanes = async (state, app = null) => Promise.all(
   state.listOpenAccounts().map(async (accountName) => {
     const account = await state.getAccount(accountName);
     const repos = await fetchAccountRepositories(state, accountName);
@@ -2495,29 +2608,32 @@ const buildAccountPanes = async (state) => Promise.all(
       config,
       authToken: state.getAuthToken(accountName) || "",
       tracker,
+      regions: paneArrangement(app, "account"),
     });
   })
 );
 
-const buildRepositoryPanes = async (state) => Promise.all(
+const buildRepositoryPanes = async (state, app = null) => Promise.all(
   state.listOpenRepositories().map(({ accountName, repositoryName }) =>
-    renderRepositoryPane(state, accountName, repositoryName)
+    renderRepositoryPane(state, accountName, repositoryName, paneArrangement(app, "repository"))
   )
 );
 
-const renderViewPane = (state, accountName, repositoryName, viewName) => {
+const renderViewPane = (state, accountName, repositoryName, viewName, regions = null) => {
   return `
     <div id="${paneIdView(accountName, repositoryName, viewName)}" class="view-pane" data-account="${escapeHtml(accountName)}" data-repository="${escapeHtml(repositoryName)}" data-view="${escapeHtml(viewName)}">
-      <div class="view-pane-content">
-        <div id="sparql-editor-container-${escapeHtml(accountName)}-${escapeHtml(repositoryName)}-${escapeHtml(viewName)}"></div>
-      </div>
+      ${regionMarkup({ kind: "view", arrangement: regions, parts: {
+        editor: `<div class="view-pane-content">`
+              + `<div id="sparql-editor-container-${escapeHtml(accountName)}-${escapeHtml(repositoryName)}-${escapeHtml(viewName)}"></div>`
+              + `</div>`,
+      } })}
     </div>
   `;
 };
 
-const buildViewPanes = async (state) => Promise.all(
+const buildViewPanes = async (state, app = null) => Promise.all(
   state.listOpenViews().map(({ accountName, repositoryName, viewName }) =>
-    renderViewPane(state, accountName, repositoryName, viewName)
+    renderViewPane(state, accountName, repositoryName, viewName, paneArrangement(app, "view"))
   )
 );
 
@@ -2804,6 +2920,7 @@ export const openAccountPane = async (app, accountName) => {
       config,
       authToken: app.state.getAuthToken(accountName) || "",
       tracker,
+      regions: paneArrangement(app, "account"),
     });
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = paneHtml;
@@ -2813,6 +2930,7 @@ export const openAccountPane = async (app, accountName) => {
     // 4. Initialize account pane handlers
     attachAccountSidebarHandlers(app);
     initializePaneEditing(app);
+    ensureResultsPane(app);
     
     // 5. Activate the new pane's tab (this will hide all other panes including intro)
     app.activateTab(`#${paneId}`);
@@ -2843,7 +2961,8 @@ export const openRepositoryPane = async (app, accountName, repositoryName) => {
     // This ensures that if a view was deleted directly on the service, it won't appear
     invalidateRepositoryConfigCache(app.state, accountName, repositoryName);
     // Re-render the pane with fresh data
-    const paneHtml = await renderRepositoryPane(app.state, accountName, repositoryName);
+    const paneHtml = await renderRepositoryPane(app.state, accountName, repositoryName,
+                                               paneArrangement(app, "repository"));
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = paneHtml;
     const newPane = tempDiv.firstElementChild;
@@ -2851,6 +2970,7 @@ export const openRepositoryPane = async (app, accountName, repositoryName) => {
     // Re-initialize handlers for the new pane
     attachAccountSidebarHandlers(app);
     initializePaneEditing(app);
+    ensureResultsPane(app);
     // Activate the tab
     app.activateTab(`#${paneId}`);
     return;
@@ -2942,7 +3062,8 @@ export const openRepositoryPane = async (app, accountName, repositoryName) => {
   // 2. Create the pane element and add it to the content container
   const contentContainer = document.getElementById("content-container");
   if (contentContainer) {
-    const paneHtml = await renderRepositoryPane(app.state, accountName, repositoryName);
+    const paneHtml = await renderRepositoryPane(app.state, accountName, repositoryName,
+                                               paneArrangement(app, "repository"));
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = paneHtml;
     const newPane = tempDiv.firstElementChild;
@@ -2951,6 +3072,7 @@ export const openRepositoryPane = async (app, accountName, repositoryName) => {
     // 3. Initialize repository pane handlers
     attachAccountSidebarHandlers(app);
     initializePaneEditing(app);
+    ensureResultsPane(app);
     
     // 4. Activate the new pane's tab (this will hide all other panes including login)
     app.activateTab(`#${paneId}`);
@@ -3103,7 +3225,8 @@ export const openViewPane = async (app, accountName, repositoryName, viewName, d
   // 2. Create the pane element and add it to the content container
   const contentContainer = document.getElementById("content-container");
   if (contentContainer) {
-    const paneHtml = renderViewPane(app.state, accountName, repositoryName, baseViewName);
+    const paneHtml = renderViewPane(app.state, accountName, repositoryName, baseViewName,
+                                    paneArrangement(app, "view"));
     const tempDiv = document.createElement("div");
     tempDiv.innerHTML = paneHtml;
     const newPane = tempDiv.firstElementChild;
@@ -3379,8 +3502,11 @@ const initializePaneEditing = (app) => {
   document.querySelectorAll(".repository-pane").forEach((pane) => {
     // Update IPs tab state on initial load
     updateIPsTabState(pane);
-    
-    pane.querySelectorAll(".repository-sidebar .manage-tab").forEach((tab) => {
+
+    /* `.results-tab' is excluded for the reason `.exploration-tab' is in the
+       account's strip below: it selects no panel here, it shows the results
+       pane, and letting the switcher see it would blank the sidebar. */
+    pane.querySelectorAll(".repository-sidebar .manage-tab:not(.results-tab)").forEach((tab) => {
       tab.addEventListener("click", () => {
         // Don't allow clicking disabled tabs
         if (tab.disabled) return;
@@ -3763,7 +3889,7 @@ const initializePaneEditing = (app) => {
         console.log("[ViewEditor] createEditorPanel called for view", viewSlug, "(display:", viewDisplayName, ")");
         if (openViews.has(viewSlug)) {
           const existing = openViews.get(viewSlug);
-          existing.scrollIntoView({ behavior: "smooth", block: "start" });
+          bringPanelIntoView(existing);
           return;
         }
         const wrapper = document.createElement("div");
@@ -3854,9 +3980,9 @@ const initializePaneEditing = (app) => {
           app.editorInstances.set(repoEditorId, editorApi);
         }
         // The editor exists now, so the wrapper finally has a height and the
-        // pane can be scrolled to it.  Scrolling at `appendChild' scrolls to
-        // an empty div and lands short of where the editor ends up.
-        wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
+        // column can be scrolled to it.  Scrolling at `appendChild' scrolls
+        // to an empty div and lands short of where the editor ends up.
+        bringPanelIntoView(wrapper);
       };
 
       const getDragAfterElement = (containerEl, y) => {
@@ -3872,9 +3998,13 @@ const initializePaneEditing = (app) => {
       };
 
       container.addEventListener("dragover", (event) => {
-        event.preventDefault();
+        // Only an editor being reordered.  `preventDefault' before this check
+        // made the editors column a valid destination for EVERY drag,
+        // including a result tab on its way to the sheet -- which it would
+        // then accept and do nothing with (U-117, corrected).
         const dragging = container.querySelector(".view-editor.dragging");
         if (!dragging) return;
+        event.preventDefault();
         const afterElement = getDragAfterElement(container, event.clientY);
         if (!afterElement) {
           container.appendChild(dragging);
@@ -4866,6 +4996,9 @@ const renderAccountSidebar = ({ account, accountName, containerId = "", config =
                it (§34.4).  The triple is the mark: three nodes and the edges
                between them, which is what is being explored. -->
           <button type="button" class="manage-tab exploration-tab" data-account="${escapeHtml(accountName)}" data-testid="account-tab-exploration" title="Exploration — ask a model across your repositories"><img src="./images/explore.svg" alt="Exploration" width="16" height="16" /></button>
+          <!-- And the results pane, set apart for the same reason (U-120).  The
+               graph is a reading drawn, which is what is kept behind it. -->
+          ${resultsMarginTab()}
         </div>
         <div class="manage-tab-content">
           <div class="tab-panel active" data-panel="profile">
@@ -5172,7 +5305,7 @@ const attachAccountSidebarHandlers = (app) => {
     // `.exploration-tab' is excluded: it selects no panel in this sidebar, it
     // opens a pane in the column beside it, and letting the panel switcher see
     // it would blank the sidebar every time it was pressed.
-    pane.querySelectorAll(".account-sidebar .manage-tab:not(.exploration-tab):not([data-handler-bound])").forEach((tab) => {
+    pane.querySelectorAll(".account-sidebar .manage-tab:not(.exploration-tab):not(.results-tab):not([data-handler-bound])").forEach((tab) => {
       tab.dataset.handlerBound = "true";
       tab.addEventListener("click", async () => {
         const target = tab.getAttribute("data-tab");
@@ -5357,9 +5490,9 @@ export class HomePage extends BasePage {
     const loginContent = buildLoginContent(this.state);
     const hasOpenAccounts = this.state.listOpenAccounts().length > 0;
 
-    const accountPanes = await buildAccountPanes(this.state);
-    const repositoryPanes = await buildRepositoryPanes(this.state);
-    const viewPanes = await buildViewPanes(this.state);
+    const accountPanes = await buildAccountPanes(this.state, this.context?.app);
+    const repositoryPanes = await buildRepositoryPanes(this.state, this.context?.app);
+    const viewPanes = await buildViewPanes(this.state, this.context?.app);
     // Include intro pane only if not logged in (no open accounts)
     // After auth, the intro tab is hidden and only login + account tabs remain
     return `
@@ -5378,6 +5511,7 @@ export class HomePage extends BasePage {
     await setupInlineLogin(app);
     attachAccountSidebarHandlers(app);
     initializePaneEditing(app);
+    ensureResultsPane(app);
     initializeViewPanes(app);
   }
 
@@ -5410,8 +5544,8 @@ export class LoginPage extends BasePage {
     console.log("[LoginPage] renderContent() called");
     const { navLinks, session } = this.context || {};
     const loginContent = buildLoginContent(this.state);
-    const accountPanes = await buildAccountPanes(this.state);
-    const repositoryPanes = await buildRepositoryPanes(this.state);
+    const accountPanes = await buildAccountPanes(this.state, this.context?.app);
+    const repositoryPanes = await buildRepositoryPanes(this.state, this.context?.app);
     
     // Build info pane (intro content) - always render it
     const navigation = new NavigationView();
@@ -5517,7 +5651,7 @@ export class LoginPage extends BasePage {
     const isLoggedIn = this.state.session?.isLoggedIn();
     const hasOpenAccounts = this.state.listOpenAccounts().length > 0;
     
-    const viewPanes = await buildViewPanes(this.state);
+    const viewPanes = await buildViewPanes(this.state, this.context?.app);
     // Include intro pane only if not logged in (no open accounts)
     // After auth, the intro tab is hidden and only login + account tabs remain
     return `
@@ -5540,6 +5674,7 @@ export class LoginPage extends BasePage {
     await setupInlineLogin(app);
     attachAccountSidebarHandlers(app);
     initializePaneEditing(app);
+    ensureResultsPane(app);
     initializeViewPanes(app);
   }
 
@@ -5712,9 +5847,9 @@ export class AccountRoute extends BasePage {
     const account = await this.state.getAccount(this.params.account_name);
     const repos = await fetchAccountRepositories(this.state, this.params.account_name);
     this.state.addOpenAccount(this.params.account_name);
-    const accountPanes = await buildAccountPanes(this.state);
-    const repositoryPanes = await buildRepositoryPanes(this.state);
-    const viewPanes = await buildViewPanes(this.state);
+    const accountPanes = await buildAccountPanes(this.state, this.context?.app);
+    const repositoryPanes = await buildRepositoryPanes(this.state, this.context?.app);
+    const viewPanes = await buildViewPanes(this.state, this.context?.app);
     const loginContent = buildLoginContent(this.state);
     // Login pane is always available so users can authenticate additional accounts
     // It starts hidden and is shown when user clicks the Login tab
@@ -5737,6 +5872,7 @@ export class AccountRoute extends BasePage {
     await setupInlineLogin(app);
     attachAccountSidebarHandlers(app);
     initializePaneEditing(app);
+    ensureResultsPane(app);
     initializeViewPanes(app);
   }
 
@@ -5977,9 +6113,9 @@ export class RepositoryRoute extends BasePage {
     const { account_name, repository_name } = this.params;
     this.state.addOpenAccount(account_name);
     this.state.addOpenRepository(account_name, repository_name);
-    const accountPanes = await buildAccountPanes(this.state);
-    const repositoryPanes = await buildRepositoryPanes(this.state);
-    const viewPanes = await buildViewPanes(this.state);
+    const accountPanes = await buildAccountPanes(this.state, this.context?.app);
+    const repositoryPanes = await buildRepositoryPanes(this.state, this.context?.app);
+    const viewPanes = await buildViewPanes(this.state, this.context?.app);
     // Login pane is available for additional account authentication, starts hidden
     return `
       <div id="tab-login" class="pane" style="display:none">${buildLoginContent(this.state)}</div>
@@ -6060,7 +6196,7 @@ export class RepositoryRoute extends BasePage {
         const baseViewName = ensureBaseViewName(view.friendlyId);
         if (openViews.has(view.friendlyId)) {
           const existing = openViews.get(view.friendlyId);
-          existing.scrollIntoView({ behavior: "smooth", block: "start" });
+          bringPanelIntoView(existing);
           return;
         }
         const wrapper = document.createElement("div");
@@ -6149,9 +6285,9 @@ export class RepositoryRoute extends BasePage {
           app.editorInstances.set(repoEditorId, editorApi);
         }
         // The editor exists now, so the wrapper finally has a height and the
-        // pane can be scrolled to it.  Scrolling at `appendChild' scrolls to
-        // an empty div and lands short of where the editor ends up.
-        wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
+        // column can be scrolled to it.  Scrolling at `appendChild' scrolls
+        // to an empty div and lands short of where the editor ends up.
+        bringPanelIntoView(wrapper);
       };
 
       const getDragAfterElement = (containerEl, y) => {
@@ -6167,9 +6303,13 @@ export class RepositoryRoute extends BasePage {
       };
 
       container.addEventListener("dragover", (event) => {
-        event.preventDefault();
+        // Only an editor being reordered.  `preventDefault' before this check
+        // made the editors column a valid destination for EVERY drag,
+        // including a result tab on its way to the sheet -- which it would
+        // then accept and do nothing with (U-117, corrected).
         const dragging = container.querySelector(".view-editor.dragging");
         if (!dragging) return;
+        event.preventDefault();
         const afterElement = getDragAfterElement(container, event.clientY);
         if (!afterElement) {
           container.appendChild(dragging);
@@ -6657,6 +6797,7 @@ export class RepositoryRoute extends BasePage {
     }
     attachAccountSidebarHandlers(app);
     initializePaneEditing(app);
+    ensureResultsPane(app);
     initializeViewPanes(app);
   }
 
@@ -7013,9 +7154,9 @@ export class ViewRoute extends BasePage {
     this.state.addOpenView(accountName, repositoryName, viewName);
     
     // Build panes including view panes
-    const accountPanes = await buildAccountPanes(this.state);
-    const repositoryPanes = await buildRepositoryPanes(this.state);
-    const viewPanes = await buildViewPanes(this.state);
+    const accountPanes = await buildAccountPanes(this.state, this.context?.app);
+    const repositoryPanes = await buildRepositoryPanes(this.state, this.context?.app);
+    const viewPanes = await buildViewPanes(this.state, this.context?.app);
     const loginContent = buildLoginContent(this.state);
     
     // Login pane is available for additional account authentication, starts hidden
@@ -7075,6 +7216,7 @@ export class ViewRoute extends BasePage {
     // Also initialize account sidebar handlers and pane editing for repository panes
     attachAccountSidebarHandlers(app);
     initializePaneEditing(app);
+    ensureResultsPane(app);
   }
 }
 

@@ -307,13 +307,76 @@ function createSparqlEditor(config) {
         tabButton.style.cssText = 'background: #007bff; color: white; border: none; padding: 4px 8px; border-radius: 4px 4px 0 0; cursor: pointer; font-size: 12px; margin-right: 2px; display: flex; align-items: center; gap: 4px;';
 
         // Avoid nested button inside button to preserve drag behavior
-        tabButton.innerHTML = '<span>' + timestamp + '</span><span class="close-tab" style="display:inline-block; color: white; cursor: pointer; padding: 0; margin-left: 4px; font-size: 14px; line-height: 1; user-select: none;" title="Close Tab">×</span>';
+        tabButton.innerHTML = '<span>' + timestamp + '</span>'
+            + '<span class="send-tab" style="display:inline-block; color: white; cursor: pointer; padding: 0; margin-left: 4px; font-size: 13px; line-height: 1; user-select: none;" title="Send this reading to the Results pane (the graph icon in the left margin)">\u2192</span>'
+            + '<span class="close-tab" style="display:inline-block; color: white; cursor: pointer; padding: 0; margin-left: 4px; font-size: 14px; line-height: 1; user-select: none;" title="Close Tab">×</span>';
         
         // Add event listeners (like client.js)
+        /* The payload, built in one place for the two ways of sending it.
+           It was written inline in `dragstart' and there was nowhere else
+           that could send a result, because the drop zone it named has never
+           existed in this tree (U-117). */
+        function resultPayload() {
+            var rootDialog = null;
+            try {
+                var root = panel && panel.closest ? panel.closest('[id^="view-dialog-"]') : null;
+                rootDialog = root ? root.id : null;
+            } catch (_) {}
+            return {
+                type: 'result-sheet',
+                viewName: viewName,
+                accountName: accountName,
+                repositoryName: repositoryName,
+                timestamp: Date.now(),
+                tabId: tabId,
+                tab: tab,
+                urlArguments: tab.urlArguments || '',
+                dialogId: rootDialog,
+                key: 'view:' + accountName + '/' + repositoryName + '/' + viewName
+            };
+        }
+
+        /* The sheet, which is in the results pane and nowhere else (U-120).
+           It was looked for in THIS repository pane, because that is where a
+           band of it was put for a day; what is kept is kept to be compared
+           with readings from other repositories, so there is one sheet for
+           the interface and the reading carries the account and repository
+           it came from. */
+        function resultsTabLink() {
+            /* The Results tab in the left margin of the pane that is in front.
+               There is one per pane -- this repository's strip, the account's,
+               the station's own -- and the others are inside panes that are
+               `display:none', so they have no layout box and could neither be
+               dropped on nor seen to light up. */
+            var tabs = document.querySelectorAll('[data-results-tab]');
+            for (var i = 0; i < tabs.length; i++) {
+                if (tabs[i].offsetParent !== null) return tabs[i];
+            }
+            return tabs.length ? tabs[0] : null;
+        }
+        function sheetHandle() {
+            var found = document.querySelector('#tab-results [data-result-sheet]');
+            return found && found.parentElement ? found.parentElement.__resultSheet || null : null;
+        }
+        /* The pane is hidden while the editor is in front, so what landed has
+           to be said where the reader is looking: the tab lights, and its
+           count -- kept by the pane itself -- goes up. */
+        function markResultsTab() {
+            var tab = resultsTabLink();
+            if (!tab) return;
+            tab.classList.add('took');
+            setTimeout(function () { tab.classList.remove('took'); }, 1200);
+        }
+
         tabButton.addEventListener('click', function(e) {
             if (e.target.classList.contains('close-tab')) {
                 e.stopPropagation();
                 closeTab(tabId);
+            } else if (e.target.classList.contains('send-tab')) {
+                e.stopPropagation();
+                var sheet = sheetHandle();
+                if (sheet) { sheet.add(resultPayload()); markResultsTab(); }
+                else { console.warn('[editor] there is no results pane to send this to'); }
             } else {
                 activateTab(tabId);
             }
@@ -329,25 +392,7 @@ function createSparqlEditor(config) {
         tabButton.addEventListener('dragstart', function(e) {
             e.stopPropagation();
             console.log('🚚 [editor] dragstart on tab', { tabId: tabId, hasDataTransfer: !!e.dataTransfer });
-            var rootDialog = null;
-            try {
-                // panel is the container/div or dialog; find nearest dialog id
-                var root = panel && panel.closest ? panel.closest('[id^="view-dialog-"]') : null;
-                rootDialog = root ? root.id : null;
-            } catch (_) {}
-            var dragData = {
-                type: 'result-sheet',
-                viewName: viewName,
-                accountName: accountName,
-                repositoryName: repositoryName,
-                timestamp: Date.now(),
-                tabId: tabId,
-                tab: tab,
-                urlArguments: tab.urlArguments || '',
-                dialogId: rootDialog,
-                key: `view:${accountName}/${repositoryName}/${viewName}`
-                // No dialog id here; external handler can use these fields
-            };
+            var dragData = resultPayload();
             if (e.dataTransfer) {
                 e.dataTransfer.effectAllowed = 'copy';
                 try {
@@ -359,17 +404,20 @@ function createSparqlEditor(config) {
             } else {
                 console.warn('⚠️ [editor] No dataTransfer on dragstart');
             }
-            var dropZone = document.getElementById('result-sheet-drop-zone');
-            if (dropZone) {
-                dropZone.classList.add('drag-active');
-                console.log('🎯 [editor] Drop zone activated from tab drag');
-            }
+            /* What is lit is the TAB: the pane behind it is hidden, and an
+               element with no layout box is not a drop target. */
+            var lit = resultsTabLink();
+            if (lit) lit.classList.add('drag-active');
         });
         tabButton.addEventListener('drag', function() {
             console.log('🚚 [editor] dragging tab', { tabId: tabId });
         });
         tabButton.addEventListener('dragend', function(e) {
-            console.log('🧲 [editor] dragend on tab', { tabId: tabId, dropEffect: e.dataTransfer ? e.dataTransfer.dropEffect : undefined });
+            // The highlight goes out whether or not the drop landed: a sheet
+            // left lit after a drag that went nowhere reads as a sheet that
+            // took something.
+            var litEnd = resultsTabLink();
+            if (litEnd) litEnd.classList.remove('drag-active');
         });
 
         // Add to tabs list

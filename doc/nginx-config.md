@@ -49,6 +49,21 @@ This document describes the nginx configuration needed to serve the JSUI applica
 
 ## Why `no-cache` on `/ui/`
 
+**Deployed 2026-11-22.** Verified against nl4: the header is served on nested
+paths as well as the top of the tree, and a conditional `GET` carrying the
+`ETag` answers `304 Not Modified`, so the steady-state cost is a few hundred
+bytes per file per load.
+
+One caveat for anyone who met the failure before the change: a stored response
+keeps the freshness it was stored **with**, so a browser that cached `/ui/`
+under the old headers goes on using those copies until the heuristic lifetime
+runs out. One hard reload (or clearing the site's data) flushes them, and
+ordinary loads suffice from then on. Closing the tab never helped — the HTTP
+cache is shared across tabs and survives a restart — and a normal reload
+revalidates the top-level document but not its subresources, which is why a
+reload that looked like it should have fixed it did not.
+
+
 Without it nginx sends no `Cache-Control` and no `Expires` at all, only
 `Last-Modified` and an `ETag`. A browser given no instruction applies
 **heuristic freshness** — roughly a tenth of the file's age when it was cached

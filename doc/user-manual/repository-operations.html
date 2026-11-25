@@ -1,574 +1,432 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Repository Operations - Dydra Studio User Manual</title>
-    <link rel="stylesheet" href="manual.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Repository Operations — Dydra Studio</title>
+<meta name="description" content="This chapter tells you how to create a repository, edit its metadata, import and export data, manage collaborators, and delete a repository.">
+<meta name="date" content="2026-11-21">
+<link rel="stylesheet" href="tschichold.css" type="text/css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Repository Operations</h1>
-        </div>
-    </header>
-
-    <div class="container">
-        <nav>
-            <a href="index.html">← Back to Manual Home</a>
-            <a href="account-operations.html">← Previous: Account Operations</a>
-            <a href="view-operations.html">Next: View Operations →</a>
-        </nav>
-
-        <div class="content">
-            <h2>Overview</h2>
-            <p>This section covers all operations related to managing repositories, including creating repositories, editing repository metadata, importing and exporting data, managing collaborators, and deleting repositories.</p>
-
-            <h2>Creating a Repository</h2>
-            <p>To create a new repository in your account:</p>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to your account page by clicking on your account name in the navigation.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Click the <strong>New Repository</strong> button (usually located in the repositories section or in the account sidebar).
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                A dialog will appear prompting you to enter a repository name. Enter a unique name for your repository. Optionally, you may also select a repository type:
-                <ul>
-                    <li><strong>lmdb</strong>: Standard LMDB repository (default)</li>
-                    <li><strong>lmdb-revisioned</strong>: Revisioned LMDB repository that supports version history</li>
-                </ul>
-            </div>
-
-            <div class="float-left">
-            <img src="images/repository-creation-dialog.png" alt="Repository creation dialog with name entered">
-            <p class="image-caption">Figure 1: Repository creation dialog with repository name entered</p>
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Click <strong>OK</strong> or press <kbd>Enter</kbd> to create the repository.
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                The repository will be created and you will be automatically navigated to the repository page.
-            </div>
-
-            <div class="note">
-                <strong>Note:</strong> Repository names must be unique within your account. The name can contain letters, numbers, hyphens, and underscores.
-            </div>
-
-            <h2>Viewing Repository Information</h2>
-            <p>When you navigate to a repository, you will see:</p>
-            <ul>
-                <li>Repository name and summary</li>
-                <li>Description and abstract</li>
-                <li>Homepage URL</li>
-                <li>Quad count (number of RDF statements)</li>
-                <li>Disk size</li>
-                <li>License information</li>
-                <li>Import status</li>
-                <li>List of views (SPARQL queries)</li>
-            </ul>
-
-            <h2>Editing Repository Metadata</h2>
-            <p>You can edit various repository metadata fields to provide information about your repository.</p>
-
-            <h3>Editable Fields</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Field</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>homepage</code></td>
-                        <td>URL to the repository's homepage</td>
-                    </tr>
-                    <tr>
-                        <td><code>summary</code></td>
-                        <td>Brief summary of the repository</td>
-                    </tr>
-                    <tr>
-                        <td><code>description</code></td>
-                        <td>Detailed description of the repository</td>
-                    </tr>
-                    <tr>
-                        <td><code>abstract</code></td>
-                        <td>Abstract or overview of the repository</td>
-                    </tr>
-                    <tr>
-                        <td><code>privacy_setting</code></td>
-                        <td>Privacy setting (e.g., "private", "public")</td>
-                    </tr>
-                    <tr>
-                        <td><code>permissible_ip_addresses</code></td>
-                        <td>List of IP addresses allowed to access the repository (one per line)</td>
-                    </tr>
-                    <tr>
-                        <td><code>prefixes</code></td>
-                        <td>RDF namespace prefixes (one per line)</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h3>How to Edit Repository Metadata</h3>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to the repository page you want to edit.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Locate the field you want to edit in the repository information section.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                Double-click on the field value to enter edit mode. The field will become an editable input field.
-            </div>
-
-            <div class="float-right">
-            <img src="images/repository-metadata-editing.png" alt="Repository metadata field in edit mode">
-            <p class="image-caption">Figure 2: Repository metadata field in edit mode with new value entered</p>
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Enter or modify the value in the input field.
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                Press <kbd>Enter</kbd> or click outside the field to save the change locally.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 6:</span>
-                Click the <strong>Save</strong> button (usually located in the tab bar) to persist your changes to the server.
-            </div>
-
-            <div class="float-left">
-            <img src="images/repository-save-button.png" alt="Repository page with Save button highlighted">
-            <p class="image-caption">Figure 3: Repository page showing the Save button in the tab bar</p>
-            </div>
-            <div class="clear"></div>
-
-            <div class="note">
-                <strong>Note:</strong> The application tracks only the fields you have edited. When you click Save, only the modified fields are sent to the server.
-            </div>
-
-            <h2>Importing Data</h2>
-            <p>You can import RDF data into your repository from local files or remote URLs.</p>
-
-            <h3>Supported File Formats</h3>
-            <p>The following file formats are supported for import:</p>
-            <ul>
-                <li><strong>Turtle</strong> (.ttl)</li>
-                <li><strong>RDF/XML</strong> (.rdf, .xml)</li>
-                <li><strong>N-Triples</strong> (.nt)</li>
-                <li><strong>N-Quads</strong> (.nq)</li>
-                <li><strong>TriG</strong> (.trig)</li>
-                <li><strong>JSON-LD</strong> (.jsonld, .json)</li>
-                <li><strong>CSV</strong> (.csv)</li>
-            </ul>
-
-            <h3>Importing from a Local File</h3>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to the repository where you want to import data.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Click the <strong>Import</strong> button (usually located in the repository actions area).
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                Select <strong>File Upload</strong> or <strong>Choose File</strong> option.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Browse and select the file you want to import from your computer.
-            </div>
-
-            <div class="float-right">
-            <img src="images/dataset-import-file-selected.png" alt="Dataset import dialog with file selected">
-            <p class="image-caption">Figure 4: Dataset import dialog with file selected, ready to import</p>
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                The file format will be auto-detected based on the file extension.
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="step">
-                <span class="step-number">Step 6:</span>
-                Click <strong>Import</strong> or <strong>Upload</strong> to start the import process.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 7:</span>
-                Monitor the import progress. You will see a success message when the import completes.
-            </div>
-
-            <h3>Importing from a URL</h3>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to the repository where you want to import data.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Click the <strong>Import</strong> button.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                Select <strong>URL Import</strong> or enter a URL in the import dialog.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Enter the URL of the RDF data you want to import.
-            </div>
-
-            <div class="float-left">
-            <img src="images/dataset-import-url-entered.png" alt="Dataset import dialog with URL entered">
-            <p class="image-caption">Figure 5: Dataset import dialog with URL entered, ready to import</p>
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                Optionally specify the content type if it cannot be auto-detected.
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="step">
-                <span class="step-number">Step 6:</span>
-                Click <strong>Import</strong> to start the import process.
-            </div>
-
-            <div class="note">
-                <strong>Note:</strong> Large imports may take some time. The application supports asynchronous imports, which allow you to continue working while the import processes in the background.
-            </div>
-
-            <h2>Exporting Data</h2>
-            <p>You can export your repository data in various RDF formats.</p>
-
-            <h3>Supported Export Formats</h3>
-            <p>The following formats are available for export:</p>
-            <ul>
-                <li><strong>Turtle</strong> (.ttl)</li>
-                <li><strong>N-Triples</strong> (.nt)</li>
-                <li><strong>RDF/XML</strong> (.rdf)</li>
-                <li><strong>JSON-LD</strong> (.jsonld)</li>
-                <li><strong>TriG</strong> (.trig)</li>
-                <li><strong>CSV</strong> (.csv)</li>
-                <li><strong>Graphviz</strong> (.gv)</li>
-            </ul>
-
-            <h3>How to Export Data</h3>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to the repository you want to export.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Click the <strong>Export</strong> button (usually located in the repository actions area).
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                Select the desired export format from the dropdown menu.
-            </div>
-
-            <div class="float-left">
-            <img src="images/dataset-export-format-selected.png" alt="Dataset export dialog with format selected">
-            <p class="image-caption">Figure 5: Dataset export dialog with export format selected, ready to export</p>
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Click <strong>Export</strong> or <strong>Download</strong>.
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                The file will be downloaded to your computer with the appropriate file extension.
-            </div>
-
-            <div class="note">
-                <strong>Note:</strong> You can also use the direct download URL provided on the repository page to download the data in Turtle format directly.
-            </div>
-
-            <h2>Managing Collaborators</h2>
-            <p>You can add other users as collaborators to your repository, giving them read or write access.</p>
-
-            <h3>Adding a Collaborator</h3>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to the repository where you want to add a collaborator.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Find the <strong>Collaboration</strong> section (usually in a tab or sidebar).
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                Click <strong>Add Collaborator</strong> or a similar button.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Enter the collaborator's account name or username.
-            </div>
-
-            <div class="float-right">
-            <img src="images/collaborator-addition-form.png" alt="Collaborator addition form with values entered">
-            <p class="image-caption">Figure 6: Collaborator addition form with account name and permission level selected</p>
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                Select the permission level:
-                <ul>
-                    <li><strong>Read:</strong> The collaborator can view and query the repository</li>
-                    <li><strong>Write:</strong> The collaborator can modify data and views in the repository</li>
-                </ul>
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="step">
-                <span class="step-number">Step 6:</span>
-                Click <strong>Add</strong> or <strong>Save</strong>.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 7:</span>
-                Click the <strong>Save</strong> button in the tab bar to persist the collaboration changes.
-            </div>
-
-            <h3>Collaboration Best Practices</h3>
-            <div class="note">
-                <p><strong>Best Practices for Managing Collaborators:</strong></p>
-                <ul>
-                    <li><strong>Grant minimal permissions:</strong> Only grant the permissions necessary for the collaborator's role</li>
-                    <li><strong>Review collaborators regularly:</strong> Periodically review and remove collaborators who no longer need access</li>
-                    <li><strong>Use read-only for sharing:</strong> Grant read-only access when you want to share data without allowing modifications</li>
-                    <li><strong>Document permissions:</strong> Keep track of why each collaborator has access and what they're working on</li>
-                </ul>
-            </div>
-
-            <h3>Removing a Collaborator</h3>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to the repository's collaboration section.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Find the collaborator you want to remove in the collaborators list.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                Click the <strong>Delete</strong> or <strong>Remove</strong> button (usually represented by a trash icon) next to the collaborator's name.
-            </div>
-
-            <div class="float-right">
-            <img src="images/collaborator-removal-confirmation.png" alt="Collaborator removal confirmation dialog">
-            <p class="image-caption">Figure 7: Collaborator removal confirmation dialog</p>
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Confirm the removal if prompted.
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                Click the <strong>Save</strong> button in the tab bar to persist the changes.
-            </div>
-
-            <h3>Editing Collaborator Permissions</h3>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to the repository's collaboration section.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Find the collaborator whose permissions you want to change.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                Click on the permission level (Read/Write) to edit it, or use an edit button if available.
-            </div>
-
-            <div class="float-left">
-            <img src="images/collaborator-permission-editing.png" alt="Collaborator permission editing with new permission selected">
-            <p class="image-caption">Figure 8: Collaborator permission editing with new permission level selected</p>
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Select the new permission level.
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                Click the <strong>Save</strong> button in the tab bar to persist the changes.
-            </div>
-
-            <h2>Clearing Repository Data</h2>
-            <p>You can clear all data from a repository, removing all triples while keeping the repository structure.</p>
-
-            <div class="warning">
-                <strong>Warning:</strong> Clearing repository data is irreversible. All RDF data in the repository will be permanently deleted. This action cannot be undone.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to the repository you want to clear.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Find the <strong>Clear</strong> or <strong>Clear Repository</strong> button (usually in the repository actions area).
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                Click the button. A confirmation dialog will appear.
-            </div>
-
-            <div class="float-right">
-            <img src="images/repository-clear-confirmation.png" alt="Repository clear confirmation dialog">
-            <p class="image-caption">Figure 9: Repository clear confirmation dialog with warning message</p>
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Read the warning message carefully.
-            </div>
-
-            <div class="clear"></div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                If you are sure you want to proceed, confirm the action.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 6:</span>
-                Wait for the operation to complete. You will see a success message when finished.
-            </div>
-
-            <h2>Deleting a Repository</h2>
-            <p>You can permanently delete a repository and all its data.</p>
-
-            <div class="warning">
-                <strong>Warning:</strong> Deleting a repository is permanent and irreversible. All data, views, and settings will be permanently removed. This action cannot be undone.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 1:</span>
-                Navigate to the repository you want to delete.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 2:</span>
-                Find the <strong>Delete Repository</strong> button (usually in the repository actions area or settings).
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 3:</span>
-                Click the button. A confirmation dialog will appear.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 4:</span>
-                Read the warning message carefully. You may be asked to type the repository name to confirm.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 5:</span>
-                If you are absolutely sure you want to proceed, confirm the deletion.
-            </div>
-
-            <div class="step">
-                <span class="step-number">Step 6:</span>
-                The repository will be deleted and you will be redirected to your account page.
-            </div>
-
-            <h2>Troubleshooting</h2>
-            <h3>Import Failures</h3>
-            <p>If an import fails:</p>
-            <ul>
-                <li>Check that the file format is supported</li>
-                <li>Verify that the file is valid RDF data</li>
-                <li>Check your internet connection (for URL imports)</li>
-                <li>Ensure you have write permissions for the repository</li>
-                <li>Check the error message for specific details</li>
-            </ul>
-
-            <h3>Export Issues</h3>
-            <p>If you have trouble exporting:</p>
-            <ul>
-                <li>Verify that the repository contains data</li>
-                <li>Try a different export format</li>
-                <li>Check your browser's download settings</li>
-                <li>Ensure you have read permissions for the repository</li>
-            </ul>
-
-            <h2>Next Steps</h2>
-            <p>After managing your repositories, you can:</p>
-            <ul>
-                <li>Create and execute <a href="view-operations.html">SPARQL views</a> to query your data</li>
-                <li>Import additional datasets</li>
-                <li>Manage repository settings and metadata</li>
-                <li>See <a href="tips-and-best-practices.html">Tips and Best Practices</a> for helpful tips and troubleshooting</li>
-                <li>Refer to the <a href="appendices.html">Appendices</a> for file formats and keyboard shortcuts</li>
-            </ul>
-        </div>
+<div class="container">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Graph Database · Triple Store · User Manual</div>
+      <div class="wordmark"><a href="index.html">dydra (1.2)</a></div>
     </div>
-    <script src="manual.js"></script>
+    <div class="meta">User manual<br>Repository Operations</div>
+  </header>
+
+  <section class="title">
+    <div class="rail"><div class="vlabel">chapter</div></div>
+    <div class="content">
+      <p class="chapno">Dydra Studio · user manual · 03</p>
+      <h1>Repository Operations</h1>
+      <p class="lede">This chapter tells you how to create a repository, edit its metadata, import and export data, manage collaborators, and delete a repository.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="create-a-repository">
+    <div class="rail"><div class="numeral">01</div><div class="vlabel">create a repository</div></div>
+    <div class="content">
+      <h2>Create a Repository</h2>
+      <p>To create a repository in your account:</p>
+      <p class="step">Step 1</p>
+      <p>Open your account page: click your account name in the navigation.</p>
+      <p class="step">Step 2</p>
+      <p>Click <strong>New Repository</strong>, in the repositories section or the account sidebar.</p>
+      <p class="step">Step 3</p>
+      <p>A dialog asks for a repository name. Give it one no other repository in the account holds. You may also choose a type:</p>
+      <ul>
+      <li><strong>lmdb</strong>: Standard LMDB repository (default)</li>
+      <li><strong>lmdb-revisioned</strong>: Revisioned LMDB repository that supports version history</li>
+      </ul>
+      <div class="figure">
+      <img src="images/repository-creation-dialog.png" alt="Repository creation dialog with name entered">
+      <p class="caption">Figure 1: Repository creation dialog with repository name entered</p>
+      </div>
+      <p class="step">Step 4</p>
+      <p>Click <strong>OK</strong> or press <kbd>Enter</kbd> to create the repository.</p>
+      <p class="step">Step 5</p>
+      <p>The service creates the repository and opens its page.</p>
+      <div class="admonition note">
+      <p class="admonition-title">Note</p>
+      <p>a repository name must be unique within your account. It may hold letters, numbers, hyphens, and underscores.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section heavy" id="read-repository-information">
+    <div class="rail"><div class="numeral">02</div><div class="vlabel">read repository information</div></div>
+    <div class="content">
+      <h2>Read Repository Information</h2>
+      <p>Open a repository and you see:</p>
+      <ul>
+      <li>Repository name and summary</li>
+      <li>Description and abstract</li>
+      <li>Homepage URL</li>
+      <li>Quad count (number of RDF statements)</li>
+      <li>Disk size</li>
+      <li>License information</li>
+      <li>Import status</li>
+      <li>List of views (SPARQL queries)</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section heavy" id="edit-repository-metadata">
+    <div class="rail"><div class="numeral">03</div><div class="vlabel">edit repository metadata</div></div>
+    <div class="content">
+      <h2>Edit Repository Metadata</h2>
+      <p>Edit the metadata fields to say what the repository holds.</p>
+      <h3>Fields You Can Edit</h3>
+      <div class="tablewrap">
+      <table class="docutils">
+      <thead>
+      <tr>
+      <th>Field</th>
+      <th>Description</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><code>homepage</code></td>
+      <td>URL to the repository's homepage</td>
+      </tr>
+      <tr>
+      <td><code>summary</code></td>
+      <td>Brief summary of the repository</td>
+      </tr>
+      <tr>
+      <td><code>description</code></td>
+      <td>Detailed description of the repository</td>
+      </tr>
+      <tr>
+      <td><code>abstract</code></td>
+      <td>Abstract or overview of the repository</td>
+      </tr>
+      <tr>
+      <td><code>privacy_setting</code></td>
+      <td>Privacy setting (e.g., "private", "public")</td>
+      </tr>
+      <tr>
+      <td><code>permissible_ip_addresses</code></td>
+      <td>The IP addresses that may reach the repository, one per line</td>
+      </tr>
+      <tr>
+      <td><code>prefixes</code></td>
+      <td>RDF namespace prefixes (one per line)</td>
+      </tr>
+      </tbody>
+      </table>
+      </div>
+      <h3>How to Edit a Field</h3>
+      <p class="step">Step 1</p>
+      <p>Open the repository page you want to edit.</p>
+      <p class="step">Step 2</p>
+      <p>Find the field you want to edit in the repository information section.</p>
+      <p class="step">Step 3</p>
+      <p>Double-click the field value. The field turns into an input box.</p>
+      <div class="figure">
+      <img src="images/repository-metadata-editing.png" alt="Repository metadata field in edit mode">
+      <p class="caption">Figure 2: Repository metadata field in edit mode with new value entered</p>
+      </div>
+      <p class="step">Step 4</p>
+      <p>Type the new value, or change what is there.</p>
+      <p class="step">Step 5</p>
+      <p>Press <kbd>Enter</kbd>, or click outside the field, to hold the change locally.</p>
+      <p class="step">Step 6</p>
+      <p>Click <strong>Save</strong>, in the tab bar, to write your changes to the server.</p>
+      <div class="figure">
+      <img src="images/repository-save-button.png" alt="Repository page with Save button highlighted">
+      <p class="caption">Figure 3: Repository page showing the Save button in the tab bar</p>
+      </div>
+      <div class="admonition note">
+      <p class="admonition-title">Note</p>
+      <p>the application tracks only the fields you touched. Save sends those fields alone.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section heavy" id="import-data">
+    <div class="rail"><div class="numeral">04</div><div class="vlabel">import data</div></div>
+    <div class="content">
+      <h2>Import Data</h2>
+      <p>Import RDF data into your repository from a local file or a remote URL.</p>
+      <h3>File Formats You Can Import</h3>
+      <p>Import any of these:</p>
+      <ul>
+      <li><strong>Turtle</strong> (.ttl)</li>
+      <li><strong>RDF/XML</strong> (.rdf, .xml)</li>
+      <li><strong>N-Triples</strong> (.nt)</li>
+      <li><strong>N-Quads</strong> (.nq)</li>
+      <li><strong>TriG</strong> (.trig)</li>
+      <li><strong>JSON-LD</strong> (.jsonld, .json)</li>
+      <li><strong>CSV</strong> (.csv)</li>
+      </ul>
+      <h3>Import From a Local File</h3>
+      <p class="step">Step 1</p>
+      <p>Open the repository you want to import into.</p>
+      <p class="step">Step 2</p>
+      <p>Click <strong>Import</strong>, in the repository actions area.</p>
+      <p class="step">Step 3</p>
+      <p>Choose <strong>File Upload</strong> or <strong>Choose File</strong>.</p>
+      <p class="step">Step 4</p>
+      <p>Find the file on your computer and select it.</p>
+      <div class="figure">
+      <img src="images/dataset-import-file-selected.png" alt="Dataset import dialog with file selected">
+      <p class="caption">Figure 4: Dataset import dialog with file selected, ready to import</p>
+      </div>
+      <p class="step">Step 5</p>
+      <p>The dialog reads the format from the file extension.</p>
+      <p class="step">Step 6</p>
+      <p>Click <strong>Import</strong> or <strong>Upload</strong> to start.</p>
+      <p class="step">Step 7</p>
+      <p>Watch the progress. The application reports success when the import finishes.</p>
+      <h3>Import From a URL</h3>
+      <p class="step">Step 1</p>
+      <p>Open the repository you want to import into.</p>
+      <p class="step">Step 2</p>
+      <p>Click <strong>Import</strong>.</p>
+      <p class="step">Step 3</p>
+      <p>Choose <strong>URL Import</strong>, or type a URL into the import dialog.</p>
+      <p class="step">Step 4</p>
+      <p>Type the URL of the RDF data you want.</p>
+      <div class="figure">
+      <img src="images/dataset-import-url-entered.png" alt="Dataset import dialog with URL entered">
+      <p class="caption">Figure 5: Dataset import dialog with URL entered, ready to import</p>
+      </div>
+      <p class="step">Step 5</p>
+      <p>Name the content type, if the dialog cannot read it from the URL.</p>
+      <p class="step">Step 6</p>
+      <p>Click <strong>Import</strong> to start.</p>
+      <div class="admonition note">
+      <p class="admonition-title">Note</p>
+      <p>a large import takes time. It runs in the background, so carry on working while it does.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section heavy" id="export-data">
+    <div class="rail"><div class="numeral">05</div><div class="vlabel">export data</div></div>
+    <div class="content">
+      <h2>Export Data</h2>
+      <p>Export your repository in any of several RDF formats.</p>
+      <h3>Formats You Can Export</h3>
+      <p>Choose one of these:</p>
+      <ul>
+      <li><strong>Turtle</strong> (.ttl)</li>
+      <li><strong>N-Triples</strong> (.nt)</li>
+      <li><strong>RDF/XML</strong> (.rdf)</li>
+      <li><strong>JSON-LD</strong> (.jsonld)</li>
+      <li><strong>TriG</strong> (.trig)</li>
+      <li><strong>CSV</strong> (.csv)</li>
+      <li><strong>Graphviz</strong> (.gv)</li>
+      </ul>
+      <h3>How to Export</h3>
+      <p class="step">Step 1</p>
+      <p>Open the repository you want to export.</p>
+      <p class="step">Step 2</p>
+      <p>Click <strong>Export</strong>, in the repository actions area.</p>
+      <p class="step">Step 3</p>
+      <p>Choose a format from the dropdown.</p>
+      <div class="figure">
+      <img src="images/dataset-export-format-selected.png" alt="Dataset export dialog with format selected">
+      <p class="caption">Figure 5: Dataset export dialog with export format selected, ready to export</p>
+      </div>
+      <p class="step">Step 4</p>
+      <p>Click <strong>Export</strong> or <strong>Download</strong>.</p>
+      <p class="step">Step 5</p>
+      <p>The browser downloads the file, under the extension its format calls for.</p>
+      <div class="admonition note">
+      <p class="admonition-title">Note</p>
+      <p>the repository page also carries a direct download URL, which hands you the data in Turtle.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section heavy" id="manage-collaborators">
+    <div class="rail"><div class="numeral">06</div><div class="vlabel">manage collaborators</div></div>
+    <div class="content">
+      <h2>Manage Collaborators</h2>
+      <p>Add other users as collaborators on your repository, and grant each one read or write access.</p>
+      <h3>Add a Collaborator</h3>
+      <p class="step">Step 1</p>
+      <p>Open the repository you want to share.</p>
+      <p class="step">Step 2</p>
+      <p>Find the <strong>Collaboration</strong> section, in a tab or the sidebar.</p>
+      <p class="step">Step 3</p>
+      <p>Click <strong>Add Collaborator</strong>.</p>
+      <p class="step">Step 4</p>
+      <p>Type the collaborator's account name.</p>
+      <div class="figure">
+      <img src="images/collaborator-addition-form.png" alt="Collaborator addition form with values entered">
+      <p class="caption">Figure 6: Collaborator addition form with account name and permission level selected</p>
+      </div>
+      <p class="step">Step 5</p>
+      <p>Choose the permission level:</p>
+      <ul>
+      <li><strong>Read:</strong> the collaborator reads and queries the repository</li>
+      <li><strong>Write:</strong> the collaborator also changes its data and its views</li>
+      </ul>
+      <p class="step">Step 6</p>
+      <p>Click <strong>Add</strong> or <strong>Save</strong>.</p>
+      <p class="step">Step 7</p>
+      <p>Click <strong>Save</strong>, in the tab bar, to write the collaboration changes to the server.</p>
+      <h3>How to Share Well</h3>
+      <div class="admonition note">
+      <p class="admonition-title">Note</p>
+      <p><strong>Four rules worth keeping:</strong></p>
+      <ul>
+      <li><strong>Grant the least that works.</strong> Give only what the collaborator's role needs.</li>
+      <li><strong>Review the list.</strong> Go through it from time to time and remove anyone who no longer needs access.</li>
+      <li><strong>Share read-only.</strong> Grant read when you want someone to see the data but not change it.</li>
+      <li><strong>Write down why.</strong> Record what each collaborator is working on and why they hold access.</li>
+      </ul>
+      </div>
+      <h3>Remove a Collaborator</h3>
+      <p class="step">Step 1</p>
+      <p>Open the repository's collaboration section.</p>
+      <p class="step">Step 2</p>
+      <p>Find the collaborator in the list.</p>
+      <p class="step">Step 3</p>
+      <p>Click <strong>Delete</strong> or <strong>Remove</strong> — the trash icon — beside the name.</p>
+      <div class="figure">
+      <img src="images/collaborator-removal-confirmation.png" alt="Collaborator removal confirmation dialog">
+      <p class="caption">Figure 7: Collaborator removal confirmation dialog</p>
+      </div>
+      <p class="step">Step 4</p>
+      <p>Confirm the removal, if the application asks.</p>
+      <p class="step">Step 5</p>
+      <p>Click <strong>Save</strong>, in the tab bar, to write the change to the server.</p>
+      <h3>Change a Collaborator's Permissions</h3>
+      <p class="step">Step 1</p>
+      <p>Open the repository's collaboration section.</p>
+      <p class="step">Step 2</p>
+      <p>Find the collaborator whose permissions you want to change.</p>
+      <p class="step">Step 3</p>
+      <p>Click the permission level — Read or Write — or the edit button beside it.</p>
+      <div class="figure">
+      <img src="images/collaborator-permission-editing.png" alt="Collaborator permission editing with new permission selected">
+      <p class="caption">Figure 8: Collaborator permission editing with new permission level selected</p>
+      </div>
+      <p class="step">Step 4</p>
+      <p>Choose the new level.</p>
+      <p class="step">Step 5</p>
+      <p>Click <strong>Save</strong>, in the tab bar, to write the change to the server.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="clear-a-repository">
+    <div class="rail"><div class="numeral">07</div><div class="vlabel">clear a repository</div></div>
+    <div class="content">
+      <h2>Clear a Repository</h2>
+      <p>Clear a repository to remove every triple from it and keep the repository itself.</p>
+      <div class="admonition caution">
+      <p class="admonition-title">Warning</p>
+      <p>a clear is irreversible. It deletes every RDF statement in the repository, and nothing brings them back.</p>
+      </div>
+      <p class="step">Step 1</p>
+      <p>Open the repository you want to clear.</p>
+      <p class="step">Step 2</p>
+      <p>Find <strong>Clear</strong> or <strong>Clear Repository</strong>, in the repository actions area.</p>
+      <p class="step">Step 3</p>
+      <p>Click it. A confirmation dialog opens.</p>
+      <div class="figure">
+      <img src="images/repository-clear-confirmation.png" alt="Repository clear confirmation dialog">
+      <p class="caption">Figure 9: Repository clear confirmation dialog with warning message</p>
+      </div>
+      <p class="step">Step 4</p>
+      <p>Read the warning.</p>
+      <p class="step">Step 5</p>
+      <p>Confirm, if you are sure.</p>
+      <p class="step">Step 6</p>
+      <p>Wait. The application reports success when the clear finishes.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="delete-a-repository">
+    <div class="rail"><div class="numeral">08</div><div class="vlabel">delete a repository</div></div>
+    <div class="content">
+      <h2>Delete a Repository</h2>
+      <p>Delete a repository to remove it and everything in it, for good.</p>
+      <div class="admonition caution">
+      <p class="admonition-title">Warning</p>
+      <p>a delete is permanent. It removes the data, the views, and the settings, and nothing brings them back.</p>
+      </div>
+      <p class="step">Step 1</p>
+      <p>Open the repository you want to delete.</p>
+      <p class="step">Step 2</p>
+      <p>Find <strong>Delete Repository</strong>, in the repository actions area or its settings.</p>
+      <p class="step">Step 3</p>
+      <p>Click it. A confirmation dialog opens.</p>
+      <p class="step">Step 4</p>
+      <p>Read the warning. The dialog may ask you to type the repository name.</p>
+      <p class="step">Step 5</p>
+      <p>Confirm, if you are quite sure.</p>
+      <p class="step">Step 6</p>
+      <p>The service deletes the repository and returns you to your account page.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="when-something-goes-wrong">
+    <div class="rail"><div class="numeral">09</div><div class="vlabel">when something goes wrong</div></div>
+    <div class="content">
+      <h2>When Something Goes Wrong</h2>
+      <h3>An Import Fails</h3>
+      <p>If an import fails, check that:</p>
+      <ul>
+      <li>Dydra reads the file's format</li>
+      <li>The file holds valid RDF</li>
+      <li>Your network reaches the source, for a URL import</li>
+      <li>You hold write permission on the repository</li>
+      <li>The error message says something more — read it</li>
+      </ul>
+      <h3>An Export Fails</h3>
+      <p>If an export gives you trouble, check that:</p>
+      <ul>
+      <li>The repository holds data</li>
+      <li>Another format works</li>
+      <li>Your browser allows the download</li>
+      <li>You hold read permission on the repository</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="next-steps">
+    <div class="rail"><div class="numeral">10</div><div class="vlabel">next steps</div></div>
+    <div class="content">
+      <h2>Next Steps</h2>
+      <p>With your repositories in order, you can:</p>
+      <ul>
+      <li>Create and execute <a href="view-operations.html">SPARQL views</a> to query your data</li>
+      <li>Import more datasets</li>
+      <li>Revise repository settings and metadata</li>
+      <li>Read <a href="tips-and-best-practices.html">Tips and Best Practices</a> to move faster and diagnose trouble</li>
+      <li>Turn to the <a href="appendices.html">Appendices</a> for file formats and keyboard shortcuts</li>
+      </ul>
+    </div>
+  </section>
+  <nav class="band pager" aria-label="Manual">
+    <a class="cell" href="account-operations.html"><span class="dir">Previous</span> Account Operations</a>
+    <a class="cell" href="index.html"><span class="dir">Up</span> Contents</a>
+    <span class="spacer"></span>
+    <a class="cell" href="view-operations.html"><span class="dir">Next</span> View Operations</a>
+  </nav>
+
+
+  <footer class="footer">
+    <div class="wm"><a href="index.html">dydra (1.2)</a></div>
+    <div class="fl">Dydra Studio · user manual<br>&copy; 2026 Dydra</div>
+    <div class="disclaimer">
+      <p>This documentation describes a <strong>Dydra 1.2 preview</strong>: what is
+      written here is subject to change before release.</p>
+      <p class="service"><a href="https://dydra.com/login">Login</a><a href="https://dydra.com/signup">Sign up</a><a href="https://dydra.com/legal/terms_of_service">Legal</a></p>
+    </div>
+  </footer>
+
+</div>
 </body>
 </html>

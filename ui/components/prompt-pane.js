@@ -79,7 +79,8 @@ function template(st) {
       <button type="button" data-testid="prompt-connect" class="prompt-connect"
               style="padding:4px 10px;cursor:pointer;">Connect</button>
       <button type="button" data-testid="prompt-session-log" class="prompt-session-log"
-              style="padding:4px 10px;cursor:pointer;">Session log</button>
+              title="The record of what has already happened: past explorations, their transcripts, and the endpoint's own journal."
+              style="padding:4px 10px;cursor:pointer;">Past runs</button>
       <span class="prompt-status" data-testid="prompt-status" style="font-size:12px;color:#666;"></span>
     </div>
 

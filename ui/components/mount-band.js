@@ -71,6 +71,12 @@ export function mountBandMarkup({ name, element = null }) {
        + `<div class="ui-mount-actions">`
        + `<button type="button" class="ui-mount-open" data-testid="mount-expand" `
        + `data-mount="${who}">Open ‘${who}’</button>`
+       /* Beside Open, and not behind it: a reader who wants the file does not
+          want to draw it first, and what is downloaded does not depend on
+          whether it has been drawn — a mount is a reference either way
+          (U-122). */
+       + `<button type="button" class="ui-mount-download" data-testid="mount-download" `
+       + `data-mount="${who}">Download</button>`
        + `<span class="ui-mount-status" data-testid="mount-status"></span>`
        + `</div>`
        + `<div class="ui-mount-content" ${MOUNT_CONTENT_ATTRIBUTE}></div>`
@@ -135,6 +141,11 @@ export function expandInto(band, { presentation, name, revision = null, page = "
   installComponents(band.ownerDocument, kindsOf(view.elements), components);
   mountTree(view.elements, region, { components });
   band.setAttribute("data-ui-expanded", String(revision ?? ""));
+  // What was drawn here, for whoever has to say what an element inside the
+  // band is called (U-104).  Kept on the node rather than in a registry: the
+  // band is the only thing that outlives this call, a redraw of the chrome
+  // takes the property with it, and nothing has to be told that it went.
+  band.__uiMounted = { name: String(name), view };
   const note = band.querySelector(".ui-mount-note");
   if (note) {
     note.textContent = `${name}${revision == null ? "" : ` · revision ${revision}`}`
@@ -146,6 +157,20 @@ export function expandInto(band, { presentation, name, revision = null, page = "
 }
 
 /**
+ * The presentation drawn into the band holding EL, and its tree.
+ *
+ * Null for an element that is not inside an opened band — the chrome's own
+ * elements, and a band that has not been pressed.  The band element itself
+ * answers null too, and must: the band is a `host' element of the WORKSPACE,
+ * and only what was drawn inside it belongs to the mounted presentation.
+ */
+export function mountedIn(el) {
+  const band = el?.closest?.(`[${MOUNT_ATTRIBUTE}]`);
+  const held = band && band.__uiMounted;
+  return held && held.view ? { presentation: held.name, view: held.view } : null;
+}
+
+/**
  * Wire every unopened band under ROOT.
  *
  * Called after the chrome is drawn.  `expand' does the reading and reports
@@ -153,9 +178,33 @@ export function expandInto(band, { presentation, name, revision = null, page = "
  * band that stays shut after a press with the reason somewhere else is a
  * band the reader will press again.
  */
-export function installExpanders(root, { expand } = {}) {
+export function installExpanders(root, { expand, download = null } = {}) {
   if (!root || typeof expand !== "function") return 0;
-  const buttons = Array.from(root.querySelectorAll(`[${MOUNT_ATTRIBUTE}] .ui-mount-open`));
+  let wired = 0;
+  wired += press(root, ".ui-mount-open", expand, {
+    busy: "reading…", bad: "could not open", clear: true });
+  /* Optional, and silently so.  A build that calls this with `expand' alone
+     is every build before U-122, and the band it draws simply has no
+     Download wired — which is better than a press that does nothing and
+     better than refusing to wire the Open press beside it. */
+  if (typeof download === "function") {
+    wired += press(root, ".ui-mount-download", download, {
+      busy: "saving…", bad: "could not save", clear: false });
+  }
+  return wired;
+}
+
+/**
+ * One kind of press on every band, wired once.
+ *
+ * `clear' is the difference between the two: a successful Open replaces the
+ * band's own note with what was drawn, so the status line has nothing left
+ * to say; a successful Download leaves the band exactly as it was, so the
+ * only evidence that anything happened is the sentence — which therefore
+ * stays.
+ */
+function press(root, selector, act, { busy, bad, clear }) {
+  const buttons = Array.from(root.querySelectorAll(`[${MOUNT_ATTRIBUTE}] ${selector}`));
   let wired = 0;
   for (const button of buttons) {
     if (button.__uiWired) continue;
@@ -166,11 +215,19 @@ export function installExpanders(root, { expand } = {}) {
       const name = button.getAttribute("data-mount");
       const status = band?.querySelector(".ui-mount-status");
       button.disabled = true;
-      if (status) status.textContent = "reading…";
+      if (status) status.textContent = busy;
       let out;
-      try { out = await expand({ name, band }); }
+      try { out = await act({ name, band }); }
       catch (e) { out = { ok: false, error: String(e) }; }
-      if (status) status.textContent = out?.ok ? "" : `could not open: ${out?.error}`;
+      if (status) {
+        status.textContent = out?.ok
+          ? (clear ? "" : (out.message || ""))
+          : `${bad}: ${out?.error}`;
+        // The line used to carry nothing but failures and was red for all of
+        // them.  A download reports its success here, so what is red has to
+        // be said rather than assumed.
+        status.classList.toggle("ui-mount-bad", !out?.ok);
+      }
       button.disabled = false;
     });
   }

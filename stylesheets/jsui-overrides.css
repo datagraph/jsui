@@ -240,10 +240,6 @@ h1#content-title {
   display: none;
 }
 
-body.accounts.show .account-pane-layout {
-  flex-direction: row-reverse;
-}
-
 body.accounts.show .account-pane-content {
   margin-left: 0;
   padding-left: 0;
@@ -325,15 +321,12 @@ body.accounts.show .account-sidebar .manage-save-button {
   padding: 8px 6px;
 }
 
-body.repositories.show .repository-pane-layout {
-  display: flex;
-  flex-direction: row-reverse;
-  align-items: stretch;
-}
-
-body.repositories.show .repository-pane-content {
-  flex: 1;
-}
+/* The repository pane's parts are regions of one grid now (U-115), and the
+   grid template is written inline from the account's arrangement.  The flex
+   row that used to put the properties column on the left is gone with the
+   wrappers it was written for: `.repository-pane-layout' and
+   `.repository-pane-content' are no longer emitted, and the default
+   arrangement reproduces what they drew. */
 
 body.repositories.show .repository-sidebar {
   width: 260px;
@@ -482,12 +475,6 @@ body.repositories.show .repository-sidebar .collaboration-table th {
 body.repositories.show .repository-sidebar .collab-flag {
   text-align: center;
   font-weight: bold;
-}
-
-.account-pane-layout {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
 }
 
 .account-pane-content {
@@ -713,23 +700,18 @@ body.repositories.show .repository-sidebar .repo-meta-field .value {
    `display: contents' promotes each column's header and list to grid items;
    the column elements themselves draw nothing, and are kept because the markup
    and the handlers read them. */
-.repository-views-layout {
-  display: grid;
-  grid-template-columns: 300px minmax(300px, 1fr);
-  grid-template-rows: auto 1fr;
-  align-items: start;
-  gap: 8px 12px;
-}
-
+/* The two lists were children of one grid, placed by column and row so that
+   their headings sat on the same line.  They are now two REGIONS placed in
+   the same row of the pane's own grid (U-115), which puts their heading
+   boxes on the same line for the same reason and leaves the arrangement free
+   to put them somewhere else entirely.  Each is a column of its own: a
+   heading, then a list that takes the rest. */
 .query-catalog,
 .view-editors {
-  display: contents;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
-
-.query-catalog > h2            { grid-column: 1; grid-row: 1; }
-.query-catalog > .query-container { grid-column: 1; grid-row: 2; }
-.view-editors > .view-editors-head { grid-column: 2; grid-row: 1; }
-.view-editors > .view-editors-container { grid-column: 2; grid-row: 2; }
 
 /* 420px is the floor, not the height.  Both columns measure border-box and
    read the one expression below, so the drawn height is the same on each side
@@ -942,6 +924,58 @@ body.repositories.show #content-container > #sidebar-gutter.dragging {
 
 .location-inert {
   min-height: 0;
+}
+
+/* The identifiers, while a line is being typed (U-104).
+
+   An outline and a legend in the element's own top border: nothing is
+   inserted into the element and nothing is moved, so an interface that is
+   mid-interaction keeps every pixel it had.  `outline' and not `border' for
+   the same reason — a border would re-lay the page out under the pointer. */
+[data-ui-candidate] {
+  outline: 1px dashed #9db7e8;
+  outline-offset: 2px;
+}
+
+[data-ui-hover="yes"] {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+[data-ui-hover="no"] {
+  outline: 1px dotted #a4acb6;
+  outline-offset: 2px;
+}
+
+.ui-anchor-badge {
+  position: absolute;
+  z-index: 1100;
+  transform: translateY(-50%);
+  padding: 0 5px;
+  border-radius: 3px;
+  font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  pointer-events: none;
+  background: #2563eb;
+  color: #fff;
+}
+
+/* An element the verb could not take says so in grey rather than going
+   dark: an identifier that stopped appearing reads as the interface having
+   lost interest, and the reason is the refusal that would have come back. */
+.ui-anchor-badge[data-ok="no"] {
+  background: #6b7280;
+}
+
+/* What the pointer is over, beside the address.  It outlives the pointer so
+   that the name can be read and copied after the mouse has moved on. */
+.location-note {
+  display: inline-block;
+  margin-left: 12px;
+  color: #4b5563;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
 }
 
 /* Location bar */
@@ -2021,7 +2055,8 @@ a.ui-state-active:active {
   margin-top: 8px;
 }
 
-.ui-mount-open {
+.ui-mount-open,
+.ui-mount-download {
   font-size: 12px;
   padding: 2px 10px;
   border: 1px solid #9aa4ae;
@@ -2030,8 +2065,14 @@ a.ui-state-active:active {
   cursor: pointer;
 }
 
+/* The line said nothing but failures until U-122 put a download's own report
+   in it, so it is neutral now and red only when what it carries is one. */
 .ui-mount-status {
   font-size: 11px;
+  color: #5b6670;
+}
+
+.ui-mount-status.ui-mount-bad {
   color: #b91c1c;
 }
 
@@ -2041,4 +2082,391 @@ a.ui-state-active:active {
 
 .ui-mount-content {
   margin-top: 10px;
+}
+
+/* ── the regions of a pane (U-115) ──────────────────────── */
+
+/* The container's `grid-template-*' and each region's `grid-area' are written
+   inline, from the arrangement held in `<account>/ui'.  What belongs here is
+   only what does not change when the arrangement does.
+
+   `min-width: 0' is the one that matters: a grid item's automatic minimum is
+   its content, so a region holding a wide table or a long IRI would push its
+   column past the template and silently widen the pane rather than scroll.
+   `align-items: start' keeps a short region short, as the two lists' own grid
+   did before them. */
+.ui-regions {
+  display: grid;
+  align-items: start;
+}
+
+.ui-region {
+  min-width: 0;
+}
+
+/* A region the arrangement does not place is emitted after the ones it does,
+   across the full width, rather than being dropped: an arrangement saved
+   before a region existed should show it in the wrong place and not lose it.
+   The rule is the chrome's, and `data-unplaced' is the chrome's attribute. */
+.ui-region[data-unplaced] {
+  grid-column: 1 / -1;
+}
+
+/* A host nothing is registered for, and a region the interface draws nothing
+   for, both carry their reason in `data-inert' -- and until this rule neither
+   of them SHOWED it: the box was empty, which is the silent fault the reason
+   was written to avoid, and the manual said otherwise.  One rule for both,
+   because the two cases differ only in which sentence is in the attribute. */
+.location-inert::before {
+  content: attr(data-inert);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* ── the result sheet (U-117) ─────────────────────────────────────────────── */
+
+/* The panel behind the Results tab in the sidebar's left margin.  It is a
+   working surface: what is dropped here is a reading that has already
+   happened, and the sheet neither re-runs it nor keeps it past this page. */
+.result-sheet-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+/* The sheet is a pane's whole width now (U-120), not a column in a sidebar
+   and not a band squeezed under a repository's lists: a result is as wide as
+   its widest row, and what is kept here was kept to be compared with
+   readings from elsewhere.  Each reading scrolls within the sheet. */
+.rs-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px;
+  border: 1px dashed #c7c7c7;
+  border-radius: 4px;
+  background: #fff;
+  min-width: 0;
+}
+
+/* While something is over it, and only then. */
+.rs-sheet.drag-active {
+  border-color: #1f4e79;
+  border-style: solid;
+  background: #f2f7fc;
+}
+
+/* ── the results pane (U-120) ──────────────────────────────────────────────
+   A station of its own: readings above, presentations moved here below, each
+   the full width of the window because each was composed for one. */
+.results-pane {
+  padding: 12px;
+  min-height: 0;
+  /* The margin strip, then the regions: see `.results-margin' below. */
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+}
+
+.results-pane .ui-regions {
+  min-height: 0;
+}
+
+.results-readings h2,
+.results-mounts h2 {
+  font-size: 13px;
+  margin: 0 0 6px;
+  color: #333;
+}
+
+.results-mounts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.results-empty {
+  font-size: 12px;
+  color: #555;
+  margin: 0;
+}
+
+.results-mount {
+  min-width: 0;
+}
+
+/* The pane's own left margin, holding the same tab marked open: showing this
+   pane hides the pane whose margin was pressed, and with it the tab, so the
+   way back and the "you are here" have to be here.  Outside the region grid,
+   because it is the pane's chrome and not one of its parts. */
+.results-margin {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+/* The strips in the account and repository panes style their own tabs, under
+   a body class apiece; this strip is in a pane that has no body class of its
+   own, so it states the same shape here rather than inheriting one. */
+.results-margin .manage-tab {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 32px;
+  background: #eee;
+  border: 1px solid #ccc;
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  color: #333;
+  cursor: pointer;
+}
+
+.results-margin .manage-tab img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* Nothing above it in this strip, so nothing to be set apart from. */
+.results-margin .manage-tab.results-tab {
+  margin-top: 0;
+  border-top: 1px solid #ccc;
+}
+
+.results-pane > .ui-regions {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The Results tab, wherever a strip of margin tabs is drawn.  Set apart by a
+   rule above it for the reason the exploration tab is: "active" in a strip
+   means "this panel is showing", and this one shows a pane instead, so it
+   marks itself `open'.
+   It is also the DROP target, because the pane behind it is hidden while the
+   editor is in front and an element with no layout box receives no drop.
+   `drag-active' is on while a drag is in flight; `took' is the flash that
+   says something landed where the reader is not looking. */
+.manage-tab.results-tab {
+  position: relative;
+  margin-top: 14px;
+  border-top: 1px solid #ccc;
+}
+
+.manage-tab.results-tab.open {
+  background: #fff;
+  border-color: #aaa;
+  border-right-color: #fff;
+  box-shadow: inset 2px 0 0 #1f4e79;
+}
+
+.manage-tab.results-tab.drag-active {
+  outline: 2px solid #1f4e79;
+  background: #f2f7fc;
+}
+
+.manage-tab.results-tab.took {
+  background: #e6f4ea;
+}
+
+/* On the icon rather than beside it: the strip is 16px wide by design and a
+   count in the flow would widen every tab in it. */
+.manage-tab.results-tab .tab-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 8px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: #1f4e79;
+  color: #fff;
+  font-size: 9px;
+  line-height: 12px;
+  text-align: center;
+}
+
+.rs-empty {
+  font-size: 12px;
+  color: #555;
+}
+
+.rs-note {
+  font-size: 11px;
+  color: #666;
+}
+
+.rs-status {
+  margin: 0;
+  font-size: 11px;
+  color: #1f4e79;
+  min-height: 1em;
+}
+
+.rs-status.rs-error,
+.rs-error {
+  color: #b91c1c;
+}
+
+.rs-entry {
+  border: 1px solid #e3e3e3;
+  border-radius: 4px;
+  padding: 6px;
+  background: #fcfcfc;
+  min-width: 0;
+}
+
+.rs-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+}
+
+/* The tab the reading came out of, drawn as the editor draws its result tabs
+   so that the reader reaches for the same thing: the time it ran, on a tab,
+   and pressing it folds the reading away.  `aria-expanded' carries the state
+   for a reader who cannot see the caret, and is also what the caret is drawn
+   from, so the two cannot disagree. */
+.rs-tab {
+  font: inherit;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  padding: 1px 6px;
+  border: 1px solid #ccc;
+  border-bottom-color: #fff;
+  border-radius: 3px 3px 0 0;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  margin-bottom: -1px;
+}
+
+.rs-tab::after {
+  content: " \25BE";
+  color: #888;
+}
+
+.rs-tab[aria-expanded="false"] {
+  background: #eee;
+  border-bottom-color: #ccc;
+  color: #555;
+}
+
+.rs-tab[aria-expanded="false"]::after {
+  content: " \25B8";
+}
+
+/* Folded: the head alone, and it still says which reading this is and still
+   carries Run, Download and ×.  A fold that hid those would leave a row of times with
+   nothing to tell them apart. */
+.rs-entry[data-rs-collapsed] .rs-head {
+  border-bottom: none;
+}
+
+.rs-head .rs-count {
+  margin-left: auto;
+  font-size: 11px;
+  color: #666;
+}
+
+.rs-drop {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  color: #888;
+  padding: 0 2px;
+}
+
+.rs-query summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: #555;
+}
+
+.rs-query pre {
+  margin: 4px 0;
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* A table is the one thing in a pane that may be wider than its column: it
+   scrolls in its own box rather than widening the sheet. */
+.rs-table {
+  overflow-x: auto;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.rs-table table {
+  border-collapse: collapse;
+  font-size: 11px;
+  width: 100%;
+}
+
+.rs-table th,
+.rs-table td {
+  text-align: left;
+  padding: 2px 6px 2px 0;
+  border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+
+.rs-table th {
+  position: sticky;
+  top: 0;
+  background: #fcfcfc;
+}
+
+/* The Run control on a sheet entry (U-119).  Disabled where the reading
+   cannot be reproduced — no query kept, or arguments this button would drop
+   — and the reason is on the control rather than discovered by pressing it. */
+.rs-run {
+  background: #1f4e79;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 1px 6px;
+}
+
+.rs-run[disabled] {
+  background: #d7d7d7;
+  color: #777;
+  cursor: not-allowed;
+}
+
+/* Download, beside Run and quieter than it (U-123).  The two are not
+   alternatives — Run asks whether the reading has moved, Download keeps what
+   is already in hand — and the one that spends nothing and asks nobody for a
+   credential is the one drawn as the secondary.  Never disabled: a reading
+   that cannot be re-run can still be kept, and its file says so itself. */
+.rs-save {
+  background: #fff;
+  color: #1f4e79;
+  border: 1px solid #1f4e79;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 11px;
+  padding: 0 6px;
+}
+
+.rs-save:hover {
+  background: #eef3f8;
+}
+
+/* A reading that has moved since it was dropped says so in its own colour:
+   "unchanged" and "it has moved" are the two answers the press is for, and
+   they should not have to be read word by word to be told apart. */
+.rs-moved {
+  color: #92400e;
+  font-weight: 600;
 }

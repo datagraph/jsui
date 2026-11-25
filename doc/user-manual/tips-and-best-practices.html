@@ -1,125 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tips and Best Practices - Dydra Studio User Manual</title>
-    <link rel="stylesheet" href="manual.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tips and Best Practices — Dydra Studio</title>
+<meta name="description" content="This chapter collects what will help you move quickly through Dydra Studio, work well in it, and diagnose it when it misbehaves.">
+<meta name="date" content="2026-11-21">
+<link rel="stylesheet" href="tschichold.css" type="text/css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1>Tips and Best Practices</h1>
-        </div>
-    </header>
+<div class="container">
 
-    <div class="container">
-        <nav>
-            <a href="index.html">← Back to Manual Home</a>
-            <a href="view-operations.html">← Previous: View Operations</a>
-            <a href="appendices.html">Next: Appendices →</a>
-        </nav>
-
-        <div class="content">
-            <h2>Overview</h2>
-            <p>This section provides tips, best practices, and troubleshooting guidance to help you get the most out of Dydra Studio.</p>
-
-            <h2>Navigation Tips</h2>
-            <ul>
-                <li><strong>Location Bar</strong>: The editable location bar is the last band of the chrome, below the page content, and shows your current route. You can type a path directly to navigate — and a line that is <em>not</em> a path is an instruction against whatever the bar is addressing. See <a href="multi-repository-analysis.html">Asking Across Several Repositories</a>.</li>
-                <li><strong>Browser Navigation</strong>: Use browser back/forward buttons to navigate through your history.</li>
-                <li><strong>Tabs</strong>: Open multiple repositories or views in separate tabs to work with multiple resources simultaneously.</li>
-                <li><strong>Keyboard Shortcuts</strong>:
-                    <ul>
-                        <li>Ctrl/Cmd+Enter: Execute SPARQL query</li>
-                        <li>Enter: Submit forms</li>
-                        <li>Escape: Cancel dialogs</li>
-                    </ul>
-                </li>
-            </ul>
-
-            <h2>Query Editor Tips</h2>
-            <ul>
-                <li><strong>Syntax Highlighting</strong>: The editor provides syntax highlighting for SPARQL queries</li>
-                <li><strong>Autocomplete</strong>: Use autocomplete suggestions while typing</li>
-                <li><strong>Multiple Tabs</strong>: Execute multiple queries and compare results using tabs</li>
-                <li><strong>Result Formats</strong>: Experiment with different result formats to find the best one for your needs</li>
-                <li><strong>Event Log</strong>: Review the event log to track query execution history</li>
-            </ul>
-
-            <h2>Data Management Tips</h2>
-            <ul>
-                <li><strong>Backup Important Data</strong>: Export important repositories before making major changes</li>
-                <li><strong>Test Imports</strong>: Test imports on a small sample before importing large datasets</li>
-                <li><strong>Use Asynchronous Imports</strong>: For large files, use asynchronous imports to avoid browser timeouts</li>
-                <li><strong>Monitor Progress</strong>: Watch import progress indicators to track upload status</li>
-                <li><strong>Verify Data</strong>: After importing, execute a query to verify the data was imported correctly</li>
-            </ul>
-
-            <h2>Collaboration Tips</h2>
-            <ul>
-                <li><strong>Start with Read-Only</strong>: When adding new collaborators, start with read-only access and upgrade to write access if needed</li>
-                <li><strong>Document Access</strong>: Keep notes on why each collaborator has access</li>
-                <li><strong>Regular Reviews</strong>: Periodically review collaborator lists and remove unnecessary access</li>
-                <li><strong>Clear Communication</strong>: Communicate with collaborators about repository changes and expectations</li>
-            </ul>
-
-            <h2>Performance Tips</h2>
-            <ul>
-                <li><strong>Limit Open Tabs</strong>: Having too many tabs open can slow down the application</li>
-                <li><strong>Close Unused Tabs</strong>: Close tabs you're not actively using</li>
-                <li><strong>Use Filters</strong>: Use repository and view filters to find what you need quickly</li>
-                <li><strong>Optimize Queries</strong>: Write efficient SPARQL queries to reduce execution time</li>
-            </ul>
-
-            <h2>Troubleshooting</h2>
-
-            <h3>Import Issues</h3>
-            <p>If you encounter problems importing data:</p>
-            <ul>
-                <li>Verify file format is supported</li>
-                <li>Check file size limits</li>
-                <li>Ensure you have write permissions</li>
-                <li>Try asynchronous import for large files</li>
-            </ul>
-
-            <h3>Query Issues</h3>
-            <p>If a query fails to execute:</p>
-            <ul>
-                <li>Check SPARQL syntax</li>
-                <li>Verify repository contains the expected data</li>
-                <li>Review error messages in the event log</li>
-                <li>Try simpler queries to isolate issues</li>
-            </ul>
-
-            <h3>Authentication Issues</h3>
-            <p>If you have trouble logging in:</p>
-            <ul>
-                <li>Verify username and password/token</li>
-                <li>Check host URL is correct</li>
-                <li>Clear browser cache and try again</li>
-                <li>Contact administrator if problems persist</li>
-            </ul>
-
-            <h3>Collaboration Issues</h3>
-            <p>If collaboration features aren't working:</p>
-            <ul>
-                <li>Verify collaborator account names are correct</li>
-                <li>Check that you have permission to manage collaborators</li>
-                <li>Ensure permissions are saved (click Save button)</li>
-                <li>Refresh the page if changes don't appear</li>
-            </ul>
-
-            <h2>Next Steps</h2>
-            <p>For more detailed information, see:</p>
-            <ul>
-                <li><a href="appendices.html">Appendices</a> - File formats, keyboard shortcuts, and glossary</li>
-                <li><a href="login.html">Login</a> - Authentication details</li>
-                <li><a href="repository-operations.html">Repository Operations</a> - Data management</li>
-                <li><a href="view-operations.html">View Operations</a> - Query management</li>
-            </ul>
-        </div>
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Graph Database · Triple Store · User Manual</div>
+      <div class="wordmark"><a href="index.html">dydra (1.2)</a></div>
     </div>
-    <script src="manual.js"></script>
+    <div class="meta">User manual<br>Tips and Best Practices</div>
+  </header>
+
+  <section class="title">
+    <div class="rail"><div class="vlabel">chapter</div></div>
+    <div class="content">
+      <p class="chapno">Dydra Studio · user manual · 08</p>
+      <h1>Tips and Best Practices</h1>
+      <p class="lede">This chapter collects what will help you move quickly through Dydra Studio, work well in it, and diagnose it when it misbehaves.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="move-around-quickly">
+    <div class="rail"><div class="numeral">01</div><div class="vlabel">move around quickly</div></div>
+    <div class="content">
+      <h2>Move Around Quickly</h2>
+      <ul>
+      <li><strong>Location bar</strong>: the editable location bar is the last band of the chrome, below the page content, and it shows your current route. Type a path and it navigates — and a line that is <em>not</em> a path instructs whatever the bar addresses. See <a href="multi-repository-analysis.html">Ask Across Several Repositories</a>.</li>
+      <li><strong>Browser navigation</strong>: the back and forward buttons walk your history.</li>
+      <li><strong>Tabs</strong>: open repositories and views in separate tabs, and work on several at once.</li>
+      <li><strong>Keyboard shortcuts</strong>:
+      <ul>
+      <li>Ctrl/Cmd+Enter: execute the SPARQL query</li>
+      <li>Enter: submit the form</li>
+      <li>Escape: cancel the dialog</li>
+      </ul>
+      </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section heavy" id="get-more-from-the-query-editor">
+    <div class="rail"><div class="numeral">02</div><div class="vlabel">get more from the query</div></div>
+    <div class="content">
+      <h2>Get More From the Query Editor</h2>
+      <ul>
+      <li><strong>Read the highlighting.</strong> The editor colours SPARQL as you type it.</li>
+      <li><strong>Take the completions.</strong> They save keystrokes and spelling.</li>
+      <li><strong>Open several tabs.</strong> Run several queries and compare their answers side by side.</li>
+      <li><strong>Try other formats.</strong> One of them will suit what you are doing better than the default.</li>
+      <li><strong>Read the event log.</strong> It holds every run you made.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section heavy" id="look-after-your-data">
+    <div class="rail"><div class="numeral">03</div><div class="vlabel">look after your data</div></div>
+    <div class="content">
+      <h2>Look After Your Data</h2>
+      <ul>
+      <li><strong>Export before a large change.</strong> Keep a copy of a repository that matters.</li>
+      <li><strong>Try a sample first.</strong> Import a small part of a large dataset before you import all of it.</li>
+      <li><strong>Import large files in the background.</strong> That avoids a browser timeout.</li>
+      <li><strong>Watch the progress.</strong> The indicators tell you how far an upload has come.</li>
+      <li><strong>Query afterwards.</strong> Run something simple to confirm that the data arrived.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section heavy" id="work-with-others">
+    <div class="rail"><div class="numeral">04</div><div class="vlabel">work with others</div></div>
+    <div class="content">
+      <h2>Work With Others</h2>
+      <ul>
+      <li><strong>Start read-only.</strong> Grant read first, and raise it to write when the work calls for it.</li>
+      <li><strong>Record why.</strong> Keep a note of what each collaborator holds access for.</li>
+      <li><strong>Review the list.</strong> Go through it from time to time and remove access nobody needs.</li>
+      <li><strong>Say what changed.</strong> Tell collaborators about changes to the repository and what you expect of them.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section heavy" id="keep-it-fast">
+    <div class="rail"><div class="numeral">05</div><div class="vlabel">keep it fast</div></div>
+    <div class="content">
+      <h2>Keep It Fast</h2>
+      <ul>
+      <li><strong>Open fewer tabs.</strong> Too many slow the application down.</li>
+      <li><strong>Close what you finished with.</strong></li>
+      <li><strong>Filter.</strong> The repository and view filters find things faster than scrolling.</li>
+      <li><strong>Write tight queries.</strong> An efficient SPARQL query returns sooner.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section heavy" id="when-something-goes-wrong">
+    <div class="rail"><div class="numeral">06</div><div class="vlabel">when something goes wrong</div></div>
+    <div class="content">
+      <h2>When Something Goes Wrong</h2>
+      <h3>An Import Gives Trouble</h3>
+      <p>Check that:</p>
+      <ul>
+      <li>Dydra reads the file's format</li>
+      <li>The file is within the size limit</li>
+      <li>You hold write permission</li>
+      <li>A background import succeeds where a direct one did not</li>
+      </ul>
+      <h3>A Query Fails</h3>
+      <p>Check that:</p>
+      <ul>
+      <li>The SPARQL parses</li>
+      <li>The repository holds the data you expect</li>
+      <li>The event log says something more — read it</li>
+      <li>A simpler query works, which narrows the fault</li>
+      </ul>
+      <h3>Sign-In Fails</h3>
+      <p>Check that:</p>
+      <ul>
+      <li>Your username and password, or your token, are right</li>
+      <li>The host URL is right</li>
+      <li>A cleared browser cache helps</li>
+      <li>Your administrator knows, if it keeps happening</li>
+      </ul>
+      <h3>Collaboration Does Not Work</h3>
+      <p>Check that:</p>
+      <ul>
+      <li>You spelled each collaborator's account name correctly</li>
+      <li>You may manage collaborators on this repository</li>
+      <li>You clicked <strong>Save</strong> after setting the permissions</li>
+      <li>A reload shows the change</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="next-steps">
+    <div class="rail"><div class="numeral">07</div><div class="vlabel">next steps</div></div>
+    <div class="content">
+      <h2>Next Steps</h2>
+      <p>For more, read:</p>
+      <ul>
+      <li><a href="appendices.html">Appendices</a> — file formats, keyboard shortcuts, and glossary</li>
+      <li><a href="login.html">Login</a> — how to sign in, and what the session holds</li>
+      <li><a href="repository-operations.html">Repository Operations</a> — how to move data in and out</li>
+      <li><a href="view-operations.html">View Operations</a> — how to keep your queries</li>
+      </ul>
+    </div>
+  </section>
+  <nav class="band pager" aria-label="Manual">
+    <a class="cell" href="multi-repository-analysis.html"><span class="dir">Previous</span> Ask Across Several Repositories</a>
+    <a class="cell" href="index.html"><span class="dir">Up</span> Contents</a>
+    <span class="spacer"></span>
+    <a class="cell" href="appendices.html"><span class="dir">Next</span> Appendices</a>
+  </nav>
+
+
+  <footer class="footer">
+    <div class="wm"><a href="index.html">dydra (1.2)</a></div>
+    <div class="fl">Dydra Studio · user manual<br>&copy; 2026 Dydra</div>
+    <div class="disclaimer">
+      <p>This documentation describes a <strong>Dydra 1.2 preview</strong>: what is
+      written here is subject to change before release.</p>
+      <p class="service"><a href="https://dydra.com/login">Login</a><a href="https://dydra.com/signup">Sign up</a><a href="https://dydra.com/legal/terms_of_service">Legal</a></p>
+    </div>
+  </footer>
+
+</div>
 </body>
 </html>

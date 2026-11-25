@@ -115,6 +115,21 @@ const STYLE = `
   display: flex; gap: 8px; align-items: center; margin: 7px 0 10px; }
 .exploration-pane .exp-actions button { padding: 4px 14px; cursor: pointer; }
 .exploration-pane .exp-status { color: #666; }
+/* REQ-37.1.6: each control says what it is for before it is pressed, where it
+   is.  A tooltip is the weakest form of that -- it is read by nobody who does
+   not already know the answer -- so the distinction is on the screen, in one
+   line, under the row of buttons it is about.  Defined here rather than in
+   either pane because both panes carry it and one wording is the point. */
+.exploration-pane .exp-legend {
+  margin: -4px 0 10px; color: #777; font-size: 11px; line-height: 1.5; }
+.exploration-pane .exp-legend b { font-weight: 600; color: #444; }
+/* REQ-37.2.4: the scope is said BESIDE the verb and not encoded in it.  The
+   label was growing the count into the name -- "Ask across 3", "Compose from
+   3" -- which made one operation read as several and left a reader who had
+   learned one of them unable to recognise the others. */
+.exploration-pane .exp-scope { color: #1f4e79; font-size: 11px;
+  background: #eef3f8; border-radius: 8px; padding: 1px 7px; }
+.exploration-pane .exp-scope-none { color: #8a6d3b; background: #fbf3e4; }
 
 .exploration-pane .exp-x > summary { font-family: ui-monospace, Menlo, monospace; }
 .exploration-pane .exp-x-time  { color: #999; flex: none; }
@@ -245,6 +260,13 @@ export function createExchangeList(list, {
   addViewLabel = "Add as a view",
   draw = null,
   drawLabel = "Draw it…",
+  // Where a new row pulls the reader to.  The exploration pane is the
+  // transcript -- scrolling the page to the newest row is the right thing
+  // there.  A pane that holds the transcript part way down a column of stages
+  // wants the opposite: the list scrolls inside itself and the page stays
+  // where the reader left it, which in the compose pane is the box they have
+  // just typed a revision into.
+  follow = "view",
 } = {}) {
   if (!list || !doc) return { add: () => null, count: () => 0 };
 
@@ -357,7 +379,8 @@ export function createExchangeList(list, {
     else { row.appendChild(toggle); row.appendChild(d); }
 
     list.appendChild(row);
-    row.scrollIntoView({ block: "nearest" });
+    if (follow === "container") list.scrollTop = list.scrollHeight;
+    else row.scrollIntoView({ block: "nearest" });
     return d;
   }
 

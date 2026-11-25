@@ -221,6 +221,7 @@ window.fetch = async (url, init = {}) => {
     if (body.method === "tools/list") {
       return reply(rpc({ tools: [
         { name: "survey", description: "explore", inputSchema: { type: "object" } },
+        { name: "query",  description: "read",    inputSchema: { type: "object" } },
         { name: "update", description: "write",   inputSchema: { type: "object" } },
       ] }));
     }
@@ -261,6 +262,10 @@ window.fetch = async (url, init = {}) => {
   }
 
   llmCalls += 1;
+  /* Kept so a follow-up can be asserted on what it actually SENT: whether the
+     earlier turns travelled with it is not visible anywhere else. */
+  window.__llmBodies = [...(window.__llmBodies || []),
+                        (init && init.body) ? JSON.parse(init.body) : {}];
   /* The first turn of EVERY run calls a tool, not just the page's first run:
      a run that calls nothing is now a reported condition, and a stub that
      answered the account pane's run straight out of its head would be
@@ -273,6 +278,16 @@ window.fetch = async (url, init = {}) => {
         { type: "text", text: "Let me look at the types first." },
         { type: "tool_use", id: "t1", name: "survey", input: { op: "catalog", scope: "types" } },
       ],
+    });
+  }
+  /* A model told to say which store its query is for says it, and the account's
+     pane reads the name back out of the prose.  A stub that never wrote one
+     would leave that half of the draw untested. */
+  if (/Say which store/.test(String(askedBody.system || ""))) {
+    return reply({
+      id: "m3", stop_reason: "end_turn", usage: { input_tokens: 6100, output_tokens: 210 },
+      content: [{ type: "text", text:
+        "I will draw this from playwright/other.\\n\\n\`\`\`sparql\\nSELECT ?s (COUNT(*) AS ?n)\\nWHERE { ?s ?p ?o }\\nGROUP BY ?s\\n\`\`\`\\n\\nA bar per subject." }],
     });
   }
   return reply({
@@ -595,12 +610,12 @@ console.log("\nthe request the model was sent");
      "and the whole body is one disclosure away, primer and all");
 }
 
-console.log("\nthe session button, and the log it opens");
+console.log("\nthe Past runs button, and the record it opens");
 {
   const panel = page.locator('[data-testid="exploration-session-panel"]');
   ok(await panel.isHidden(), "the log is out of the way until it is asked for");
   await page.locator('[data-testid="exploration-session"]').click();
-  ok(await panel.isVisible(), "Session shows it");
+  ok(await panel.isVisible(), "Past runs shows it");
 
   await panel.locator('[data-testid="session-log-item-AAAA-1111"]').waitFor({ timeout: 5000 });
   ok(true, "the account's sessions are listed");
@@ -782,6 +797,171 @@ console.log("\nthe report can be kept");
      `saved as ${file.suggestedFilename()} — dated, named for the account, .html`);
 }
 
+console.log("\nthe next step continues the exploration");
+{
+  const next = page.locator('[data-testid="account-exploration-next"]');
+  await next.waitFor({ timeout: 5000 });
+  ok(await next.isVisible(),
+     "a box to write the next step appears once there is an exploration to continue");
+  ok(await page.evaluate(() => {
+       const answer = document.querySelector('[data-testid="account-exploration-answer"]');
+       return answer && answer.nextElementSibling
+              === document.querySelector('[data-testid="account-exploration-next"]');
+     }),
+     "directly under the answer, which is what it responds to");
+  const note = await page.locator('[data-testid="account-exploration-next-note"]').textContent();
+  ok(/earlier turn\(s\)/.test(note) && /KB/.test(note) && /playwright\/test/.test(note),
+     `what the press carries is stated before it is pressed: ${note.trim()}`);
+
+  const before = (await page.evaluate(() => window.__llmBodies.length));
+  await page.locator('[data-testid="account-exploration-next-text"]')
+    .fill("now do the second of those, for the storeys above 3");
+  await page.locator('[data-testid="account-exploration-next-run"]').click();
+  await page.waitForFunction(
+    (n) => window.__llmBodies.length > n
+           && /done|failed|answered/.test(
+                document.querySelector('[data-testid="account-exploration-status"]').textContent),
+    before, { timeout: 15000 });
+
+  const sent = await page.evaluate((n) => window.__llmBodies[n], before);
+  ok(sent.messages.length > 1,
+     "the turn is sent with what came before it, not as a fresh conversation");
+  ok(sent.messages[sent.messages.length - 1].content
+       === "now do the second of those, for the storeys above 3",
+     "with the instruction last");
+  ok(sent.messages[sent.messages.length - 2].role === "assistant",
+     "and an assistant turn before it — two user turns in a row are refused");
+  ok(JSON.stringify(sent.messages).includes("tool_result"),
+     "the results the earlier turns read travel with it, so \"the second of those\" names something");
+
+  const titles = await page.locator('[data-testid="account-exploration-exchanges"] .exp-x-title')
+    .allTextContents();
+  ok(titles.includes("next step"),
+     "the transcript says this was a continuation, not another first question");
+  ok((await page.locator('[data-testid="account-exploration-next-text"]').textContent()).trim() === "",
+     "and the box is cleared once the instruction is in the transcript");
+}
+
+console.log("\nthe account's pane can ask for a figure too");
+{
+  const mode = page.locator('[data-testid="account-exploration-figure-mode"]');
+  ok(await mode.count() === 1,
+     "Figure is a mode of this exploration as well, beside the stores it is asked across");
+  ok(!(await mode.isChecked()), "off by default, as it is in a repository's pane");
+
+  await mode.check();
+  const said = await page.locator('[data-testid="account-exploration-authorises"]').textContent();
+  ok(/query/.test(said) && /survey/.test(said),
+     "ticking it says what it widens -- a second tool -- before the press (\u00a735.2)");
+  ok(/read-only/.test(said), "and that the grant is unchanged: it was read-only and stays so");
+
+  const before = await page.evaluate(() => window.__llmBodies.length);
+  await page.locator('[data-testid="account-exploration-prompt"]')
+    .fill("chart the subjects by how many triples they carry");
+  await page.locator('[data-testid="account-exploration-ask"]').click();
+  await page.waitForFunction(
+    (n) => window.__llmBodies.length > n
+           && /done|failed|answered/.test(
+                document.querySelector('[data-testid="account-exploration-status"]').textContent),
+    before, { timeout: 15000 });
+
+  const sent = await page.evaluate((n) => window.__llmBodies[n], before);
+  ok(/step 1/i.test(sent.system) && /Draw\./.test(sent.system),
+     "the run is told that drawing is step 3 and that this call ends at a proposal (U-12)");
+  ok(/analysis|repositor/i.test(sent.system),
+     "on top of the analysis brief, not instead of it -- the stores are still named");
+  ok((sent.tools || []).some((t) => t.name === "query"),
+     "and query is offered beside survey: a figure is drawn from a query (U-11)");
+  ok((sent.tools || []).every((t) => t.name !== "update"),
+     "the write tool is still withheld, which is what the mode does not change");
+
+  await mode.uncheck();
+  const after = await page.evaluate(() => window.__llmBodies.length);
+  await page.locator('[data-testid="account-exploration-prompt"]').fill("and in prose");
+  await page.locator('[data-testid="account-exploration-ask"]').click();
+  await page.waitForFunction(
+    (n) => window.__llmBodies.length > n, after, { timeout: 15000 });
+  const plain = await page.evaluate((n) => window.__llmBodies[n], after);
+  ok(!/step 1/i.test(plain.system) && (plain.tools || []).every((t) => t.name !== "query"),
+     "unticked, the next run is the analysis it was before -- the mode is per run, not per pane");
+}
+
+console.log("\ncomposing from more than one store");
+{
+  await page.locator('[data-testid="account-exploration-add-store"]')
+    .selectOption("playwright/other");
+  await page.waitForFunction(() =>
+    document.querySelector('[data-testid="account-exploration-choose-playwright-other"]'),
+    null, { timeout: 5000 });
+  await page.locator('[data-testid="account-exploration-choose-playwright-other"]').check();
+  // REQ-37.2.4.  The count used to be in the label -- `Compose from 2' -- so
+  // one operation read as several and the same press in a repository's pane,
+  // labelled `Compose', looked like a different thing.  The verb is now the
+  // verb and the scope is said beside it, which also lets it name the stores
+  // rather than only count them.
+  await page.waitForFunction(() =>
+    /across 2 stores/.test(
+      document.querySelector('[data-testid="account-exploration-scope"]').textContent),
+    null, { timeout: 5000 });
+  ok(await page.textContent('[data-testid="account-exploration-compose"]') === "Compose",
+     "the verb is the verb: the count is no longer grown into the label");
+  ok((await page.getAttribute('[data-testid="account-exploration-scope"]', "title"))
+       .includes("playwright/other"),
+     "and the scope beside it names the stores a press would grant a page over, "
+   + "not merely how many there are");
+
+  await page.locator('[data-testid="account-exploration-compose"]').click();
+  const dash = page.locator('[data-testid="dashboard-pane"]');
+  await dash.waitFor({ timeout: 5000 });
+  ok(await dash.count() === 1,
+     "two stores compose — the press is no longer refused for having more than one");
+  const head = await dash.locator(".dsh-head span").first().textContent();
+  ok(/playwright\/test/.test(head) && /playwright\/other/.test(head),
+     `and the page says which stores it is over: ${head.trim()}`);
+  const repos = await dash.locator('input').evaluateAll((els) =>
+    els.map((e) => e.value).find((v) => /playwright\/test/.test(String(v))));
+  ok(/playwright\/other/.test(String(repos)),
+     "Gate 0 offers the grant over both, which is where the user may still narrow it");
+}
+
+console.log("\na figure across two stores has to say which one it is of");
+{
+  // The dashboard pane opened over the account's; press through it rather
+  // than closing it, because what is being tested is behind it either way.
+  const press = (sel) => page.locator(sel).evaluate((el) => el.click());
+  await page.locator('[data-testid="account-exploration-figure-mode"]').evaluate((el) => {
+    el.checked = true; el.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  const before = await page.evaluate(() => window.__llmBodies.length);
+  await page.locator('[data-testid="account-exploration-prompt"]')
+    .evaluate((el) => { el.textContent = "chart the subjects in each"; });
+  await press('[data-testid="account-exploration-ask"]');
+  await page.waitForFunction(
+    (n) => window.__llmBodies.length > n
+           && /done|failed|answered/.test(
+                document.querySelector('[data-testid="account-exploration-status"]').textContent),
+    before, { timeout: 15000 });
+
+  const sent = await page.evaluate((n) => window.__llmBodies[n], before);
+  ok(/Say which store/.test(sent.system),
+     "with two stores chosen, the model is asked to name the one its query is for");
+  ok(sent.system.includes("playwright/test") && sent.system.includes("playwright/other"),
+     "listing them in the spelling the pane matches on");
+
+  const draw = page.locator('[data-testid^="account-exploration-draw-"]').last();
+  ok(await draw.count() === 1, "the proposal carries a query, so Draw it\u2026 is offered");
+  await draw.evaluate((el) => el.click());
+  ok(await page.locator('[data-testid="figure-gate"]').count() === 1,
+     "and it opens: the store was named in the prose, so the gate knows where to run");
+  const status = await page.locator('[data-testid="account-exploration-status"]').textContent();
+  ok(!/names no repository/.test(status),
+     "not the refusal that a proposal naming nothing would get");
+  await draw.evaluate((el) => el.click());
+  await page.locator('[data-testid="account-exploration-figure-mode"]').evaluate((el) => {
+    el.checked = false; el.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+}
+
 console.log("\nthe location and the model are linked menus");
 {
   const loc = page.locator('[data-testid="connection-location"]');
@@ -846,6 +1026,61 @@ console.log("\nthe location and the model are linked menus");
   s = await state();
   ok(!await locOther.isVisible() && s.provider === "anthropic", "choosing a preset closes the field");
   ok(s.model === "my-local-model", "and a model typed by hand is kept until it is changed");
+}
+
+console.log("\nREQ-37: the three controls say what they are for, and say it the same way");
+{
+  /*
+   * The question this was written for: what are Ask, Session and Compose?
+   *
+   * Every mechanism behind the three was specified and tested; what was not
+   * was the one thing a reader meets first.  The repository pane called its
+   * run `Run', the account pane called the same operation `Ask', the bar
+   * called it `Ask across 2', and `Session' named both the button and the
+   * live MCP exploration handle the interface carries between runs.  So the
+   * three assertions here are: one verb, one noun for the record, and a
+   * visible line saying which is which.
+   */
+  const text = (sel) => page.textContent(sel);
+  const title = (sel) => page.getAttribute(sel, "title");
+
+  // REQ-37.2.4 — one name for one operation.
+  ok(await text('[data-testid="exploration-run"]') === "Ask",
+     "a repository's pane asks with the same verb the account's pane uses — it "
+   + "said `Run', which is also what the query editor's execute button says");
+  ok(await text('[data-testid="account-exploration-ask"]') === "Ask",
+     "and the account's pane carries no count in the verb");
+
+  // REQ-37.2.5 — `Session' named two different things on one screen.
+  ok(await text('[data-testid="exploration-session"]') === "Past runs",
+     "the record browser is named for what it shows, not for the exploration "
+   + "handle that is also called a session");
+  ok(await text('[data-testid="account-exploration-session"]') === "Past runs",
+     "in the account's pane too, which is the same record read from one level up");
+
+  // REQ-37.1.6 — said before it is pressed, where it is, in one line.
+  for (const pane of ["exploration", "account-exploration"]) {
+    const legend = (await text(`[data-testid="${pane}-legend"]`)).replace(/\s+/g, " ");
+    ok(/Ask answers a question/.test(legend),
+       `${pane}: the legend says Ask answers a question`);
+    ok(/builds a page/.test(legend), `${pane}: that Compose builds a page`);
+    ok(/already happened/.test(legend),
+       `${pane}: and that Past runs shows what has already happened`);
+  }
+
+  for (const id of ["exploration-run", "exploration-session", "exploration-dashboard",
+                    "account-exploration-ask", "account-exploration-session",
+                    "account-exploration-compose", "account-exploration-stop"]) {
+    const t = await title(`[data-testid="${id}"]`);
+    ok(Boolean(t) && t.length > 30, `${id} also carries the longer sentence`);
+  }
+  ok(/has not run/.test(await title('[data-testid="exploration-run"]')),
+     "Ask says the part a reader cannot see: the query it ends with has not run");
+  ok(/once, up front/.test(await title('[data-testid="exploration-dashboard"]')),
+     "Compose says the part that makes it a different control: the authority is "
+   + "granted before anything is sent");
+  ok(/no model/.test(await title('[data-testid="exploration-session"]')),
+     "and Past runs says it asks no model, which is why it needs no disclosure");
 }
 
 console.log("\nclose");

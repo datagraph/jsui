@@ -44,6 +44,8 @@ const {
   REQUIRED_HOSTS, WORKSPACE_NAME, hostElement,
 } = await load("app/workspace.js");
 const { runWorkspaceInstruction, describe } = await load("app/workspace-instruction.js");
+const { ensureRegionViews, REGIONS, REGION_KINDS, regionHost, regionViewName } =
+  await load("app/regions.js");
 const { instructionSystem, workspaceSummary, WORKSPACE_CONTRACT } =
   await load("llm/instruction-prompt.js");
 const { validateApplication } = await load("app/document.js");
@@ -399,6 +401,31 @@ section("U-76: the workspace prompt is not the dashboard prompt");
   for (const h of WORKSPACE_HOSTS) ok(sys.includes("`" + h + "`"), `it names the host \`${h}'`);
   ok(/IMMUTABLE/.test(sys), "it says which bands are immutable");
   ok(/w-chrome/.test(sys), "and shows the outline, so the model has names to address");
+}
+
+section("U-115: the contract names the pane regions, and where they are arranged");
+{
+  const w = ensureRegionViews(defaultWorkspace());
+  const sys = instructionSystem("BASE", { target: { kind: "workspace" }, document: w,
+                                          request: "put the view list beside the results",
+                                          answerTokens: 8000 });
+  for (const kind of REGION_KINDS) {
+    ok(sys.includes("`" + regionViewName(kind) + "`"),
+       `it names the view that arranges a \`${kind}' pane`);
+    for (const r of REGIONS[kind]) {
+      ok(sys.includes("`" + regionHost(kind, r.region) + "`"),
+         `and the region \`${regionHost(kind, r.region)}'`);
+    }
+  }
+  ok(/r-repository-pane/.test(sys),
+     "the outline of the pane's own arrangement is shown too, so the model has "
+     + "an anchor to address and not only a host value to guess at");
+  ok(/"view": "repository-pane"/.test(sys),
+     "and the example shows the `view' field, without which a patch against a "
+     + "document of several views cannot say which one it means");
+  ok(/not of one repository/.test(sys),
+     "it says plainly that there is no per-repository arrangement, rather than "
+     + "letting a model approximate one");
 }
 
 section("U-76: the chrome's catalogue is tier 1 only, and the bound is a ceiling");
