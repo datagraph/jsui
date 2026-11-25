@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Authentication - Dydra Admin Console Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 1: Authentication</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="dashboard.html">Next: Chapter 2 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>1.1 The Login Page</h2>
+            <p>The administrative console is reached at <code>https://dydra.com/ui/admin</code>. An unauthenticated request to any route within this path is redirected to <code>/ui/admin/login</code>. The login page presents a form requesting three inputs.</p>
+
+            <div class="float-right">
+                <img src="images/admin-login-form.png" alt="Admin login form">
+                <p class="image-caption">Figure 1.1: The administrative login form.</p>
+            </div>
+
+            <h2>1.2 Input Fields</h2>
+            <table>
+                <thead>
+                    <tr><th>Field</th><th>Default Value</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Host</strong></td>
+                        <td>Current window host, or the <code>?host=</code> query parameter if present</td>
+                        <td>The base URL of the Dydra installation. Determines the API endpoint for all subsequent requests.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Username</strong></td>
+                        <td>Restored from <code>localStorage</code> if a previous session exists</td>
+                        <td>The account name of the authenticating user.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Password</strong></td>
+                        <td>(empty)</td>
+                        <td>The account password or API authentication token. See Section 1.4.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="clear"></div>
+
+            <h2>1.3 Authentication Procedure</h2>
+            <p>Submission of the login form initiates the following sequence:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                The application displays "Authenticating..." in the location bar.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                The supplied credentials are submitted to the authentication endpoint. On success, an access token is stored in the application's auth store.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                The application fetches <code>/system/users/{accountName}/configuration</code> and inspects the <code>administrator_of</code> property.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                If <code>administrator_of</code> includes <code>http://dydra.com</code>, the session is marked as administrator-level. Otherwise it is marked operator-level. See Section 1.5 for the implications of each designation.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                The application navigates to <code>/admin/</code> (the dashboard) and displays a confirmation message: "Authenticated as {accountName} ({admin|user})".
+            </div>
+
+            <div class="float-left">
+                <img src="images/admin-login-success.png" alt="Successful login message">
+                <p class="image-caption">Figure 1.2: The location bar confirmation after successful authentication.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>1.4 Credential Types</h2>
+
+            <h3>1.4.1 Password Authentication</h3>
+            <p>Standard account password. Suitable for interactive sessions.</p>
+
+            <h3>1.4.2 Token Authentication</h3>
+            <p>An API authentication token may be supplied in lieu of a password. Tokens are opaque strings available from the account's profile in the user application. Token authentication is recommended for scripted or programmatic access and for accounts subject to password rotation policies.</p>
+
+            <h2>1.5 Privilege Levels</h2>
+            <p>The console enforces two privilege levels at the session level. The determination is made once at login and is not re-evaluated during the session.</p>
+            <table>
+                <thead>
+                    <tr><th>Level</th><th>Write Operations Available</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Administrator</strong></td>
+                        <td>Create and delete accounts; create and delete repositories; issue, resend, and delete invitations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Operator</strong></td>
+                        <td>None — all write controls are hidden</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>1.6 Session Persistence</h2>
+            <p>The application stores the authenticated username in <code>localStorage</code> under the key <code>dydra.session.accountName</code>. This value is restored into the username field on subsequent visits to the login page, eliminating the need to re-enter the account name. The access token and session state are held in memory only and are not persisted across browser sessions.</p>
+
+            <div class="warning">
+                <strong>Security note:</strong> The access token is retained in browser memory for the duration of the session. On shared or multi-user machines, always sign out explicitly when the session is complete. Closing the browser tab is sufficient to discard the in-memory token.
+            </div>
+
+            <h2>1.7 Sign-Out</h2>
+            <p>The <strong>Log out</strong> control is displayed in the header when a session is active. Activating it performs the following operations in sequence:</p>
+            <ol>
+                <li>Clears the auth store (discards the access token)</li>
+                <li>Terminates the session object</li>
+                <li>Navigates to <code>/admin/login</code> (replacing the current history entry)</li>
+            </ol>
+
+            <h2>1.8 Error Handling</h2>
+
+            <h3>1.8.1 Invalid Credentials</h3>
+            <p>The authentication endpoint returns an error response. The application displays the error message in the alert area above the form and in the location bar (with a five-second timeout). The form fields remain populated for correction and resubmission.</p>
+
+            <h3>1.8.2 Network Errors</h3>
+            <p>If the host is unreachable, a network error is reported in the same fashion. Verify the host field value and network connectivity before retrying.</p>
+
+            <h3>1.8.3 Insufficient Privilege</h3>
+            <p>Authentication succeeds even if the account is not an administrator. The session is established with operator-level access. Write controls throughout the console are suppressed accordingly. If administrator access is required, authenticate with an account that holds the <code>administrator_of</code> designation.</p>
+
+            <h2>1.9 Proceeding</h2>
+            <ul>
+                <li>The dashboard interface and its navigation model — <a href="dashboard.html">Chapter 2</a></li>
+                <li>Account operations — <a href="account-operations.html">Chapter 3</a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

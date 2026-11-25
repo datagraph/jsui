@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compose a Page — Dydra Studio</title>
+<meta name="description" content="Compose is not a longer Ask. It takes a different shape of consent, for a practical reason: a page is a set of queries you authorise together, and no useful moment arrives at which to confirm the eighth of twelve. So you grant the authority once, up front, against a stated budget, and watch a mete">
+<meta name="date" content="2026-11-21">
+<link rel="stylesheet" href="tschichold.css" type="text/css">
+</head>
+<body>
+<div class="container">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Graph Database · Triple Store · User Manual</div>
+      <div class="wordmark"><a href="index.html">dydra (1.2)</a></div>
+    </div>
+    <div class="meta">User manual<br>Compose a Page</div>
+  </header>
+
+  <section class="title">
+    <div class="rail"><div class="vlabel">chapter</div></div>
+    <div class="content">
+      <p class="chapno">Dydra Studio · user manual · 06</p>
+      <h1>Compose a Page</h1>
+      <p class="lede"><strong>Compose</strong> is not a longer <strong>Ask</strong>. It takes a different shape of consent, for a practical reason: a page is a set of queries you authorise <em>together</em>, and no useful moment arrives at which to confirm the eighth of twelve. So you grant the authority once, up front, against a stated budget, and watch a meter spend it.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="where-a-compose-starts">
+    <div class="rail"><div class="numeral">01</div><div class="vlabel">where a compose starts</div></div>
+    <div class="content">
+      <h2>Where a Compose Starts</h2>
+      <p>Press <strong>Compose</strong> in either exploration pane. It opens its own pane beside the one you were in, seeded with whatever you had typed — the prompt is usually most of the way there already.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="the-four-stages">
+    <div class="rail"><div class="numeral">02</div><div class="vlabel">the four stages</div></div>
+    <div class="content">
+      <h2>The Four Stages</h2>
+      <h3>Gate 0 — the grant</h3>
+      <p>Before the interface sends anything, you set — and see — what the run may do: which repositories it may read, how many calls, how many rows, how many bytes, and whether it may write. The meter beside the grant counts the spending as it happens, and you may revoke the grant while the run goes.</p>
+      <h3>Phase 1 — the exchange</h3>
+      <p>The model explores, through the same MCP endpoints an <strong>Ask</strong> uses, and proposes a page. The transcript shows every exchange — what went out, what came back, each call's arguments and payload. The run log beside it keeps the terse record you read the grant, the meter and the budget verdict against.</p>
+      <p>A turn in flight counts its own seconds and says what it waits on. The turn that writes the whole page is one request with no events inside it, so this is the stretch in which another surface would look as though it had stopped.</p>
+      <h3>Gate 1 — the proposal</h3>
+      <p>You review the whole page as one unit: every panel's query, every transform's source, every passage the model wrote. The gate lists the errors and the warnings. If you asked for a chart and the page draws none, it says so here — as a notice, never a refusal, since some results genuinely cannot carry a chart.</p>
+      <h3>Phase 2 — the interface's own runs</h3>
+      <p>You approve, and <strong>the interface</strong> runs the panels under your credentials. The page binds to what came back. It never shows you rows the model reported.</p>
+      <h3>Gate 2 — the disposition</h3>
+      <p>Keep it, save it, refresh it, or discard it.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="what-a-page-holds">
+    <div class="rail"><div class="numeral">03</div><div class="vlabel">what a page holds</div></div>
+    <div class="content">
+      <h2>What a Page Holds</h2>
+      <p>Every region declares which of three kinds it is, and the page says so where you can see it:</p>
+      <ul>
+      <li><strong>bound</strong> — the interface ran that panel's query and filled the slot. Live: it refreshes.</li>
+      <li><strong>derived</strong> — a value the model computed, written as a function the page can re-run. Still live, because the function runs again when the data does.</li>
+      <li><strong>asserted</strong> — prose, judgement, a chart the model drew by hand. Nothing re-derives it, and the page marks it as the model's own work.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section heavy" id="where-a-provenance-mark-comes-from">
+    <div class="rail"><div class="numeral">04</div><div class="vlabel">where a provenance mark</div></div>
+    <div class="content">
+      <h2>Where a Provenance Mark Comes From</h2>
+      <p>Each region carries a mark, and <strong>the interface writes it, not the model</strong>. The interface keeps its own ledger of everything it put in front of the model — the prompt, the documentation it read, and every result with its repository, its query, its shape and its digest — and adds to that ledger through the compose and every revision after it. A region the model wrote takes its attribution from that ledger: <em>written by the model from alice/sales, alice/costs</em>, listing the sources in the order the run read them. Hover the mark to see them.</p>
+      <p>The mark keeps three statements apart, because they mean different things: the run read data; the run read nothing from any store; and no record exists for this page. A page carries its ledger into a downloaded copy and into its record, so a page you reopen from the archive carries the same evidence a fresh one does.</p>
+      <p>Beside that, the page carries the <strong>EU AI Act Article 50</strong> line: which model produced it, when, and which repositories it read.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="revise-a-page">
+    <div class="rail"><div class="numeral">05</div><div class="vlabel">revise a page</div></div>
+    <div class="content">
+      <h2>Revise a Page</h2>
+      <p>The <strong>Revise</strong> box under the page is the location bar's instruction channel, with its target already set to the page it sits in — the same mechanism, so the same reply. Type what you want changed. Back comes a <em>patch</em>, not a new page: your scroll position, the tab you had open and your selection all survive, and the page numbers the revision and keeps it.</p>
+      <p>A change that needs new authority opens a gate. A presentational one does not.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="a-page-stays-live">
+    <div class="rail"><div class="numeral">06</div><div class="vlabel">a page stays live</div></div>
+    <div class="content">
+      <h2>A Page Stays Live</h2>
+      <ul>
+      <li><strong>Refresh</strong> re-runs the panels under your credentials.</li>
+      <li>A control on the page may change a <strong>parameter</strong> — what a query asks <em>for</em> — and the page re-runs only the panels that depend on it, charging them against its own interaction budget. A page never rewrites its own query.</li>
+      <li>Where results have moved under a passage, the page <strong>marks it stale</strong> in place rather than quietly running it again.</li>
+      </ul>
+      <p>A copy you download stays live as well. It opens with the data it was saved with and draws that without reaching anything, and its own <strong>Refresh</strong> runs the same queries again: give it the address and a token of yours and the panels refill, the computed values recompute, and any passage the numbers have moved under is marked. Nothing of yours travels in the file &mdash; you type the token into the tab, and it goes when you close it. A copy opened straight off the disk may not be able to reach the service at all; most browsers refuse that. Serve the file, or open the page again in Dydra.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="find-a-page-again">
+    <div class="rail"><div class="numeral">07</div><div class="vlabel">find a page again</div></div>
+    <div class="content">
+      <h2>Find a Page Again</h2>
+      <p>A page you keep goes into your account's <code>mcp</code> repository with its panels, its transforms, its passages, the digests each was made from, and the ledger of what the interface showed the model. Reopen it and the interface <em>runs</em> the queries again rather than replay a snapshot, so a page reopened after the data moved marks its own prose on the way up. Open an earlier revision and it forks: it takes a new identity starting at revision 1, because carrying on from revision 2 of a page that reached revision 4 is a different page from there on.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="what-a-page-cannot-do">
+    <div class="rail"><div class="numeral">08</div><div class="vlabel">what a page cannot do</div></div>
+    <div class="content">
+      <h2>What a Page Cannot Do</h2>
+      <p>The page runs in a sandbox with no origin and no network. It fetches nothing, reaches no credential of yours, reads no storage, and speaks to the rest of the interface only through the one channel the interface opens for it. That is what makes it safe to run a page a model wrote.</p>
+    </div>
+  </section>
+
+  <section class="section" id="next-steps">
+    <div class="rail"><div class="numeral">09</div><div class="vlabel">next steps</div></div>
+    <div class="content">
+      <h2>Next Steps</h2>
+      <ul>
+      <li><a href="asking-a-model.html">Ask a Model About Your Data</a> — the three controls, and what each takes</li>
+      <li><a href="../arrangement-manual/index.html">Arrangement</a> — lift a region out of one page and apply it to another</li>
+      <li><a href="view-operations.html">View Operations</a> — the saved queries a panel is promoted into</li>
+      </ul>
+    </div>
+  </section>
+  <nav class="band pager" aria-label="Manual">
+    <a class="cell" href="asking-a-model.html"><span class="dir">Previous</span> Ask a Model About Your Data</a>
+    <a class="cell" href="index.html"><span class="dir">Up</span> Contents</a>
+    <span class="spacer"></span>
+    <a class="cell" href="multi-repository-analysis.html"><span class="dir">Next</span> Ask Across Several Repositories</a>
+  </nav>
+
+
+  <footer class="footer">
+    <div class="wm"><a href="index.html">dydra (1.2)</a></div>
+    <div class="fl">Dydra Studio · user manual<br>&copy; 2026 Dydra</div>
+    <div class="disclaimer">
+      <p>This documentation describes a <strong>Dydra 1.2 preview</strong>: what is
+      written here is subject to change before release.</p>
+      <p class="service"><a href="https://dydra.com/login">Login</a><a href="https://dydra.com/signup">Sign up</a><a href="https://dydra.com/legal/terms_of_service">Legal</a></p>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

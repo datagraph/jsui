@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 2: The Admin Dashboard - Dydra Admin Console Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 2: The Admin Dashboard</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="login.html">← Previous: Chapter 1</a>
+            <a href="account-operations.html">Next: Chapter 3 →</a>
+        </nav>
+
+        <div class="content">
+            <h2>2.1 Overview</h2>
+            <p>Following successful authentication, the application navigates to the administrative dashboard at route <code>/admin/</code>. The dashboard is a single page organized into six tabs, each presenting a distinct operational domain. All substantive administrative work is conducted from this page.</p>
+
+            <div class="float-left">
+                <img src="images/admin-dashboard-overview.png" alt="Admin dashboard overview">
+                <p class="image-caption">Figure 2.1: The admin dashboard as rendered immediately after login.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h2>2.2 Page Structure</h2>
+            <p>The page is composed of the following structural regions, rendered top to bottom:</p>
+            <table>
+                <thead>
+                    <tr><th>Region</th><th>Element ID</th><th>Contents</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Header</td><td><code>#header-container</code></td><td>Logo, application title, session navigation links</td></tr>
+                    <tr><td>Tab Bar</td><td><code>#tabs-container</code></td><td>Six tab links; visible only when a session is active</td></tr>
+                    <tr><td>Content</td><td><code>#content-container</code></td><td>The active tab's panel</td></tr>
+                    <tr><td>Footer</td><td><code>#footer</code></td><td>Administrative metadata</td></tr>
+                    <tr><td>Location Bar</td><td><code>#location-bar</code></td><td>Editable URL field; also displays transient status messages</td></tr>
+                </tbody>
+            </table>
+
+            <h2>2.3 The Tab Bar</h2>
+            <p>The tab bar presents six tabs. Each tab corresponds to a named panel within the page. Only one panel is visible at a time.</p>
+
+            <div class="float-right">
+                <img src="images/admin-dashboard-tabs.png" alt="Admin dashboard tab bar">
+                <p class="image-caption">Figure 2.2: The six-tab navigation bar.</p>
+            </div>
+            <div class="clear"></div>
+
+            <table>
+                <thead>
+                    <tr><th>Tab Label</th><th>Panel ID</th><th>Route Alias</th><th>Chapter</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Accounts</td><td><code>#admin-accounts</code></td><td><code>/admin/manage/accounts</code></td><td><a href="account-operations.html">Chapter 3</a></td></tr>
+                    <tr><td>Repositories</td><td><code>#admin-repositories</code></td><td><code>/admin/manage/repositories</code></td><td><a href="repository-operations.html">Chapter 4</a></td></tr>
+                    <tr><td>Invitations</td><td><code>#admin-invitations</code></td><td><code>/admin/invitations</code></td><td><a href="invitations.html">Chapter 5</a></td></tr>
+                    <tr><td>Query History</td><td><code>#admin-query-history</code></td><td><code>/admin/history/queries</code></td><td><a href="system-monitoring.html">Chapter 6</a></td></tr>
+                    <tr><td>Transaction History</td><td><code>#admin-transaction-history</code></td><td><code>/admin/history/transactions</code></td><td><a href="system-monitoring.html">Chapter 6</a></td></tr>
+                    <tr><td>Import History</td><td><code>#admin-import-history</code></td><td><code>/admin/history/imports</code></td><td><a href="system-monitoring.html">Chapter 6</a></td></tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <strong>Route aliases:</strong> The route aliases listed above navigate directly to the dashboard with the corresponding tab pre-selected. They may be used in the location bar or as bookmarks. All six aliases resolve to the same dashboard page; only the initially-active tab differs.
+            </div>
+
+            <h2>2.4 Tab Loading Behaviour</h2>
+            <p>Tab content is loaded lazily. The following rules govern when network requests are issued:</p>
+            <ul>
+                <li>The <strong>Accounts</strong> tab is loaded immediately when the dashboard is first rendered, regardless of which tab is initially active.</li>
+                <li>All other tabs issue their initial data fetch on the first click that activates them.</li>
+                <li>Subsequent clicks to an already-loaded tab do not re-fetch data. Use the <strong>Refresh</strong> button within each tab to reload.</li>
+                <li>Certain tabs invalidate their cached data when upstream selections change: the Repositories tab re-fetches when the account selection changes; the Query History tab re-fetches when the repository selection changes. See Sections 2.5 and 2.6.</li>
+            </ul>
+
+            <h2>2.5 Cross-Tab Dependencies</h2>
+            <p>Three tabs participate in a filtering relationship. Data selected in one tab constrains the data displayed in another:</p>
+            <ol>
+                <li>Checkboxes in the <strong>Accounts</strong> tab determine which accounts' repositories are fetched in the <strong>Repositories</strong> tab.</li>
+                <li>Checkboxes in the <strong>Repositories</strong> tab determine which repositories' query history is fetched in the <strong>Query History</strong> tab.</li>
+            </ol>
+            <p>This dependency chain is unidirectional: selecting or deselecting an account will trigger an automatic refresh of the Repositories tab if that tab has already been loaded. Similarly, changes to repository selection trigger a refresh of the Query History tab if loaded.</p>
+
+            <div class="note">
+                <strong>Navigation note:</strong> To follow the dependency chain in the intended order, work left to right through the tabs: select accounts first, then proceed to Repositories, then to Query History.
+            </div>
+
+            <h2>2.6 The Location Bar</h2>
+            <p>The location bar occupies the bottom of every page. It serves two purposes:</p>
+
+            <h3>2.6.1 URL Display and Direct Navigation</h3>
+            <p>The location bar displays the current route. Clicking on it transforms the display into an editable text field. Typing a path and pressing Enter navigates the application to that route, using the client-side router. This is equivalent to typing in the browser's address bar but confines navigation to routes within the admin application.</p>
+
+            <h3>2.6.2 Status Messages</h3>
+            <p>The application writes transient status messages to the location bar. Such messages replace the URL display for a configured duration (typically three to five seconds) before reverting to the current route path. Status messages are issued by the following events:</p>
+            <ul>
+                <li>Login initiation ("Authenticating...")</li>
+                <li>Successful authentication ("Authenticated as {name} ({level})")</li>
+                <li>Authentication errors</li>
+                <li>Operation confirmations and error reports from individual tab panels</li>
+            </ul>
+
+            <h2>2.7 Header Navigation</h2>
+            <p>The header contains the following navigation elements when a session is active:</p>
+            <table>
+                <thead>
+                    <tr><th>Element</th><th>Destination / Action</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Logo / application title</td><td>Navigates to <code>/admin/</code> (the dashboard root)</td></tr>
+                    <tr><td><strong>User</strong> link</td><td>Navigates to the user application at <code>/ui/user</code></td></tr>
+                    <tr><td><strong>Log out</strong> button</td><td>Clears the session and navigates to <code>/admin/login</code></td></tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <strong>Switching to the user application:</strong> The <strong>User</strong> link opens the standard user-facing interface. The admin session is independent; navigating to the user app does not terminate the admin session. Use the browser's back button to return.
+            </div>
+
+            <h2>2.8 Dialog Windows</h2>
+            <p>Several operations within the dashboard open modal dialog windows. All dialogs share the following interaction model:</p>
+            <ul>
+                <li>The dialog is overlaid on a semi-transparent background that obscures the page behind it.</li>
+                <li>Clicking the background (outside the dialog boundary) closes the dialog without taking any action.</li>
+                <li>A close or cancel button within the dialog likewise closes it without action.</li>
+                <li>Pressing <strong>Enter</strong> in a text input submits the associated form.</li>
+                <li>Pressing <strong>Escape</strong> closes the dialog.</li>
+            </ul>
+
+            <h2>2.9 Proceeding</h2>
+            <ul>
+                <li>Account enumeration, inspection, creation, and deletion — <a href="account-operations.html">Chapter 3</a></li>
+                <li>Repository management — <a href="repository-operations.html">Chapter 4</a></li>
+                <li>Invitation management — <a href="invitations.html">Chapter 5</a></li>
+                <li>System monitoring — <a href="system-monitoring.html">Chapter 6</a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

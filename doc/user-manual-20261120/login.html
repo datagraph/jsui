@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Sign In</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="account-operations.html">Next: Account Operations →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Overview</h2>
+            <p>Dydra Studio asks you to sign in before it shows your account and repositories. This chapter tells you how to sign in and how to hold a session.</p>
+
+            <h2>Open the Login Page</h2>
+            <p>To reach Dydra Studio, go to:</p>
+            <div class="note">
+                <strong>URL:</strong> <code>https://dydra.com/ui/user</code>
+            </div>
+            <p>The application shows the login page when you first open it, and whenever you are not signed in.</p>
+
+            <h2>Sign In to Your Account</h2>
+            <p>To sign in:</p>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Go to the login page at <code>https://dydra.com/ui/user</code>
+            </div>
+
+
+            <div  class="float-right">
+            <img src="images/login-form-filled.png" alt="Login form with credentials entered">
+            <p class="image-caption">Figure 1: Login form with credentials entered, ready to submit</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Enter your account credentials:
+                <ul>
+                    <li><strong>Host:</strong> The Dydra service host (typically <code>https://dydra.com</code>)</li>
+                    <li><strong>Login:</strong> Your account username</li>
+                    <li><strong>Password:</strong> Your account password</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Click the <strong>Login</strong> button or press <kbd>Enter</kbd>
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                The application takes you to your account page, where you can see your repositories and account information.
+            </div>
+
+            <div class="note">
+                <strong>Note:</strong> You can hold several accounts open at once. Switch between them, or add another, at any point in a session.
+            </div>
+
+            <h2>Two Ways to Prove Who You Are</h2>
+            <p>Dydra Studio accepts two:</p>
+            <ul>
+                <li><strong>Basic:</strong> give a username and a password</li>
+                <li><strong>Bearer token:</strong> give a token instead, for programmatic access.
+                  <br />Write it as "Bearer <i>tokenValue</i>".</li>
+            </ul>
+            <p>For ordinary use, choose Basic and give your username and password.</p>
+
+            <h2>Hold a Session</h2>
+            <h3>What the Browser Remembers</h3>
+            <p>The application keeps only account names across a page reload, in browser storage. So:</p>
+            <ul>
+                <li>It remembers the accounts you have signed in to, and offers them after a reload</li>
+                <li>You reach an account you used before without typing its name again</li>
+            </ul>
+
+            <div class="warning">
+                <strong>Important:</strong> tokens and every other piece of session data live in JavaScript objects for the life of one page. Close the page or the browser tab and all of it goes, tokens included. Sign in again afterwards, even though the account names come back.
+            </div>
+
+            <h3>Sign Out</h3>
+            <p>To sign out:</p>
+            <ol>
+                <li>Click the <strong>Logout</strong> link in the navigation bar</li>
+                <li>The application returns you to the login page</li>
+                <li>It clears every piece of session data from memory, tokens included</li>
+                <li>Browser storage may still hold the account names, for convenience; sign in again to reach the account</li>
+            </ol>
+
+            <h2>When Sign-In Fails</h2>
+            <h3>Check These First</h3>
+            <p>If you cannot sign in, check that:</p>
+            <ul>
+                <li>Your username and password are right</li>
+                <li>The host URL is right — usually <code>https://dydra.com</code></li>
+                <li>Your network reaches the service</li>
+                <li>Your account exists and is active</li>
+            </ul>
+
+            <h3>Error Messages</h3>
+            <p>If the application reports an error:</p>
+            <ul>
+                <li>Read it closely — it names the problem</li>
+                <li>"Invalid credentials" and "Authentication failed" are the common ones</li>
+                <li>If it keeps happening, write to <strong>support@dydra.com</strong></li>
+            </ul>
+
+            <h2>Next Steps</h2>
+            <p>Once you are in, you can:</p>
+            <ul>
+                <li>Read and edit your <a href="account-operations.html">account metadata</a></li>
+                <li>Create and manage <a href="repository-operations.html">repositories</a></li>
+                <li>Import and export data</li>
+                <li>Create and execute <a href="view-operations.html">SPARQL views</a></li>
+                <li>Read <a href="tips-and-best-practices.html">Tips and Best Practices</a> to move faster and diagnose trouble</li>
+                <li>Turn to the <a href="appendices.html">Appendices</a> for file formats and keyboard shortcuts</li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ask a Model About Your Data — Dydra Studio</title>
+<meta name="description" content="Dydra Studio can put a language model in front of your repositories. The model never reaches the store directly and never runs anything: it reads through the repository's MCP endpoint, it proposes, and the interface runs what you approve, under your own credentials. Everything on this page follows">
+<meta name="date" content="2026-11-21">
+<link rel="stylesheet" href="tschichold.css" type="text/css">
+</head>
+<body>
+<div class="container">
+
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Graph Database · Triple Store · User Manual</div>
+      <div class="wordmark"><a href="index.html">dydra (1.2)</a></div>
+    </div>
+    <div class="meta">User manual<br>Ask a Model About Your Data</div>
+  </header>
+
+  <section class="title">
+    <div class="rail"><div class="vlabel">chapter</div></div>
+    <div class="content">
+      <p class="chapno">Dydra Studio · user manual · 05</p>
+      <h1>Ask a Model About Your Data</h1>
+      <p class="lede">Dydra Studio can put a language model in front of your repositories. The model never reaches the store directly and never runs anything: it reads through the repository's MCP endpoint, it <em>proposes</em>, and <strong>the interface runs what you approve, under your own credentials</strong>. Everything on this page follows from that one rule.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="the-three-controls-and-what-each-one-does">
+    <div class="rail"><div class="numeral">01</div><div class="vlabel">the three controls</div></div>
+    <div class="content">
+      <h2>The three controls, and what each one does</h2>
+      <p>Under the prompt box sit three buttons. They are not three sizes of the same thing: they differ in what comes back, and in what you authorise to produce it.</p>
+      <div class="tablewrap">
+      <table class="docutils">
+      <thead>
+      <tr><th>Control</th><th>What it does</th><th>What you get back</th><th>What it takes</th></tr>
+      </thead>
+      <tbody>
+      <tr>
+      <td><strong>Ask</strong></td>
+      <td>A <strong>question</strong></td>
+      <td>Prose, usually ending in a SPARQL query</td>
+      <td>The read-only tool set, for one turn</td>
+      </tr>
+      <tr>
+      <td><strong>Compose</strong></td>
+      <td>A <strong>page</strong></td>
+      <td>A live document: panels, charts, prose, provenance marks, revisions</td>
+      <td>A grant with a budget, taken once before anything is sent</td>
+      </tr>
+      <tr>
+      <td><strong>Past runs</strong></td>
+      <td><strong>What already happened</strong></td>
+      <td>The record of past runs — nothing new</td>
+      <td>Nothing: it asks no model and runs no query</td>
+      </tr>
+      </tbody>
+      </table>
+      </div>
+      <p>In one line each:</p>
+      <ul>
+      <li><strong>Ask answers a question.</strong> The model explores the stores you chose and writes an answer. Any query it ends with has <em>not</em> run; running it, drawing a figure from it, or keeping it as a view are each your own separate act.</li>
+      <li><strong>Compose builds a page.</strong> See <a href="composing-a-page.html">Compose a Page</a>.</li>
+      <li><strong>Past runs shows what has already happened.</strong> It opens the record of past explorations, what the interface showed the model in each, and the endpoint's own journal of what it served.</li>
+      </ul>
+      <p>Both panes print that same line under the buttons, so you need not remember it, and hovering any of the three gives you the longer sentence. <strong>Run</strong> is not one of these: in this interface it means one thing only, which is <em>execute this SPARQL query</em>.</p>
+      <p>Two further controls are <em>modes</em> rather than actions:</p>
+      <ul>
+      <li><strong>Figure</strong> changes what you <em>ask the model for</em>, not how anything is drawn. Tick it and the run tells the model that proposing a query is step 2 and drawing is step 3, and offers it <code>query</code> beside <code>survey</code>. The run reads the tick once, as it begins — tick it mid-run and nothing changes. <strong>Draw it…</strong> draws from any query in the transcript, ticked or not.</li>
+      <li><strong>Stop</strong> raises a flag the run reads between rounds. A call already in flight comes back, and the record keeps it, because the store has already done the work. A stopped run says so, and hands you the prose it had.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section heavy" id="connect-a-model">
+    <div class="rail"><div class="numeral">02</div><div class="vlabel">connect a model</div></div>
+    <div class="content">
+      <h2>Connect a Model</h2>
+      <p>The connection is a setting of <strong>your account</strong>, not of a repository:</p>
+      <ol>
+      <li>Open your account page and choose the <strong>Connection</strong> tab, beside Profile, Configuration and Collaborations.</li>
+      <li>Choose the provider and the model, and enter the credential.</li>
+      </ol>
+      <p>The page holds the credential in memory for its own life. It writes it to no repository and to no browser storage, exactly as it treats your Dydra token. Close the tab and it goes.</p>
+      <p>Every surface that asks a model anything — the exploration panes, the location bar, a compose pane, the figure gate — draws on that one connection. None asks you for the credential twice, and where you have set none they all refuse in the same words and name the one place to set it.</p>
+      <p>A repository's <strong>MCP endpoint</strong>, its token and the exploration it holds open are a different matter, and stay with the repository. A repository's exploration pane says which connection it draws on; it does not own it.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="two-panes-one-repository-or-several">
+    <div class="rail"><div class="numeral">03</div><div class="vlabel">two panes</div></div>
+    <div class="content">
+      <h2>Two Panes: One Repository, or Several</h2>
+      <ul>
+      <li><strong>A repository's exploration pane</strong> opens from the repository page. It explores that one repository.</li>
+      <li><strong>The account's exploration pane</strong> opens from the tab marked with the triple in the account's left margin. It carries the model connection and a choice of stores.</li>
+      <li>Both ask with the same button, <strong>Ask</strong>. The chip beside it says what a press would reach — <em>no store chosen</em>, the store's name, or <em>across 3 stores</em>, whose tooltip names them. The count is beside the verb rather than inside it, so one operation reads as one operation wherever you meet it.</li>
+      </ul>
+      <p>The <em>permitted set</em> — the repositories you may choose from — holds your own repositories and the ones you collaborate on. The session reads it as it begins, and refuses a repository outside it by name, before anything runs.</p>
+      <p>Two worked examples follow: <a href="multi-repository-analysis.html">Ask Across Several Repositories</a> and <a href="../analysis-live/index.html">The same analysis, with a real model</a>.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="ask-from-the-location-bar">
+    <div class="rail"><div class="numeral">04</div><div class="vlabel">ask from the location bar</div></div>
+    <div class="content">
+      <h2>Ask From the Location Bar</h2>
+      <p>The location bar is the one thing always on the screen, and it takes a question about data as readily as an instruction about the interface. It works out which you meant without asking you, and without spending a turn to find out:</p>
+      <ul>
+      <li>A path, or a line beginning <code>goto</code>, <strong>navigates</strong>.</li>
+      <li>A line naming a repository — <code>compare classes in alice/sales and alice/costs</code> — is a <strong>question about data</strong>, and the reply names the stores it would read.</li>
+      <li>Anything else is an <strong>instruction about the interface</strong>. See the <a href="../arrangement-manual/index.html">Arrangement</a> manual.</li>
+      </ul>
+      <p>Nothing runs until you press the button in the reply. That button performs the same operation as the account pane's <strong>Ask</strong>.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="what-you-learn-before-anything-runs">
+    <div class="rail"><div class="numeral">05</div><div class="vlabel">what you learn before</div></div>
+    <div class="content">
+      <h2>What You Learn Before Anything Runs</h2>
+      <p>The interface discloses a run before it starts, in the terms the authority itself holds rather than a summary of them. It tells you:</p>
+      <ul>
+      <li>which repositories the turn may reach, each with the account it belongs to;</li>
+      <li>how many rounds of tool calls it may take, and how many calls in all;</li>
+      <li>that it is <strong>read-only</strong> for this run;</li>
+      <li>that large results are read as their shape first, with the whole document available on request;</li>
+      <li>where it will write the record, and that you may stop the run while it goes.</li>
+      </ul>
+      <p>Where a store offers no tools, the interface names it, and says why it offered none, before you read an answer that quietly leaves it out.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="watch-a-run-and-read-the-exchange">
+    <div class="rail"><div class="numeral">06</div><div class="vlabel">watch a run</div></div>
+    <div class="content">
+      <h2>Watch a Run, and Read the Exchange</h2>
+      <p>While a run goes, the status line names the store it is asking, says what it is asking for, and says how far into its rounds it has come — and it counts the seconds of a request still in flight, so a long turn does not look like a stopped one.</p>
+      <p>Below it, the <strong>transcript</strong> shows every exchange whole rather than summarised: what the interface sent the model, what the model answered, the arguments of each call it made, and the payload that came back. The same transcript appears in both panes and in a compose pane.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="what-you-can-do-with-an-answer">
+    <div class="rail"><div class="numeral">07</div><div class="vlabel">what you can do</div></div>
+    <div class="content">
+      <h2>What You Can Do With an Answer</h2>
+      <ul>
+      <li><strong>Draw it…</strong> on a query in the transcript renders a figure. The interface runs the query — never the model.</li>
+      <li><strong>Add as a view</strong> keeps the query in the repository's catalogue as an ordinary saved view.</li>
+      <li><strong>Keep the report</strong> renders the answer as a standalone HTML page carrying its own styles, no script and nothing to fetch, with the provenance line, the stores it read and the links to its record. One control opens it in its own window; the other saves it under a dated file name. Both panes offer it.</li>
+      <li><strong>Past runs</strong> finds it again later.</li>
+      </ul>
+      <p>Where you chose several stores, each query belongs to the store that produced it. Where the interface cannot settle which — the prose names two stores, or none — <strong>Draw it…</strong> and <strong>Add as a view</strong> refuse, and say what would make them work, rather than run one repository's query against another.</p>
+    </div>
+  </section>
+
+  <section class="section heavy" id="what-the-run-records">
+    <div class="rail"><div class="numeral">08</div><div class="vlabel">what the run records</div></div>
+    <div class="content">
+      <h2>What the Run Records</h2>
+      <p>A run can write itself as RDF into your account's <code>mcp</code> repository: the prompt, the documents the model read, each turn of its prose, and the payload of every call. Where a run reached several stores it writes one record per store, so you can attribute a cross-repository answer store by store. If it cannot write the record it tells you, and keeps the answer.</p>
+    </div>
+  </section>
+
+  <section class="section" id="next-steps">
+    <div class="rail"><div class="numeral">09</div><div class="vlabel">next steps</div></div>
+    <div class="content">
+      <h2>Next Steps</h2>
+      <ul>
+      <li><a href="composing-a-page.html">Compose a Page</a> — what <strong>Compose</strong> does, and why it asks for authority differently</li>
+      <li><a href="multi-repository-analysis.html">Ask Across Several Repositories</a> — the disclosure and the choice of stores, in detail</li>
+      <li><a href="../arrangement-manual/index.html">Arrangement</a> — change the interface itself by asking for it</li>
+      </ul>
+    </div>
+  </section>
+  <nav class="band pager" aria-label="Manual">
+    <a class="cell" href="view-operations.html"><span class="dir">Previous</span> View Operations</a>
+    <a class="cell" href="index.html"><span class="dir">Up</span> Contents</a>
+    <span class="spacer"></span>
+    <a class="cell" href="composing-a-page.html"><span class="dir">Next</span> Compose a Page</a>
+  </nav>
+
+
+  <footer class="footer">
+    <div class="wm"><a href="index.html">dydra (1.2)</a></div>
+    <div class="fl">Dydra Studio · user manual<br>&copy; 2026 Dydra</div>
+    <div class="disclaimer">
+      <p>This documentation describes a <strong>Dydra 1.2 preview</strong>: what is
+      written here is subject to change before release.</p>
+      <p class="service"><a href="https://dydra.com/login">Login</a><a href="https://dydra.com/signup">Sign up</a><a href="https://dydra.com/legal/terms_of_service">Legal</a></p>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

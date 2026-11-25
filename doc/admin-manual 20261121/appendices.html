@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appendices - Dydra Admin Console Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Appendices</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="system-monitoring.html">← Previous: Chapter 6</a>
+        </nav>
+
+        <div class="content">
+            <h2>Appendix A: Route Reference</h2>
+            <p>All routes within the administrative console are prefixed with <code>/admin</code>. The following table enumerates every route and its corresponding function.</p>
+            <table>
+                <thead>
+                    <tr><th>Route</th><th>Page</th><th>Access</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>/admin/login</code></td><td>Login</td><td>Public</td><td>Authentication form. Unauthenticated requests to any protected route are redirected here.</td></tr>
+                    <tr><td><code>/admin/</code></td><td>Dashboard</td><td>Auth required</td><td>The main tabbed dashboard. Loads with the Accounts tab active.</td></tr>
+                    <tr><td><code>/admin/manage/accounts</code></td><td>Dashboard</td><td>Auth required</td><td>Alias for <code>/admin/</code> with the Accounts tab pre-selected.</td></tr>
+                    <tr><td><code>/admin/manage/accounts/:account_name</code></td><td>Dashboard</td><td>Auth required</td><td>Opens the account details dialog for the named account.</td></tr>
+                    <tr><td><code>/admin/manage/repositories</code></td><td>Dashboard</td><td>Auth required</td><td>Alias with the Repositories tab pre-selected.</td></tr>
+                    <tr><td><code>/admin/invitations</code></td><td>Dashboard</td><td>Auth required</td><td>Alias with the Invitations tab pre-selected.</td></tr>
+                    <tr><td><code>/admin/invite</code></td><td>Dashboard</td><td>Auth required (Admin)</td><td>Opens the New Invitation dialog.</td></tr>
+                    <tr><td><code>/admin/history/queries</code></td><td>Dashboard</td><td>Auth required</td><td>Alias with the Query History tab pre-selected.</td></tr>
+                    <tr><td><code>/admin/history/transactions</code></td><td>Dashboard</td><td>Auth required</td><td>Alias with the Transaction History tab pre-selected.</td></tr>
+                    <tr><td><code>/admin/logout</code></td><td>—</td><td>Auth required</td><td>Clears the session and redirects to <code>/admin/login</code>.</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix B: API Endpoints</h2>
+            <p>The following table enumerates all API endpoints exercised by the administrative console, with their HTTP methods and purposes.</p>
+
+            <h3>B.1 Account Endpoints</h3>
+            <table>
+                <thead>
+                    <tr><th>Method</th><th>Endpoint</th><th>Purpose</th><th>Admin Only</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>GET</code></td><td><code>/system/accounts</code></td><td>Enumerate all system accounts</td><td>No</td></tr>
+                    <tr><td><code>GET</code></td><td><code>/system/accounts/{account}/configuration</code></td><td>Retrieve account configuration properties</td><td>No</td></tr>
+                    <tr><td><code>POST</code></td><td><code>/system/accounts</code></td><td>Create a new account</td><td>Yes</td></tr>
+                    <tr><td><code>DELETE</code></td><td><code>/system/accounts/{account}</code></td><td>Delete an account and all its repositories</td><td>Yes</td></tr>
+                </tbody>
+            </table>
+
+            <h3>B.2 Repository Endpoints</h3>
+            <table>
+                <thead>
+                    <tr><th>Method</th><th>Endpoint</th><th>Purpose</th><th>Admin Only</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>GET</code></td><td><code>/system/accounts/{account}/repositories</code></td><td>Enumerate repositories for an account</td><td>No</td></tr>
+                    <tr><td><code>POST</code></td><td><code>/system/accounts/{account}/repositories</code></td><td>Create a repository under an account</td><td>Yes</td></tr>
+                    <tr><td><code>DELETE</code></td><td><code>/system/accounts/{account}/repositories/{repo}</code></td><td>Delete a repository</td><td>Yes</td></tr>
+                </tbody>
+            </table>
+
+            <h3>B.3 Invitation Endpoints</h3>
+            <table>
+                <thead>
+                    <tr><th>Method</th><th>Endpoint</th><th>Purpose</th><th>Admin Only</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>POST</code></td><td><code>/invitations</code></td><td>Issue or resend an invitation to an email address</td><td>Yes</td></tr>
+                    <tr><td><code>DELETE</code></td><td><code>/invitations/{email}</code></td><td>Delete an invitation record</td><td>Yes</td></tr>
+                </tbody>
+            </table>
+
+            <h3>B.4 Service History Endpoints</h3>
+            <table>
+                <thead>
+                    <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>GET</code></td><td><code>/system/accounts/{account}/repositories/{repo}/service_history</code></td><td>Query execution history for a specific repository</td></tr>
+                    <tr><td><code>GET</code></td><td><code>/system/service_history/queries/{account}/{signature}</code></td><td>Full SPARQL text for a query identified by signature</td></tr>
+                    <tr><td><code>GET</code></td><td><code>/system/service_history/transactions</code></td><td>System-wide transaction history</td></tr>
+                    <tr><td><code>GET</code></td><td><code>/system/service_history/imports?offset={o}&amp;limit={l}</code></td><td>System-wide import history, paginated</td></tr>
+                </tbody>
+            </table>
+
+            <h3>B.5 User Configuration Endpoint</h3>
+            <table>
+                <thead>
+                    <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>GET</code></td><td><code>/system/users/{accountName}/configuration</code></td><td>Retrieve user configuration; used during login to determine administrator status</td></tr>
+                </tbody>
+            </table>
+
+            <h3>B.6 Request Headers</h3>
+            <table>
+                <thead>
+                    <tr><th>Header</th><th>Value</th><th>Context</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><code>Authorization</code></td><td><code>Bearer {token}</code></td><td>All authenticated requests</td></tr>
+                    <tr><td><code>Accept</code></td><td><code>application/json</code></td><td>Most data-fetching requests</td></tr>
+                    <tr><td><code>Accept</code></td><td><code>application/sparql-query</code></td><td>Query text retrieval (<code>/service_history/queries/…</code>)</td></tr>
+                    <tr><td><code>Accept</code></td><td><code>application/n-triples</code></td><td>Delete operation responses</td></tr>
+                    <tr><td><code>Cache-Control</code></td><td><code>no-cache</code></td><td>Requests where stale data must be avoided</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix C: Keyboard Shortcuts</h2>
+            <table>
+                <thead>
+                    <tr><th>Action</th><th>Key</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Submit the login form or a dialog form</td><td>Enter</td></tr>
+                    <tr><td>Close a dialog without taking action</td><td>Escape</td></tr>
+                    <tr><td>Activate the location bar for direct navigation</td><td>Click the location bar</td></tr>
+                    <tr><td>Commit a typed URL in the location bar</td><td>Enter</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Appendix D: Terminology</h2>
+            <table>
+                <thead>
+                    <tr><th>Term</th><th>Definition</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Account</strong></td><td>A principal entity capable of authentication; the identity under which repositories and views are organized.</td></tr>
+                    <tr><td><strong>Administrator</strong></td><td>An account whose <code>administrator_of</code> configuration property includes <code>http://dydra.com</code>. Administrators have write access to all console operations.</td></tr>
+                    <tr><td><strong>Operator</strong></td><td>An authenticated account that does not hold administrator designation. Operators have read-only access.</td></tr>
+                    <tr><td><strong>Repository</strong></td><td>A named, persistent container for RDF quads, owned by an account.</td></tr>
+                    <tr><td><strong>Invitation</strong></td><td>A record pairing an email address with a unique invite code, authorizing account creation by the recipient.</td></tr>
+                    <tr><td><strong>Invite Code</strong></td><td>The opaque string embedded in an invitation URL. Validated by the system when a new user completes registration.</td></tr>
+                    <tr><td><strong>Service History</strong></td><td>The system's persistent log of query executions, data transactions, and data imports.</td></tr>
+                    <tr><td><strong>Query Signature</strong></td><td>A content-based hash identifying a unique SPARQL query text. Queries with identical text share a signature regardless of when or by whom they were executed.</td></tr>
+                    <tr><td><strong>Transaction</strong></td><td>A discrete data operation that inserted or removed quads from a repository, recorded with a UUID timestamp.</td></tr>
+                    <tr><td><strong>Import</strong></td><td>An operation that ingested an external data source into a repository, recorded with a UUID, source URI, and quad count.</td></tr>
+                    <tr><td><strong>Location Bar</strong></td><td>The editable URL field at the bottom of every page. Displays the current route; accepts typed paths for direct navigation; also serves as a transient status message display.</td></tr>
+                    <tr><td><strong>Pane / Tab</strong></td><td>One of the six named panels within the admin dashboard. Only one is visible at a time; switching is controlled by the tab bar.</td></tr>
+                    <tr><td><strong>Lazy Loading</strong></td><td>The pattern by which tab content is fetched from the server only on first activation, not at page load. Reduces unnecessary network traffic.</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Manual Cross-Reference</h2>
+            <ul>
+                <li><a href="index.html">Manual Home</a></li>
+                <li><a href="login.html">Chapter 1: Authentication</a></li>
+                <li><a href="dashboard.html">Chapter 2: The Admin Dashboard</a></li>
+                <li><a href="account-operations.html">Chapter 3: Account Operations</a></li>
+                <li><a href="repository-operations.html">Chapter 4: Repository Operations</a></li>
+                <li><a href="invitations.html">Chapter 5: Invitation Management</a></li>
+                <li><a href="system-monitoring.html">Chapter 6: System Monitoring</a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

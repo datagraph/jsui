@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Operations - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Account Operations</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="login.html">← Previous: Login</a>
+            <a href="repository-operations.html">Next: Repository Operations →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Overview</h2>
+            <p>This chapter tells you how to read your account information, edit your account metadata, and manage your authentication token.</p>
+
+            <h2>Read Your Account Information</h2>
+            <p>When you sign in, the application opens your account page. It shows:</p>
+            <ul>
+                <li>Account friendly ID (username)</li>
+                <li>Email address</li>
+                <li>Full name</li>
+                <li>Homepage URL</li>
+                <li>Blog URL</li>
+                <li>Company name</li>
+                <li>Location</li>
+                <li>List of repositories</li>
+            </ul>
+
+            <h2>Edit Your Account Metadata</h2>
+            <p>Edit the profile fields to keep your account information current.</p>
+
+            <h3>Fields You Can Edit</h3>
+            <p>Edit any of these:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Field</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>firstname</code></td>
+                        <td>Your first name</td>
+                    </tr>
+                    <tr>
+                        <td><code>familyname</code></td>
+                        <td>Your family/last name</td>
+                    </tr>
+                    <tr>
+                        <td><code>fullname</code></td>
+                        <td>Your full name</td>
+                    </tr>
+                    <tr>
+                        <td><code>email</code></td>
+                        <td>Your email address</td>
+                    </tr>
+                    <tr>
+                        <td><code>homepage</code></td>
+                        <td>URL to your personal homepage</td>
+                    </tr>
+                    <tr>
+                        <td><code>blog</code></td>
+                        <td>URL to your blog</td>
+                    </tr>
+                    <tr>
+                        <td><code>company</code></td>
+                        <td>Your company name</td>
+                    </tr>
+                    <tr>
+                        <td><code>location</code></td>
+                        <td>Your location</td>
+                    </tr>
+                    <tr>
+                        <td><code>phone</code></td>
+                        <td>Your phone number</td>
+                    </tr>
+                    <tr>
+                        <td><code>skype_id</code></td>
+                        <td>Your Skype ID</td>
+                    </tr>
+                    <tr>
+                        <td><code>jabber_id</code></td>
+                        <td>Your Jabber/XMPP ID</td>
+                    </tr>
+                    <tr>
+                        <td><code>workinfo</code></td>
+                        <td>Work-related information</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>How to Edit a Field</h3>
+
+            <div class="step">
+                <span class="step-number">Step 1:</span>
+                Open your account page: click your account name in the navigation, or go to the account directly.
+            </div>
+
+            <div class="float-right">
+            <img src="images/account-metadata-editing.png" alt="Account metadata field in edit mode">
+            <p class="image-caption">Figure 1: Account metadata field in edit mode with new value entered</p>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 2:</span>
+                Find the field you want to edit in the account information section.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 3:</span>
+                Double-click the field value. The field turns into an input box.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 4:</span>
+                Type the new value, or change what is there.
+            </div>
+
+            <div class="clear"></div>
+
+            <div class="step">
+                <span class="step-number">Step 5:</span>
+                Press <kbd>Enter</kbd>, or click outside the field. The field goes back to displaying its value, now the one you typed.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Step 6:</span>
+                Click <strong>Save</strong>, in the tab bar, to write your changes to the server.
+            </div>
+
+            <div class="float-left">
+            <img src="images/account-save-button.png" alt="Account page with Save button highlighted">
+            <p class="image-caption">Figure 2: Account page showing the Save button in the tab bar</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="note">
+                <strong>Note:</strong> the application tracks only the fields you touched. Save sends those fields, not the whole account configuration.
+            </div>
+
+            <div class="warning">
+                <strong>Important:</strong> nothing reaches the server until you click Save. Leave the page without saving and you lose your changes.
+            </div>
+
+            <h2>Find Your Authentication Token</h2>
+            <p>Your account page shows your authentication token. Use it to reach the Dydra API from a program.</p>
+
+            <h3>Read the Token</h3>
+            <ol>
+                <li>Open your account page</li>
+                <li>Find the "Token" section, in the sidebar or the account information area</li>
+                <li>Read your current token there</li>
+            </ol>
+
+            <h3>Reset the Token</h3>
+            <p>To replace your token with a new one:</p>
+            <ol>
+                <li>Open your account page</li>
+                <li>Find the token section</li>
+                <li>Click <strong>Reset Token</strong>, where the button appears</li>
+                <li>The service issues a new token and shows it</li>
+                <li>Update every application or script that used the old one</li>
+            </ol>
+
+            <div class="float-right">
+            <img src="images/account-token-reset.png" alt="Account page showing token section with Reset Token button">
+            <p class="image-caption">Figure 3: Account page showing token section with Reset Token button</p>
+            </div>
+            <div class="clear"></div>
+
+            <div class="warning">
+                <strong>Security Warning:</strong> guard your token. Whoever holds it holds your account. Reset it at once if you suspect anyone else has seen it.
+            </div>
+
+            <h2>Move Around From the Account Page</h2>
+            <p>From your account page you can:</p>
+            <ul>
+                <li>See all your repositories</li>
+                <li>Create a repository</li>
+                <li>Open any one of them</li>
+                <li>Reach the repository management controls</li>
+            </ul>
+
+            <h2>Work With Several Accounts</h2>
+            <p>Hold several accounts open at once, and:</p>
+            <ul>
+                <li>Switch between them</li>
+                <li>Work with repositories drawn from more than one</li>
+                <li>Keep accounts that carry different permissions</li>
+            </ul>
+
+            <div class="note">
+                <strong>Note:</strong> each account holds its own session and its own credentials. Keep as many account tabs open as you like.
+            </div>
+
+            <h2>When Something Goes Wrong</h2>
+            <h3>A Change Does Not Stick</h3>
+            <p>If an edit to your account metadata does not survive:</p>
+            <ul>
+                <li>Check that you clicked <strong>Save</strong> after making it</li>
+                <li>Look for an error message — it names the problem</li>
+                <li>Check that you may edit the account</li>
+                <li>Check that your network reaches the service</li>
+            </ul>
+
+            <h3>The Token Does Not Appear</h3>
+            <p>If you cannot see your token:</p>
+            <ul>
+                <li>Check that you signed in to the right account</li>
+                <li>Check that you may read tokens</li>
+                <li>Reload the page</li>
+            </ul>
+
+            <h2>Next Steps</h2>
+            <p>With your account in order, you can:</p>
+            <ul>
+                <li>Create and manage <a href="repository-operations.html">repositories</a></li>
+                <li>Import and export data</li>
+                <li>Create and execute <a href="view-operations.html">SPARQL views</a></li>
+                <li>Read <a href="tips-and-best-practices.html">Tips and Best Practices</a> to move faster and diagnose trouble</li>
+                <li>Turn to the <a href="appendices.html">Appendices</a> for file formats and keyboard shortcuts</li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

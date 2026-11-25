@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 6: System Monitoring - Dydra Admin Console Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chapter 6: System Monitoring</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="invitations.html">← Previous: Chapter 5</a>
+            <a href="appendices.html">Next: Appendices →</a>
+        </nav>
+
+        <div class="content">
+            <h2>6.1 Overview</h2>
+            <p>The administrative dashboard provides three history tabs covering distinct categories of system activity: query execution, data transactions, and data imports. Together these tabs constitute the system monitoring capability of the console. Access to all three tabs is available to both administrators and operators; no write operations are performed from these tabs.</p>
+
+            <table>
+                <thead>
+                    <tr><th>Tab</th><th>Scope</th><th>Data Source</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Query History</strong></td>
+                        <td>SPARQL query executions for selected repositories</td>
+                        <td><code>GET /system/accounts/{account}/repositories/{repo}/service_history</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transaction History</strong></td>
+                        <td>All data transactions, system-wide</td>
+                        <td><code>GET /system/service_history/transactions</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Import History</strong></td>
+                        <td>All import operations, system-wide, paginated</td>
+                        <td><code>GET /system/service_history/imports?offset={o}&amp;limit={l}</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>6.2 Query History</h2>
+
+            <h3>6.2.1 Prerequisites and Navigation</h3>
+            <p>The Query History tab is filtered by repository selection. To populate it:</p>
+            <ol>
+                <li>Select one or more accounts in the <strong>Accounts</strong> tab.</li>
+                <li>Navigate to the <strong>Repositories</strong> tab and check the repositories of interest.</li>
+                <li>Navigate to the <strong>Query History</strong> tab. Data is fetched automatically for the checked repositories.</li>
+            </ol>
+            <p>If no repositories are checked, the tab displays an empty state. Changes to the repository selection trigger an automatic refresh of this tab.</p>
+
+            <h3>6.2.2 Table View</h3>
+            <p>The default view of the Query History tab is a sortable table.</p>
+
+            <div class="float-left">
+                <img src="images/admin-query-history-table.png" alt="Query history table">
+                <p class="image-caption">Figure 6.1: The Query History tab in table view.</p>
+            </div>
+            <div class="clear"></div>
+
+            <table>
+                <thead>
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Timestamp</td><td>Date/time</td><td>The time at which the query execution was recorded.</td></tr>
+                    <tr><td>Elapsed Time</td><td>Numeric</td><td>Wall-clock time from query receipt to response delivery.</td></tr>
+                    <tr><td>Run Time</td><td>Numeric (ms, displayed as seconds)</td><td>CPU time consumed by the query execution engine.</td></tr>
+                    <tr><td>Account</td><td>String</td><td>The account under which the query was executed.</td></tr>
+                    <tr><td>Repository</td><td>String</td><td>The repository against which the query was executed.</td></tr>
+                    <tr><td>Signature</td><td>Hash (clickable)</td><td>A content-based identifier for the query text. Click to retrieve and display the full query. See Section 6.2.4.</td></tr>
+                </tbody>
+            </table>
+
+            <p>Columns are sortable. Click a column header to sort ascending; click again to sort descending. A ▲ or ▼ indicator marks the active sort column and direction. The default sort order is Timestamp descending (most recent first).</p>
+
+            <h3>6.2.3 Graph View</h3>
+            <p>The <strong>Graph</strong> sub-tab renders query history as an SVG line graph.</p>
+
+            <div class="float-right">
+                <img src="images/admin-query-history-graph.png" alt="Query history graph">
+                <p class="image-caption">Figure 6.2: The Query History tab in graph view, plotting run time over time.</p>
+            </div>
+            <div class="clear"></div>
+
+            <table>
+                <thead>
+                    <tr><th>Axis</th><th>Variable</th><th>Scale</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>X</td><td>Timestamp</td><td>Linear time; grid interval adapts to the data range (minutes, hours, days, months)</td></tr>
+                    <tr><td>Y</td><td>Run time (seconds)</td><td>Linear; maximum rounded to the nearest power-of-10 multiple</td></tr>
+                </tbody>
+            </table>
+
+            <p>Each data point is rendered as a clickable circle. Clicking a point opens the query detail dialog for that execution. See Section 6.2.4.</p>
+
+            <h3>6.2.4 Query Detail Dialog</h3>
+            <p>Clicking a signature value in the table, or a data point in the graph, opens the query detail dialog.</p>
+
+            <div class="float-left">
+                <img src="images/admin-query-detail-dialog.png" alt="Query detail dialog">
+                <p class="image-caption">Figure 6.3: The query detail dialog displaying the full SPARQL text.</p>
+            </div>
+            <div class="clear"></div>
+
+            <p>The dialog presents:</p>
+            <ul>
+                <li>Query signature</li>
+                <li>Timestamp</li>
+                <li>Account and repository</li>
+                <li>Full SPARQL query text, fetched on demand from <code>GET {host}/system/service_history/queries/{account}/{signature}</code> with <code>Accept: application/sparql-query</code></li>
+            </ul>
+            <p>Close the dialog by clicking outside it or pressing Escape.</p>
+
+            <h3>6.2.5 Controls</h3>
+            <table>
+                <thead>
+                    <tr><th>Control</th><th>Function</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Refresh</strong></td><td>Re-fetches query history for the currently selected repositories. Invalidates the tab's cached data.</td></tr>
+                    <tr><td><strong>Table</strong> / <strong>Graph</strong></td><td>Switches between the tabular and graphical presentations of the same dataset.</td></tr>
+                </tbody>
+            </table>
+
+            <h2>6.3 Transaction History</h2>
+
+            <h3>6.3.1 Overview</h3>
+            <p>The <strong>Transaction History</strong> tab presents a system-wide log of data transactions — operations that inserted or removed RDF quads from any repository. This tab requires no upstream selection; it fetches from a single global endpoint and displays results for all accounts and repositories.</p>
+
+            <div class="float-right">
+                <img src="images/admin-transaction-history.png" alt="Transaction history table">
+                <p class="image-caption">Figure 6.4: The Transaction History tab.</p>
+            </div>
+            <div class="clear"></div>
+
+            <h3>6.3.2 Table Structure</h3>
+            <table>
+                <thead>
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Timestamp</td><td>Date/time</td><td>When the transaction was recorded.</td></tr>
+                    <tr><td>UUID</td><td>Monospace string</td><td>The unique transaction identifier.</td></tr>
+                    <tr><td>Account</td><td>String</td><td>The account under which the transaction occurred.</td></tr>
+                    <tr><td>Repository</td><td>String</td><td>The repository on which the transaction operated.</td></tr>
+                    <tr><td>Insert Count</td><td>Numeric</td><td>Number of quads inserted by this transaction.</td></tr>
+                    <tr><td>Remove Count</td><td>Numeric</td><td>Number of quads removed by this transaction.</td></tr>
+                    <tr><td>Agent Key</td><td>String</td><td>Identifier of the authenticated agent that initiated the transaction.</td></tr>
+                    <tr><td>Agent Tag</td><td>String</td><td>Descriptive tag associated with the agent.</td></tr>
+                </tbody>
+            </table>
+
+            <p>All columns are sortable by clicking the column header. Numeric columns (Insert Count, Remove Count) sort numerically. The default sort is Timestamp descending.</p>
+
+            <h3>6.3.3 Controls</h3>
+            <table>
+                <thead>
+                    <tr><th>Control</th><th>Function</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Refresh</strong></td><td>Re-fetches all transaction history from <code>/system/service_history/transactions</code>.</td></tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <strong>Data volume:</strong> The transaction history endpoint returns all recorded transactions. On active systems this may represent a large dataset. The Refresh button should be used deliberately rather than repeatedly.
+            </div>
+
+            <h2>6.4 Import History</h2>
+
+            <h3>6.4.1 Overview</h3>
+            <p>The <strong>Import History</strong> tab presents a paginated log of data import operations. Like Transaction History, it covers all accounts and repositories system-wide. Pagination controls allow navigation through large datasets without fetching the entire history at once.</p>
+
+            <h3>6.4.2 Table Structure</h3>
+            <div class="float-left">
+                <img src="images/admin-import-history-table.png" alt="Import history table">
+                <p class="image-caption">Figure 6.5: The Import History tab in table view.</p>
+            </div>
+            <div class="clear"></div>
+
+            <table>
+                <thead>
+                    <tr><th>Column</th><th>Type</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>Timestamp</td><td>Date/time</td><td>When the import operation was recorded.</td></tr>
+                    <tr><td>UUID</td><td>Monospace string</td><td>The unique import operation identifier.</td></tr>
+                    <tr><td>Account Key</td><td>String</td><td>The account under which the import was performed.</td></tr>
+                    <tr><td>Repository Key</td><td>String</td><td>The repository into which data was imported.</td></tr>
+                    <tr><td>Agent Key</td><td>String</td><td>Identifier of the agent that performed the import.</td></tr>
+                    <tr><td>Source URI</td><td>URI (truncated with ellipsis if long)</td><td>The location from which the data was sourced.</td></tr>
+                    <tr><td>Quad Count</td><td>Numeric</td><td>Number of RDF quads successfully imported.</td></tr>
+                    <tr><td>Success</td><td>Yes / No</td><td>Whether the import operation completed without error.</td></tr>
+                </tbody>
+            </table>
+
+            <p>All columns are sortable. The Quad Count column sorts numerically. The default sort is Timestamp descending.</p>
+
+            <h3>6.4.3 Pagination</h3>
+            <p>Import history is retrieved with explicit offset and limit parameters: <code>GET {host}/system/service_history/imports?offset={offset}&amp;limit={limit}</code>. The pagination controls allow navigation through the complete dataset.</p>
+
+            <table>
+                <thead>
+                    <tr><th>Control</th><th>Function</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Offset</strong> input</td><td>Sets the zero-based index of the first entry to retrieve. Changing this value triggers an automatic fetch.</td></tr>
+                    <tr><td><strong>Limit</strong> input</td><td>Sets the number of entries per page. Accepted range: 1–1000. Changing this value triggers an automatic fetch.</td></tr>
+                    <tr><td><strong>Previous</strong></td><td>Decrements the offset by the current limit value (minimum: 0). Triggers a fetch.</td></tr>
+                    <tr><td><strong>Next</strong></td><td>Increments the offset by the current limit value. Triggers a fetch.</td></tr>
+                    <tr><td><strong>Refresh</strong></td><td>Re-fetches the current page with the current offset and limit.</td></tr>
+                </tbody>
+            </table>
+
+            <p>The entry count display reads "Showing <em>N</em> entries" and reflects the count of entries in the current page, not the total in the system.</p>
+
+            <h3>6.4.4 Graph View</h3>
+            <p>The <strong>Graph</strong> sub-tab renders import history as an SVG line graph.</p>
+
+            <div class="float-right">
+                <img src="images/admin-import-history-graph.png" alt="Import history graph">
+                <p class="image-caption">Figure 6.6: The Import History tab in graph view, plotting quad count over time.</p>
+            </div>
+            <div class="clear"></div>
+
+            <table>
+                <thead>
+                    <tr><th>Axis</th><th>Variable</th><th>Scale</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>X</td><td>Timestamp</td><td>Linear time; grid interval adapts to the data range</td></tr>
+                    <tr><td>Y</td><td>Quad count</td><td>Logarithmic; accommodates the wide dynamic range typical of import operations</td></tr>
+                </tbody>
+            </table>
+
+            <div class="note">
+                <strong>Logarithmic scale:</strong> Import operations vary widely in quad count, from single-digit test imports to multi-million-quad bulk loads. A logarithmic Y-axis renders both small and large operations legibly on the same graph.
+            </div>
+
+            <h2>6.5 Sorting Behaviour (All History Tabs)</h2>
+            <p>The following rules apply uniformly across the three history tables:</p>
+            <ul>
+                <li>Click a column header to sort ascending by that column. A ▲ indicator appears.</li>
+                <li>Click the same header again to reverse the sort to descending. The indicator changes to ▼.</li>
+                <li>Sorting is performed client-side on the currently loaded dataset; it does not trigger a new server request.</li>
+                <li>Columns containing numeric data (counts, run times) sort numerically. All other columns sort lexicographically.</li>
+                <li>Sort state is not preserved across Refresh operations; the table reverts to its default sort after a refresh.</li>
+            </ul>
+
+            <h2>6.6 Proceeding</h2>
+            <ul>
+                <li>API endpoints, keyboard shortcuts, and terminology — <a href="appendices.html">Appendices</a></li>
+                <li>Return to <a href="index.html">Manual Home</a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

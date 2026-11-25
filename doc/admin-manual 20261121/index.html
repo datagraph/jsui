@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dydra Admin Console Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Dydra Admin Console Manual</h1>
+            <p>A Systematic Reference for System Administrators</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <ul>
+                <li>
+                    <a href="login.html">
+                        <h2>Chapter 1: Authentication</h2>
+                        <p>Credentials, privilege verification, and session establishment.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="dashboard.html">
+                        <h2>Chapter 2: The Admin Dashboard</h2>
+                        <p>The tabbed interface, navigation model, and the location bar.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="account-operations.html">
+                        <h2>Chapter 3: Account Operations</h2>
+                        <p>Enumerating, inspecting, creating, and removing accounts.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="repository-operations.html">
+                        <h2>Chapter 4: Repository Operations</h2>
+                        <p>Browsing, creating, and removing repositories across accounts.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="invitations.html">
+                        <h2>Chapter 5: Invitation Management</h2>
+                        <p>Issuing, resending, and retracting access invitations.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="system-monitoring.html">
+                        <h2>Chapter 6: System Monitoring</h2>
+                        <p>Query history, transaction history, and import history.</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="appendices.html">
+                        <h2>Appendices</h2>
+                        <p>API endpoints, keyboard shortcuts, and terminology.</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <h2>Preface</h2>
+            <p>This manual describes the Dydra administrative console: a browser-based single-page application that provides privileged access to system-level operations not available through the ordinary user interface. It is intended for personnel who hold administrative credentials on a Dydra installation and who require precise, authoritative documentation of the console's capabilities and operational model.</p>
+
+            <p>The administrative console is accessible at <code>https://dydra.com/ui/admin</code>. It is distinct from the user application (<code>https://dydra.com/ui/user</code>) in both purpose and privilege level. Where the user application permits an authenticated account to manage its own repositories and views, the administrative console permits qualified operators to inspect and modify the system as a whole: every account, every repository, and the complete service history.</p>
+
+            <h3>Scope of This Document</h3>
+            <p>This manual covers the following functional areas:</p>
+            <ul>
+                <li>Administrative login and privilege verification — <a href="login.html">Chapter 1</a></li>
+                <li>The dashboard interface and its navigation model — <a href="dashboard.html">Chapter 2</a></li>
+                <li>Account enumeration, inspection, creation, and deletion — <a href="account-operations.html">Chapter 3</a></li>
+                <li>Repository enumeration, creation, and deletion — <a href="repository-operations.html">Chapter 4</a></li>
+                <li>Invitation issuance and management — <a href="invitations.html">Chapter 5</a></li>
+                <li>Query history, transaction history, and import history — <a href="system-monitoring.html">Chapter 6</a></li>
+            </ul>
+
+            <h3>Privilege Levels</h3>
+            <p>The console distinguishes two classes of authenticated user:</p>
+            <table>
+                <thead>
+                    <tr><th>Class</th><th>Condition</th><th>Capabilities</th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Administrator</strong></td>
+                        <td>Account's <code>administrator_of</code> property includes <code>http://dydra.com</code></td>
+                        <td>Full read/write access: create and delete accounts, repositories, and invitations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Operator</strong></td>
+                        <td>Any authenticated account without administrator designation</td>
+                        <td>Read-only access: inspect accounts, repositories, and all history tabs</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Throughout this manual, operations marked <strong>(Admin only)</strong> are unavailable to operators. All other operations are available to both classes.</p>
+
+            <h3>Notation Conventions</h3>
+            <p>Steps in procedural sequences are numbered. Interface element names appear in <strong>bold</strong>. Literal strings, URLs, and code appear in <code>monospace</code>. Notes and warnings appear in shaded boxes.</p>
+
+            <h3>Navigating Between Chapters</h3>
+            <p>Each chapter page carries a navigation bar immediately below the chapter header. This bar provides a link back to this index and links to the preceding and following chapters. The location bar at the bottom of every page accepts direct URL entry and may be used for rapid navigation to any route within the admin application.</p>
+
+            <p><em>Proceed to Chapter 1 to begin.</em></p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Dydra. All rights reserved.</p>
+            <p>Admin Manual Version: 2026-02-27 (Knuth Edition)</p>
+        </div>
+    </footer>
+    <script src="manual.js"></script>
+</body>
+</html>

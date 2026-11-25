@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="date" content="2026-11-21">
+    <title>Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Dydra Studio User Manual</h1>
+            <p>Everything you can do in Dydra Studio</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <ul>
+                <li>
+                    <a href="login.html">
+                          <h2>Login</h2>
+                          <p>Sign in, hold a session, and sign out</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="account-operations.html">
+                        <h2>Account Operations</h2>
+                        <p>Read and edit your account metadata and settings</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="repository-operations.html">
+                        <h2>Repository Operations</h2>
+                        <p>Create repositories, import and export data, and manage collaborators</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="view-operations.html">
+                        <h2>View Operations</h2>
+                        <p>Create, edit, execute, and manage SPARQL views</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="asking-a-model.html">
+                        <h2>Ask a Model About Your Data</h2>
+                        <p>What <strong>Ask</strong>, <strong>Compose</strong> and <strong>Past runs</strong> each do; connect a model to your account; the two exploration panes; what a run may do, and what it leaves behind</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="composing-a-page.html">
+                        <h2>Compose a Page</h2>
+                        <p>Build a whole page from several queries: the grant the interface takes before it sends anything, the four stages, the three kinds of region, where a provenance mark comes from, and how to revise and refresh a page</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="../arrangement-manual/index.html">
+                        <h2>Arrangement</h2>
+                        <p>Change the interface itself by asking for it: the location bar, the operations, the components, the four verbs that need no model, and the catalog they can name</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="../analysis-demonstration/index.html">
+                        <h2>An analysis across repositories</h2>
+                        <p>A worked example: one line names two repositories; the run explores each store through its own interface, captures the screen at every step, and reports what it found</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="multi-repository-analysis.html">
+                        <h2>Ask Across Several Repositories</h2>
+                        <p>One question reaches several repositories at once, from the exploration pane behind the triple in the left margin or from the location bar: how to choose or name the stores, what the disclosure tells you before anything runs, and what the interface does and does not hand the model</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="../analysis-live/index.html">
+                        <h2>The same analysis, with a real model</h2>
+                        <p>The same question again, against the live service, with the model choosing every call: four runs side by side, the candidate table the earlier defects had made impossible, the report the model wrote after the round budget ran out, and what each run could not establish</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="tips-and-best-practices.html">
+                        <h2>Tips and Best Practices</h2>
+                        <p>Move quickly, diagnose trouble, and work well</p>
+                    </a>
+                </li>
+                <li>
+                    <a href="appendices.html">
+                        <h2>Appendices</h2>
+                        <p>File formats, keyboard shortcuts, and glossary</p>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <h2>Welcome to the Dydra Studio User Manual</h2>
+            <p>This manual tells you how to manage your RDF data repositories, execute SPARQL queries, and administer your account on the Dydra platform.</p>
+
+            <h3>What is Dydra Studio?</h3>
+            <p>Dydra Studio is a single-page web application. From it you can:</p>
+            <ul>
+                <li>Manage RDF data repositories</li>
+                <li>Execute SPARQL queries</li>
+                <li>Import and export data</li>
+                <li>Create and manage SPARQL views (saved queries)</li>
+                <li>Edit account and repository metadata</li>
+                <li>Collaborate with other users</li>
+                <li>Ask a language model about your data, and compose whole pages from several queries</li>
+                <li>Arrange the interface itself, and share those arrangements</li>
+            </ul>
+
+            <h2>Start Here</h2>
+
+            <h3>Open the Application</h3>
+            <p>Dydra Studio runs in your web browser. Go to the login page at:</p>
+            <div class="note">
+                <strong>URL:</strong> <code>https://dydra.com/ui/user</code>
+            </div>
+            <p>The application shows the login page when you first open it, and whenever you are not signed in.</p>
+
+            <h3>Browser Requirements</h3>
+            <p>The application needs a modern web browser with:</p>
+            <ul>
+                <li>JavaScript enabled</li>
+                <li>ES6+ JavaScript support</li>
+                <li>History API support (or hash-based routing fallback)</li>
+            </ul>
+            <p>Chrome, Firefox, Safari, and Edge all qualify, in their current versions.</p>
+
+            <h3>The Two Interfaces</h3>
+            <p>Dydra Studio offers two interfaces:</p>
+            <ul>
+                <li><strong>User App</strong>: manage your account, work with repositories, run SPARQL queries, and import or export data</li>
+                <li><strong>Console</strong>: administer the system as a whole. Its own manual covers it.</li>
+            </ul>
+            <p>This manual covers the <strong>User App</strong>.</p>
+
+            <h3>Quick Start</h3>
+            <p>To begin:</p>
+            <ol>
+                <li>Go to <strong>https://dydra.com/ui/user</strong> in your web browser</li>
+                <li>Follow the <a href="login.html">Login</a> instructions and sign in</li>
+                <li>Once signed in, reach every feature through the navigation interface</li>
+            </ol>
+
+            <h3>What This Manual Covers</h3>
+            <p>The manual has these sections:</p>
+            <ul>
+                <li><strong><a href="login.html">Login</a></strong> — sign in, hold a session, and sign out</li>
+                <li><strong><a href="account-operations.html">Account Operations</a></strong> — read and edit your account metadata and settings</li>
+                <li><strong><a href="repository-operations.html">Repository Operations</a></strong> — create repositories, import and export data, manage collaborators, and delete a repository</li>
+                <li><strong><a href="view-operations.html">View Operations</a></strong> — create, edit, execute, and manage SPARQL views</li>
+                <li><strong><a href="asking-a-model.html">Ask a Model About Your Data</a></strong> — what the three controls each do, how to connect a model, and what a run authorises</li>
+                <li><strong><a href="composing-a-page.html">Compose a Page</a></strong> — build a whole page from several queries, and read the marks it carries</li>
+                <li><strong><a href="../arrangement-manual/index.html">Arrangement</a></strong> — change the interface itself by asking for it</li>
+                <li><strong><a href="tips-and-best-practices.html">Tips and Best Practices</a></strong> — move quickly, diagnose trouble, and work well</li>
+                <li><strong><a href="appendices.html">Appendices</a></strong> — file formats, keyboard shortcuts, and glossary</li>
+            </ul>
+
+            <h3>Support</h3>
+            <p>If anything goes wrong, or you have a question, write to <strong>support@dydra.com</strong>.</p>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 Dydra. All rights reserved.</p>
+            <p>Manual Version: 2026-02-07</p>
+        </div>
+    </footer>
+    <script src="manual.js"></script>
+</body>
+</html>

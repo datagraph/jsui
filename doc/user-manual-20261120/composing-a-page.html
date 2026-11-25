@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="date" content="2026-11-21">
+    <title>Compose a Page - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Compose a Page</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="asking-a-model.html">← Previous: Ask a Model About Your Data</a>
+            <a href="multi-repository-analysis.html">Next: Ask Across Several Repositories →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Overview</h2>
+            <p><strong>Compose</strong> is not a longer <strong>Ask</strong>. It takes a different shape of consent, for a practical reason: a page is a set of queries you authorise <em>together</em>, and no useful moment arrives at which to confirm the eighth of twelve. So you grant the authority once, up front, against a stated budget, and watch a meter spend it.</p>
+            <p>Press <strong>Compose</strong> in either exploration pane. It opens its own pane beside the one you were in, seeded with whatever you had typed — the prompt is usually most of the way there already.</p>
+
+            <h2>The Four Stages</h2>
+
+            <h3>Gate 0 — the grant</h3>
+            <p>Before the interface sends anything, you set — and see — what the run may do: which repositories it may read, how many calls, how many rows, how many bytes, and whether it may write. The meter beside the grant counts the spending as it happens, and you may revoke the grant while the run goes.</p>
+
+            <h3>Phase 1 — the exchange</h3>
+            <p>The model explores, through the same MCP endpoints an <strong>Ask</strong> uses, and proposes a page. The transcript shows every exchange — what went out, what came back, each call's arguments and payload. The run log beside it keeps the terse record you read the grant, the meter and the budget verdict against.</p>
+            <p>A turn in flight counts its own seconds and says what it waits on. The turn that writes the whole page is one request with no events inside it, so this is the stretch in which another surface would look as though it had stopped.</p>
+
+            <h3>Gate 1 — the proposal</h3>
+            <p>You review the whole page as one unit: every panel's query, every transform's source, every passage the model wrote. The gate lists the errors and the warnings. If you asked for a chart and the page draws none, it says so here — as a notice, never a refusal, since some results genuinely cannot carry a chart.</p>
+
+            <h3>Phase 2 — the interface's own runs</h3>
+            <p>You approve, and <strong>the interface</strong> runs the panels under your credentials. The page binds to what came back. It never shows you rows the model reported.</p>
+
+            <h3>Gate 2 — the disposition</h3>
+            <p>Keep it, save it, refresh it, or discard it.</p>
+
+            <h2>What a Page Holds</h2>
+            <p>Every region declares which of three kinds it is, and the page says so where you can see it:</p>
+            <ul>
+                <li><strong>bound</strong> — the interface ran that panel's query and filled the slot. Live: it refreshes.</li>
+                <li><strong>derived</strong> — a value the model computed, written as a function the page can re-run. Still live, because the function runs again when the data does.</li>
+                <li><strong>asserted</strong> — prose, judgement, a chart the model drew by hand. Nothing re-derives it, and the page marks it as the model's own work.</li>
+            </ul>
+
+            <h2>Where a Provenance Mark Comes From</h2>
+            <p>Each region carries a mark, and <strong>the interface writes it, not the model</strong>. The interface keeps its own ledger of everything it put in front of the model — the prompt, the documentation it read, and every result with its repository, its query, its shape and its digest — and adds to that ledger through the compose and every revision after it. A region the model wrote takes its attribution from that ledger: <em>written by the model from alice/sales, alice/costs</em>, listing the sources in the order the run read them. Hover the mark to see them.</p>
+            <p>The mark keeps three statements apart, because they mean different things: the run read data; the run read nothing from any store; and no record exists for this page. A page carries its ledger into a downloaded copy and into its record, so a page you reopen from the archive carries the same evidence a fresh one does.</p>
+            <p>Beside that, the page carries the <strong>EU AI Act Article 50</strong> line: which model produced it, when, and which repositories it read.</p>
+
+            <h2>Revise a Page</h2>
+            <p>The <strong>Revise</strong> box under the page is the location bar's instruction channel, with its target already set to the page it sits in — the same mechanism, so the same reply. Type what you want changed. Back comes a <em>patch</em>, not a new page: your scroll position, the tab you had open and your selection all survive, and the page numbers the revision and keeps it.</p>
+            <p>A change that needs new authority opens a gate. A presentational one does not.</p>
+
+            <h2>A Page Stays Live</h2>
+            <ul>
+                <li><strong>Refresh</strong> re-runs the panels under your credentials.</li>
+                <li>A control on the page may change a <strong>parameter</strong> — what a query asks <em>for</em> — and the page re-runs only the panels that depend on it, charging them against its own interaction budget. A page never rewrites its own query.</li>
+                <li>Where results have moved under a passage, the page <strong>marks it stale</strong> in place rather than quietly running it again.</li>
+            </ul>
+
+            <h2>Find a Page Again</h2>
+            <p>A page you keep goes into your account's <code>mcp</code> repository with its panels, its transforms, its passages, the digests each was made from, and the ledger of what the interface showed the model. Reopen it and the interface <em>runs</em> the queries again rather than replay a snapshot, so a page reopened after the data moved marks its own prose on the way up. Open an earlier revision and it forks: it takes a new identity starting at revision 1, because carrying on from revision 2 of a page that reached revision 4 is a different page from there on.</p>
+
+            <h2>What a Page Cannot Do</h2>
+            <p>The page runs in a sandbox with no origin and no network. It fetches nothing, reaches no credential of yours, reads no storage, and speaks to the rest of the interface only through the one channel the interface opens for it. That is what makes it safe to run a page a model wrote.</p>
+
+            <h2>Next Steps</h2>
+            <ul>
+                <li><a href="asking-a-model.html">Ask a Model About Your Data</a> — the three controls, and what each takes</li>
+                <li><a href="../arrangement-manual/index.html">Arrangement</a> — lift a region out of one page and apply it to another</li>
+                <li><a href="view-operations.html">View Operations</a> — the saved queries a panel is promoted into</li>
+            </ul>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>

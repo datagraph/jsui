@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="date" content="2026-11-17">
+    <title>Ask Across Several Repositories - Dydra Studio User Manual</title>
+    <link rel="stylesheet" href="manual.css">
+    <style>
+      /* The location bar is a wide, short strip: at the stylesheet's default
+         of 50% these figures are unreadable. */
+      .content .wide img { width: 100%; max-width: 100%; }
+      .content .panel img { width: auto; max-width: 100%; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Ask Across Several Repositories</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav>
+            <a href="index.html">← Back to Manual Home</a>
+            <a href="composing-a-page.html">← Previous: Compose a Page</a>
+            <a href="tips-and-best-practices.html">Next: Tips and Best Practices →</a>
+        </nav>
+
+        <div class="content">
+            <h2>Overview</h2>
+            <p>One question, several repositories, one answer. The interface tells you what
+            it would read before it reads anything, and one press authorises the run. A
+            model chooses every query; it holds no credential and has no way to write.</p>
+
+            <p>Two routes lead in, and they do the same thing:</p>
+
+            <ul>
+            <li><strong>The exploration pane</strong> — a tab at the foot of your account
+            page's left margin, marked with the triple. Choose the repositories from a
+            list, type the question, and read the answer in the pane. This is the one to
+            use when the answer is long, when you want the transcript beside it, or when
+            you want to draw from what came back.</li>
+            <li><strong>The location bar</strong> — type the question into the one control
+            on the screen before you have opened anything, naming the repositories in the
+            line itself. Quicker, and the answer folds out under the bar.</li>
+            </ul>
+
+            <p>Both run the same analysis under the same budget and record it in the same
+            place. This page covers the exploration pane first and the location bar after
+            it.</p>
+
+            <h2>Before You Start</h2>
+
+            <div class="step">
+                <span class="step-number">Sign in.</span>
+                The analysis runs under your credentials and reads only what your account
+                may read.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Set the connection.</span>
+                Open your account page, then the <strong>Connection</strong> tab in the
+                sidebar's icon strip (the gear, third from the bottom — History and the
+                triple sit below it). The top of the exploration pane carries the same
+                settings, and they really are the same: type into either and both hold
+                them. Choose a
+                <strong>Location</strong> — the provider — and a <strong>Model</strong>,
+                and paste your provider <strong>Key</strong>. A <strong>Workspace</strong>
+                is needed only for an organisation-scoped key.
+            </div>
+
+            <div class="panel">
+            <img src="multi-repository-analysis/04-the-connection-tab.png"
+                 alt="The Connection tab: Location, Model, Key and Workspace fields">
+            <div class="image-caption">One connection serves the whole account — the
+            location bar, the exploration panes, the prompt tab and the dashboards all draw
+            on it. The browser holds the key for the life of the page, sends it only to the
+            location named above it, and writes it to no repository; a reload asks for it
+            again.</div>
+            </div>
+
+            <div class="note">
+            <strong>Until you set a key</strong>, every surface that would ask a model
+            anything says so and names these settings. Without one, nothing asks anything.
+            </div>
+
+            <h2>The Exploration Pane</h2>
+
+            <p>The left margin of your account page is a strip of icons. The last one,
+            set apart below the rest, is the <strong>triple</strong> — three nodes and the
+            edges between them. Press it.</p>
+
+            <div class="panel">
+            <img src="multi-repository-analysis/10-the-margin.png"
+                 alt="The account page's left-margin icon strip, with the triple at its foot">
+            <div class="image-caption">The icons above it choose what the sidebar shows.
+            The triple does something else: it opens a pane in the column beside the
+            sidebar, and pressing it again closes it.</div>
+            </div>
+
+            <div class="wide">
+            <img src="multi-repository-analysis/11-the-exploration-pane.png"
+                 alt="The exploration pane: Model, Stores, a prompt, and what a press would authorise">
+            <div class="image-caption">Four things, in the order you need them: the
+            connection to the model, the stores to ask, the question, and — before you press
+            anything — what the press would authorise.</div>
+            </div>
+
+            <div class="step">
+                <span class="step-number">Choose the stores.</span>
+                Under <strong>Stores</strong>, tick the repositories the question is about.
+                The list carries each repository you have already opened an
+                <strong>Explore</strong> pane on, with the state of its handshake; the
+                <em>add a repository…</em> menu holds every other repository your account
+                may read — your own and the ones you collaborate on — and choosing one
+                connects it.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Ask.</span>
+                Type the question and press <strong>Ask</strong>. The chip beside the
+                button says what the press would reach — the store's name, or
+                <em>across 3 stores</em>, whose tooltip names them. The line beneath says
+                how many rounds of tool calls the run may take, how many calls in all, that
+                it reads and never writes, and where it will record the answer. Stop a run
+                that goes on too long: the call already out comes back, and the record
+                keeps it.
+            </div>
+
+            <div class="step">
+                <span class="step-number">Keep the report.</span>
+                The answer appears under the transcript with two controls beneath it.
+                <strong>Open as a page</strong> renders it as a web page in a window of its
+                own — headings, tables and queries set as a document rather than as one
+                block of text — which your browser can then save or print. <strong>Save</strong>
+                writes the same page straight to a file, named for the account and the
+                date. Either way the page names the model that wrote the answer, the
+                repositories it read and the links to the recorded transcripts, so a copy
+                you send to somebody else still says where it came from. A single
+                repository's exploration pane offers the same two controls under its own
+                buttons: there the page reports that one store, and the file name carries
+                the repository as well as the account.
+            </div>
+
+            <div class="note">
+            In the pane, do <em>not</em> name the repositories in the question — the tick
+            boxes say what the run reads. Naming them in the line is how the location bar
+            works, which is the next section.
+            </div>
+
+            <h2>Step 1 — Find the Location Bar</h2>
+
+            <p>The location bar is the last band of the chrome, and every page carries it.
+            On a long page it sits below the fold, so scroll to the bottom.</p>
+
+            <div class="wide">
+            <img src="multi-repository-analysis/03-the-location-bar.png"
+                 alt="The location bar showing the current path and nothing addressed">
+            <div class="image-caption">It shows the current path — here
+            <code>/account/james</code> — and, to start with, nothing else. It addresses
+            nothing yet.</div>
+            </div>
+
+            <h2>Step 2 — Address the Workspace</h2>
+
+            <p>The bar routes what you type to whatever it <em>addresses</em>. A path still
+            navigates, as it always did. Anything else is an instruction, and an instruction
+            needs a destination — so point the bar at the workspace first:</p>
+
+            <pre><code>goto workspace</code></pre>
+
+            <div class="wide">
+            <img src="multi-repository-analysis/06-addressed.png"
+                 alt="The bar now reads: addressing workspace (the arrangement)">
+            <div class="image-caption">The bar prints the address to the left of the reply
+            and keeps it until you change it. From here, a line that is not a path is an
+            instruction.</div>
+            </div>
+
+            <div class="warning">
+            Skip this and your question goes nowhere: the bar answers
+            <em>"nothing is addressed — <code>goto</code> something first, or click into
+            it"</em>. Most people miss this step, because the bar looks ready before it is.
+            </div>
+
+            <h2>Step 3 — Ask, Naming the Repositories</h2>
+
+            <p>Type the question. Name in it the repositories it is about — the workspace
+            itself knows none, and a question with nothing to read does not run.</p>
+
+            <pre><code>compare the concepts present in james/finto and james/fibo</code></pre>
+
+            <div class="wide">
+            <img src="multi-repository-analysis/07-the-question-typed.png"
+                 alt="The question typed into the location bar">
+            <div class="image-caption">A line that is not a path and that names two
+            repositories reads as a question about data, not as an instruction about the
+            interface.</div>
+            </div>
+
+            <p>Three ways name a repository, and one line may mix them:</p>
+
+            <table>
+                <tr><th>Written as</th><th>Example</th><th>Notes</th></tr>
+                <tr>
+                    <td>Qualified</td>
+                    <td><code>james/finto</code></td>
+                    <td>Anywhere in the line, as a whole word.</td>
+                </tr>
+                <tr>
+                    <td>A link or a path</td>
+                    <td><code>https://dydra.com/james/finto</code><br>
+                        <code>/account/james/repositories/finto</code></td>
+                    <td>Paste either — what the address bar shows is as good as a URL.</td>
+                </tr>
+                <tr>
+                    <td>A bare name after a cue</td>
+                    <td><code>across finto, fibo and bob/parts</code></td>
+                    <td>The cue words are <code>in, into, from, against, across, on, over,
+                        within, about, of</code>. A list stays open across a comma or
+                        <code>and</code>, and closes at anything else — so a cue cannot
+                        reach across a whole sentence.</td>
+                </tr>
+            </table>
+
+            <h2>Step 4 — Read What the Press Authorises, Then Press</h2>
+
+            <p>Press Enter and <strong>nothing runs</strong>. The bar answers with what it
+            would read, and offers one button: <strong>Ask</strong>. The detail above it
+            already names every repository the press would reach, line by line, so the
+            button itself stays plain.</p>
+
+            <div class="wide">
+            <img src="multi-repository-analysis/08-disclosed-before-it-runs.png"
+                 alt="The bar names the two repositories and offers an Ask button">
+            <div class="image-caption">"reads james/finto and james/fibo — 2 repositories —
+            under your credentials, nothing has run yet".</div>
+            </div>
+
+            <p>Press <strong>show</strong> for the rest of it. This is the grant, in the
+            terms the run itself holds:</p>
+
+            <div class="wide">
+            <img src="multi-repository-analysis/09-what-the-press-authorises.png"
+                 alt="The disclosure: repositories, rounds, calls, read-only, and where the answer is kept">
+            <div class="image-caption">Which repositories, how many rounds and how many
+            calls, that it reads and never writes, that it reads a large result as its
+            shape before its contents, that it records the answer in your <code>mcp</code>
+            repository, and that you may stop it while it runs.</div>
+            </div>
+
+            <p>The budget grows with the number of stores: six rounds plus ten for each
+            repository, to a ceiling of forty, and three calls per round. Two
+            repositories give 26 rounds and 78 calls; one gives 16 and 48.</p>
+
+            <h2>Step 5 — The Answer</h2>
+
+            <p>The answer appears under the bar. Read it there, or copy it. It ends with a
+            line the interface writes, not the model: the model <em>as served</em> — which
+            is not always the one you asked for — how many calls each repository took, the
+            date, and, where the exploration used up its rounds, that it stopped at the
+            limit. Below that sit the links to the record, one per repository, in
+            <code><em>your-account</em>/mcp</code>.</p>
+
+            <div class="note">
+            <strong>Worked examples.</strong> <code>doc/analysis-live/</code> keeps four
+            complete runs of this question — every turn, every call, and the report each
+            produced — including one where the round budget ran out and the model wrote the
+            report anyway.
+            </div>
+
+            <h2>If It Refuses</h2>
+
+            <table>
+                <tr><th>What it says</th><th>What to do</th></tr>
+                <tr>
+                    <td>nothing is addressed — <code>goto</code> something first, or click into it</td>
+                    <td>Step 2. Type <code>goto workspace</code>.</td>
+                </tr>
+                <tr>
+                    <td>It names your account's Connection settings</td>
+                    <td>No key is set. See <em>Before you start</em>.</td>
+                </tr>
+                <tr>
+                    <td>the workspace names no repository, so there is nothing to read</td>
+                    <td>Your line named none the bar could recognise. Name one as
+                        <code>account/repository</code>, or after a cue word.</td>
+                </tr>
+                <tr>
+                    <td>One sentence about each name it could not read</td>
+                    <td>You named a repository this account may not read. The bar refuses
+                        the <em>whole</em> line, not just that name — answering the readable
+                        half would answer a question you did not ask, about one store when
+                        you named two, and would not say so.</td>
+                </tr>
+                <tr>
+                    <td>sign in before rearranging the interface</td>
+                    <td>Your session has lapsed. Sign in again.</td>
+                </tr>
+            </table>
+
+            <h2>What the Interface Hands the Model, and What It Does Not</h2>
+
+            <ul>
+                <li>One tool per repository you named, and nothing else. The model cannot
+                reach a repository you did not name, whether or not you may read it.</li>
+                <li>The read-only operation set. Nothing it can call writes.</li>
+                <li>No credential. The interface carries every call under your token.</li>
+                <li>A budget, stated: it knows how many rounds it holds, and the prompt asks
+                it to leave itself one to write in.</li>
+            </ul>
+
+            <nav>
+                <a href="index.html">← Back to Manual Home</a>
+                <a href="tips-and-best-practices.html">Next: Tips and Best Practices →</a>
+            </nav>
+        </div>
+    </div>
+    <script src="manual.js"></script>
+</body>
+</html>
